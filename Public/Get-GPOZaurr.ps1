@@ -7,7 +7,6 @@
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [string[]] $GPOPath
     )
-
     if (-not $GPOPath) {
         if (-not $ExtendedForestInformation) {
             $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
@@ -16,9 +15,9 @@
         }
 
         foreach ($Domain in $ForestInformation.Domains) {
-            Get-GPO -All -Server $ForestInformation.QueryServers[$Domain] -Domain $Domain | ForEach-Object {
-               $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain] -Domain $Domain
-               Get-XMLGPO -XMLContent $XMLContent
+            Get-GPO -All -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain | ForEach-Object {
+                $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
+                Get-XMLGPO -XMLContent $XMLContent
             }
         }
     } else {
