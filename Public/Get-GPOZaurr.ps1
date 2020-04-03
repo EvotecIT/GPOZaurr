@@ -7,26 +7,30 @@
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [string[]] $GPOPath
     )
-    if (-not $GPOPath) {
-        if (-not $ExtendedForestInformation) {
-            $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+    Begin {
+        if (-not $GPOPath) {
+            $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        }
+    }
+    Process {
+        if (-not $GPOPath) {
+            foreach ($Domain in $ForestInformation.Domains) {
+                Get-GPO -All -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain | ForEach-Object {
+                    $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
+                    Get-XMLGPO -XMLContent $XMLContent
+                }
+            }
         } else {
-            $ForestInformation = $ExtendedForestInformation
+            foreach ($Path in $GPOPath) {
+                Get-ChildItem -LiteralPath $Path -Recurse -Filter *.xml | ForEach-Object {
+                    $XMLContent = [XML]::new()
+                    $XMLContent.Load($_.FullName)
+                    Get-XMLGPO -XMLContent $XMLContent
+                }
+            }
         }
+    }
+    End {
 
-        foreach ($Domain in $ForestInformation.Domains) {
-            Get-GPO -All -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain | ForEach-Object {
-                $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
-                Get-XMLGPO -XMLContent $XMLContent
-            }
-        }
-    } else {
-        foreach ($Path in $GPOPath) {
-            Get-ChildItem -LiteralPath $Path -Recurse -Filter *.xml | ForEach-Object {
-                $XMLContent = [XML]::new()
-                $XMLContent.Load($_.FullName)
-                Get-XMLGPO -XMLContent $XMLContent
-            }
-        }
     }
 }
