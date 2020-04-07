@@ -16,6 +16,7 @@
         if (-not $GPOPath) {
             foreach ($Domain in $ForestInformation.Domains) {
                 Get-GPO -All -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain | ForEach-Object {
+                    Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
                     $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
                     Get-XMLGPO -XMLContent $XMLContent
                 }

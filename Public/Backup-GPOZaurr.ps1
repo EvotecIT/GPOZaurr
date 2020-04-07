@@ -1,5 +1,5 @@
 ﻿function Backup-GPOZaurr {
-    [cmdletBinding()]
+    [cmdletBinding(SupportsShouldProcess)]
     param(
         [int] $LimitProcessing,
         [validateset('All', 'Empty', 'Unlinked', 'EmptyAndUnlinked')][string] $Type = 'All',
@@ -8,74 +8,85 @@
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [string[]] $GPOPath,
-        [string] $BackupPath
+        [string] $BackupPath,
+        [switch] $BackupDated
     )
-    # Logging Paths
-    $DateDirectory = "$BackupPath\$((Get-Date).ToString('yyyy-MM-dd_HH_mm_ss'))"
-    Write-Verbose "Backup-GPOZaurr - Backing up to $DateDirectory"
+    Begin {
+        if ($BackupDated) {
+            $BackupFinalPath = "$BackupPath\$((Get-Date).ToString('yyyy-MM-dd_HH_mm_ss'))"
+        } else {
+            $BackupFinalPath = $BackupPath
+        }
+        Write-Verbose "Backup-GPOZaurr - Backing up to $BackupFinalPath"
+        $null = New-Item -ItemType Directory -Path $BackupFinalPath -Force
+        $Count = 0
+    }
+    Process {
+        Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOPath $GPOPath | ForEach-Object {
+            #$ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+            #$GPOSummary = foreach ($GPO in $GPOs) {
+            #$QueryServer = $ForestInformation['QueryServers'][$_.Domain]['HostName'][0]
+            if ($Type -eq 'All') {
+                Write-Verbose "Backup-GPOZaurr - Backing up GPO $($_.Name) from $($_.Domain)"
+                $Count++
+                try {
+                    $BackupInfo = Backup-GPO -Guid $_.GUID -Domain $_.Domain -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
+                    $BackupInfo
+                } catch {
+                    Write-Warning "Backup-GPOZaurr - Backing up GPO $($_.Name) from $($_.Domain) failed: $($_.Exception.Message)"
+                }
+                if ($LimitProcessing -eq $Count) {
+                    break
+                }
+            } elseif ($Type -eq 'Empty') {
+                if ($_.ComputerSettingsAvailable -eq $false -and $_.UserSettingsAvailable -eq $false) {
+                    Write-Verbose "Backup-GPOZaurr - Backing up GPO $($_.Name) from $($_.Domain)"
+                    $Count++
+                    try {
+                        $BackupInfo = Backup-GPO -Guid $_.GUID -Domain $_.Domain -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
+                        $BackupInfo
+                    } catch {
+                        Write-Warning "Backup-GPOZaurr - Backing up GPO $($_.Name) from $($_.Domain) failed: $($_.Exception.Message)"
+                    }
+                    if ($LimitProcessing -eq $Count) {
+                        break
+                    }
+                }
+            } elseif ($Type -eq 'EmptyAndUnlinked') {
+                if ($_.ComputerSettingsAvailable -eq $false -and $_.UserSettingsAvailable -eq $false -or $_.Linked -eq $false) {
+                    Write-Verbose "Backup-GPOZaurr - Backing up GPO $($_.Name) from $($_.Domain)"
+                    $Count++
+                    try {
+                        $BackupInfo = Backup-GPO -Guid $_.GUID -Domain $_.Domain -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
+                        $BackupInfo
+                    } catch {
+                        Write-Warning "Backup-GPOZaurr - Backing up GPO $($_.Name) from $($_.Domain) failed: $($_.Exception.Message)"
+                    }
+                    if ($LimitProcessing -eq $Count) {
+                        break
+                    }
+                }
+            } elseif ($Type -eq 'Unlinked') {
+                if ($_.Linked -eq $false) {
+                    Write-Verbose "Backup-GPOZaurr - Backing up GPO $($_.Name) from $($_.Domain)"
+                    $Count++
+                    try {
+                        $BackupInfo = Backup-GPO -Guid $_.GUID -Domain $_.Domain -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
+                        $BackupInfo
+                    } catch {
+                        Write-Warning "Backup-GPOZaurr - Backing up GPO $($_.Name) from $($_.Domain) failed: $($_.Exception.Message)"
+                    }
+                    if ($LimitProcessing -eq $Count) {
+                        break
+                    }
+                }
+            }
 
-    $GPOs = Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOPath $GPOPath
-    #$ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
-
-    $Count = 0
-    $null = New-Item -ItemType Directory -Path $DateDirectory -Force
-    $GPOSummary = foreach ($GPO in $GPOs) {
-        #$QueryServer = $ForestInformation['QueryServers'][$GPO.Domain]['HostName'][0]
-        if ($Type -eq 'All') {
-            Write-Verbose "Backup-GPOZaurr - Backing up GPO $($GPO.Name) from $($GPO.Domain)"
-            $Count++
-            try {
-                $BackupInfo = Backup-GPO -Name $GPO.Name -Domain $GPO.Domain -Path $DateDirectory #-Server $QueryServer
-                $BackupInfo
-            } catch {
-                Write-Warning "Backup-GPOZaurr - Backing up GPO $($GPO.Name) from $($GPO.Domain) using server $QueryServer failed: $($_.Exception.Message)"
-            }
-            if ($LimitProcessing -eq $Count) {
-                break
-            }
-        } elseif ($Type -eq 'Empty') {
-            if ($GPO.ComputerSettingsAvailable -eq $false -and $GPO.UserSettingsAvailable -eq $false) {
-                Write-Verbose "Backup-GPOZaurr - Backing up GPO $($GPO.Name) from $($GPO.Domain)"
-                $Count++
-                try {
-                    $BackupInfo = Backup-GPO -Name $GPO.Name -Domain $GPO.Domain -Path $DateDirectory #-Server $QueryServer
-                    $BackupInfo
-                } catch {
-                    Write-Warning "Backup-GPOZaurr - Backing up GPO $($GPO.Name) from $($GPO.Domain) using server $QueryServer failed: $($_.Exception.Message)"
-                }
-                if ($LimitProcessing -eq $Count) {
-                    break
-                }
-            }
-        } elseif ($Type -eq 'EmptyAndUnlinked') {
-            if ($GPO.ComputerSettingsAvailable -eq $false -and $GPO.UserSettingsAvailable -eq $false -or $Gpo.Linked -eq $false) {
-                Write-Verbose "Backup-GPOZaurr - Backing up GPO $($GPO.Name) from $($GPO.Domain)"
-                $Count++
-                try {
-                    $BackupInfo = Backup-GPO -Name $GPO.Name -Domain $GPO.Domain -Path $DateDirectory #-Server $QueryServer
-                    $BackupInfo
-                } catch {
-                    Write-Warning "Backup-GPOZaurr - Backing up GPO $($GPO.Name) from $($GPO.Domain) using server $QueryServer failed: $($_.Exception.Message)"
-                }
-                if ($LimitProcessing -eq $Count) {
-                    break
-                }
-            }
-        } elseif ($Type -eq 'Unlinked') {
-            if ($Gpo.Linked -eq $false) {
-                Write-Verbose "Backup-GPOZaurr - Backing up GPO $($GPO.Name) from $($GPO.Domain)"
-                $Count++
-                try {
-                    $BackupInfo = Backup-GPO -Name $GPO.Name -Domain $GPO.Domain -Path $DateDirectory #-Server $QueryServer
-                    $BackupInfo
-                } catch {
-                    Write-Warning "Backup-GPOZaurr - Backing up GPO $($GPO.Name) from $($GPO.Domain) using server $QueryServer failed: $($_.Exception.Message)"
-                }
-                if ($LimitProcessing -eq $Count) {
-                    break
-                }
-            }
+            #}
+            #$GPOSummary
         }
     }
-    $GPOSummary
+    End {
+
+    }
 }

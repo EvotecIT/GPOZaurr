@@ -25,7 +25,7 @@
                             try {
                                 Restore-GPO -Path $BackupFolder -BackupID $GPO.ID -Domain $GPO.Domain
                             } catch {
-                                Write-Warning "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($_.Domain) failed: $($_.Exception.Message)"
+                                Write-Warning "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($GPO.Domain) failed: $($_.Exception.Message)"
                             }
                         }
                     }
