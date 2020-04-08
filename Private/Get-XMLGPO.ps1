@@ -1,7 +1,8 @@
 ﻿function Get-XMLGPO {
     [cmdletBinding()]
     param(
-        [XML] $XMLContent
+        [XML] $XMLContent,
+        $GPO
     )
     if ($XMLContent.GPO.LinksTo) {
         $Linked = $true
@@ -27,9 +28,9 @@
         $Enabled = 'Enabled'
     } elseif ($UserEnabled -eq $false -and $ComputerEnabled -eq $false) {
         $Enabled = 'All settings disabled'
-    }elseif ($UserEnabled -eq $true -and $ComputerEnabled -eq $false) {
+    } elseif ($UserEnabled -eq $true -and $ComputerEnabled -eq $false) {
         $Enabled = 'Computer configuration settings disabled'
-    }elseif ($UserEnabled -eq $false -and $ComputerEnabled -eq $true) {
+    } elseif ($UserEnabled -eq $false -and $ComputerEnabled -eq $true) {
         $Enabled = 'User configuration settings disabled'
     }
 
@@ -58,16 +59,37 @@
         'WMIFilter'                         = $GPO.WmiFilter.name
         'WMIFilterDescription'              = $GPO.WmiFilter.Description
         'Path'                              = $GPO.Path
-        #'SDDL'                      = if ($Splitter -ne '') { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' -join $Splitter } else { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' }
+        'SDDL'                              = if ($Splitter -ne '') { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' -join $Splitter } else { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' }
+        'Owner'                             = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
+        'OwnerSID'                          = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'
         'ACL'                               = $XMLContent.GPO.SecurityDescriptor.Permissions.TrusteePermissions | ForEach-Object -Process {
-            [PsCustomObject] @{
-                'User'            = $_.trustee.name.'#Text'
-                'Permission Type' = $_.type.PermissionType
-                'Inherited'       = $_.Inherited
-                'Permissions'     = $_.Standard.GPOGroupedAccessEnum
+            if ($_) {
+                [PsCustomObject] @{
+                    'Name'           = $_.trustee.name.'#Text'
+                    'Sid'            = $_.trustee.SID.'#Text'
+                    'PermissionType' = $_.type.PermissionType
+                    'Inherited'      = $_.Inherited
+                    'Permissions'    = $_.Standard.GPOGroupedAccessEnum
+                }
             }
         }
-        'Links'                             = $XMLContent.GPO.LinksTo #| Select-Object -ExpandProperty SOMPath
+        'Auditing'                          = if ($XMLContent.GPO.SecurityDescriptor.AuditingPresent.'#text' -eq 'true') { $true } else { $false }
+        'Links'                             = $XMLContent.GPO.LinksTo | ForEach-Object -Process {
+            if ($_) {
+                [PSCustomObject] @{
+                    CanonicalName = $_.SOMPath
+                    Enabled       = $_.Enabled
+                    NoOverride    = $_.NoOverride
+                }
+            }
+        }
+        <#
+        SOMName SOMPath       Enabled NoOverride
+        ------- -------       ------- ----------
+        ad      ad.evotec.xyz true    false
+        #>
+
+        #| Select-Object -ExpandProperty SOMPath
 
     }
     #break
