@@ -2,7 +2,7 @@
     [cmdletBinding()]
     param(
         [XML] $XMLContent,
-        $GPO
+        [Microsoft.GroupPolicy.Gpo] $GPO
     )
     if ($XMLContent.GPO.LinksTo) {
         $Linked = $true
