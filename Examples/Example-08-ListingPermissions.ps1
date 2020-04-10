@@ -10,7 +10,7 @@
 #Get-GPOZaurrPermissions | Format-Table -AutoSize
 $T = Get-GPOZaurrPermissions #| Out-HtmlView
 #$T[0] | Format-List *
-$T | Format-Table -AutoSize
+$T | Format-Table -AutoSize *
 #$T[0].Trustee
 #$T[0].Permission
 #$T[0]

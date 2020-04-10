@@ -26,7 +26,7 @@
             ComputerVersion  : AD Version: 1, SysVol Version: 1
             WmiFilter        :
             #>
-            Get-GPPermissions -Name $GPO.DisplayName -DomainName $GPO.DomainName -All -Server $QueryServer | ForEach-Object -Process {
+            Get-GPPermissions -Guid $GPO.ID -DomainName $GPO.DomainName -All -Server $QueryServer | ForEach-Object -Process {
                 $GPOPermission = $_
                 #$GPOPermissionFormatted = ConvertTo-TableFormat -InputObject $_
                 [PSCustomObject] @{
@@ -49,7 +49,15 @@
                     SidType           = $GPOPermission.Trustee.SidType #: Group
                 }
             }
-            $SplittedOwner = $GPO.Owner.Split('\')
+
+            if ($GPO.Owner) {
+                $SplittedOwner = $GPO.Owner.Split('\')
+                $DomainOwner = $SplittedOwner[0]  #: EVOTEC
+                $DomainUserName = $SplittedOwner[1]   #: Domain Admins
+            } else {
+                $DomainOwner = $GPO.Owner
+                $DomainUserName = ''
+            }
             [PSCustomObject] @{
                 DisplayName       = $GPO.DisplayName #      : ALL | Enable RDP
                 GUID              = $GPO.GUID
@@ -64,9 +72,9 @@
 
                 Permission        = 'Owner'  # : GpoEditDeleteModifySecurity
                 Inherited         = $false  # : False
-                Domain            = $SplittedOwner[0]  #: EVOTEC
+                Domain            = $DomainOwner
                 DistinguishedName = ''  #: CN = Domain Admins, CN = Users, DC = ad, DC = evotec, DC = xyz
-                Name              = $SplittedOwner[1]   #: Domain Admins
+                Name              = $DomainUserName
                 Sid               = ''     #: S - 1 - 5 - 21 - 853615985 - 2870445339 - 3163598659 - 512
                 SidType           = '' #: Group
             }
