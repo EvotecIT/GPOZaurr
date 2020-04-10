@@ -5,7 +5,7 @@
     CompatiblePSEditions = 'Desktop'
     Copyright            = '(c) 2011 - 2020 Przemyslaw Klys @ Evotec. All rights reserved.'
     Description          = 'Group Policy Eater'
-    FunctionsToExport    = 'Backup-GPOZaurr', 'Get-GPOZaurr', 'Get-GPOZaurrBackupInformation', 'Get-GPOZaurrPassword', 'Get-GPOZaurrWMI', 'New-GPOZaurrWMI', 'Remove-GPOZaurr', 'Remove-GPOZaurrWMI', 'Restore-GPOZaurr', 'Save-GPOZaurrFiles'
+    FunctionsToExport    = 'Backup-GPOZaurr', 'Get-GPOZaurr', 'Get-GPOZaurrBackupInformation', 'Get-GPOZaurrPassword', 'Get-GPOZaurrPermissions', 'Get-GPOZaurrWMI', 'New-GPOZaurrWMI', 'Remove-GPOZaurr', 'Remove-GPOZaurrWMI', 'Restore-GPOZaurr', 'Save-GPOZaurrFiles'
     GUID                 = 'f7d4c9e4-0298-4f51-ad77-e8e3febebbde'
     ModuleVersion        = '0.0.6'
     PowerShellVersion    = '5.1'
