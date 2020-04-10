@@ -26,7 +26,7 @@
             ComputerVersion  : AD Version: 1, SysVol Version: 1
             WmiFilter        :
             #>
-            Get-GPPermission -Name $GPO.DisplayName -DomainName $GPO.DomainName -All -Server $QueryServer | ForEach-Object -Process {
+            Get-GPPermissions -Name $GPO.DisplayName -DomainName $GPO.DomainName -All -Server $QueryServer | ForEach-Object -Process {
                 $GPOPermission = $_
                 #$GPOPermissionFormatted = ConvertTo-TableFormat -InputObject $_
                 [PSCustomObject] @{
