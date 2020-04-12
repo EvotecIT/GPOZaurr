@@ -45,6 +45,7 @@ function Get-ADADministrativeGroups {
     )
     $ADDictionary = [ordered] @{ }
     $ADDictionary['ByNetBIOS'] = [ordered] @{ }
+    $ADDictionary['BySID'] = [ordered] @{ }
 
     $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     foreach ($Domain in $ForestInformation.Domains) {
@@ -56,12 +57,14 @@ function Get-ADADministrativeGroups {
             Get-ADGroup -Filter "SID -eq '$($DomainInformation.DomainSID)-512'" -Server $QueryServer -ErrorAction SilentlyContinue | ForEach-Object {
                 $ADDictionary['ByNetBIOS']["$($DomainInformation.NetBIOSName)\$($_.Name)"] = $_
                 $ADDictionary[$Domain]['DomainAdmins'] = "$($DomainInformation.NetBIOSName)\$($_.Name)"
+                $ADDictionary['BySID'][$_.SID.Value] = $_
             }
         }
         if ($Type -contains 'EnterpriseAdmins') {
             Get-ADGroup -Filter "SID -eq '$($DomainInformation.DomainSID)-519'" -Server $QueryServer -ErrorAction SilentlyContinue | ForEach-Object {
                 $ADDictionary['ByNetBIOS']["$($DomainInformation.NetBIOSName)\$($_.Name)"] = $_
                 $ADDictionary[$Domain]['EnterpriseAdmins'] = "$($DomainInformation.NetBIOSName)\$($_.Name)"
+                $ADDictionary['BySID'][$_.SID.Value] = $_ #"$($DomainInformation.NetBIOSName)\$($_.Name)"
             }
         }
     }
