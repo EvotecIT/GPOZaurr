@@ -14,7 +14,7 @@
                     $Xml.Backups.BackupInst | ForEach-Object {
                         [PSCustomObject] @{
                             DisplayName      = $_.GPODisplayName.'#cdata-section'
-                            Domain           = $_.GPODomain.'#cdata-section'
+                            DomainName       = $_.GPODomain.'#cdata-section'
                             Guid             = $_.GPOGUid.'#cdata-section'
                             DomainGuid       = $_.GPODomainGuid.'#cdata-section'
                             DomainController = $_.GPODomainController.'#cdata-section'

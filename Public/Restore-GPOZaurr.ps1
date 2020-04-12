@@ -13,7 +13,7 @@
                 if (-not $SkipBackupSummary) {
                     $BackupSummary = Get-GPOZaurrBackupInformation -BackupFolder $BackupFolder
                     if ($Domain) {
-                        [Array] $FoundGPO = $BackupSummary | Where-Object { $_.DisplayName -eq $DisplayName -and $_.Domain -eq $Domain }
+                        [Array] $FoundGPO = $BackupSummary | Where-Object { $_.DisplayName -eq $DisplayName -and $_.DomainName -eq $Domain }
                     } else {
                         [Array] $FoundGPO = $BackupSummary | Where-Object { $_.DisplayName -eq $DisplayName }
                     }
@@ -21,11 +21,11 @@
                         if ($NewDisplayName) {
                             Import-GPO -Path $BackupFolder -BackupID $GPO.ID -Domain $GPO.Domain -TargetName $NewDisplayName -CreateIfNeeded
                         } else {
-                            Write-Verbose "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($GPO.Domain) / BackupId: $($GPO.ID)"
+                            Write-Verbose "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($GPO.DomainName) / BackupId: $($GPO.ID)"
                             try {
-                                Restore-GPO -Path $BackupFolder -BackupID $GPO.ID -Domain $GPO.Domain
+                                Restore-GPO -Path $BackupFolder -BackupID $GPO.ID -Domain $GPO.DomainName
                             } catch {
-                                Write-Warning "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($GPO.Domain) failed: $($_.Exception.Message)"
+                                Write-Warning "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($GPO.DomainName) failed: $($_.Exception.Message)"
                             }
                         }
                     }
@@ -49,11 +49,11 @@
             } else {
                 $BackupSummary = Get-GPOZaurrBackupInformation -BackupFolder $BackupFolder
                 foreach ($GPO in $BackupSummary) {
-                    Write-Verbose "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($GPO.Domain) / BackupId: $($GPO.ID)"
+                    Write-Verbose "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($GPO.DomainName) / BackupId: $($GPO.ID)"
                     try {
-                        Restore-GPO -Path $BackupFolder -Domain $GPO.Domain -BackupId $GPO.ID
+                        Restore-GPO -Path $BackupFolder -Domain $GPO.DomainName -BackupId $GPO.ID
                     } catch {
-                        Write-Warning "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($GPO.Domain) failed: $($_.Exception.Message)"
+                        Write-Warning "Restore-GPOZaurr - Restoring GPO $($GPO.DisplayName) from $($GPO.DomainName) failed: $($_.Exception.Message)"
                     }
                 }
             }

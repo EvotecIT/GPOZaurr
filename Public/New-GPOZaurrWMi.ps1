@@ -74,7 +74,7 @@
             }
         } else {
             foreach ($_ in $ExistingWmiFilter) {
-                Write-Warning "New-GPOZaurrWMI - Skipping creation of GPO because name: $($_.Name) guid: $($_.ID) for $($_.Domain) already exists."
+                Write-Warning "New-GPOZaurrWMI - Skipping creation of GPO because name: $($_.DisplayName) guid: $($_.ID) for $($_.DomainName) already exists."
             }
         }
     }

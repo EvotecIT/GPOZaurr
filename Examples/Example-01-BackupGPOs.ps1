@@ -2,7 +2,7 @@
 
 # Backup GPOs
 $BackupPath = "$Env:UserProfile\Desktop\GPO"
-$GPOSummary = Backup-GPOZaurr -BackupPath $BackupPath -Verbose -Type EmptyAndUnlinked -BackupDated #-LimitProcessing 1
+$GPOSummary = Backup-GPOZaurr -BackupPath $BackupPath -Verbose -Type Unlinked -BackupDated #-LimitProcessing 1
 $GPOSummary | Format-Table -AutoSize
 
 # Confirm GPOs are backed up properly
