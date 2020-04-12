@@ -1,7 +1,16 @@
 ﻿function Remove-GPOZaurrPermission {
     [cmdletBinding(SupportsShouldProcess)]
     param(
-        [alias('Unknown', 'Named')][string[]] $Type,
+        [Parameter(ParameterSetName = 'GPOName', Mandatory)]
+        [string] $GPOName,
+
+        [Parameter(ParameterSetName = 'GPOGUID', Mandatory)]
+        [alias('GUID', 'GPOID')][string] $GPOGuid,
+
+        [Parameter(ParameterSetName = 'GPOGUID', Mandatory)]
+        [validateset('Unknown', 'Named')][string[]] $Type,
+
+
         [Microsoft.GroupPolicy.GPPermissionType[]] $IncludePermissionType,
         [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
         [switch] $SkipWellKnown,
@@ -33,11 +42,11 @@
                         $GPOPermission.GPOSecurity.RemoveTrustee($GPOPermission.Sid)
                         $GPOPermission.GPOObject.SetSecurityInfo($GPOPermission.GPOSecurity)
                         # Set-GPPPermission doesn't work on Unknown Accounts
-                        $Count++
-                        if ($Count -eq $LimitProcessing) {
-                            # skipping skips per removed permission not per gpo.
-                            break
-                        }
+                    }
+                    $Count++
+                    if ($Count -eq $LimitProcessing) {
+                        # skipping skips per removed permission not per gpo.
+                        break
                     }
                 }
             }
@@ -49,17 +58,13 @@
                         $GPOPermission.GPOSecurity.RemoveTrustee($GPOPermission.Sid)
                         $GPOPermission.GPOObject.SetSecurityInfo($GPOPermission.GPOSecurity)
                         # Set-GPPPermission doesn't work on Unknown Accounts
-                        $Count++
-                        if ($Count -eq $LimitProcessing) {
-                            # skipping skips per removed permission not per gpo.
-                            break
-                        }
                     }
-
+                    $Count++
+                    if ($Count -eq $LimitProcessing) {
+                        # skipping skips per removed permission not per gpo.
+                        break
+                    }
                 }
-
-
-
             }
             #Set-GPPermission -PermissionLevel None -TargetName $GPOPermission.Sid -Verbose -DomainName $GPOPermission.DomainName -Guid $GPOPermission.GUID #-WhatIf
             #Set-GPPermission -PermissionLevel GpoRead -TargetName 'Authenticated Users' -TargetType Group -Verbose -DomainName $Domain -Guid $_.GUID -WhatIf
