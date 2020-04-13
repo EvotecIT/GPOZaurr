@@ -11,9 +11,11 @@
         [string[]] $GPOPath,
 
         [switch] $PermissionsOnly,
+        [switch] $OwnerOnly,
         [switch] $Limited
     )
     Begin {
+        $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
         if (-not $GPOPath) {
             $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
         }
@@ -27,7 +29,7 @@
                         Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
                         if (-not $Limited) {
                             $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
-                            Get-XMLGPO -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent
+                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups
                         } else {
                             $_
                         }
@@ -37,7 +39,7 @@
                         Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
                         if (-not $Limited) {
                             $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
-                            Get-XMLGPO -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent
+                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups
                         } else {
                             $_
                         }
@@ -47,7 +49,7 @@
                         Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
                         if (-not $Limited) {
                             $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
-                            Get-XMLGPO -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent
+                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups
                         } else {
                             $_
                         }
@@ -59,7 +61,7 @@
                 Get-ChildItem -LiteralPath $Path -Recurse -Filter *.xml | ForEach-Object {
                     $XMLContent = [XML]::new()
                     $XMLContent.Load($_.FullName)
-                    Get-XMLGPO -XMLContent $XMLContent -PermissionsOnly:$PermissionsOnly.IsPresent
+                    Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -PermissionsOnly:$PermissionsOnly.IsPresent
                 }
             }
         }

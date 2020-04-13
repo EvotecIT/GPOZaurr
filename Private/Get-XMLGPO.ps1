@@ -3,7 +3,9 @@
     param(
         [XML] $XMLContent,
         [Microsoft.GroupPolicy.Gpo] $GPO,
-        [switch] $PermissionsOnly
+        [switch] $PermissionsOnly,
+        [switch] $OwnerOnly,
+        [System.Collections.IDictionary] $ADAdministrativeGroups
     )
     if ($XMLContent.GPO.LinksTo) {
         $Linked = $true
@@ -34,7 +36,21 @@
     } elseif ($UserEnabled -eq $false -and $ComputerEnabled -eq $true) {
         $Enabled = 'User configuration settings disabled'
     }
-
+    if (-not $PermissionsOnly) {
+        if ($XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text') {
+            $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text')"]
+            $WellKnown = ConvertFrom-SID -SID $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text' -OnlyWellKnown
+            if ($AdministrativeGroup) {
+                $OwnerType = 'Administrative'
+            } elseif ($WellKnown.Name) {
+                $OwnerType = 'WellKnown'
+            } else {
+                $OwnerType = 'NonAdministrative'
+            }
+        } else {
+            $OwnerType = 'EmptyOrUnknown'
+        }
+    }
     if ($PermissionsOnly) {
         [PsCustomObject] @{
             'DisplayName'    = $XMLContent.GPO.Name
@@ -63,6 +79,16 @@
                     'Permissions'    = $_.Standard.GPOGroupedAccessEnum
                 }
             }
+        }
+    } elseif ($OwnerOnly) {
+        [PsCustomObject] @{
+            'DisplayName' = $XMLContent.GPO.Name
+            'DomainName'  = $XMLContent.GPO.Identifier.Domain.'#text'
+            'GUID'        = $XMLContent.GPO.Identifier.Identifier.InnerText
+            'Enabled'     = $Enabled
+            'Owner'       = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
+            'OwnerSID'    = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'
+            'OwnerType'   = $OwnerType
         }
     } else {
         [PsCustomObject] @{
@@ -93,6 +119,7 @@
             'SDDL'                              = if ($Splitter -ne '') { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' -join $Splitter } else { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' }
             'Owner'                             = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
             'OwnerSID'                          = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'
+            'OwnerType'                         = $OwnerType
             'ACL'                               = @(
                 [PsCustomObject] @{
                     'Name'           = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
