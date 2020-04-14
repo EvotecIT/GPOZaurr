@@ -9,10 +9,9 @@
         [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
         [switch] $IncludeGPOObject,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
-        [string[]] $Type
+        [string[]] $Type,
+        [System.Collections.IDictionary] $Accounts
     )
-
-    # $GPO = $_
     Write-Verbose "Get-GPOZaurrPermission - Processing $($GPO.DisplayName) from $($GPO.DomainName)"
     $SecurityRights = $GPO.GetSecurityInfo()
     $SecurityRights | ForEach-Object -Process {
@@ -43,7 +42,6 @@
                 return
             }
         }
-
         $ReturnObject = [ordered] @{
             DisplayName       = $GPO.DisplayName #      : ALL | Enable RDP
             GUID              = $GPO.ID
@@ -59,11 +57,25 @@
             Name              = $GPOPermission.Trustee.Name    #: Domain Admins
             Sid               = $GPOPermission.Trustee.Sid.Value     #: S - 1 - 5 - 21 - 853615985 - 2870445339 - 3163598659 - 512
             SidType           = $GPOPermission.Trustee.SidType #: Group
+        }
+        if ($Accounts) {
+            $A = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
+            #$TranslatedUser = $Accounts[$A]
+            $ReturnObject['UserPrincipalName'] = $Accounts[$A].UserPrincipalName
+            $ReturnObject['AccountEnabled'] = $Accounts[$A].Enabled
+            $ReturnObject['PasswordLastSet'] = if ($Accounts[$A].PasswordLastSet) { $Accounts[$A].PasswordLastSet } else { '' }
+            $ReturnObject['LastLogonDate'] = if ($Accounts[$A].LastLogonDate ) { $Accounts[$A].LastLogonDate } else { '' }
+            if ($Accounts[$A].ObjectClass -eq 'group') {
+                $ReturnObject['SidType'] = 'Group'
+            } elseif ($Accounts[$A].ObjectClass -eq 'user') {
+                $ReturnObject['SidType'] = 'user'
+            } #else {
 
+            #}
         }
         if ($IncludeGPOObject) {
-            $ReturnObject.GPOObject = $GPO
-            $ReturnObject.GPOSecurity = $SecurityRights
+            $ReturnObject['GPOObject'] = $GPO
+            $ReturnObject['GPOSecurity'] = $SecurityRights
         }
         [PSCustomObject] $ReturnObject
     }
@@ -84,12 +96,12 @@
             $DomainOwner = $GPO.Owner
             $DomainUserName = ''
             $SID = ''
-            $SIDType = ''
+            $SIDType = 'EmptyOrUnknown'
             $DistinguishedName = ''
         }
         $ReturnObject = [ordered] @{
             DisplayName       = $GPO.DisplayName #      : ALL | Enable RDP
-            GUID              = $GPO.GUID
+            GUID              = $GPO.Id
             DomainName        = $GPO.DomainName  #      : ad.evotec.xyz
             Enabled           = $GPO.GpoStatus
             Description       = $GPO.Description
@@ -102,6 +114,27 @@
             Name              = $DomainUserName
             Sid               = $SID     #: S - 1 - 5 - 21 - 853615985 - 2870445339 - 3163598659 - 512
             SidType           = $SIDType #  #: Group
+        }
+        if ($Accounts) {
+            $A = $GPO.Owner
+            #$TranslatedUser = $Accounts[$A]
+            $ReturnObject['UserPrincipalName'] = $Accounts[$A].UserPrincipalName
+            $ReturnObject['AccountEnabled'] = $Accounts[$A].Enabled
+            $ReturnObject['DistinguishedName'] = $Accounts[$A].DistinguishedName
+            $ReturnObject['PasswordLastSet'] = if ($Accounts[$A].PasswordLastSet) { $Accounts[$A].PasswordLastSet } else { '' }
+            $ReturnObject['LastLogonDate'] = if ($Accounts[$A].LastLogonDate ) { $Accounts[$A].LastLogonDate } else { '' }
+            if (-not $ReturnObject['Sid']) {
+                $ReturnObject['Sid'] = $Accounts[$A].Sid.Value
+            }
+            if ($Accounts[$A].ObjectClass -eq 'group') {
+                $ReturnObject['SidType'] = 'Group'
+            } elseif ($Accounts[$A].ObjectClass -eq 'user') {
+                $ReturnObject['SidType'] = 'User'
+            } elseif ($Accounts[$A].ObjectClass -eq 'computer') {
+                $ReturnObject['SidType'] = 'Computer'
+            } else {
+                $ReturnObject['SidType'] = 'EmptyOrUnknown'
+            }
         }
         if ($IncludeGPOObject) {
             $ReturnObject.GPOObject = $GPO

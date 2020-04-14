@@ -2,6 +2,6 @@
 
 #$T = Get-GPOZaurrPermission -GPOName 'DC | PowerShell Logging' -Type Unknown
 
-$T = Get-GPOZaurrPermission -ExcludePermissionType GpoRead,GpoApply #-Type All #-SkipWellKnown -SkipAdministrative # -ExcludePermissionType GpoRead,GpoApply #| Out-HtmlView
+$T = Get-GPOZaurrPermission -ResolveAccounts -IncludeOwner #-ExcludePermissionType GpoRead,GpoApply #-Type All #-SkipWellKnown -SkipAdministrative # -ExcludePermissionType GpoRead,GpoApply #| Out-HtmlView
 $T | Format-Table -AutoSize *
-#$T | Out-HtmlView -ScrollX -Filtering -Online -DisablePaging
+$T | Out-HtmlView -ScrollX -Filtering -Online -DisablePaging
