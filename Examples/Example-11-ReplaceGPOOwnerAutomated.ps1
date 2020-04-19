@@ -5,9 +5,9 @@
 # regardless if current user is still Domain Admin or not
 
 $GPOs = Get-GPOZaurr #-GPOName 'New Group Policy Object'
-$GPOs | Format-Table DisplayName, Owner, OwnerSID
+$GPOs | Format-Table DisplayName, Owner, OwnerSID, OwnerType
 
-Set-GPOZaurrOwner -Type 'NonAdministrative','EmptyOrUnknown' -Verbose -LimitProcessing 3 #-WhatIf
+Set-GPOZaurrOwner -Type 'EmptyOrUnknown' -Verbose -LimitProcessing 1 -WhatIf
 
 $GPOs = Get-GPOZaurr #-GPOName 'New Group Policy Object'
 $GPOs | Format-Table DisplayName, Owner, OwnerSID

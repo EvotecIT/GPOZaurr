@@ -1,5 +1,6 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
+# You can set owner per guid if you want to have more control.
 $LImitProcessing = 2
 
 # check what is there now
