@@ -14,31 +14,37 @@
     )
     Write-Verbose "Get-GPOZaurrPermission - Processing $($GPO.DisplayName) from $($GPO.DomainName)"
     $SecurityRights = $GPO.GetSecurityInfo()
+    $Index = 0
     $SecurityRights | ForEach-Object -Process {
         #Get-GPPermissions -Guid $GPO.ID -DomainName $GPO.DomainName -All -Server $QueryServer | ForEach-Object -Process {
         $GPOPermission = $_
         if ($ExcludePermissionType -contains $GPOPermission.Permission) {
+            $Index++
             return
         }
         if ($IncludePermissionType) {
             if ($IncludePermissionType -notcontains $GPOPermission.Permission) {
+                $Index++
                 return
             }
         }
         if ($SkipWellKnown.IsPresent) {
             if ($GPOPermission.Trustee.SidType -eq 'WellKnownGroup') {
+                $Index++
                 return
             }
         }
         if ($SkipAdministrative.IsPresent) {
             $IsAdministrative = $ADAdministrativeGroups['BySID'][$GPOPermission.Trustee.Sid.Value]
             if ($IsAdministrative) {
+                $Index++
                 return
             }
         }
         if ($Type -contains 'Unknown' -and $Type -notcontains 'All') {
             # May need updates if there's more types
             if ($GPOPermission.Trustee.SidType -ne 'Unknown') {
+                $Index++
                 return
             }
         }
@@ -60,24 +66,38 @@
         }
         if ($Accounts) {
             $A = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
-            #$TranslatedUser = $Accounts[$A]
-            $ReturnObject['UserPrincipalName'] = $Accounts[$A].UserPrincipalName
-            $ReturnObject['AccountEnabled'] = $Accounts[$A].Enabled
-            $ReturnObject['PasswordLastSet'] = if ($Accounts[$A].PasswordLastSet) { $Accounts[$A].PasswordLastSet } else { '' }
-            $ReturnObject['LastLogonDate'] = if ($Accounts[$A].LastLogonDate ) { $Accounts[$A].LastLogonDate } else { '' }
-            if ($Accounts[$A].ObjectClass -eq 'group') {
-                $ReturnObject['SidType'] = 'Group'
-            } elseif ($Accounts[$A].ObjectClass -eq 'user') {
-                $ReturnObject['SidType'] = 'user'
-            } #else {
-
-            #}
+            if ($A -and $Accounts[$A]) {
+                $ReturnObject['UserPrincipalName'] = $Accounts[$A].UserPrincipalName
+                $ReturnObject['AccountEnabled'] = $Accounts[$A].Enabled
+                $ReturnObject['DistinguishedName'] = $Accounts[$A].DistinguishedName
+                $ReturnObject['PasswordLastSet'] = if ($Accounts[$A].PasswordLastSet) { $Accounts[$A].PasswordLastSet } else { '' }
+                $ReturnObject['LastLogonDate'] = if ($Accounts[$A].LastLogonDate ) { $Accounts[$A].LastLogonDate } else { '' }
+                if (-not $ReturnObject['Sid']) {
+                    $ReturnObject['Sid'] = $Accounts[$A].Sid.Value
+                }
+                if ($Accounts[$A].ObjectClass -eq 'group') {
+                    $ReturnObject['SidType'] = 'Group'
+                } elseif ($Accounts[$A].ObjectClass -eq 'user') {
+                    $ReturnObject['SidType'] = 'User'
+                } elseif ($Accounts[$A].ObjectClass -eq 'computer') {
+                    $ReturnObject['SidType'] = 'Computer'
+                } else {
+                    $ReturnObject['SidType'] = 'EmptyOrUnknown'
+                }
+            } else {
+                $ReturnObject['UserPrincipalName'] = ''
+                $ReturnObject['AccountEnabled'] = ''
+                $ReturnObject['PasswordLastSet'] = ''
+                $ReturnObject['LastLogonDate'] = ''
+            }
         }
         if ($IncludeGPOObject) {
             $ReturnObject['GPOObject'] = $GPO
             $ReturnObject['GPOSecurity'] = $SecurityRights
+            $ReturnObject['GPOSecurityPermissionIndex'] = $Index
         }
         [PSCustomObject] $ReturnObject
+        $Index++
     }
     if ($IncludeOwner.IsPresent) {
         if ($GPO.Owner) {
@@ -117,28 +137,35 @@
         }
         if ($Accounts) {
             $A = $GPO.Owner
-            #$TranslatedUser = $Accounts[$A]
-            $ReturnObject['UserPrincipalName'] = $Accounts[$A].UserPrincipalName
-            $ReturnObject['AccountEnabled'] = $Accounts[$A].Enabled
-            $ReturnObject['DistinguishedName'] = $Accounts[$A].DistinguishedName
-            $ReturnObject['PasswordLastSet'] = if ($Accounts[$A].PasswordLastSet) { $Accounts[$A].PasswordLastSet } else { '' }
-            $ReturnObject['LastLogonDate'] = if ($Accounts[$A].LastLogonDate ) { $Accounts[$A].LastLogonDate } else { '' }
-            if (-not $ReturnObject['Sid']) {
-                $ReturnObject['Sid'] = $Accounts[$A].Sid.Value
-            }
-            if ($Accounts[$A].ObjectClass -eq 'group') {
-                $ReturnObject['SidType'] = 'Group'
-            } elseif ($Accounts[$A].ObjectClass -eq 'user') {
-                $ReturnObject['SidType'] = 'User'
-            } elseif ($Accounts[$A].ObjectClass -eq 'computer') {
-                $ReturnObject['SidType'] = 'Computer'
+            if ($A -and $Accounts[$A]) {
+                $ReturnObject['UserPrincipalName'] = $Accounts[$A].UserPrincipalName
+                $ReturnObject['AccountEnabled'] = $Accounts[$A].Enabled
+                $ReturnObject['DistinguishedName'] = $Accounts[$A].DistinguishedName
+                $ReturnObject['PasswordLastSet'] = if ($Accounts[$A].PasswordLastSet) { $Accounts[$A].PasswordLastSet } else { '' }
+                $ReturnObject['LastLogonDate'] = if ($Accounts[$A].LastLogonDate ) { $Accounts[$A].LastLogonDate } else { '' }
+                if (-not $ReturnObject['Sid']) {
+                    $ReturnObject['Sid'] = $Accounts[$A].Sid.Value
+                }
+                if ($Accounts[$A].ObjectClass -eq 'group') {
+                    $ReturnObject['SidType'] = 'Group'
+                } elseif ($Accounts[$A].ObjectClass -eq 'user') {
+                    $ReturnObject['SidType'] = 'User'
+                } elseif ($Accounts[$A].ObjectClass -eq 'computer') {
+                    $ReturnObject['SidType'] = 'Computer'
+                } else {
+                    $ReturnObject['SidType'] = 'EmptyOrUnknown'
+                }
             } else {
-                $ReturnObject['SidType'] = 'EmptyOrUnknown'
+                $ReturnObject['UserPrincipalName'] = ''
+                $ReturnObject['AccountEnabled'] = ''
+                $ReturnObject['PasswordLastSet'] = ''
+                $ReturnObject['LastLogonDate'] = ''
             }
         }
         if ($IncludeGPOObject) {
-            $ReturnObject.GPOObject = $GPO
-            $ReturnObject.GPOSecurity = $SecurityRights
+            $ReturnObject['GPOObject'] = $GPO
+            $ReturnObject['GPOSecurity'] = $SecurityRights
+            $ReturnObject['GPOSecurityPermissionIndex'] = $null
         }
         [PSCustomObject] $ReturnObject
     }

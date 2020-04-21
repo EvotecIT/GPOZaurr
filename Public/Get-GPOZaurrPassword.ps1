@@ -14,7 +14,7 @@
             $ForestInformation = $ExtendedForestInformation
         }
 
-        $GPOPath = foreach ($Domain in $ForestInformation.Domains) {
+        [Array] $GPOPath = foreach ($Domain in $ForestInformation.Domains) {
             -join ('\\', $Domain, '\SYSVOL\', $Domain, '\Policies')
         }
     }

@@ -28,7 +28,12 @@
                     Get-GPO -Name $GPOName -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue | ForEach-Object {
                         Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
                         if (-not $Limited) {
-                            $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
+                            try {
+                                $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
+                            } catch {
+                                Write-Warning "Get-GPOZaurr - Failed to ger GPOReport: $($_.Exception.Message). Skipping."
+                                continue
+                            }
                             Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups
                         } else {
                             $_
@@ -38,7 +43,12 @@
                     Get-GPO -Guid $GPOGuid -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue | ForEach-Object {
                         Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
                         if (-not $Limited) {
-                            $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
+                            try {
+                                $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
+                            } catch {
+                                Write-Warning "Get-GPOZaurr - Failed to ger GPOReport: $($_.Exception.Message). Skipping."
+                                continue
+                            }
                             Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups
                         } else {
                             $_
@@ -48,7 +58,12 @@
                     Get-GPO -All -Server $QueryServer -Domain $Domain -ErrorAction SilentlyContinue | ForEach-Object {
                         Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
                         if (-not $Limited) {
-                            $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
+                            try {
+                                $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
+                            } catch {
+                                Write-Warning "Get-GPOZaurr - Failed to ger GPOReport: $($_.Exception.Message). Skipping."
+                                continue
+                            }
                             Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups
                         } else {
                             $_

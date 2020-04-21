@@ -35,12 +35,13 @@
                             Write-Verbose "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName)"
                             $BackupInfo = Backup-GPO -Guid $_.Guid -Domain $_.DomainName -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
                             $BackupInfo
+                            $BackupOK = $true
                         } catch {
                             Write-Warning "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
-
+                            $BackupOK = $false
                         }
                     }
-                    if (($BackupRequired -and $BackupInfo) -or (-not $BackupRequired)) {
+                    if (($BackupRequired -and $BackupOK) -or (-not $BackupRequired)) {
                         try {
                             Write-Verbose "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName)"
                             Remove-GPO -Domain $_.DomainName -Guid $_.Guid -ErrorAction Stop #-Server $QueryServer
@@ -61,11 +62,13 @@
                             Write-Verbose "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName)"
                             $BackupInfo = Backup-GPO -Guid $_.Guid -Domain $_.DomainName -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
                             $BackupInfo
+                            $BackupOK = $true
                         } catch {
                             Write-Warning "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
+                            $BackupOK = $false
                         }
                     }
-                    if (($BackupRequired -and $BackupInfo) -or (-not $BackupRequired)) {
+                    if (($BackupRequired -and $BackupOK) -or (-not $BackupRequired)) {
                         try {
                             Write-Verbose "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName)"
                             Remove-GPO -Domain $_.DomainName -Guid $_.Guid -ErrorAction Stop #-Server $QueryServer

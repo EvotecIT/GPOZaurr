@@ -20,9 +20,9 @@
                     Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer | ForEach-Object -Process {
                         $WMI = $_.'msWMI-Parm2' -split ';'
                         [PSCustomObject] @{
-                            DisplayName              = $_.'msWMI-Name'
+                            DisplayName       = $_.'msWMI-Name'
                             Description       = $_.'msWMI-Parm1'
-                            DomainName            = $Domain
+                            DomainName        = $Domain
                             NameSpace         = $WMI[5]
                             Query             = $WMI[6]
                             Author            = $_.'msWMI-Author'
@@ -44,9 +44,9 @@
                     Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer | ForEach-Object -Process {
                         $WMI = $_.'msWMI-Parm2' -split ';'
                         [PSCustomObject] @{
-                            DisplayName              = $_.'msWMI-Name'
+                            DisplayName       = $_.'msWMI-Name'
                             Description       = $_.'msWMI-Parm1'
-                            DomainName            = $Domain
+                            DomainName        = $Domain
                             NameSpace         = $WMI[5]
                             Query             = $WMI[6]
                             Author            = $_.'msWMI-Author'
@@ -68,9 +68,9 @@
                 Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer | ForEach-Object -Process {
                     $WMI = $_.'msWMI-Parm2' -split ';'
                     [PSCustomObject] @{
-                        DisplayName              = $_.'msWMI-Name'
+                        DisplayName       = $_.'msWMI-Name'
                         Description       = $_.'msWMI-Parm1'
-                        DomainName            = $Domain
+                        DomainName        = $Domain
                         NameSpace         = $WMI[5]
                         Query             = $WMI[6]
                         Author            = $_.'msWMI-Author'
