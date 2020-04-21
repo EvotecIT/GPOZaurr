@@ -7,7 +7,7 @@
     Description          = 'Group Policy Eater'
     FunctionsToExport    = 'Add-GPOZaurrPermission', 'Backup-GPOZaurr', 'Get-GPOZaurr', 'Get-GPOZaurrBackupInformation', 'Get-GPOZaurrLink', 'Get-GPOZaurrPassword', 'Get-GPOZaurrPermission', 'Get-GPOZaurrWMI', 'New-GPOZaurrWMI', 'Remove-GPOZaurr', 'Remove-GPOZaurrPermission', 'Remove-GPOZaurrWMI', 'Restore-GPOZaurr', 'Save-GPOZaurrFiles', 'Set-GPOZaurrOwner'
     GUID                 = 'f7d4c9e4-0298-4f51-ad77-e8e3febebbde'
-    ModuleVersion        = '0.0.18'
+    ModuleVersion        = '0.0.19'
     PowerShellVersion    = '5.1'
     PrivateData          = @{
         PSData = @{
