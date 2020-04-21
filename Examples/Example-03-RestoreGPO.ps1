@@ -1,6 +1,6 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-$RestoreFrom = 'C:\Users\przemyslaw.klys\Desktop\GPO\2020-04-12_10_11_24'
+$RestoreFrom = 'C:\Users\przemyslaw.klys\Desktop\GPO\2020-04-20_15_51_00'
 
 $BackupInformation = Get-GPOZaurrBackupInformation -BackupFolder $RestoreFrom
 $BackupInformation | Format-Table -a

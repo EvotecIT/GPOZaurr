@@ -9,4 +9,4 @@ $GPOs[0].ACL | Format-Table -AutoSize
 
 $GPOs.Links | Format-Table -AutoSize
 
-$GPOS | Format-Table -AutoSize Name, WmiFilter, WMIDescription
+$GPOS | Format-Table -AutoSize DisplayName, WmiFilter, WMIDescription
