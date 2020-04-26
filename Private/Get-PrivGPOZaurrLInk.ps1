@@ -6,7 +6,7 @@
         [System.Collections.IDictionary] $GPOCache
     )
     if ($Object.GpLink -and $Object.GpLink.Trim() -ne '') {
-        $Object.GpLink -split { $_ -eq '[' -or $_ -eq ']' } -replace ';0' -replace 'LDAP://' | ForEach-Object {
+        $Object.GpLink -split { $_ -eq '[' -or $_ -eq ']' } -replace ';0' -replace 'LDAP://' | ForEach-Object -Process {
             if ($_) {
                 $Output = [ordered] @{
                     DistinguishedName = $Object.DistinguishedName
@@ -14,7 +14,7 @@
                     Guid              = [Regex]::Match( $_, '(?={)(.*)(?<=})').Value -replace '{' -replace '}'
                 }
                 if ($GPOCache -and -not $Limited) {
-                    $Output['Name'] = $GPOCache[$Output['Guid']].DisplayName
+                    $Output['DisplayName'] = $GPOCache[$Output['Guid']].DisplayName
                     $Output['DomainName'] = $GPOCache[$Output['Guid']].DomainName
                     $Output['Owner'] = $GPOCache[$Output['Guid']].Owner
                     $Output['GpoStatus'] = $GPOCache[$Output['Guid']].GpoStatus
@@ -23,12 +23,12 @@
                     $Output['ModificationTime'] = $GPOCache[$Output['Guid']].ModificationTime
                 }
                 $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
-                $Output['GPOLink'] = $_
+                $Output['GPODistinguishedName'] = $_
                 [PSCustomObject] $Output
             }
         }
     } elseif ($Object.LinkedGroupPolicyObjects -and $Object.LinkedGroupPolicyObjects.Trim() -ne '') {
-        $Object.LinkedGroupPolicyObjects -split { $_ -eq '[' -or $_ -eq ']' } -replace ';0' -replace 'LDAP://' | ForEach-Object {
+        $Object.LinkedGroupPolicyObjects -split { $_ -eq '[' -or $_ -eq ']' } -replace ';0' -replace 'LDAP://' | ForEach-Object -Process {
             if ($_) {
                 $Output = [ordered] @{
                     DistinguishedName = $Object.DistinguishedName
@@ -45,7 +45,7 @@
                     $Output['ModificationTime'] = $GPOCache[$Output['Guid']].ModificationTime
                 }
                 $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
-                $Output['GPOLink'] = $_
+                $Output['GPODistinguishedName'] = $_
                 [PSCustomObject] $Output
             }
         }

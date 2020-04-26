@@ -1,5 +1,4 @@
-﻿
-function Get-ADADministrativeGroups {
+﻿function Get-ADADministrativeGroups {
     <#
     .SYNOPSIS
     Short description

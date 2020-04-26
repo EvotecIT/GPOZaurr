@@ -9,42 +9,49 @@
         [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
         [switch] $IncludeGPOObject,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
-        [string[]] $Type,
+        [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative','Administrative', 'All')][string[]] $Type,
         [System.Collections.IDictionary] $Accounts
     )
     Write-Verbose "Get-GPOZaurrPermission - Processing $($GPO.DisplayName) from $($GPO.DomainName)"
     $SecurityRights = $GPO.GetSecurityInfo()
-    $Index = 0
     $SecurityRights | ForEach-Object -Process {
         #Get-GPPermissions -Guid $GPO.ID -DomainName $GPO.DomainName -All -Server $QueryServer | ForEach-Object -Process {
         $GPOPermission = $_
         if ($ExcludePermissionType -contains $GPOPermission.Permission) {
-            $Index++
             return
         }
         if ($IncludePermissionType) {
             if ($IncludePermissionType -notcontains $GPOPermission.Permission) {
-                $Index++
                 return
             }
         }
-        if ($SkipWellKnown.IsPresent) {
+        if ($SkipWellKnown.IsPresent -or $Type -contains 'NotWellKnown') {
             if ($GPOPermission.Trustee.SidType -eq 'WellKnownGroup') {
-                $Index++
                 return
             }
         }
-        if ($SkipAdministrative.IsPresent) {
+        if ($SkipAdministrative.IsPresent -or $Type -contains 'NotAdministrative') {
             $IsAdministrative = $ADAdministrativeGroups['BySID'][$GPOPermission.Trustee.Sid.Value]
             if ($IsAdministrative) {
-                $Index++
+                return
+            }
+        }
+        if ($Type -contains 'Administrative' -and $Type -notcontains 'All') {
+            $IsAdministrative = $ADAdministrativeGroups['BySID'][$GPOPermission.Trustee.Sid.Value]
+            if (-not $IsAdministrative) {
+                return
+            }
+        }
+        if ($Type -contains 'NotWellKnownAdministrative' -and $Type -notcontains 'All') {
+            # We check for SYSTEM account
+            # Maybe we should make it a function and provide more
+            if ($GPOPermission.Trustee.Sid -eq 'S-1-5-18') {
                 return
             }
         }
         if ($Type -contains 'Unknown' -and $Type -notcontains 'All') {
             # May need updates if there's more types
             if ($GPOPermission.Trustee.SidType -ne 'Unknown') {
-                $Index++
                 return
             }
         }
@@ -94,10 +101,9 @@
         if ($IncludeGPOObject) {
             $ReturnObject['GPOObject'] = $GPO
             $ReturnObject['GPOSecurity'] = $SecurityRights
-            $ReturnObject['GPOSecurityPermissionIndex'] = $Index
+            $ReturnObject['GPOSecurityPermissionIndex'] = $GPOPermission
         }
         [PSCustomObject] $ReturnObject
-        $Index++
     }
     if ($IncludeOwner.IsPresent) {
         if ($GPO.Owner) {

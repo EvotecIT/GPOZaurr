@@ -10,7 +10,7 @@
         [string] $Principal,
         [validateset('DistinguishedName', 'Name', 'Sid')][string] $PrincipalType = 'DistinguishedName',
 
-        [validateset('Unknown', 'Named', 'NonAdministrative', 'Default')][string[]] $Type = 'Default',
+        [validateset('Unknown', 'Named', 'NotAdministrative', 'Default')][string[]] $Type = 'Default',
 
         [alias('PermissionType')][Microsoft.GroupPolicy.GPPermissionType[]] $IncludePermissionType,
         [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
@@ -119,10 +119,12 @@
                 }
                 #>
             }
-            if ($Type -contains 'NonAdministrative') {
+            if ($Type -contains 'NotAdministrative') {
 
             }
             if ($Type -contains 'Default') {
+                Remove-PrivPermission -Principal $Principal -PrincipalType $PrincipalType -GPOPermission $GPOPermission -IncludePermissionType $IncludePermissionType
+                <#
                 if ($PrincipalType -eq 'DistinguishedName') {
                     if ($GPOPermission.DistinguishedName -eq $Principal -and $GPOPermission.Permission -eq $IncludePermissionType) {
                         try {
@@ -154,6 +156,7 @@
                         }
                     }
                 }
+                #>
 
             }
             #Set-GPPermission -PermissionLevel None -TargetName $GPOPermission.Sid -Verbose -DomainName $GPOPermission.DomainName -Guid $GPOPermission.GUID #-WhatIf

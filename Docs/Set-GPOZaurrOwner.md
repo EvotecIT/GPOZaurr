@@ -182,7 +182,7 @@ Accept wildcard characters: False
 Type: String[]
 Parameter Sets: Type
 Aliases:
-Accepted values: EmptyOrUnknown, NonAdministrative
+Accepted values: EmptyOrUnknown, NotAdministrative
 
 Required: True
 Position: Named

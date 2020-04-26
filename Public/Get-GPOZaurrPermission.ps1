@@ -7,7 +7,7 @@
         [Parameter(ParameterSetName = 'GPOGUID')]
         [alias('GUID', 'GPOID')][string] $GPOGuid,
 
-        [validateSet('Unknown', 'All')][string[]] $Type = 'All',
+        [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative','All')][string[]] $Type = 'All',
 
         [switch] $SkipWellKnown,
         [switch] $SkipAdministrative,

@@ -45,7 +45,7 @@
             } elseif ($WellKnown.Name) {
                 $OwnerType = 'WellKnown'
             } else {
-                $OwnerType = 'NonAdministrative'
+                $OwnerType = 'NotAdministrative'
             }
         } else {
             $OwnerType = 'EmptyOrUnknown'
@@ -53,48 +53,51 @@
     }
     if ($PermissionsOnly) {
         [PsCustomObject] @{
-            'DisplayName'    = $XMLContent.GPO.Name
-            'DomainName'     = $XMLContent.GPO.Identifier.Domain.'#text'
-            'GUID'           = $XMLContent.GPO.Identifier.Identifier.InnerText
-            'Enabled'        = $Enabled
-            'Name'           = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
-            'Sid'            = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'
+            'DisplayName'          = $XMLContent.GPO.Name
+            'DomainName'           = $XMLContent.GPO.Identifier.Domain.'#text'
+            'GUID'                 = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
+            'Enabled'              = $Enabled
+            'Name'                 = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
+            'Sid'                  = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'
             #'SidType'        = if (($XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text').Length -le 10) { 'WellKnown' } else { 'Other' }
-            'PermissionType' = 'Allow'
-            'Inherited'      = $false
-            'Permissions'    = 'Owner'
+            'PermissionType'       = 'Allow'
+            'Inherited'            = $false
+            'Permissions'          = 'Owner'
+            'GPODistinguishedName' = $GPO.Path
         }
         $XMLContent.GPO.SecurityDescriptor.Permissions.TrusteePermissions | ForEach-Object -Process {
             if ($_) {
                 [PsCustomObject] @{
-                    'DisplayName'    = $XMLContent.GPO.Name
-                    'DomainName'     = $XMLContent.GPO.Identifier.Domain.'#text'
-                    'GUID'           = $XMLContent.GPO.Identifier.Identifier.InnerText
-                    'Enabled'        = $Enabled
-                    'Name'           = $_.trustee.name.'#Text'
-                    'Sid'            = $_.trustee.SID.'#Text'
+                    'DisplayName'          = $XMLContent.GPO.Name
+                    'DomainName'           = $XMLContent.GPO.Identifier.Domain.'#text'
+                    'GUID'                 = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
+                    'Enabled'              = $Enabled
+                    'Name'                 = $_.trustee.name.'#Text'
+                    'Sid'                  = $_.trustee.SID.'#Text'
                     #'SidType'        = if (($XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text').Length -le 10) { 'WellKnown' } else { 'Other' }
-                    'PermissionType' = $_.type.PermissionType
-                    'Inherited'      = if ($_.Inherited -eq 'false') { $false } else { $true }
-                    'Permissions'    = $_.Standard.GPOGroupedAccessEnum
+                    'PermissionType'       = $_.type.PermissionType
+                    'Inherited'            = if ($_.Inherited -eq 'false') { $false } else { $true }
+                    'Permissions'          = $_.Standard.GPOGroupedAccessEnum
+                    'GPODistinguishedName' = $GPO.Path
                 }
             }
         }
     } elseif ($OwnerOnly) {
         [PsCustomObject] @{
-            'DisplayName' = $XMLContent.GPO.Name
-            'DomainName'  = $XMLContent.GPO.Identifier.Domain.'#text'
-            'GUID'        = $XMLContent.GPO.Identifier.Identifier.InnerText
-            'Enabled'     = $Enabled
-            'Owner'       = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
-            'OwnerSID'    = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'
-            'OwnerType'   = $OwnerType
+            'DisplayName'          = $XMLContent.GPO.Name
+            'DomainName'           = $XMLContent.GPO.Identifier.Domain.'#text'
+            'GUID'                 = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
+            'Enabled'              = $Enabled
+            'Owner'                = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
+            'OwnerSID'             = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'
+            'OwnerType'            = $OwnerType
+            'GPODistinguishedName' = $GPO.Path
         }
     } else {
         [PsCustomObject] @{
             'DisplayName'                       = $XMLContent.GPO.Name
             'DomainName'                        = $XMLContent.GPO.Identifier.Domain.'#text'
-            'GUID'                              = $XMLContent.GPO.Identifier.Identifier.InnerText
+            'GUID'                              = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
             'Linked'                            = $Linked
             'LinksCount'                        = $LinksCount
             'Enabled'                           = $Enabled
@@ -115,7 +118,7 @@
 
             'WMIFilter'                         = $GPO.WmiFilter.name
             'WMIFilterDescription'              = $GPO.WmiFilter.Description
-            'DistinguishedName'                 = $GPO.Path
+            'GPODistinguishedName'              = $GPO.Path
             'SDDL'                              = if ($Splitter -ne '') { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' -join $Splitter } else { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' }
             'Owner'                             = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
             'OwnerSID'                          = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'

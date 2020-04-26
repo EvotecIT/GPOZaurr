@@ -2,7 +2,7 @@
     [cmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'Type')]
     param(
         [Parameter(ParameterSetName = 'Type', Mandatory)]
-        [validateset('EmptyOrUnknown', 'NonAdministrative', 'All')][string[]] $Type,
+        [validateset('EmptyOrUnknown', 'NotAdministrative', 'All')][string[]] $Type,
 
         [Parameter(ParameterSetName = 'Named')][string] $GPOName,
         [Parameter(ParameterSetName = 'Named')][alias('GUID', 'GPOID')][string] $GPOGuid,
@@ -43,32 +43,32 @@
                     # Regardless who is the owner it is overwritten
                     if ($Principal) {
                         Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $Principal"
-                        Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                        Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Principal -Verbose:$false -WhatIf:$WhatIfPreference
                     } else {
                         $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
                         Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $DefaultPrincipal"
-                        Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
-                        $Count++
-                        if ($Count -eq $LimitProcessing) {
-                            break
-                        }
+                        Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                    }
+                    $Count++
+                    if ($Count -eq $LimitProcessing) {
+                        break
                     }
                 }
-                if ($Type -contains 'NonAdministrative' -and $Type -notcontains 'All') {
+                if ($Type -contains 'NotAdministrative' -and $Type -notcontains 'All') {
                     if ($GPO.Owner) {
                         $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($GPO.Owner)"]
                         if (-not $AdministrativeGroup) {
                             if ($Principal) {
                                 Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $Principal"
-                                Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                                Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
                             } else {
                                 $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
                                 Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $DefaultPrincipal"
-                                Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
-                                $Count++
-                                if ($Count -eq $LimitProcessing) {
-                                    break
-                                }
+                                Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                            }
+                            $Count++
+                            if ($Count -eq $LimitProcessing) {
+                                break
                             }
                         }
                     }
@@ -77,11 +77,11 @@
                     if ($null -eq $GPO.Owner) {
                         if ($Principal) {
                             Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner NULL/$($GPO.OwnerSID) to $Principal"
-                            Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                            Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Principal -Verbose:$false -WhatIf:$WhatIfPreference
                         } else {
                             $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
                             Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner NULL/$($GPO.OwnerSID) to $DefaultPrincipal"
-                            Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                            Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
                         }
                         $Count++
                         if ($Count -eq $LimitProcessing) {
@@ -95,11 +95,11 @@
                 $GPO = $_
                 if ($Principal) {
                     Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $Principal"
-                    Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $Principal -Verbose:$false -WhatIf:$WhatIfPreference
+                    Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Principal -Verbose:$false -WhatIf:$WhatIfPreference
                 } else {
                     $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
                     Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $DefaultPrincipal"
-                    Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                    Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
                 }
                 $Count++
                 if ($Count -eq $LimitProcessing) {
