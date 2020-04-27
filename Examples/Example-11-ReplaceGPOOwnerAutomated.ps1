@@ -7,7 +7,7 @@
 $GPOs = Get-GPOZaurr #-GPOName 'New Group Policy Object'
 $GPOs | Format-Table DisplayName, Owner, OwnerSID, OwnerType
 
-Set-GPOZaurrOwner -Type EmptyOrUnknown -Verbose -LimitProcessing 1 -WhatIf
+Set-GPOZaurrOwner -Type NonAdministrative -Verbose -LimitProcessing 1 -WhatIf
 
 $GPOs = Get-GPOZaurr #-GPOName 'New Group Policy Object'
 $GPOs | Format-Table DisplayName, Owner, OwnerSID

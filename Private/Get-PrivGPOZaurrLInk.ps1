@@ -8,19 +8,21 @@
     if ($Object.GpLink -and $Object.GpLink.Trim() -ne '') {
         $Object.GpLink -split { $_ -eq '[' -or $_ -eq ']' } -replace ';0' -replace 'LDAP://' | ForEach-Object -Process {
             if ($_) {
+                $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDomainCN
                 $Output = [ordered] @{
                     DistinguishedName = $Object.DistinguishedName
                     CanonicalName     = $Object.CanonicalName
                     Guid              = [Regex]::Match( $_, '(?={)(.*)(?<=})').Value -replace '{' -replace '}'
                 }
+                $Search = -join ($DomainCN, $Output['Guid'])
                 if ($GPOCache -and -not $Limited) {
-                    $Output['DisplayName'] = $GPOCache[$Output['Guid']].DisplayName
-                    $Output['DomainName'] = $GPOCache[$Output['Guid']].DomainName
-                    $Output['Owner'] = $GPOCache[$Output['Guid']].Owner
-                    $Output['GpoStatus'] = $GPOCache[$Output['Guid']].GpoStatus
-                    $Output['Description'] = $GPOCache[$Output['Guid']].Description
-                    $Output['CreationTime'] = $GPOCache[$Output['Guid']].CreationTime
-                    $Output['ModificationTime'] = $GPOCache[$Output['Guid']].ModificationTime
+                    $Output['DisplayName'] = $GPOCache[$Search].DisplayName
+                    $Output['DomainName'] = $GPOCache[$Search].DomainName
+                    $Output['Owner'] = $GPOCache[$Search].Owner
+                    $Output['GpoStatus'] = $GPOCache[$Search].GpoStatus
+                    $Output['Description'] = $GPOCache[$Search].Description
+                    $Output['CreationTime'] = $GPOCache[$Search].CreationTime
+                    $Output['ModificationTime'] = $GPOCache[$Search].ModificationTime
                 }
                 $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
                 $Output['GPODistinguishedName'] = $_
@@ -30,19 +32,21 @@
     } elseif ($Object.LinkedGroupPolicyObjects -and $Object.LinkedGroupPolicyObjects.Trim() -ne '') {
         $Object.LinkedGroupPolicyObjects -split { $_ -eq '[' -or $_ -eq ']' } -replace ';0' -replace 'LDAP://' | ForEach-Object -Process {
             if ($_) {
+                $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDomainCN
                 $Output = [ordered] @{
                     DistinguishedName = $Object.DistinguishedName
                     CanonicalName     = $Object.CanonicalName
                     Guid              = [Regex]::Match( $_, '(?={)(.*)(?<=})').Value -replace '{' -replace '}'
                 }
+                $Search = -join ($DomainCN, $Output['Guid'])
                 if ($GPOCache -and -not $Limited) {
-                    $Output['Name'] = $GPOCache[$Output['Guid']].DisplayName
-                    $Output['DomainName'] = $GPOCache[$Output['Guid']].DomainName
-                    $Output['Owner'] = $GPOCache[$Output['Guid']].Owner
-                    $Output['GpoStatus'] = $GPOCache[$Output['Guid']].GpoStatus
-                    $Output['Description'] = $GPOCache[$Output['Guid']].Description
-                    $Output['CreationTime'] = $GPOCache[$Output['Guid']].CreationTime
-                    $Output['ModificationTime'] = $GPOCache[$Output['Guid']].ModificationTime
+                    $Output['Name'] = $GPOCache[$Search].DisplayName
+                    $Output['DomainName'] = $GPOCache[$Search].DomainName
+                    $Output['Owner'] = $GPOCache[$Search].Owner
+                    $Output['GpoStatus'] = $GPOCache[$Search].GpoStatus
+                    $Output['Description'] = $GPOCache[$Search].Description
+                    $Output['CreationTime'] = $GPOCache[$Search].CreationTime
+                    $Output['ModificationTime'] = $GPOCache[$Search].ModificationTime
                 }
                 $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
                 $Output['GPODistinguishedName'] = $_

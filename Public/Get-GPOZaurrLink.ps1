@@ -23,7 +23,7 @@
             foreach ($Domain in $ForestInformation.Domains) {
                 $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
                 Get-GPO -All -DomainName $Domain -Server $QueryServer | ForEach-Object {
-                    $GPOCache[$_.ID.Guid] = $_
+                    $GPOCache["$Domain$($_.ID.Guid)"] = $_
                 }
             }
         }
