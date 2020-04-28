@@ -1,19 +1,42 @@
 ﻿function Get-GPOZaurrLink {
     [cmdletbinding()]
     param(
-        [parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)][Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,
-        [switch] $Limited,
-        [System.Collections.IDictionary] $GPOCache,
+        [parameter(ParameterSetName = 'ADObject', ValueFromPipeline, ValueFromPipelineByPropertyName, Mandatory)][Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,
         # weirdly enough site doesn't really work this way unless you give it 'CN=Configuration,DC=ad,DC=evotec,DC=xyz' as SearchBase
-        [string] $Filter = "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')",
-        [string] $SearchBase,
-        [Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
+        [parameter(ParameterSetName = 'Filter')][string] $Filter = "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')",
+        [parameter(ParameterSetName = 'Filter')][string] $SearchBase,
+        [parameter(ParameterSetName = 'Filter')][Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
 
-        [validateset('Root', 'DomainControllers', 'Site', 'Other')][string] $Linked,
+        [parameter(ParameterSetName = 'Linked',Mandatory)][validateset('Root', 'DomainControllers', 'Site', 'Other')][string] $Linked,
 
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
+        [switch] $Limited,
+
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
+        [System.Collections.IDictionary] $GPOCache,
+
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
         [alias('ForestName')][string] $Forest,
+
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
         [string[]] $ExcludeDomains,
+
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
+
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {

@@ -32,12 +32,14 @@
         [int] $LimitProcessing
     )
     Begin {
+        Write-Verbose "Set-GPOZaurrOwner - Getting ADAdministrativeGroups"
         $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
         $Count = 0
+        Write-Verbose "Set-GPOZaurrOwner - Processing GPOs for Type $Type"
     }
     Process {
         if ($Type) {
-            Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Verbose:$false | ForEach-Object -Process {
+            Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -ADAdministrativeGroups $ADAdministrativeGroups -OwnerOnly | ForEach-Object -Process {
                 $GPO = $_
                 if ($Type -contains 'All') {
                     # Regardless who is the owner it is overwritten
@@ -91,7 +93,7 @@
                 }
             }
         } else {
-            Get-GPOZaurr -GPOName $GPOName -GPOGuid $GPOGUiD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Verbose:$false | ForEach-Object -Process {
+            Get-GPOZaurr -GPOName $GPOName -GPOGuid $GPOGUiD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Verbose:$false -ADAdministrativeGroups $ADAdministrativeGroups | ForEach-Object -Process {
                 $GPO = $_
                 if ($Principal) {
                     Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $Principal"

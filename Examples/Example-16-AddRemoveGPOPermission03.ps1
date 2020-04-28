@@ -9,8 +9,7 @@ $RootGroups = @(
 )
 
 
-
-Invoke-GPOZaurrPermission -Linked Root -Verbose { #-IncludePermissionType GpoEdit, GpoEditDeleteModifySecurity -Type NotAdministrative, NotWellKnownAdministrative -Verbose {
+Invoke-GPOZaurrPermission -Linked Root -Verbose {
     Set-GPOOwner -Type Administrative
     #Set-GPOOwner -Principal 'EVOTEC\Enterprise Admins'
     #Set-GPOOwner -Principal 'Domain Admins'
