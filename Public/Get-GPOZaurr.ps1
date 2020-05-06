@@ -36,7 +36,7 @@
                             try {
                                 $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
                             } catch {
-                                Write-Warning "Get-GPOZaurr - Failed to ger GPOReport: $($_.Exception.Message). Skipping."
+                                Write-Warning "Get-GPOZaurr - Failed to get GPOReport: $($_.Exception.Message). Skipping."
                                 continue
                             }
                             Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups
@@ -51,7 +51,7 @@
                             try {
                                 $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
                             } catch {
-                                Write-Warning "Get-GPOZaurr - Failed to ger GPOReport: $($_.Exception.Message). Skipping."
+                                Write-Warning "Get-GPOZaurr - Failed to get GPOReport: $($_.Exception.Message). Skipping."
                                 continue
                             }
                             Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups
@@ -66,7 +66,7 @@
                             try {
                                 $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
                             } catch {
-                                Write-Warning "Get-GPOZaurr - Failed to ger GPOReport: $($_.Exception.Message). Skipping."
+                                Write-Warning "Get-GPOZaurr - Failed to get GPOReport: $($_.Exception.Message). Skipping."
                                 continue
                             }
                             Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups
