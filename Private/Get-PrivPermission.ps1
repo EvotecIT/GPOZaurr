@@ -13,7 +13,7 @@
         [System.Collections.IDictionary] $Accounts
     )
     Begin {
-        Write-Verbose "Get-GPOZaurrPermission - Processing $($GPO.DisplayName) from $($GPO.DomainName)"
+        Write-Verbose "Get-PrivPermission - Processing $($GPO.DisplayName) from $($GPO.DomainName)"
     }
     Process {
         $SecurityRights = $GPO.GetSecurityInfo()
@@ -66,6 +66,7 @@
                 Description       = $GPO.Description
                 CreationDate      = $GPO.CreationTime
                 ModificationTime  = $GPO.ModificationTime
+                PermissionType    = if ($GPOPermission.Denied -eq $true) { 'Deny' } else { 'Allow' }
                 Permission        = $GPOPermission.Permission  # : GpoEditDeleteModifySecurity
                 Inherited         = $GPOPermission.Inherited   # : False
                 Domain            = $GPOPermission.Trustee.Domain  #: EVOTEC
