@@ -26,8 +26,6 @@
     )
     Begin {
         $Count = 0
-        $StopMe = $false
-
         $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
         $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
         if ($Type -eq 'Unknown') {
@@ -89,8 +87,10 @@
                     ADAdministrativeGroups = $ADAdministrativeGroups
                 }
                 [Array] $GPOPermissions = Get-PrivPermission @getPrivPermissionSplat
-                foreach ($Permission in $GPOPermissions) {
-                    Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission #-IncludeDomains $GPO.DomainName
+                if ($GPOPermissions.Count -gt 0) {
+                    foreach ($Permission in $GPOPermissions) {
+                        Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission #-IncludeDomains $GPO.DomainName
+                    }
                     $Count++
                     if ($Count -eq $LimitProcessing) {
                         # skipping skips per removed permission not per gpo.
