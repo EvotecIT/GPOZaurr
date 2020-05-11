@@ -1,3 +1,3 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-Remove-GPOZaurrPermission -Verbose -Type Unknown -WhatIf
+Remove-GPOZaurrPermission -Verbose -Type Unknown -WhatIf -LimitProcessing 1
