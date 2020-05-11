@@ -2,6 +2,10 @@
     [cmdletBinding()]
     param(
         [Microsoft.GroupPolicy.Gpo] $GPO,
+
+        [string[]] $Principal,
+        [validateset('DistinguishedName', 'Name', 'Sid')][string] $PrincipalType = 'Sid',
+
         [switch] $SkipWellKnown,
         [switch] $SkipAdministrative,
         [switch] $IncludeOwner,
@@ -9,7 +13,7 @@
         [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
         [switch] $IncludeGPOObject,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
-        [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All')][string[]] $Type,
+        [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All', 'Default')][string[]] $Type,
         [System.Collections.IDictionary] $Accounts
     )
     Begin {
@@ -56,6 +60,22 @@
                 # May need updates if there's more types
                 if ($GPOPermission.Trustee.SidType -ne 'Unknown') {
                     return
+                }
+            }
+            if ($Principal) {
+                if ($PrincipalType -eq 'Sid') {
+                    if ($Principal -notcontains $GPOPermission.Trustee.Sid.Value) {
+                        return
+                    }
+                } elseif ($PrincipalType -eq 'DistinguishedName') {
+                    if ($Principal -notcontains $GPOPermission.Trustee.DSPath) {
+                        return
+                    }
+                } elseif ($PrincipalType -eq 'Name') {
+                    $UserMerge = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
+                    if ($Principal -notcontains $UserMerge -and $Principal -notcontains $GPOPermission.Trustee.Name) {
+                        return
+                    }
                 }
             }
             $ReturnObject = [ordered] @{
@@ -105,7 +125,7 @@
             if ($IncludeGPOObject) {
                 $ReturnObject['GPOObject'] = $GPO
                 $ReturnObject['GPOSecurity'] = $SecurityRights
-                $ReturnObject['GPOSecurityPermissionIndex'] = $GPOPermission
+                $ReturnObject['GPOSecurityPermissionItem'] = $GPOPermission
             }
             [PSCustomObject] $ReturnObject
         }
@@ -175,7 +195,7 @@
             if ($IncludeGPOObject) {
                 $ReturnObject['GPOObject'] = $GPO
                 $ReturnObject['GPOSecurity'] = $SecurityRights
-                $ReturnObject['GPOSecurityPermissionIndex'] = $null
+                $ReturnObject['GPOSecurityPermissionItem'] = $null
             }
             [PSCustomObject] $ReturnObject
         }
