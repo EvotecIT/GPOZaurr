@@ -7,7 +7,10 @@
         [Parameter(ParameterSetName = 'GPOGUID')]
         [alias('GUID', 'GPOID')][string] $GPOGuid,
 
-        [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative','All')][string[]] $Type = 'All',
+        [string[]] $Principal,
+        [validateset('DistinguishedName', 'Name', 'Sid')][string] $PrincipalType = 'Sid',
+
+        [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All')][string[]] $Type = 'All',
 
         [switch] $SkipWellKnown,
         [switch] $SkipAdministrative,
@@ -48,23 +51,48 @@
                 }
             }
         }
-
     }
     Process {
         foreach ($Domain in $ForestInformation.Domains) {
             $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
             if ($GPOName) {
-                Get-GPO -Name $GPOName -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue | ForEach-Object -Process {
-                    Get-PrivPermission -Accounts $Accounts -Type $Type -GPO $_ -SkipWellKnown:$SkipWellKnown.IsPresent -SkipAdministrative:$SkipAdministrative.IsPresent -IncludeOwner:$IncludeOwner.IsPresent -IncludeGPOObject:$IncludeGPOObject.IsPresent -IncludePermissionType $IncludePermissionType -ExcludePermissionType $ExcludePermissionType -ADAdministrativeGroups $ADAdministrativeGroups
+                $getGPOSplat = @{
+                    Name        = $GPOName
+                    Domain      = $Domain
+                    Server      = $QueryServer
+                    ErrorAction = 'SilentlyContinue'
                 }
             } elseif ($GPOGuid) {
-                Get-GPO -Guid $GPOGuid -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue | ForEach-Object -Process {
-                    Get-PrivPermission -Accounts $Accounts -Type $Type -GPO $_ -SkipWellKnown:$SkipWellKnown.IsPresent -SkipAdministrative:$SkipAdministrative.IsPresent -IncludeOwner:$IncludeOwner.IsPresent -IncludeGPOObject:$IncludeGPOObject.IsPresent -IncludePermissionType $IncludePermissionType -ExcludePermissionType $ExcludePermissionType -ADAdministrativeGroups $ADAdministrativeGroups
+                $getGPOSplat = @{
+                    Guid        = $GPOGuid
+                    Domain      = $Domain
+                    Server      = $QueryServer
+                    ErrorAction = 'SilentlyContinue'
                 }
             } else {
-                Get-GPO -All -Domain $Domain -Server $QueryServer | ForEach-Object -Process {
-                    Get-PrivPermission -Accounts $Accounts -Type $Type -GPO $_ -SkipWellKnown:$SkipWellKnown.IsPresent -SkipAdministrative:$SkipAdministrative.IsPresent -IncludeOwner:$IncludeOwner.IsPresent -IncludeGPOObject:$IncludeGPOObject.IsPresent -IncludePermissionType $IncludePermissionType -ExcludePermissionType $ExcludePermissionType -ADAdministrativeGroups $ADAdministrativeGroups
+                $getGPOSplat = @{
+                    All         = $true
+                    Domain      = $Domain
+                    Server      = $QueryServer
+                    ErrorAction = 'SilentlyContinue'
                 }
+            }
+            Get-GPO @getGPOSplat | ForEach-Object -Process {
+                $getPrivPermissionSplat = @{
+                    Principal              = $Principal
+                    PrincipalType          = $PrincipalType
+                    Accounts               = $Accounts
+                    Type                   = $Type
+                    GPO                    = $_
+                    SkipWellKnown          = $SkipWellKnown.IsPresent
+                    SkipAdministrative     = $SkipAdministrative.IsPresent
+                    IncludeOwner           = $IncludeOwner.IsPresent
+                    IncludeGPOObject       = $IncludeGPOObject.IsPresent
+                    IncludePermissionType  = $IncludePermissionType
+                    ExcludePermissionType  = $ExcludePermissionType
+                    ADAdministrativeGroups = $ADAdministrativeGroups
+                }
+                Get-PrivPermission @getPrivPermissionSplat
             }
         }
     }
