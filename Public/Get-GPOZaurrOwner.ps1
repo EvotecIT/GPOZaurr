@@ -1,6 +1,9 @@
 ﻿function Get-GPOZaurrOwner {
-    [cmdletbinding()]
+    [cmdletbinding(DefaultParameterSetName = 'Default')]
     param(
+        [Parameter(ParameterSetName = 'GPOName')][string] $GPOName,
+        [Parameter(ParameterSetName = 'GPOGUID')][alias('GUID', 'GPOID')][string] $GPOGuid,
+
         [switch] $IncludeSysvol,
 
         [alias('ForestName')][string] $Forest,
@@ -16,7 +19,19 @@
         }
     }
     Process {
-        Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ForestInformation | ForEach-Object -Process {
+        $getGPOZaurrADSplat = @{
+            Forest                    = $Forest
+            IncludeDomains            = $IncludeDomains
+            ExcludeDomains            = $ExcludeDomains
+            ExtendedForestInformation = $ForestInformation
+        }
+        if ($GPOName) {
+            $getGPOZaurrADSplat['GPOName']                   = $GPOName
+        } elseif ($GPOGuid) {
+            $getGPOZaurrADSplat['GPOGUID']                    = $GPOGuid
+        }
+        Get-GPOZaurrAD @getGPOZaurrADSplat | ForEach-Object -Process {
+            Write-Verbose "Get-GPOZaurrOwner - Processing GPO: $($_.DisplayName) from domain: $($_.DomainName)"
             $ACL = Get-ADACLOwner -ADObject $_.GPODistinguishedName -Resolve -ADAdministrativeGroups $ADAdministrativeGroups
             $Object = [ordered] @{
                 DisplayName       = $_.DisplayName

@@ -4,10 +4,12 @@
 # And also can fix at the same time NotAdministrative - this basically looks for users/groups that are not Domain Admins or Enterprise Admins
 # regardless if current user is still Domain Admin or not
 
-$GPOs = Get-GPOZaurr #-GPOName 'New Group Policy Object'
-$GPOs | Format-Table DisplayName, Owner, OwnerSID, OwnerType
+$GPOs = Get-GPOZaurrOwner -IncludeSysvol #-GPOName
+$GPOs | Format-Table DisplayName, Owner, OwnerSID, OwnerType, SysvolOwner, SysvolSID, SysvolType
 
-Set-GPOZaurrOwner -Type NonAdministrative -Verbose -LimitProcessing 1 -WhatIf
+Set-GPOZaurrOwner -Type NotAdministrative -Verbose -WhatIf #-LimitProcessing 12
 
-$GPOs = Get-GPOZaurr #-GPOName 'New Group Policy Object'
-$GPOs | Format-Table DisplayName, Owner, OwnerSID
+#Set-GPOZaurrOwner -GPOName 'New Group Policy Object' -Verbose -Principal 'przemyslaw.klys' -IncludeSysVol
+
+#$GPOs = Get-GPOZaurrOwner -IncludeSysvol #-GPOName 'New Group Policy Object'
+#$GPOs | Format-Table DisplayName, Owner, OwnerSID
