@@ -26,9 +26,9 @@
             ExtendedForestInformation = $ForestInformation
         }
         if ($GPOName) {
-            $getGPOZaurrADSplat['GPOName']                   = $GPOName
+            $getGPOZaurrADSplat['GPOName'] = $GPOName
         } elseif ($GPOGuid) {
-            $getGPOZaurrADSplat['GPOGUID']                    = $GPOGuid
+            $getGPOZaurrADSplat['GPOGUID'] = $GPOGuid
         }
         Get-GPOZaurrAD @getGPOZaurrADSplat | ForEach-Object -Process {
             Write-Verbose "Get-GPOZaurrOwner - Processing GPO: $($_.DisplayName) from domain: $($_.DomainName)"
@@ -47,6 +47,7 @@
                 $Object['SysvolOwner'] = $FileOwner.OwnerName
                 $Object['SysvolSid'] = $FileOwner.OwnerSid
                 $Object['SysvolType'] = $FileOwner.OwnerType
+                $Object['SysvolPath'] = $_.Path
             }
             [PSCUstomObject] $Object
         }
