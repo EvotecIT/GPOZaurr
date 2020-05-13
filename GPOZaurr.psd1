@@ -7,7 +7,7 @@
     Description          = 'Group Policy Eater'
     FunctionsToExport    = 'Add-GPOPermission', 'Add-GPOZaurrPermission', 'Backup-GPOZaurr', 'Get-GPOZaurr', 'Get-GPOZaurrAD', 'Get-GPOZaurrBackupInformation', 'Get-GPOZaurrPermissionConsistency', 'Get-GPOZaurrLink', 'Get-GPOZaurrOwner', 'Get-GPOZaurrPassword', 'Get-GPOZaurrPermission', 'Get-GPOZaurrWMI', 'Invoke-GPOZaurrPermission', 'New-GPOZaurrWMI', 'Remove-GPOPermission', 'Remove-GPOZaurr', 'Remove-GPOZaurrPermission', 'Remove-GPOZaurrWMI', 'Restore-GPOZaurr', 'Save-GPOZaurrFiles', 'Set-GPOOwner', 'Set-GPOZaurrOwner'
     GUID                 = 'f7d4c9e4-0298-4f51-ad77-e8e3febebbde'
-    ModuleVersion        = '0.0.21'
+    ModuleVersion        = '0.0.22'
     PowerShellVersion    = '5.1'
     PrivateData          = @{
         PSData = @{
@@ -17,7 +17,7 @@
         }
     }
     RequiredModules      = @{
-        ModuleVersion = '0.0.140'
+        ModuleVersion = '0.0.141'
         ModuleName    = 'PSSharedGoods'
         Guid          = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe'
     }, @{
