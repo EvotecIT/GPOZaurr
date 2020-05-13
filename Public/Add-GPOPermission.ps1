@@ -8,7 +8,7 @@
     )
     if ($Type -eq 'Default') {
         @{
-            Action                       = 'Add'
+            Action                = 'Add'
             Type                  = 'Standard'
             Trustee               = $Trustee
             IncludePermissionType = $IncludePermissionType
