@@ -7,7 +7,7 @@
         [parameter(ParameterSetName = 'Filter')][string] $SearchBase,
         [parameter(ParameterSetName = 'Filter')][Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
 
-        [parameter(ParameterSetName = 'Linked',Mandatory)][validateset('Root', 'DomainControllers', 'Site', 'Other')][string] $Linked,
+        [parameter(ParameterSetName = 'Linked', Mandatory)][validateset('Root', 'DomainControllers', 'Site', 'Other')][string] $Linked,
 
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
@@ -58,7 +58,7 @@
                     $Splat = @{
                         #Filter     = $Filter
                         Properties = 'distinguishedName', 'gplink', 'CanonicalName'
-                       # Filter     = "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')"
+                        # Filter     = "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')"
                         Server     = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
                     }
                     if ($Linked -contains 'DomainControllers') {
@@ -103,7 +103,7 @@
                     if ($Linked -contains 'Other') {
                         $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
                         #if ($SearchBase -notlike "*$DomainDistinguishedName") {
-                            # we check if SearchBase is part of domain distinugishname. If it isn't we skip
+                        # we check if SearchBase is part of domain distinugishname. If it isn't we skip
                         #    continue
                         #}
                         $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
@@ -125,6 +125,7 @@
                         Filter     = $Filter
                         Properties = 'distinguishedName', 'gplink', 'CanonicalName'
                         Server     = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
+
                     }
                     if ($PSBoundParameters.ContainsKey('SearchBase')) {
                         $DomainDistinguishedName = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
@@ -139,8 +140,12 @@
                         $Splat['SearchScope'] = $SearchScope
                     }
 
-                    Get-ADObject @Splat | ForEach-Object {
-                        Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                    try {
+                        Get-ADObject @Splat | ForEach-Object {
+                            Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                        }
+                    } catch {
+                        Write-Warning "Get-GPOZaurrLink - Processing error $($_.Exception.Message)"
                     }
                 }
             }

@@ -1,10 +1,9 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-$T = Get-GPOZaurrOwner -Verbose -IncludeSysvol -Forest 'test.evotec.pl'
-$T | Format-Table *
+#$T = Get-GPOZaurrOwner -Verbose -IncludeSysvol -Forest 'test.evotec.pl'
+#$T | Format-Table *
 #$T | Out-HtmlView -ScrollX
 
-return
 $T = Get-GPOZaurrOwner -Verbose -IncludeSysvol -GPOName 'Default Domain Policy'
 $T | Format-Table *
 
