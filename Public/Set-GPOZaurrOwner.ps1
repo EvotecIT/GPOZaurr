@@ -146,7 +146,7 @@
                 if ($SkipSysvol) {
                     Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). SysVol scanning is disabled. Skipping."
                 } else {
-                if ($AdministrativeGroup -ne $AdministrativeGroupSysvol) {
+                    if ($AdministrativeGroup -ne $AdministrativeGroupSysvol) {
                         #Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). Fixing required."
                         $_
                     }
@@ -197,7 +197,7 @@
                 }
             }
         }
-            <#
+        <#
             if ($Type -contains 'All') {
                 # Regardless who is the owner it is overwritten
                 if ($Principal) {
