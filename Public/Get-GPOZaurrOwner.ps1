@@ -30,7 +30,8 @@
         } elseif ($GPOGuid) {
             $getGPOZaurrADSplat['GPOGUID'] = $GPOGuid
         }
-        Get-GPOZaurrAD @getGPOZaurrADSplat | ForEach-Object -Process {
+        $Objects = Get-GPOZaurrAD @getGPOZaurrADSplat
+        foreach ($_ in $Objects) {
             Write-Verbose "Get-GPOZaurrOwner - Processing GPO: $($_.DisplayName) from domain: $($_.DomainName)"
             $ACL = Get-ADACLOwner -ADObject $_.GPODistinguishedName -Resolve -ADAdministrativeGroups $ADAdministrativeGroups
             $Object = [ordered] @{
