@@ -120,24 +120,6 @@
                         $_
                     }
                 }
-
-                <#
-                if (-not $AdministrativeGroup -and (-not $AdministrativeGroupSysvol -and -not $SkipSysvol)) {
-                    $Action = 'Both'
-                    $_
-                } elseif (-not $AdministrativeGroup) {
-                    $Action = 'OnlyGPO'
-                    $_
-                } elseif (-not $AdministrativeGroupSysvol -and -not $SkipSysvol) {
-                    $Action = 'OnlyFileSystem'
-                    $_
-                } else {
-                    if ($_.Owner -ne $_.SysvolOwner) {
-                        $Action = 'OnlyFileSystem'
-                        $_
-                    }
-                }
-                #>
             } elseif ($Type -eq 'Unknown') {
                 if (-not $_.Owner -or (-not $_.SysvolOwner -and -not $SkipSysvol)) {
                     $_
@@ -172,9 +154,6 @@
             }
         } | Select-Object -First $LimitProcessing | ForEach-Object -Process {
             $GPO = $_
-            #if (-not $Principal) {
-            #   $Principal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
-            #}
             if (-not $Principal) {
                 $DefaultPrincipal = $ADAdministrativeGroups["$($_.DomainName)"]['DomainAdmins']
             } else {
@@ -197,98 +176,6 @@
                 }
             }
         }
-        <#
-            if ($Type -contains 'All') {
-                # Regardless who is the owner it is overwritten
-                if ($Principal) {
-                    Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $Principal"
-                    Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Principal -Verbose:$false -WhatIf:$WhatIfPreference
-                } else {
-                    $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
-                    Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $DefaultPrincipal"
-                    Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
-                }
-                $Count++
-                if ($Count -eq $LimitProcessing) {
-                    break
-                }
-            } elseif ($Type -contains 'NotAdministrative' -and $Type -notcontains 'All') {
-                if ($GPO.Owner) {
-                    $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($GPO.Owner)"]
-                    if (-not $AdministrativeGroup) {
-                        if ($Principal) {
-                            Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $Principal"
-                            Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
-                        } else {
-                            $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
-                            Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $DefaultPrincipal"
-                            Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
-                        }
-                        $Count++
-                        if ($Count -eq $LimitProcessing) {
-                            return
-                        }
-                    }
-                }
-            } else ($Type -contains 'Unknown' -and $Type -notcontains 'All') {
-                if ($null -eq $GPO.Owner) {
-                    if ($Principal) {
-                        Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner NULL/$($GPO.OwnerSID) to $Principal"
-                        Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Principal -Verbose:$false -WhatIf:$WhatIfPreference
-                    } else {
-                        $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
-                        Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner NULL/$($GPO.OwnerSID) to $DefaultPrincipal"
-                        Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
-                    }
-                    $Count++
-                    if ($Count -eq $LimitProcessing) {
-                        break
-                    }
-                }
-            } else {
-                $GPO = $_
-                if ($Principal) {
-                    Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $Principal"
-                    Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Principal -Verbose:$false -WhatIf:$WhatIfPreference
-                } else {
-                    $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
-                    Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $DefaultPrincipal"
-                    Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
-                }
-            }
-            #>
-        #}
-        #>
-        #}
-        <#
-        else {
-            $getGPOZaurrOwnerSplat = @{
-                IncludeSysvol             = $IncludeSysVol
-                Forest                    = $Forest
-                IncludeDomains            = $IncludeDomains
-                ExcludeDomains            = $ExcludeDomains
-                ExtendedForestInformation = $ExtendedForestInformation
-                ADAdministrativeGroups    = $ADAdministrativeGroups
-                GPOName                   = $GPOName
-                GPOGuid                   = $GPOGUiD
-            }
-            Get-GPOZaurrOwner @getGPOZaurrOwnerSplat $IncludeSysVol | ForEach-Object -Process {
-                $GPO = $_
-                if ($Principal) {
-                    Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $Principal"
-                    Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Principal -Verbose:$false -WhatIf:$WhatIfPreference
-                } else {
-                    $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
-                    Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner)/$($GPO.OwnerSID) to $DefaultPrincipal"
-                    Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
-                }
-                $Count++
-                if ($Count -eq $LimitProcessing) {
-                    break
-                }
-            }
-        }
-        #>
     }
     End {
 
