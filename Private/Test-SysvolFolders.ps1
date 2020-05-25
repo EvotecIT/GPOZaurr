@@ -37,12 +37,13 @@
     $GPOSummary = @(
         foreach ($GPO in $GPOS) {
             if ($null -ne $SysvolHash[$GPO.Id.GUID].FullName) {
+                $FullPath = $SysvolHash[$GPO.Id.GUID].FullName
                 try {
                     $ACL = Get-Acl -Path $SysvolHash[$GPO.Id.GUID].FullName -ErrorAction Stop
                     $Owner = $ACL.Owner
                     $ErrorMessage = ''
                 } catch {
-                    Write-Warning "Get-GPOZaurrSysvol - ACL reading failed for $($SysvolHash[$GPO.Id.GUID].FullName) with error: $($_.Exception.Message)"
+                    Write-Warning "Get-GPOZaurrSysvol - ACL reading (1) failed for $FullPath with error: $($_.Exception.Message)"
                     $ACL = $null
                     $Owner = ''
                     $ErrorMessage = $_.Exception.Message
@@ -65,6 +66,7 @@
                 FileOwner        = $Owner
                 Id               = $GPO.Id.Guid
                 GpoStatus        = $GPO.GpoStatus
+                Path             = $FullPath
                 Description      = $GPO.Description
                 CreationTime     = $GPO.CreationTime
                 ModificationTime = $GPO.ModificationTime
@@ -78,12 +80,13 @@
         foreach ($_ in $Differences.Keys) {
             if ($Differences[$_] -eq 'Orphaned GPO') {
                 if ($SysvolHash[$_].BaseName -notcontains 'PolicyDefinitions') {
+                    $FullPath = $SysvolHash[$_].FullName
                     try {
-                        $ACL = Get-Acl -Path $SysvolHash[$_].FullName -ErrorAction Stop
+                        $ACL = Get-Acl -Path $FullPath -ErrorAction Stop
                         $Owner = $ACL.Owner
                         $ErrorMessage = ''
                     } catch {
-                        Write-Warning "Get-GPOZaurrSysvol - ACL reading failed for $($SysvolHash[$_].FullName) with error: $($_.Exception.Message)"
+                        Write-Warning "Get-GPOZaurrSysvol - ACL reading (2) failed for $FullPath with error: $($_.Exception.Message)"
                         $ACL = $null
                         $Owner = $null
                         $ErrorMessage = $_.Exception.Message
@@ -99,6 +102,7 @@
                         FileOwner        = $Owner
                         Id               = $_
                         GpoStatus        = 'Orphaned'
+                        Path             = $FullPath
                         Description      = $null
                         CreationTime     = $SysvolHash[$_].CreationTime
                         ModificationTime = $SysvolHash[$_].LastWriteTime
