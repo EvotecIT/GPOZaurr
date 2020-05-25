@@ -9,7 +9,7 @@
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [switch] $IncludeGPOObject,
-        [switch] $VerifyInside
+        [switch] $VerifyInheritance
     )
     Begin {
         $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
@@ -49,7 +49,7 @@
                     $IsConsistent = 'Not available.'
                 }
                 $SysVolpath = -join ('\\', $Domain, '\sysvol\', $Domain, '\Policies\{', $_.ID.GUID, '}')
-                if ($VerifyInside) {
+                if ($VerifyInheritance) {
                     $FolderPermissions = Get-WinADSharePermission -Path $SysVolpath
                     [Array] $NotInheritedPermissions = foreach ($File in $FolderPermissions) {
                         if ($File.Path -ne $SysVolpath -and $File.IsInherited -eq $false) {
@@ -65,30 +65,54 @@
                     $ACLConsistentInside = $null
                 }
                 $Object = [ordered] @{
-                    DisplayName         = $_.DisplayName     # : New Group Policy Object
-                    DomainName          = $_.DomainName      # : ad.evotec.xyz
-                    ACLConsistent       = $IsConsistent
-                    ACLConsistentInside = $ACLConsistentInside
-                    Owner               = $_.Owner           # : EVOTEC\Enterprise Admins
-                    Path                = $_.Path
-                    SysVolPath          = $SysvolPath
-                    Id                  = $_.Id              # : 8a7bc515-d7fd-4d1f-90b8-e47c15f89295
-                    GpoStatus           = $_.GpoStatus       # : AllSettingsEnabled
-                    Description         = $_.Description     # :
-                    CreationTime        = $_.CreationTime    # : 04.03.2020 17:19:42
-                    ModificationTime    = $_.ModificationTime# : 06.05.2020 10:30:36
-                    UserVersion         = $_.UserVersion     # : AD Version: 0, SysVol Version: 0
-                    ComputerVersion     = $_.ComputerVersion # : AD Version: 1, SysVol Version: 1
-                    WmiFilter           = $_.WmiFilter       # :
-                    Error               = $ErrorMessage
+                    DisplayName   = $_.DisplayName     # : New Group Policy Object
+                    DomainName    = $_.DomainName      # : ad.evotec.xyz
+                    ACLConsistent = $IsConsistent
                 }
+                if ($VerifyInheritance) {
+                    $Object['ACLConsistentInside'] = $ACLConsistentInside
+                }
+                $Object['Owner'] = $_.Owner           # : EVOTEC\Enterprise Admins
+                $Object['Path'] = $_.Path
+                $Object['SysVolPath '] = $SysvolPath
+                $Object['Id       '] = $_.Id              # : 8a7bc515-d7fd-4d1f-90b8-e47c15f89295
+                $Object['GpoStatus'] = $_.GpoStatus       # : AllSettingsEnabled
+                $Object['Description'] = $_.Description     # :
+                $Object['CreationTime'] = $_.CreationTime    # : 04.03.2020 17:19:42
+                $Object['ModificationTime'] = $_.ModificationTime# : 06.05.2020 10:30:36
+                $Object['UserVersion'] = $_.UserVersion     # : AD Version: 0, SysVol Version: 0
+                $Object['ComputerVersion'] = $_.ComputerVersion # : AD Version: 1, SysVol Version: 1
+                $Object['WmiFilter'] = $_.WmiFilter       # :
+                $Object['Error'] = $ErrorMessage
                 if ($IncludeGPOObject) {
                     $Object['IncludeGPOObject'] = $_
                 }
-                if ($VerifyInside) {
+                if ($VerifyInheritance) {
                     $Object['ACLConsistentInsideDetails'] = $NotInheritedPermissions
                 }
-                [PSCustomObject] $Object
+                if ($Type -eq 'All') {
+                    [PSCustomObject] $Object
+                } elseif ($Type -eq 'Inconsistent') {
+                    if ($VerifyInheritance) {
+                        if (-not $IsConsistent -or -not $ACLConsistentInside) {
+                            [PSCustomObject] $Object
+                        }
+                    } else {
+                        if (-not $IsConsistent) {
+                            [PSCustomObject] $Object
+                        }
+                    }
+                } elseif ($Type -eq 'Consistent') {
+                    if ($VerifyInheritance) {
+                        if ($IsConsistent -and $ACLConsistentInside) {
+                            [PSCustomObject] $Object
+                        }
+                    } else {
+                        if ($IsConsistent) {
+                            [PSCustomObject] $Object
+                        }
+                    }
+                }
             }
         }
     }

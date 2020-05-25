@@ -35,13 +35,12 @@
             Write-Verbose "Get-GPOZaurrOwner - Processing GPO: $($_.DisplayName) from domain: $($_.DomainName)"
             $ACL = Get-ADACLOwner -ADObject $_.GPODistinguishedName -Resolve -ADAdministrativeGroups $ADAdministrativeGroups
             $Object = [ordered] @{
-                DisplayName       = $_.DisplayName
-                DomainName        = $_.DomainName
-                GUID              = $_.GUID
-                DistinguishedName = $_.GPODistinguishedName
-                Owner             = $ACL.OwnerName
-                OwnerSid          = $ACL.OwnerSid
-                OwnerType         = $ACL.OwnerType
+                DisplayName = $_.DisplayName
+                DomainName  = $_.DomainName
+                GUID        = $_.GUID
+                Owner       = $ACL.OwnerName
+                OwnerSid    = $ACL.OwnerSid
+                OwnerType   = $ACL.OwnerType
             }
             if ($IncludeSysvol) {
                 $FileOwner = Get-FileOwner -JustPath -Path $_.Path -Resolve
@@ -49,7 +48,9 @@
                 $Object['SysvolSid'] = $FileOwner.OwnerSid
                 $Object['SysvolType'] = $FileOwner.OwnerType
                 $Object['SysvolPath'] = $_.Path
+                $Object['IsOwnerConsistent'] = if ($ACL.OwnerName -eq $FileOwner.OwnerName) { $true } else { $false }
             }
+            $Object['DistinguishedName'] = $_.GPODistinguishedName
             [PSCUstomObject] $Object
         }
     }
