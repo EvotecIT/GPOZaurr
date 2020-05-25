@@ -39,9 +39,13 @@
             if ($null -ne $SysvolHash[$GPO.Id.GUID].FullName) {
                 try {
                     $ACL = Get-Acl -Path $SysvolHash[$GPO.Id.GUID].FullName -ErrorAction Stop
+                    $Owner = $ACL.Owner
+                    $ErrorMessage = ''
                 } catch {
-                    Write-Warning "Get-WinADGPOSysvolFolders - ACL reading failed for $($SysvolHash[$GPO.Id.GUID].FullName) with error: $($_.Exception.Message)"
+                    Write-Warning "Get-GPOZaurrSysvol - ACL reading failed for $($SysvolHash[$GPO.Id.GUID].FullName) with error: $($_.Exception.Message)"
                     $ACL = $null
+                    $Owner = ''
+                    $ErrorMessage = $_.Exception.Message
                 }
             } else {
                 $ACL = $null
@@ -58,7 +62,7 @@
                 SysvolServer     = $Server
                 SysvolStatus     = $SysVolStatus
                 Owner            = $GPO.Owner
-                FileOwner        = $ACL.Owner
+                FileOwner        = $Owner
                 Id               = $GPO.Id.Guid
                 GpoStatus        = $GPO.GpoStatus
                 Description      = $GPO.Description
@@ -67,17 +71,22 @@
                 UserVersion      = $GPO.UserVersion
                 ComputerVersion  = $GPO.ComputerVersion
                 WmiFilter        = $GPO.WmiFilter
+                Error            = $ErrorMessage
             }
         }
         # Now we need to list thru Sysvol files and fine those that do not exists as GPO and create dummy GPO objects to show orphaned gpos
         foreach ($_ in $Differences.Keys) {
             if ($Differences[$_] -eq 'Orphaned GPO') {
                 if ($SysvolHash[$_].BaseName -notcontains 'PolicyDefinitions') {
-
-                    if ($null -ne $SysvolHash[$_].FullName) {
-                        $ACL = Get-Acl -Path $SysvolHash[$_].FullName -ErrorAction SilentlyContinue
-                    } else {
+                    try {
+                        $ACL = Get-Acl -Path $SysvolHash[$_].FullName -ErrorAction Stop
+                        $Owner = $ACL.Owner
+                        $ErrorMessage = ''
+                    } catch {
+                        Write-Warning "Get-GPOZaurrSysvol - ACL reading failed for $($SysvolHash[$_].FullName) with error: $($_.Exception.Message)"
                         $ACL = $null
+                        $Owner = $null
+                        $ErrorMessage = $_.Exception.Message
                     }
 
                     [PSCustomObject] @{
@@ -86,8 +95,8 @@
                         DomainName       = $Domain
                         SysvolServer     = $Server
                         SysvolStatus     = $Differences[$GPO.Id.Guid]
-                        Owner            = $ACL.Owner
-                        FileOwner        = $ACL.Owner
+                        Owner            = ''
+                        FileOwner        = $Owner
                         Id               = $_
                         GpoStatus        = 'Orphaned'
                         Description      = $null
@@ -96,6 +105,7 @@
                         UserVersion      = $null
                         ComputerVersion  = $null
                         WmiFilter        = $null
+                        Error            = $ErrorMessage
                     }
                 }
             }
