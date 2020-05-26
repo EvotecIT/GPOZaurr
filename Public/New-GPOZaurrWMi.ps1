@@ -3,6 +3,7 @@
     param(
         [parameter(Mandatory)][string] $Name,
         [string] $Description = ' ',
+        [string] $Namespace = 'root\CIMv2',
         [parameter(Mandatory)][string] $Query,
         [switch] $SkipQueryCheck,
         [switch] $Force,
@@ -50,7 +51,7 @@
 
         [Array] $ExistingWmiFilter = Get-GPOZaurrWMI -ExtendedForestInformation $ForestInformation -IncludeDomains $Domain -Name $Name
         if ($ExistingWmiFilter.Count -eq 0) {
-            [string] $WMIParm2 = -join ("1;3;10;", $Query.Length.ToString(), ";WQL;root\CIMv2;", $Query , ";")
+            [string] $WMIParm2 = -join ("1;3;10;", $Query.Length.ToString(), ";WQL;$Namespace;", $Query , ";")
             $OtherAttributes = @{
                 "msWMI-Name"             = $Name
                 "msWMI-Parm1"            = $Description
@@ -67,7 +68,7 @@
 
             try {
                 Write-Verbose "New-GPOZaurrWMI - Creating WMI filter $Name in $Domain"
-                New-ADObject -name $GUID -type "msWMI-Som" -Path $WMIPath -OtherAttributes $OtherAttributes -Server $QueryServer
+                New-ADObject -Name $GUID -Type "msWMI-Som" -Path $WMIPath -OtherAttributes $OtherAttributes -Server $QueryServer
             } catch {
                 Write-Warning "New-GPOZaurrWMI - Creating GPO filter error $($_.Exception.Message). Terminating."
                 return

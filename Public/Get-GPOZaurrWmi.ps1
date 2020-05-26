@@ -1,4 +1,11 @@
-﻿function Get-GPOZaurrWMI {
+﻿function Get-WMIFilter {
+    param(
+
+    )
+
+}
+
+function Get-GPOZaurrWMI {
     [cmdletBinding()]
     Param(
         [Guid[]] $Guid,
@@ -13,79 +20,63 @@
     $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     foreach ($Domain in $ForestInformation.Domains) {
         $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
-        if ($Guid -or $Name) {
-            foreach ($N in $Name) {
-                try {
-                    $ldapFilter = "(&(objectClass=msWMI-Som)(msWMI-Name=$N))"
-                    Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer | ForEach-Object -Process {
-                        $WMI = $_.'msWMI-Parm2' -split ';'
-                        [PSCustomObject] @{
-                            DisplayName       = $_.'msWMI-Name'
-                            Description       = $_.'msWMI-Parm1'
-                            DomainName        = $Domain
-                            NameSpace         = $WMI[5]
-                            Query             = $WMI[6]
-                            Author            = $_.'msWMI-Author'
-                            ID                = $_.'msWMI-ID'
-                            Created           = $_.Created
-                            Modified          = $_.Modified
-                            ObjectGUID        = $_.'ObjectGUID'
-                            CanonicalName     = $_.CanonicalName
-                            DistinguishedName = $_.'DistinguishedName'
-                        }
+        $Objects = @(
+            if ($Name) {
+                foreach ($N in $Name) {
+                    try {
+                        $ldapFilter = "(&(objectClass=msWMI-Som)(msWMI-Name=$N))"
+                        Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer
+                    } catch {
+                        Write-Warning "Get-GPOZaurrWMI - Error processing WMI for $Domain`: $($_.Error.Exception)"
                     }
+                }
+            } elseif ($GUID) {
+                foreach ($G in $GUID) {
+                    try {
+                        $ldapFilter = "(&(objectClass=msWMI-Som)(Name={$G}))"
+                        Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer
+                    } catch {
+                        Write-Warning "Get-GPOZaurrWMI - Error processing WMI for $Domain`: $($_.Error.Exception)"
+                    }
+                }
+            } else {
+                try {
+                    $ldapFilter = "(objectClass=msWMI-Som)"
+                    Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer
                 } catch {
                     Write-Warning "Get-GPOZaurrWMI - Error processing WMI for $Domain`: $($_.Error.Exception)"
                 }
             }
-            foreach ($G in $GUID) {
-                $ldapFilter = "(&(objectClass=msWMI-Som)(Name={$G}))"
-                try {
-                    Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer | ForEach-Object -Process {
-                        $WMI = $_.'msWMI-Parm2' -split ';'
-                        [PSCustomObject] @{
-                            DisplayName       = $_.'msWMI-Name'
-                            Description       = $_.'msWMI-Parm1'
-                            DomainName        = $Domain
-                            NameSpace         = $WMI[5]
-                            Query             = $WMI[6]
-                            Author            = $_.'msWMI-Author'
-                            ID                = $_.'msWMI-ID'
-                            Created           = $_.Created
-                            Modified          = $_.Modified
-                            ObjectGUID        = $_.'ObjectGUID'
-                            CanonicalName     = $_.CanonicalName
-                            DistinguishedName = $_.'DistinguishedName'
-                        }
-                    }
-                } catch {
-                    Write-Warning "Get-GPOZaurrWMI - Error processing WMI for $Domain`: $($_.Error.Exception)"
+        )
+        foreach ($_ in $Objects) {
+            $WMI = $_.'msWMI-Parm2' -split ';' #$WMI = $_.'msWMI-Parm2'.Split(';',8)
+            [Array] $Data = for ($i = 0; $i -lt $WMI.length; $i += 6) {
+                if ($WMI[$i + 5]) {
+                    #[PSCustomObject] @{
+                    #    NameSpace = $WMI[$i + 5]
+                    #    Query     = $WMI[$i + 6]
+                    #}
+                    -join ($WMI[$i + 5], ';' , $WMI[$i + 6])
                 }
             }
-        } else {
-            $ldapFilter = "(objectClass=msWMI-Som)"
-            try {
-                Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer | ForEach-Object -Process {
-                    $WMI = $_.'msWMI-Parm2' -split ';'
-                    [PSCustomObject] @{
-                        DisplayName       = $_.'msWMI-Name'
-                        Description       = $_.'msWMI-Parm1'
-                        DomainName        = $Domain
-                        NameSpace         = $WMI[5]
-                        Query             = $WMI[6]
-                        Author            = $_.'msWMI-Author'
-                        ID                = $_.'msWMI-ID'
-                        Created           = $_.Created
-                        Modified          = $_.Modified
-                        ObjectGUID        = $_.'ObjectGUID'
-                        CanonicalName     = $_.CanonicalName
-                        DistinguishedName = $_.'DistinguishedName'
-                    }
-                }
-            } catch {
-                Write-Warning "Get-GPOZaurrWMI - Error processing WMI for $Domain`: $($_.Error.Exception)"
+            [PSCustomObject] @{
+                DisplayName       = $_.'msWMI-Name'
+                Description       = $_.'msWMI-Parm1'
+                DomainName        = $Domain
+                #NameSpace         = $WMI[$i + 5]
+                #Query             = $WMI[$i + 6]
+                QueryCount        = $Data.Count
+                Query             = $Data -join ","
+                Author            = $_.'msWMI-Author'
+                ID                = $_.'msWMI-ID'
+                Created           = $_.Created
+                Modified          = $_.Modified
+                ObjectGUID        = $_.'ObjectGUID'
+                CanonicalName     = $_.CanonicalName
+                DistinguishedName = $_.'DistinguishedName'
             }
         }
+
     }
 }
 <#
