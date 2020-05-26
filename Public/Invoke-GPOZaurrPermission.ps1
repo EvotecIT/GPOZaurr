@@ -197,17 +197,19 @@
                             $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($GPO.Owner)"]
                             if (-not $AdministrativeGroup) {
                                 $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
-                                Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) to $DefaultPrincipal"
-                                Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                                Write-Verbose "Invoke-GPOZaurrPermission - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) to $DefaultPrincipal"
+                                #Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                                Set-GPOZaurrOwner -GPOGuid $GPO.Guid -IncludeDomains $GPO.Domain -Principal $DefaultPrincipal -WhatIf:$WhatIfPreference
                             }
                         } elseif ($Rule.Type -eq 'Default') {
-                            Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) to $($Rule.Principal)"
-                            Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Rule.Principal -Verbose:$false -WhatIf:$WhatIfPreference
+                            Write-Verbose "Invoke-GPOZaurrPermission - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) to $($Rule.Principal)"
+                            #Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Rule.Principal -Verbose:$false -WhatIf:$WhatIfPreference
+                            Set-GPOZaurrOwner -GPOGuid $GPO.Guid -IncludeDomains $GPO.Domain -Principal $Rule.Principal -WhatIf:$WhatIfPreference
                         }
                         continue
                     }
                     if ($Rule.Action -eq 'Remove') {
-                        $GPOPermissions = Get-GPOZaurrPermission -GPOGuid $_.GUID -IncludePermissionType $Rule.IncludePermissionType -ExcludePermissionType $Rule.ExcludePermissionType -Type $Rule.Type -IncludeGPOObject
+                        $GPOPermissions = Get-GPOZaurrPermission -GPOGuid $_.GUID -IncludePermissionType $Rule.IncludePermissionType -ExcludePermissionType $Rule.ExcludePermissionType -Type $Rule.Type -IncludeGPOObject -PermitType $Rule.PermitType
                         foreach ($Permission in $GPOPermissions) {
                             Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission #-IncludeDomains $GPO.DomainName
                         }

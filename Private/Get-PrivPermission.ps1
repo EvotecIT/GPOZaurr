@@ -11,6 +11,7 @@
         [switch] $IncludeOwner,
         [Microsoft.GroupPolicy.GPPermissionType[]] $IncludePermissionType,
         [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
+        [validateSet('Allow', 'Deny', 'All')][string] $PermitType = 'All',
         [switch] $IncludeGPOObject,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
         [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All', 'Default')][string[]] $Type,
@@ -24,6 +25,18 @@
         $SecurityRights | ForEach-Object -Process {
             #Get-GPPermissions -Guid $GPO.ID -DomainName $GPO.DomainName -All -Server $QueryServer | ForEach-Object -Process {
             $GPOPermission = $_
+
+            if ($PermitType -ne 'All') {
+                if ($PermitType -eq 'Deny') {
+                    if ($GPOPermission.Denied -eq $false) {
+                        return
+                    }
+                } else {
+                    if ($GPOPermission.Denied -eq $true) {
+                        return
+                    }
+                }
+            }
             if ($ExcludePermissionType -contains $GPOPermission.Permission) {
                 return
             }

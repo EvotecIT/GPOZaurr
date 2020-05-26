@@ -3,7 +3,8 @@
     param(
         [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'Administrative', 'NotAdministrative', 'All')][string[]] $Type,
         [Microsoft.GroupPolicy.GPPermissionType[]] $IncludePermissionType,
-        [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType
+        [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
+        [validateSet('Allow', 'Deny', 'All')][string] $PermitType = 'Allow'
     )
 
     if ($Type) {
@@ -12,6 +13,7 @@
             Type                  = $Type
             IncludePermissionType = $IncludePermissionType
             ExcludePermissionType = $ExcludePermissionType
+            PermitType            = $PermitType
         }
     }
     <#

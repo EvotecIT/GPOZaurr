@@ -19,6 +19,8 @@
         [switch] $IncludeOwner,
         [Microsoft.GroupPolicy.GPPermissionType[]] $IncludePermissionType,
         [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
+        [validateSet('Allow', 'Deny', 'All')][string] $PermitType = 'All',
+
         [switch] $IncludeGPOObject,
 
         [alias('ForestName')][string] $Forest,
@@ -81,6 +83,7 @@
                 $getPrivPermissionSplat = @{
                     Principal              = $Principal
                     PrincipalType          = $PrincipalType
+                    PermitType             = $PermitType
                     Accounts               = $Accounts
                     Type                   = $Type
                     GPO                    = $_
