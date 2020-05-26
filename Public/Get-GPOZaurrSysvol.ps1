@@ -21,13 +21,17 @@
             Write-Warning "Get-GPOZaurrSysvol - Couldn't get GPOs from $Domain. Error: $($_.Exception.Message)"
             continue
         }
-        if (-not $VerifyDomainControllers) {
-            Test-SysVolFolders -GPOs $GPOs -Server $Domain -Domain $Domain
-        } else {
-            foreach ($Server in $ForestInformation['DomainDomainControllers']["$Domain"]) {
-                Write-Verbose "Get-WinADGPOSysvolFolders - Processing $Domain \ $($Server.HostName.Trim())"
-                Test-SysVolFolders -GPOs $GPOs -Server $Server.Hostname -Domain $Domain
+        if ($GPOs.Count -ge 2) {
+            if (-not $VerifyDomainControllers) {
+                Test-SysVolFolders -GPOs $GPOs -Server $Domain -Domain $Domain
+            } else {
+                foreach ($Server in $ForestInformation['DomainDomainControllers']["$Domain"]) {
+                    Write-Verbose "Get-GPOZaurrSysvol - Processing $Domain \ $($Server.HostName.Trim())"
+                    Test-SysVolFolders -GPOs $GPOs -Server $Server.Hostname -Domain $Domain
+                }
             }
+        } else {
+            Write-Warning "Get-GPOZaurrSysvol - GPO count for $Domain is less then 2. This is not expected for fully functioning domain. Skipping processing SYSVOL folder."
         }
     }
 }
