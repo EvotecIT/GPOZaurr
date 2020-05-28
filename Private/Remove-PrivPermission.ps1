@@ -7,7 +7,7 @@
         [alias('PermissionType')][Microsoft.GroupPolicy.GPPermissionType[]] $IncludePermissionType
     )
     if ($GPOPermission.Name) {
-        $Text = "Removing SID: $($GPOPermission.Sid), Name: $($GPOPermission.Name), SidType: $($GPOPermission.SidType) from domain $($GPOPermission.DomainName)"
+        $Text = "Removing SID: $($GPOPermission.Sid), Name: $($GPOPermission.Domain)\$($GPOPermission.Name), SidType: $($GPOPermission.SidType) from domain $($GPOPermission.DomainName)"
     } else {
         $Text = "Removing SID: $($GPOPermission.Sid), Name: EMPTY, SidType: $($GPOPermission.SidType) from domain $($GPOPermission.DomainName)"
     }

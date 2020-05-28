@@ -93,7 +93,8 @@
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {
-        $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ForestInformation
         <#
         $Script:Actions = @{
             GpoApply                    = @{
@@ -172,7 +173,12 @@
 
         } else {
 
-            $Splat = @{ }
+            $Splat = @{
+                Forest                    = $Forest
+                IncludeDomains            = $IncludeDomains
+                ExcludeDomains            = $ExcludeDomains
+                ExtendedForestInformation = $ForestInformation
+            }
             if ($ADObject) {
                 $Splat['ADObject'] = $ADObject
             } elseif ($Linked) {
@@ -209,16 +215,16 @@
                         continue
                     }
                     if ($Rule.Action -eq 'Remove') {
-                        $GPOPermissions = Get-GPOZaurrPermission -GPOGuid $_.GUID -IncludePermissionType $Rule.IncludePermissionType -ExcludePermissionType $Rule.ExcludePermissionType -Type $Rule.Type -IncludeGPOObject -PermitType $Rule.PermitType
+                        $GPOPermissions = Get-GPOZaurrPermission -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName -IncludePermissionType $Rule.IncludePermissionType -ExcludePermissionType $Rule.ExcludePermissionType -Type $Rule.Type -IncludeGPOObject -PermitType $Rule.PermitType -Principal $Rule.Principal -PrincipalType $Rule.PrincipalType -ExcludePrincipal $Rule.ExcludePrincipal -ExcludePrincipalType $Rule.ExcludePrincipalType
                         foreach ($Permission in $GPOPermissions) {
-                            Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission #-IncludeDomains $GPO.DomainName
+                            Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission
                         }
                         continue
                     }
                     if ($Rule.Action -eq 'Add') {
                         #$GPOPermissions = Get-GPOZaurrPermission -GPOGuid $_.GUID -IncludePermissionType $Rule.IncludePermissionType -ExcludePermissionType $Rule.ExcludePermissionType -Type 'All' -IncludeGPOObject
                         # foreach ($Permission in $GPOPermissions) {
-                        Add-GPOZaurrPermission -GPOGuid $_.GUID -IncludeDomains $GPO.DomainName -Type $Rule.Type -PermissionType $Rule.IncludePermissionType -ADAdministrativeGroups $ADAdministrativeGroups
+                        Add-GPOZaurrPermission -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName -Type $Rule.Type -PermissionType $Rule.IncludePermissionType -ADAdministrativeGroups $ADAdministrativeGroups
                         # }
                     }
                 }

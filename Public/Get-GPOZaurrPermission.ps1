@@ -21,16 +21,22 @@
         [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
         [validateSet('Allow', 'Deny', 'All')][string] $PermitType = 'All',
 
+        [string[]] $ExcludePrincipal,
+        [validateset('DistinguishedName', 'Name', 'Sid')][string] $ExcludePrincipalType = 'Sid',
+
         [switch] $IncludeGPOObject,
 
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
-        [System.Collections.IDictionary] $ExtendedForestInformation
+        [System.Collections.IDictionary] $ExtendedForestInformation,
+        [System.Collections.IDictionary] $ADAdministrativeGroups
     )
     Begin {
         $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
-        $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        if (-not $ADAdministrativeGroups) {
+            $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        }
         if ($Type -eq 'Unknown') {
             if ($SkipAdministrative -or $SkipWellKnown) {
                 Write-Warning "Get-GPOZaurrPermission - Using SkipAdministrative or SkipWellKnown while looking for Unknown doesn't make sense as only Unknown will be displayed."
@@ -93,6 +99,8 @@
                     IncludeGPOObject       = $IncludeGPOObject.IsPresent
                     IncludePermissionType  = $IncludePermissionType
                     ExcludePermissionType  = $ExcludePermissionType
+                    ExcludePrincipal       = $ExcludePrincipal
+                    ExcludePrincipalType   = $ExcludePrincipalType
                     ADAdministrativeGroups = $ADAdministrativeGroups
                 }
                 Get-PrivPermission @getPrivPermissionSplat

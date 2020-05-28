@@ -12,6 +12,10 @@
         [Microsoft.GroupPolicy.GPPermissionType[]] $IncludePermissionType,
         [Microsoft.GroupPolicy.GPPermissionType[]] $ExcludePermissionType,
         [validateSet('Allow', 'Deny', 'All')][string] $PermitType = 'All',
+
+        [string[]] $ExcludePrincipal,
+        [validateset('DistinguishedName', 'Name', 'Sid')][string] $ExcludePrincipalType = 'Sid',
+
         [switch] $IncludeGPOObject,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
         [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All', 'Default')][string[]] $Type,
@@ -87,6 +91,22 @@
                 } elseif ($PrincipalType -eq 'Name') {
                     $UserMerge = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
                     if ($Principal -notcontains $UserMerge -and $Principal -notcontains $GPOPermission.Trustee.Name) {
+                        return
+                    }
+                }
+            }
+            if ($ExcludePrincipal) {
+                if ($ExcludePrincipalType -eq 'Sid') {
+                    if ($ExcludePrincipal -contains $GPOPermission.Trustee.Sid.Value) {
+                        return
+                    }
+                } elseif ($ExcludePrincipalType -eq 'DistinguishedName') {
+                    if ($ExcludePrincipal -contains $GPOPermission.Trustee.DSPath) {
+                        return
+                    }
+                } elseif ($ExcludePrincipalType -eq 'Name') {
+                    $UserMerge = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
+                    if ($ExcludePrincipal -contains $UserMerge -or $ExcludePrincipal -contains $GPOPermission.Trustee.Name) {
                         return
                     }
                 }
