@@ -1,5 +1,5 @@
 ﻿function Get-GPOZaurrPermissionConsistency {
-    [cmdletBinding()]
+    [cmdletBinding(DefaultParameterSetName = 'Type')]
     param(
         [Parameter(ParameterSetName = 'GPOName')][string] $GPOName,
         [Parameter(ParameterSetName = 'GPOGUID')][alias('GUID', 'GPOID')][string] $GPOGuid,
