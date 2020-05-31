@@ -1,7 +1,7 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 Import-Module 'C:\Support\GitHub\PSSharedGoods\PSSharedGoods.psd1' -Force
 
-<#
+
 # Apply permissions for ROOT
 Invoke-GPOZaurrPermission -Verbose -Linked Root -IncludeDomains 'ad.evotec.xyz' {
     Set-GPOOwner -Type Administrative
@@ -19,7 +19,6 @@ Invoke-GPOZaurrPermission -Verbose -Linked DomainControllers -IncludeDomains 'ad
     Add-GPOPermission -Type AuthenticatedUsers -IncludePermissionType GpoRead -PermitType Allow
 } -WhatIf
 
-#>
 # Apply permissions for Regions, with exclusions for those 4 groups
 $Exclude = @(
     'CN=ITR01_AD Admins,OU=Security,OU=Groups,OU=Production,DC=ad,DC=evotec,DC=xyz'
