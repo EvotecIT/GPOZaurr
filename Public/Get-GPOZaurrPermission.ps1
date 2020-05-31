@@ -10,7 +10,7 @@
         [string[]] $Principal,
         [validateset('DistinguishedName', 'Name', 'Sid')][string] $PrincipalType = 'Sid',
 
-        [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All')][string[]] $Type = 'All',
+        [validateSet('AuthenticatedUsers', 'DomainComputers', 'Unknown', 'WellKnownAdministrative', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All')][string[]] $Type = 'All',
 
         [switch] $SkipWellKnown,
         [switch] $SkipAdministrative,
@@ -30,10 +30,11 @@
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation,
-        [System.Collections.IDictionary] $ADAdministrativeGroups
+        [System.Collections.IDictionary] $ADAdministrativeGroups,
+        [switch] $ReturnSecurityWhenNoData # if no data return all data
     )
     Begin {
-        $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Extended
         if (-not $ADAdministrativeGroups) {
             $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
         }
@@ -86,24 +87,46 @@
                 }
             }
             Get-GPO @getGPOSplat | ForEach-Object -Process {
+                $GPOSecurity = $_.GetSecurityInfo()
                 $getPrivPermissionSplat = @{
-                    Principal              = $Principal
-                    PrincipalType          = $PrincipalType
-                    PermitType             = $PermitType
-                    Accounts               = $Accounts
-                    Type                   = $Type
-                    GPO                    = $_
-                    SkipWellKnown          = $SkipWellKnown.IsPresent
-                    SkipAdministrative     = $SkipAdministrative.IsPresent
-                    IncludeOwner           = $IncludeOwner.IsPresent
-                    IncludeGPOObject       = $IncludeGPOObject.IsPresent
-                    IncludePermissionType  = $IncludePermissionType
-                    ExcludePermissionType  = $ExcludePermissionType
-                    ExcludePrincipal       = $ExcludePrincipal
-                    ExcludePrincipalType   = $ExcludePrincipalType
-                    ADAdministrativeGroups = $ADAdministrativeGroups
+                    Principal                 = $Principal
+                    PrincipalType             = $PrincipalType
+                    PermitType                = $PermitType
+                    Accounts                  = $Accounts
+                    Type                      = $Type
+                    GPO                       = $_
+                    SkipWellKnown             = $SkipWellKnown.IsPresent
+                    SkipAdministrative        = $SkipAdministrative.IsPresent
+                    IncludeOwner              = $IncludeOwner.IsPresent
+                    IncludeGPOObject          = $IncludeGPOObject.IsPresent
+                    IncludePermissionType     = $IncludePermissionType
+                    ExcludePermissionType     = $ExcludePermissionType
+                    ExcludePrincipal          = $ExcludePrincipal
+                    ExcludePrincipalType      = $ExcludePrincipalType
+                    ADAdministrativeGroups    = $ADAdministrativeGroups
+                    ExtendedForestInformation = $ForestInformation
+                    SecurityRights            = $GPOSecurity
                 }
-                Get-PrivPermission @getPrivPermissionSplat
+                $Output = Get-PrivPermission @getPrivPermissionSplat
+                if (-not $Output) {
+                    if ($ReturnSecurityWhenNoData) {
+                        # there is no data to return, but we need to have GPO information to process ADD permissions.
+                        $ReturnObject = [PSCustomObject] @{
+                            DisplayName      = $_.DisplayName #      : ALL | Enable RDP
+                            GUID             = $_.ID
+                            DomainName       = $_.DomainName  #      : ad.evotec.xyz
+                            Enabled          = $_.GpoStatus
+                            Description      = $_.Description
+                            CreationDate     = $_.CreationTime
+                            ModificationTime = $_.ModificationTime
+                            GPOObject        = $_
+                            GPOSecurity      = $GPOSecurity
+                        }
+                        $ReturnObject
+                    }
+                } else {
+                    $Output
+                }
             }
         }
     }

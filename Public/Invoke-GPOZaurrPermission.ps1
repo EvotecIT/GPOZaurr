@@ -92,146 +92,84 @@
         [parameter(ParameterSetName = 'Linked')]
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
-    Begin {
-        $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
-        $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ForestInformation
-        <#
-        $Script:Actions = @{
-            GpoApply                    = @{
-                Remove = @{
-                    NotAdministrative          = $false
-                    NotWellKnownAdministrative = $false
-                }
-                Add    = @{
-                    Administrative          = $false
-                    WellKnownAdministrative = $false
-                }
-            }
-            GpoRead                     = @{
-                Remove = @{
-                    NotAdministrative          = $false
-                    NotWellKnownAdministrative = $false
-                }
-                Add    = @{
-                    Administrative          = $false
-                    WellKnownAdministrative = $false
-                }
-            }
-            GpoCustom                   = @{
-                Remove = @{
-                    NotAdministrative          = $false
-                    NotWellKnownAdministrative = $false
-                }
-                Add    = @{
-                    Administrative          = $false
-                    WellKnownAdministrative = $false
-                }
-            }
-            GpoEditDeleteModifySecurity = @{
-                Remove = @{
-                    NotAdministrative          = $false
-                    NotWellKnownAdministrative = $false
-                }
-                Add    = @{
-                    Administrative          = $false
-                    WellKnownAdministrative = $false
-                }
-            }
-            GpoEdit                     = @{
-                Remove = @{
-                    NotAdministrative          = $false
-                    NotWellKnownAdministrative = $false
-                }
-                Add    = @{
-                    Administrative          = $false
-                    WellKnownAdministrative = $false
-                }
-            }
-        }
-        #>
+    if ($PermissionRules) {
+        $Rules = & $PermissionRules
+    } else {
+        Write-Warning "Invoke-GPOZaurrPermission - No rules defined. Stopping processing."
+        return
     }
-    Process {
+    $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+    $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ForestInformation
 
-        if ($PermissionRules) {
-            $Rules = & $PermissionRules
-            <#
-            foreach ($Rule in $Rules) {
+    $Splat = @{
+        Forest                    = $Forest
+        IncludeDomains            = $IncludeDomains
+        ExcludeDomains            = $ExcludeDomains
+        ExtendedForestInformation = $ForestInformation
+    }
+    if ($ADObject) {
+        $Splat['ADObject'] = $ADObject
+    } elseif ($Linked) {
+        $Splat['Linked'] = $Linked
+    } elseif ($GPOName) {
 
-                #$Actions["$Rule."]
+    } elseif ($GPOGuid) {
 
-                if ($Rule.Action -eq 'Remove' -and $Rule.Type -contains 'NotWellKnownAdministrative') {
-                    #$Actions.NotWellKnownAdministrative = $true
-                }
-                if ($Rule.Action -eq 'Remove' -and $Rule.Type -contains 'NotAdministrative') {
-                    #$Actions.Remove.NotAdministrative = $true
-                }
-            }
-            #>
+    } else {
+        if ($Filter) {
+            $Splat['Filter'] = $Filter
         }
+        if ($SearchBase) {
+            $Splat['SearchBase'] = $SearchBase
+        }
+        if ($SearchScope) {
+            $Splat['SearchScope'] = $SearchScope
+        }
+    }
 
-        if ($GPOName -or $GPOGuid) {
-
-        } else {
-
-            $Splat = @{
-                Forest                    = $Forest
-                IncludeDomains            = $IncludeDomains
-                ExcludeDomains            = $ExcludeDomains
-                ExtendedForestInformation = $ForestInformation
-            }
-            if ($ADObject) {
-                $Splat['ADObject'] = $ADObject
-            } elseif ($Linked) {
-                $Splat['Linked'] = $Linked
-            } else {
-                if ($Filter) {
-                    $Splat['Filter'] = $Filter
-                }
-                if ($SearchBase) {
-                    $Splat['SearchBase'] = $SearchBase
-                }
-                if ($SearchScope) {
-                    $Splat['SearchScope'] = $SearchScope
-                }
-            }
-
-            Get-GPOZaurrLink @Splat | ForEach-Object -Process {
-                $GPO = $_
-                foreach ($Rule in $Rules) {
-                    if ($Rule.Action -eq 'Owner') {
-                        if ($Rule.Type -eq 'Administrative') {
-                            $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($GPO.Owner)"]
-                            if (-not $AdministrativeGroup) {
-                                $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
-                                Write-Verbose "Invoke-GPOZaurrPermission - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) to $DefaultPrincipal"
-                                #Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
-                                Set-GPOZaurrOwner -GPOGuid $GPO.Guid -IncludeDomains $GPO.Domain -Principal $DefaultPrincipal -WhatIf:$WhatIfPreference
-                            }
-                        } elseif ($Rule.Type -eq 'Default') {
-                            Write-Verbose "Invoke-GPOZaurrPermission - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) to $($Rule.Principal)"
-                            #Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Rule.Principal -Verbose:$false -WhatIf:$WhatIfPreference
-                            Set-GPOZaurrOwner -GPOGuid $GPO.Guid -IncludeDomains $GPO.Domain -Principal $Rule.Principal -WhatIf:$WhatIfPreference
-                        }
-                        continue
+    Get-GPOZaurrLink @Splat | ForEach-Object -Process {
+        $GPO = $_
+        foreach ($Rule in $Rules) {
+            if ($Rule.Action -eq 'Owner') {
+                if ($Rule.Type -eq 'Administrative') {
+                    $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($GPO.Owner)"]
+                    if (-not $AdministrativeGroup) {
+                        $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
+                        Write-Verbose "Invoke-GPOZaurrPermission - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) to $DefaultPrincipal"
+                        #Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
+                        Set-GPOZaurrOwner -GPOGuid $GPO.Guid -IncludeDomains $GPO.Domain -Principal $DefaultPrincipal -WhatIf:$WhatIfPreference
                     }
-                    if ($Rule.Action -eq 'Remove') {
-                        $GPOPermissions = Get-GPOZaurrPermission -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName -IncludePermissionType $Rule.IncludePermissionType -ExcludePermissionType $Rule.ExcludePermissionType -Type $Rule.Type -IncludeGPOObject -PermitType $Rule.PermitType -Principal $Rule.Principal -PrincipalType $Rule.PrincipalType -ExcludePrincipal $Rule.ExcludePrincipal -ExcludePrincipalType $Rule.ExcludePrincipalType
-                        foreach ($Permission in $GPOPermissions) {
-                            Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission
-                        }
-                        continue
-                    }
-                    if ($Rule.Action -eq 'Add') {
-                        #$GPOPermissions = Get-GPOZaurrPermission -GPOGuid $_.GUID -IncludePermissionType $Rule.IncludePermissionType -ExcludePermissionType $Rule.ExcludePermissionType -Type 'All' -IncludeGPOObject
-                        # foreach ($Permission in $GPOPermissions) {
-                        Add-GPOZaurrPermission -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName -Type $Rule.Type -PermissionType $Rule.IncludePermissionType -ADAdministrativeGroups $ADAdministrativeGroups
-                        # }
-                    }
+                } elseif ($Rule.Type -eq 'Default') {
+                    Write-Verbose "Invoke-GPOZaurrPermission - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) to $($Rule.Principal)"
+                    #Set-ADACLOwner -ADObject $GPO.GPODistinguishedName -Principal $Rule.Principal -Verbose:$false -WhatIf:$WhatIfPreference
+                    Set-GPOZaurrOwner -GPOGuid $GPO.Guid -IncludeDomains $GPO.Domain -Principal $Rule.Principal -WhatIf:$WhatIfPreference
                 }
+            } elseif ($Rule.Action -eq 'Remove') {
+                $GPOPermissions = Get-GPOZaurrPermission -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName -IncludePermissionType $Rule.IncludePermissionType -ExcludePermissionType $Rule.ExcludePermissionType -Type $Rule.Type -IncludeGPOObject -PermitType $Rule.PermitType -Principal $Rule.Principal -PrincipalType $Rule.PrincipalType -ExcludePrincipal $Rule.ExcludePrincipal -ExcludePrincipalType $Rule.ExcludePrincipalType
+                foreach ($Permission in $GPOPermissions) {
+                    Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission
+                }
+            } elseif ($Rule.Action -eq 'Add') {
+
+                $SplatPermissions = @{
+                    Forest                    = $Forest
+                    IncludeDomains            = $IncludeDomains
+                    ExcludeDomains            = $ExcludeDomains
+                    ExtendedForestInformation = $ForestInformation
+
+                    GPOGuid                   = $GPO.GUID
+                    IncludePermissionType     = $Rule.IncludePermissionType
+                    Type                      = $Rule.Type
+                    PermitType                = $Rule.PermitType
+                    Principal                 = $Rule.Principal
+                    ADAdministrativeGroups    = $ADAdministrativeGroups
+                }
+                if ($Rule.PrincipalType) {
+                    $SplatPermissions.PrincipalType = $Rule.PrincipalType
+                }
+                Add-GPOZaurrPermission @SplatPermissions
             }
         }
     }
-    End {
 
-    }
 }

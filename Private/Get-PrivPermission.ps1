@@ -2,6 +2,7 @@
     [cmdletBinding()]
     param(
         [Microsoft.GroupPolicy.Gpo] $GPO,
+        [Object] $SecurityRights,
 
         [string[]] $Principal,
         [validateset('DistinguishedName', 'Name', 'Sid')][string] $PrincipalType = 'Sid',
@@ -18,18 +19,16 @@
 
         [switch] $IncludeGPOObject,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
-        [validateSet('Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All', 'Default')][string[]] $Type,
-        [System.Collections.IDictionary] $Accounts
+        [validateSet('AuthenticatedUsers', 'DomainComputers', 'Unknown', 'WellKnownAdministrative', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All')][string[]] $Type = 'All',
+        [System.Collections.IDictionary] $Accounts,
+        [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {
         Write-Verbose "Get-PrivPermission - Processing $($GPO.DisplayName) from $($GPO.DomainName)"
     }
     Process {
-        $SecurityRights = $GPO.GetSecurityInfo()
         $SecurityRights | ForEach-Object -Process {
-            #Get-GPPermissions -Guid $GPO.ID -DomainName $GPO.DomainName -All -Server $QueryServer | ForEach-Object -Process {
             $GPOPermission = $_
-
             if ($PermitType -ne 'All') {
                 if ($PermitType -eq 'Deny') {
                     if ($GPOPermission.Denied -eq $false) {
@@ -46,7 +45,11 @@
             }
             if ($IncludePermissionType) {
                 if ($IncludePermissionType -notcontains $GPOPermission.Permission) {
-                    return
+                    if ($IncludePermissionType -eq 'GpoRead' -and $GPOPermission.Permission -eq 'GpoApply') {
+                        # We treat GpoApply as GpoRead as well. This is because when GpoApply is set it becomes GpoRead as well but of course not vice versa
+                    } else {
+                        return
+                    }
                 }
             }
             if ($SkipWellKnown.IsPresent -or $Type -contains 'NotWellKnown') {
@@ -73,9 +76,27 @@
                     return
                 }
             }
+            if ($Type -contains 'WellKnownAdministrative' -and $Type -notcontains 'All') {
+                # We check for SYSTEM account
+                # Maybe we should make it a function and provide more
+                if ($GPOPermission.Trustee.Sid -ne 'S-1-5-18') {
+                    return
+                }
+            }
             if ($Type -contains 'Unknown' -and $Type -notcontains 'All') {
                 # May need updates if there's more types
                 if ($GPOPermission.Trustee.SidType -ne 'Unknown') {
+                    return
+                }
+            }
+            if ($Type -contains 'AuthenticatedUsers' -and $Type -notcontains 'All') {
+                if ($GPOPermission.Trustee.Sid -ne 'S-1-5-11') {
+                    return
+                }
+            }
+            if ($Type -contains 'DomainComputers' -and $Type -notcontains 'All') {
+                $DomainComputersSID = -join ($ExtendedForestInformation['DomainsExtended'][$GPO.DomainName].DomainSID, '-515')
+                if ($GPOPermission.Trustee.Sid -ne $DomainComputersSID) {
                     return
                 }
             }
