@@ -79,6 +79,12 @@
                 # We are looking for administrative but we need to make sure we got correct administrative
                 if ($GPOPermission.Permission -eq $PermissionType) {
                     $AdministrativeGroup = $ADAdministrativeGroups['BySID'][$GPOPermission.SID]
+                    if ($AdministrativeGroup.SID -like '*-519') {
+                        $AdministrativeExists['EnterpriseAdmins'] = $true
+                    } elseif ($AdministrativeGroup.SID -like '*-512') {
+                        $AdministrativeExists['DomainAdmins'] = $true
+                    }
+                    <#
                     if ($AdministrativeGroup) {
                         $DomainAdminsSID = -join ($ForestInformation['DomainsExtended'][$GPOPermission.DomainName].DomainSID, '-512')
                         $EnterpriseAdminsSID = -join ($ForestInformation['DomainsExtended'][$GPOPermission.DomainName].DomainSID, '-519')
@@ -88,6 +94,7 @@
                             $AdministrativeExists['EnterpriseAdmins'] = $true
                         }
                     }
+                    #>
                 }
             } elseif ($Type -eq 'WellKnownAdministrative') {
                 # this is for SYSTEM account

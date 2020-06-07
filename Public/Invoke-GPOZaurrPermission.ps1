@@ -99,7 +99,7 @@
         return
     }
     $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
-    $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ForestInformation
+    $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest #-IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ForestInformation
 
     $Splat = @{
         Forest                    = $Forest
@@ -132,7 +132,12 @@
         foreach ($Rule in $Rules) {
             if ($Rule.Action -eq 'Owner') {
                 if ($Rule.Type -eq 'Administrative') {
-                    $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($GPO.Owner)"]
+                    # We check for Owner (sometimes it can be empty)
+                    if ($GPO.Owner) {
+                        $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($GPO.Owner)"]
+                    } else {
+                        $AdministrativeGroup = $null
+                    }
                     if (-not $AdministrativeGroup) {
                         $DefaultPrincipal = $ADAdministrativeGroups["$($GPO.DomainName)"]['DomainAdmins']
                         Write-Verbose "Invoke-GPOZaurrPermission - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) to $DefaultPrincipal"
@@ -150,19 +155,19 @@
                     Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission
                 }
             } elseif ($Rule.Action -eq 'Add') {
-
+                # Initially we were askng for same domain as user requested, but in fact we need to apply GPODomain as it can be linked to different domain
                 $SplatPermissions = @{
-                    Forest                    = $Forest
-                    IncludeDomains            = $IncludeDomains
-                    ExcludeDomains            = $ExcludeDomains
-                    ExtendedForestInformation = $ForestInformation
+                    #Forest                    = $Forest
+                    IncludeDomains         = $GPO.DomainName
+                    #ExcludeDomains            = $ExcludeDomains
+                    #ExtendedForestInformation = $ForestInformation
 
-                    GPOGuid                   = $GPO.GUID
-                    IncludePermissionType     = $Rule.IncludePermissionType
-                    Type                      = $Rule.Type
-                    PermitType                = $Rule.PermitType
-                    Principal                 = $Rule.Principal
-                    ADAdministrativeGroups    = $ADAdministrativeGroups
+                    GPOGuid                = $GPO.GUID
+                    IncludePermissionType  = $Rule.IncludePermissionType
+                    Type                   = $Rule.Type
+                    PermitType             = $Rule.PermitType
+                    Principal              = $Rule.Principal
+                    ADAdministrativeGroups = $ADAdministrativeGroups
                 }
                 if ($Rule.PrincipalType) {
                     $SplatPermissions.PrincipalType = $Rule.PrincipalType

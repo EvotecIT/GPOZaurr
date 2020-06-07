@@ -43,7 +43,9 @@
         $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
         if (-not $GPOCache -and -not $Limited) {
             $GPOCache = @{ }
-            foreach ($Domain in $ForestInformation.Domains) {
+            # While initially we used $ForestInformation.Domains but the thing is GPOs can be linked to other domains so we need to get them all so we can use cache of it later on even if we're processing just one domain
+            # That's why we use $ForestInformation.Forest.Domains instead
+            foreach ($Domain in $ForestInformation.Forest.Domains) {
                 $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
                 Get-GPO -All -DomainName $Domain -Server $QueryServer | ForEach-Object {
                     $GPOCache["$Domain$($_.ID.Guid)"] = $_

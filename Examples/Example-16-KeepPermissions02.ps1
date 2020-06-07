@@ -1,7 +1,7 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 # Apply permissions for ROOT
-Invoke-GPOZaurrPermission -Verbose -Linked Root -IncludeDomains 'ad.evotec.xyz' {
+Invoke-GPOZaurrPermission -Verbose -Linked Root -IncludeDomains 'ad.evotec.pl' {
     Set-GPOOwner -Type Administrative
     Remove-GPOPermission -Type NotAdministrative, NotWellKnownAdministrative -IncludePermissionType GpoEdit, GpoEditDeleteModifySecurity -PermitType Allow
     Add-GPOPermission -Type Administrative -IncludePermissionType GpoEditDeleteModifySecurity -PermitType Allow
