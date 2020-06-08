@@ -6,8 +6,10 @@
         [System.Collections.IDictionary] $GPOCache
     )
     if ($Object.GpLink -and $Object.GpLink.Trim() -ne '') {
-        $Object.GpLink -split { $_ -eq '[' -or $_ -eq ']' } -replace ';0' -replace 'LDAP://' | ForEach-Object -Process {
-            if ($_) {
+        #$Object.GpLink -split { $_ -eq '[' -or $_ -eq ']' } -replace ';0' -replace 'LDAP://'
+        $Object.GpLink -split '\[LDAP://' -split ';' | ForEach-Object -Process {
+            #Write-Verbose $_
+            if ($_.Length -gt 10) {
                 $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDomainCN
                 $Output = [ordered] @{
                     DistinguishedName = $Object.DistinguishedName
@@ -30,8 +32,8 @@
             }
         }
     } elseif ($Object.LinkedGroupPolicyObjects -and $Object.LinkedGroupPolicyObjects.Trim() -ne '') {
-        $Object.LinkedGroupPolicyObjects -split { $_ -eq '[' -or $_ -eq ']' } -replace ';0' -replace 'LDAP://' | ForEach-Object -Process {
-            if ($_) {
+        $Object.LinkedGroupPolicyObjects -split '\[LDAP://' -split ';' | ForEach-Object -Process {
+            if ($_.Length -gt 10) {
                 $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDomainCN
                 $Output = [ordered] @{
                     DistinguishedName = $Object.DistinguishedName
