@@ -39,5 +39,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.37 - 16.06.2020
+  - Updates to `Invoke-GPOZaurrPermission` with new parameterset `Level`
+  - Updates to `Get-GPOZaurrLinkSummary`
 - 0.0.36 - 15.06.2020
   - Initial release
