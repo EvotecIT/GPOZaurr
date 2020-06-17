@@ -8,7 +8,6 @@ Invoke-GPOZaurrPermission -Verbose -Linked Root -IncludeDomains 'ad.evotec.xyz' 
     Add-GPOPermission -Type AuthenticatedUsers -IncludePermissionType GpoRead -PermitType Allow
 } -WhatIf
 
-
 # Apply perrmissions for Domain Controllers
 Invoke-GPOZaurrPermission -Verbose -Linked DomainControllers -IncludeDomains 'ad.evotec.xyz' {
     Set-GPOOwner -Type Administrative
