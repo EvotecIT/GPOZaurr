@@ -18,17 +18,25 @@
                 }
                 $Search = -join ($DomainCN, $Output['Guid'])
                 if ($GPOCache -and -not $Limited) {
-                    $Output['DisplayName'] = $GPOCache[$Search].DisplayName
-                    $Output['DomainName'] = $GPOCache[$Search].DomainName
-                    $Output['Owner'] = $GPOCache[$Search].Owner
-                    $Output['GpoStatus'] = $GPOCache[$Search].GpoStatus
-                    $Output['Description'] = $GPOCache[$Search].Description
-                    $Output['CreationTime'] = $GPOCache[$Search].CreationTime
-                    $Output['ModificationTime'] = $GPOCache[$Search].ModificationTime
+                    if ($GPOCache[$Search]) {
+                        $Output['DisplayName'] = $GPOCache[$Search].DisplayName
+                        $Output['DomainName'] = $GPOCache[$Search].DomainName
+                        $Output['Owner'] = $GPOCache[$Search].Owner
+                        $Output['GpoStatus'] = $GPOCache[$Search].GpoStatus
+                        $Output['Description'] = $GPOCache[$Search].Description
+                        $Output['CreationTime'] = $GPOCache[$Search].CreationTime
+                        $Output['ModificationTime'] = $GPOCache[$Search].ModificationTime
+                        $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
+                        $Output['GPODistinguishedName'] = $_
+                        [PSCustomObject] $Output
+                    } else {
+                        Write-Warning "Get-PrivGPOZaurrLink - Couldn't find link $Search in a GPO Cache. Lack of permissions for given GPO? Are you running as admin? Skipping."
+                    }
+                } else {
+                    $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
+                    $Output['GPODistinguishedName'] = $_
+                    [PSCustomObject] $Output
                 }
-                $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
-                $Output['GPODistinguishedName'] = $_
-                [PSCustomObject] $Output
             }
         }
     } elseif ($Object.LinkedGroupPolicyObjects -and $Object.LinkedGroupPolicyObjects.Trim() -ne '') {
@@ -42,17 +50,25 @@
                 }
                 $Search = -join ($DomainCN, $Output['Guid'])
                 if ($GPOCache -and -not $Limited) {
-                    $Output['Name'] = $GPOCache[$Search].DisplayName
-                    $Output['DomainName'] = $GPOCache[$Search].DomainName
-                    $Output['Owner'] = $GPOCache[$Search].Owner
-                    $Output['GpoStatus'] = $GPOCache[$Search].GpoStatus
-                    $Output['Description'] = $GPOCache[$Search].Description
-                    $Output['CreationTime'] = $GPOCache[$Search].CreationTime
-                    $Output['ModificationTime'] = $GPOCache[$Search].ModificationTime
+                    if ($GPOCache[$Search]) {
+                        $Output['Name'] = $GPOCache[$Search].DisplayName
+                        $Output['DomainName'] = $GPOCache[$Search].DomainName
+                        $Output['Owner'] = $GPOCache[$Search].Owner
+                        $Output['GpoStatus'] = $GPOCache[$Search].GpoStatus
+                        $Output['Description'] = $GPOCache[$Search].Description
+                        $Output['CreationTime'] = $GPOCache[$Search].CreationTime
+                        $Output['ModificationTime'] = $GPOCache[$Search].ModificationTime
+                        $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
+                        $Output['GPODistinguishedName'] = $_
+                        [PSCustomObject] $Output
+                    } else {
+                        Write-Warning "Get-PrivGPOZaurrLink - Couldn't find link $Search in a GPO Cache. Lack of permissions for given GPO? Are you running as admin? Skipping."
+                    }
+                } else {
+                    $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
+                    $Output['GPODistinguishedName'] = $_
+                    [PSCustomObject] $Output
                 }
-                $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDC
-                $Output['GPODistinguishedName'] = $_
-                [PSCustomObject] $Output
             }
         }
     }
