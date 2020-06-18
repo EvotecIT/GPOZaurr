@@ -17,6 +17,11 @@
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
+        [switch] $SkipDuplicates,
+
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
         [System.Collections.IDictionary] $GPOCache,
 
         [parameter(ParameterSetName = 'Filter')]
@@ -40,6 +45,7 @@
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {
+        $CacheReturnedGPOs = [ordered] @{}
         $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
         if (-not $GPOCache -and -not $Limited) {
             $GPOCache = @{ }
@@ -71,7 +77,8 @@
                         #}
                         $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
                         $Splat['SearchBase'] = $SearchBase
-                        Get-ADObject @Splat | ForEach-Object -Process {
+                        $ADObjectGPO = Get-ADObject @Splat
+                        foreach ($_ in $ADObjectGPO) {
                             Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
                         }
                     }
@@ -83,7 +90,8 @@
                         # }
                         $Splat['Filter'] = "objectClass -eq 'domainDNS'"
                         $Splat['SearchBase'] = $SearchBase
-                        Get-ADObject @Splat | ForEach-Object -Process {
+                        $ADObjectGPO = Get-ADObject @Splat
+                        foreach ($_ in $ADObjectGPO) {
                             Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
                         }
                     }
@@ -97,7 +105,8 @@
                             #}
                             $Splat['Filter'] = "(objectClass -eq 'site')"
                             $Splat['SearchBase'] = $SearchBase
-                            Get-ADObject @Splat | ForEach-Object -Process {
+                            $ADObjectGPO = Get-ADObject @Splat
+                            foreach ($_ in $ADObjectGPO) {
                                 Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
                             }
                         }
@@ -110,7 +119,8 @@
                         #}
                         $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
                         $Splat['SearchBase'] = $SearchBase
-                        Get-ADObject @Splat | ForEach-Object -Process {
+                        $ADObjectGPO = Get-ADObject @Splat
+                        foreach ($_ in $ADObjectGPO) {
                             if ($_.DistinguishedName -eq $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']) {
                                 # other skips Domain Root
                             } elseif ($_.DistinguishedName -eq $ForestInformation['DomainsExtended'][$Domain]['DomainControllersContainer']) {
@@ -143,8 +153,20 @@
                     }
 
                     try {
-                        Get-ADObject @Splat | ForEach-Object {
-                            Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                        $ADObjectGPO = Get-ADObject @Splat
+                        foreach ($_ in $ADObjectGPO) {
+                            $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                            foreach ($OutputGPO in $OutputGPOs) {
+                                if (-not $SkipDuplicates) {
+                                    $OutputGPO
+                                } else {
+                                    $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                    if (-not $CacheReturnedGPOs[$UniqueGuid]) {
+                                        $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
+                                        $OutputGPO
+                                    }
+                                }
+                            }
                         }
                     } catch {
                         Write-Warning "Get-GPOZaurrLink - Processing error $($_.Exception.Message)"
