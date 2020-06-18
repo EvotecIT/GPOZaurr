@@ -79,7 +79,18 @@
                         $Splat['SearchBase'] = $SearchBase
                         $ADObjectGPO = Get-ADObject @Splat
                         foreach ($_ in $ADObjectGPO) {
-                            Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                            $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                            foreach ($OutputGPO in $OutputGPOs) {
+                                if (-not $SkipDuplicates) {
+                                    $OutputGPO
+                                } else {
+                                    $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                    if (-not $CacheReturnedGPOs[$UniqueGuid]) {
+                                        $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
+                                        $OutputGPO
+                                    }
+                                }
+                            }
                         }
                     }
                     if ($Linked -contains 'Root') {
@@ -92,7 +103,18 @@
                         $Splat['SearchBase'] = $SearchBase
                         $ADObjectGPO = Get-ADObject @Splat
                         foreach ($_ in $ADObjectGPO) {
-                            Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                            $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                            foreach ($OutputGPO in $OutputGPOs) {
+                                if (-not $SkipDuplicates) {
+                                    $OutputGPO
+                                } else {
+                                    $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                    if (-not $CacheReturnedGPOs[$UniqueGuid]) {
+                                        $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
+                                        $OutputGPO
+                                    }
+                                }
+                            }
                         }
                     }
                     if ($Linked -contains 'Site') {
@@ -126,7 +148,18 @@
                             } elseif ($_.DistinguishedName -eq $ForestInformation['DomainsExtended'][$Domain]['DomainControllersContainer']) {
                                 # other skips Domain Controllers
                             } else {
-                                Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                                $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                                foreach ($OutputGPO in $OutputGPOs) {
+                                    if (-not $SkipDuplicates) {
+                                        $OutputGPO
+                                    } else {
+                                        $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                        if (-not $CacheReturnedGPOs[$UniqueGuid]) {
+                                            $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
+                                            $OutputGPO
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
