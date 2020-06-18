@@ -118,7 +118,14 @@
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
         [parameter(ParameterSetName = 'Level')]
-        [switch] $LimitAdministrativeGroupsToDomain
+        [switch] $LimitAdministrativeGroupsToDomain,
+
+        [Parameter(ParameterSetName = 'GPOGUID')]
+        [Parameter(ParameterSetName = 'GPOName')]
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
+        [switch] $SkipDuplicates
     )
     if ($PermissionRules) {
         $Rules = & $PermissionRules
@@ -139,6 +146,7 @@
             IncludeDomains            = $IncludeDomains
             ExcludeDomains            = $ExcludeDomains
             ExtendedForestInformation = $ForestInformation
+            SkipDuplicates            = $SkipDuplicates.IsPresent
         }
         if ($ADObject) {
             $Splat['ADObject'] = $ADObject

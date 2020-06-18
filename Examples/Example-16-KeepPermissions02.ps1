@@ -6,7 +6,7 @@ Invoke-GPOZaurrPermission -Verbose -Linked Root -IncludeDomains 'ad.evotec.pl' {
     Remove-GPOPermission -Type NotAdministrative, NotWellKnownAdministrative -IncludePermissionType GpoEdit, GpoEditDeleteModifySecurity -PermitType Allow
     Add-GPOPermission -Type Administrative -IncludePermissionType GpoEditDeleteModifySecurity -PermitType Allow
     Add-GPOPermission -Type AuthenticatedUsers -IncludePermissionType GpoRead -PermitType Allow
-} -WhatIf
+} -WhatIf -SkipDuplicates
 
 
 # Apply perrmissions for Domain Controllers
@@ -15,7 +15,7 @@ Invoke-GPOZaurrPermission -Verbose -Linked DomainControllers -IncludeDomains 'ad
     Remove-GPOPermission -Type NotAdministrative, NotWellKnownAdministrative -IncludePermissionType GpoEdit, GpoEditDeleteModifySecurity -PermitType Allow
     Add-GPOPermission -Type Administrative -IncludePermissionType GpoEditDeleteModifySecurity -PermitType Allow
     Add-GPOPermission -Type AuthenticatedUsers -IncludePermissionType GpoRead -PermitType Allow
-} -WhatIf
+} -WhatIf -SkipDuplicates
 
 # Apply permissions for Regions, with exclusions for those 4 groups
 $Exclude = @(
@@ -27,7 +27,8 @@ Invoke-GPOZaurrPermission -Verbose -SearchBase 'OU=ITR01,DC=ad,DC=evotec,DC=xyz'
     Remove-GPOPermission -Type NotAdministrative, NotWellKnownAdministrative -IncludePermissionType GpoEdit, GpoEditDeleteModifySecurity -PermitType Allow -ExcludePrincipal $Exclude -ExcludePrincipalType DistinguishedName
     Add-GPOPermission -Type Administrative -IncludePermissionType GpoEditDeleteModifySecurity -PermitType Allow
     Add-GPOPermission -Type AuthenticatedUsers -IncludePermissionType GpoRead -PermitType Allow
-} #-WhatIf
+} -WhatIf -SkipDuplicates
+
 
 $Exclude = @(
     'CN=ITR02_AD Admins,OU=Security,OU=Groups,OU=Production,DC=ad,DC=evotec,DC=xyz'
@@ -40,4 +41,4 @@ Invoke-GPOZaurrPermission -Verbose -SearchBase 'OU=ITR02,DC=ad,DC=evotec,DC=xyz'
     Remove-GPOPermission -Type NotAdministrative, NotWellKnownAdministrative -IncludePermissionType GpoEdit, GpoEditDeleteModifySecurity -PermitType Allow -ExcludePrincipal $Exclude -ExcludePrincipalType DistinguishedName
     Add-GPOPermission -Type Administrative -IncludePermissionType GpoEditDeleteModifySecurity -PermitType Allow
     Add-GPOPermission -Type AuthenticatedUsers -IncludePermissionType GpoRead -PermitType Allow
-} #-WhatIf
+} -WhatIf -SkipDuplicates
