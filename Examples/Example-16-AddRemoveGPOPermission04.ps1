@@ -8,4 +8,4 @@ Invoke-GPOZaurrPermission -Verbose -SearchBase 'OU=Computers,OU=Production,DC=ad
     Remove-GPOPermission -Type NotAdministrative, NotWellKnownAdministrative -IncludePermissionType GpoEdit, GpoEditDeleteModifySecurity
     #Add-GPOPermission -Type Administrative -IncludePermissionType GpoEditDeleteModifySecurity
     #Add-GPOPermission -Type WellKnownAdministrative -IncludePermissionType GpoEditDeleteModifySecurity
-} #-WhatIf #| Format-Table *
+} -WhatIf #| Format-Table *

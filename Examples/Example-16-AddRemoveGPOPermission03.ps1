@@ -1,14 +1,6 @@
 ﻿#Clear-Host
 Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-$ApprovedGroups = @(
-    'GDS-TestGroup10'
-)
-$RootGroups = @(
-    #'przemyslaw.klys'
-)
-
-
 Invoke-GPOZaurrPermission -Linked Root -Verbose {
     Set-GPOOwner -Type Administrative
     #Set-GPOOwner -Principal 'EVOTEC\Enterprise Admins'
