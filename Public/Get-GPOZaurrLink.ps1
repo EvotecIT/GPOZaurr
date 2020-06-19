@@ -77,7 +77,11 @@
                         #}
                         $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
                         $Splat['SearchBase'] = $SearchBase
-                        $ADObjectGPO = Get-ADObject @Splat
+                        try {
+                            $ADObjectGPO = Get-ADObject @Splat
+                        } catch {
+                            Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
+                        }
                         foreach ($_ in $ADObjectGPO) {
                             $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
                             foreach ($OutputGPO in $OutputGPOs) {
@@ -101,7 +105,11 @@
                         # }
                         $Splat['Filter'] = "objectClass -eq 'domainDNS'"
                         $Splat['SearchBase'] = $SearchBase
-                        $ADObjectGPO = Get-ADObject @Splat
+                        try {
+                            $ADObjectGPO = Get-ADObject @Splat
+                        } catch {
+                            Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
+                        }
                         foreach ($_ in $ADObjectGPO) {
                             $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
                             foreach ($OutputGPO in $OutputGPOs) {
@@ -127,7 +135,11 @@
                             #}
                             $Splat['Filter'] = "(objectClass -eq 'site')"
                             $Splat['SearchBase'] = $SearchBase
-                            $ADObjectGPO = Get-ADObject @Splat
+                            try {
+                                $ADObjectGPO = Get-ADObject @Splat
+                            } catch {
+                                Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
+                            }
                             foreach ($_ in $ADObjectGPO) {
                                 Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
                             }
@@ -141,7 +153,11 @@
                         #}
                         $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
                         $Splat['SearchBase'] = $SearchBase
-                        $ADObjectGPO = Get-ADObject @Splat
+                        try {
+                            $ADObjectGPO = Get-ADObject @Splat
+                        } catch {
+                            Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
+                        }
                         foreach ($_ in $ADObjectGPO) {
                             if ($_.DistinguishedName -eq $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']) {
                                 # other skips Domain Root
@@ -174,7 +190,8 @@
                     }
                     if ($PSBoundParameters.ContainsKey('SearchBase')) {
                         $DomainDistinguishedName = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
-                        if ($SearchBase -notlike "*$DomainDistinguishedName") {
+                        $SearchBaseDC = ConvertFrom-DistinguishedName -DistinguishedName $SearchBase -ToDC
+                        if ($SearchBaseDC -ne $DomainDistinguishedName) {
                             # we check if SearchBase is part of domain distinugishname. If it isn't we skip
                             continue
                         }
@@ -187,22 +204,22 @@
 
                     try {
                         $ADObjectGPO = Get-ADObject @Splat
-                        foreach ($_ in $ADObjectGPO) {
-                            $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
-                            foreach ($OutputGPO in $OutputGPOs) {
-                                if (-not $SkipDuplicates) {
+                    } catch {
+                        Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
+                    }
+                    foreach ($_ in $ADObjectGPO) {
+                        $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                        foreach ($OutputGPO in $OutputGPOs) {
+                            if (-not $SkipDuplicates) {
+                                $OutputGPO
+                            } else {
+                                $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                if (-not $CacheReturnedGPOs[$UniqueGuid]) {
+                                    $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
                                     $OutputGPO
-                                } else {
-                                    $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
-                                    if (-not $CacheReturnedGPOs[$UniqueGuid]) {
-                                        $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
-                                        $OutputGPO
-                                    }
                                 }
                             }
                         }
-                    } catch {
-                        Write-Warning "Get-GPOZaurrLink - Processing error $($_.Exception.Message)"
                     }
                 }
             }

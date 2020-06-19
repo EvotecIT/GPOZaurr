@@ -71,6 +71,7 @@
                     Server      = $QueryServer
                     ErrorAction = 'SilentlyContinue'
                 }
+                $TextForError = "Error running Get-GPO (QueryServer: $QueryServer / Domain: $Domain / Name: $GPOName) with:"
             } elseif ($GPOGuid) {
                 $getGPOSplat = @{
                     Guid        = $GPOGuid
@@ -78,6 +79,7 @@
                     Server      = $QueryServer
                     ErrorAction = 'SilentlyContinue'
                 }
+                $TextForError = "Error running Get-GPO (QueryServer: $QueryServer / Domain: $Domain / GUID: $GPOGuid) with:"
             } else {
                 $getGPOSplat = @{
                     All         = $true
@@ -85,48 +87,58 @@
                     Server      = $QueryServer
                     ErrorAction = 'SilentlyContinue'
                 }
+                $TextForError = "Error running Get-GPO (QueryServer: $QueryServer / Domain: $Domain / All: $True) with:"
             }
-            Get-GPO @getGPOSplat | ForEach-Object -Process {
-                $GPOSecurity = $_.GetSecurityInfo()
-                $getPrivPermissionSplat = @{
-                    Principal                 = $Principal
-                    PrincipalType             = $PrincipalType
-                    PermitType                = $PermitType
-                    Accounts                  = $Accounts
-                    Type                      = $Type
-                    GPO                       = $_
-                    SkipWellKnown             = $SkipWellKnown.IsPresent
-                    SkipAdministrative        = $SkipAdministrative.IsPresent
-                    IncludeOwner              = $IncludeOwner.IsPresent
-                    IncludeGPOObject          = $IncludeGPOObject.IsPresent
-                    IncludePermissionType     = $IncludePermissionType
-                    ExcludePermissionType     = $ExcludePermissionType
-                    ExcludePrincipal          = $ExcludePrincipal
-                    ExcludePrincipalType      = $ExcludePrincipalType
-                    ADAdministrativeGroups    = $ADAdministrativeGroups
-                    ExtendedForestInformation = $ForestInformation
-                    SecurityRights            = $GPOSecurity
-                }
-                $Output = Get-PrivPermission @getPrivPermissionSplat
-                if (-not $Output) {
-                    if ($ReturnSecurityWhenNoData) {
-                        # there is no data to return, but we need to have GPO information to process ADD permissions.
-                        $ReturnObject = [PSCustomObject] @{
-                            DisplayName      = $_.DisplayName #      : ALL | Enable RDP
-                            GUID             = $_.ID
-                            DomainName       = $_.DomainName  #      : ad.evotec.xyz
-                            Enabled          = $_.GpoStatus
-                            Description      = $_.Description
-                            CreationDate     = $_.CreationTime
-                            ModificationTime = $_.ModificationTime
-                            GPOObject        = $_
-                            GPOSecurity      = $GPOSecurity
-                        }
-                        $ReturnObject
+            Try {
+                Get-GPO @getGPOSplat | ForEach-Object -Process {
+                    $GPOSecurity = $_.GetSecurityInfo()
+                    $getPrivPermissionSplat = @{
+                        Principal                 = $Principal
+                        PrincipalType             = $PrincipalType
+                        PermitType                = $PermitType
+                        Accounts                  = $Accounts
+                        Type                      = $Type
+                        GPO                       = $_
+                        SkipWellKnown             = $SkipWellKnown.IsPresent
+                        SkipAdministrative        = $SkipAdministrative.IsPresent
+                        IncludeOwner              = $IncludeOwner.IsPresent
+                        IncludeGPOObject          = $IncludeGPOObject.IsPresent
+                        IncludePermissionType     = $IncludePermissionType
+                        ExcludePermissionType     = $ExcludePermissionType
+                        ExcludePrincipal          = $ExcludePrincipal
+                        ExcludePrincipalType      = $ExcludePrincipalType
+                        ADAdministrativeGroups    = $ADAdministrativeGroups
+                        ExtendedForestInformation = $ForestInformation
+                        SecurityRights            = $GPOSecurity
                     }
-                } else {
-                    $Output
+                    try {
+                        $Output = Get-PrivPermission @getPrivPermissionSplat
+                    } catch {
+                        $Output = $null
+                        Write-Warning "Get-GPOZaurrPermission - Error running Get-PrivPermission: $($_.Exception.Message)"
+                    }
+                    if (-not $Output) {
+                        if ($ReturnSecurityWhenNoData) {
+                            # there is no data to return, but we need to have GPO information to process ADD permissions.
+                            $ReturnObject = [PSCustomObject] @{
+                                DisplayName      = $_.DisplayName #      : ALL | Enable RDP
+                                GUID             = $_.ID
+                                DomainName       = $_.DomainName  #      : ad.evotec.xyz
+                                Enabled          = $_.GpoStatus
+                                Description      = $_.Description
+                                CreationDate     = $_.CreationTime
+                                ModificationTime = $_.ModificationTime
+                                GPOObject        = $_
+                                GPOSecurity      = $GPOSecurity
+                            }
+                            $ReturnObject
+                        }
+                    } else {
+                        $Output
+                    }
                 }
+            } catch {
+                Write-Warning "Get-GPOZaurrPermission - $TextForError $($_.Exception.Message)"
             }
         }
     }
