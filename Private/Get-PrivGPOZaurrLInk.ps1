@@ -13,7 +13,7 @@
                 $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDomainCN
                 $Output = [ordered] @{
                     DistinguishedName = $Object.DistinguishedName
-                    CanonicalName     = $Object.CanonicalName.TrimEnd('/');
+                    CanonicalName     = if ($Object.CanonicalName) { $Object.CanonicalName.TrimEnd('/') } else { $Object.CanonicalName }
                     Guid              = [Regex]::Match( $_, '(?={)(.*)(?<=})').Value -replace '{' -replace '}'
                 }
                 $Search = -join ($DomainCN, $Output['Guid'])
@@ -45,7 +45,7 @@
                 $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_ -ToDomainCN
                 $Output = [ordered] @{
                     DistinguishedName = $Object.DistinguishedName
-                    CanonicalName     = $Object.CanonicalName.TrimEnd('/');
+                    CanonicalName     = if ($Object.CanonicalName) { $Object.CanonicalName.TrimEnd('/') } else { $Object.CanonicalName }
                     Guid              = [Regex]::Match( $_, '(?={)(.*)(?<=})').Value -replace '{' -replace '}'
                 }
                 $Search = -join ($DomainCN, $Output['Guid'])
