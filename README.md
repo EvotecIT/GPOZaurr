@@ -41,6 +41,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 - 0.0.42 - 19.06.2020
   - Fix for `Get-GPOZaurrLink` and `SearchBase` parameter
+  - Fix for `Get-GPOZaurrLink` - canonical link Trim() throwing errors if empty
 - 0.0.41 - 18.06.2020
   - Added paramerter `SkipDuplicates` to `Invoke-GPOZaurrPermission` which prevents applying permissions over and over again if 1 GPO is linked to a multiple OU's within another OU
 - 0.0.40 - 18.06.2020
