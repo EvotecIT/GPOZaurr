@@ -39,6 +39,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.43 - 21.06.2020
+  - Added `Get-GPOZaurrFiles` to list files on NETLOGON/SYSVOL shares with a lot of details
 - 0.0.42 - 19.06.2020
   - Fix for `Get-GPOZaurrLink` and `SearchBase` parameter
   - Fix for `Get-GPOZaurrLink` - canonical link Trim() throwing errors if empty
