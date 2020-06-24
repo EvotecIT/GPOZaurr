@@ -2,13 +2,18 @@
     [cmdletBinding()]
     param(
         [ValidateSet('All', 'MultipleLinks', 'OneLink', 'LinksSummary')][string[]] $Report = 'All',
-        [switch] $UnlimitedProperties
+        [switch] $UnlimitedProperties,
+
+        [alias('ForestName')][string] $Forest,
+        [string[]] $ExcludeDomains,
+        [alias('Domain', 'Domains')][string[]] $IncludeDomains,
+        [System.Collections.IDictionary] $ExtendedForestInformation
     )
     $HighestCount = 0 # to keep number of depth
     $CacheSummaryLinks = [ordered] @{} # cache
 
     # Get all links
-    $Links = Get-GPOZaurrLink
+    $Links = Get-GPOZaurrLink -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     foreach ($Link in $Links) {
         if (-not $CacheSummaryLinks["$($Link.DomainName)$($Link.Guid)"]) {
             $CacheSummaryLinks["$($Link.DomainName)$($Link.Guid)"] = [System.Collections.Generic.List[System.Object]]::new()
