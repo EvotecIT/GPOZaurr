@@ -39,6 +39,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.45 - 26.06.2020
+  - During publishing ADEssentials required functions are now merged to prevent cyclic dependency bug [Using ModuleSpec syntax in RequiredModules causes incorrect "cyclic dependency" failures](https://github.com/PowerShell/PowerShell/issues/2607)
 - 0.0.44 - 24.06.2020
   - Improvement to `Get-GPOZaurrLinkSummary`
 - 0.0.43 - 21.06.2020
