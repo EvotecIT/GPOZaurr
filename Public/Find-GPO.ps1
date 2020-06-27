@@ -16,6 +16,10 @@
             'RegistrySettings'
             'RegistryPolicies'
             'Scripts'
+            'SoftwareInstallation'
+            'SecurityOptions'
+            'Account'
+            'SystemServices'
         ),
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
@@ -101,6 +105,30 @@
             [Array] $Data = Get-XMLScripts -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
             foreach ($D in $Data) {
                 $Output['Scripts'].Add($D)
+            }
+        }
+        if ($Type -contains 'SoftwareInstallation') {
+            [Array] $Data = Get-XMLSoftwareInstallation -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
+            foreach ($D in $Data) {
+                $Output['SoftwareInstallation'].Add($D)
+            }
+        }
+        if ($Type -contains 'SecurityOptions') {
+            [Array] $Data = Get-XMLSecurityOptions -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
+            foreach ($D in $Data) {
+                $Output['SecurityOptions'].Add($D)
+            }
+        }
+        if ($Type -contains 'Account') {
+            [Array] $Data = Get-XMLAccount -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
+            foreach ($D in $Data) {
+                $Output['Account'].Add($D)
+            }
+        }
+        if ($Type -contains 'SystemServices') {
+            [Array] $Data = Get-XMLSystemServices -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
+            foreach ($D in $Data) {
+                $Output['SystemServices'].Add($D)
             }
         }
     }
