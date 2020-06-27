@@ -50,19 +50,24 @@
             }
             Get-ADObject @Splat -Properties DisplayName, Name, Created, Modified, gPCFileSysPath, gPCFunctionalityVersion, gPCWQLFilter, gPCMachineExtensionNames, Description, CanonicalName, DistinguishedName | ForEach-Object -Process {
                 $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDomainCN
-                $Output = [ordered]@{ }
-                $Output['DisplayName'] = $_.DisplayName
-                $Output['DomainName'] = $DomainCN
-                $Output['Description'] = $_.Description
-                $Output['GUID'] = $_.Name -replace '{' -replace '}'
-                $Output['Path'] = $_.gPCFileSysPath
-                $Output['FunctionalityVersion'] = $_.gPCFunctionalityVersion
-                $Output['Created'] = $_.Created
-                $Output['Modified'] = $_.Modified
-                $Output['GPOCanonicalName'] = $_.CanonicalName
-                $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDC
-                $Output['GPODistinguishedName'] = $_.DistinguishedName
-                [PSCustomObject] $Output
+                $GUID = $_.Name -replace '{' -replace '}'
+                if (($GUID).Length -ne 36) {
+                    Write-Warning "Get-GPOZaurrAD - GPO GUID ($($($GUID -join ' '))) is incorrect. Skipping $($_.DisplayName) / Domain: $($DomainCN)"
+                } else {
+                    $Output = [ordered]@{ }
+                    $Output['DisplayName'] = $_.DisplayName
+                    $Output['DomainName'] = $DomainCN
+                    $Output['Description'] = $_.Description
+                    $Output['GUID'] = $GUID
+                    $Output['Path'] = $_.gPCFileSysPath
+                    $Output['FunctionalityVersion'] = $_.gPCFunctionalityVersion
+                    $Output['Created'] = $_.Created
+                    $Output['Modified'] = $_.Modified
+                    $Output['GPOCanonicalName'] = $_.CanonicalName
+                    $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDC
+                    $Output['GPODistinguishedName'] = $_.DistinguishedName
+                    [PSCustomObject] $Output
+                }
             }
         }
     }
