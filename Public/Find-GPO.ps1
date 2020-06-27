@@ -57,7 +57,7 @@
     }
     $Output = [ordered] @{}
     foreach ($T in $Type) {
-        $Output[$T] = [System.Collections.Generic.List[PSCustomObject]]::new()
+        # $Output[$T] = [System.Collections.Generic.List[PSCustomObject]]::new()
     }
     foreach ($GPO in $GPOs) {
         if ($GPOPath) {
@@ -77,6 +77,18 @@
             UserPolicies     = $GPOOutput.GPO.User.ExtensionData.Name -join ", "
         }
         #>
+        $GPOStoredTypes = Get-XMLGPOTypes -GPOOutput $GPOOutput.GPO
+
+        [Array] $Data = Get-XMLStandard -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
+        foreach ($D in $Data) {
+            if (-not $Output["$($D.GpoSubType)"]) {
+                $Output["$($D.GpoSubType)"] = [System.Collections.Generic.List[PSCustomObject]]::new()
+            }
+            $Output["$($D.GpoSubType)"].Add($D)
+        }
+
+        continue
+
         if ($Type -contains 'RegistrySettings') {
             [Array] $Data = Get-XMLRegistrySettings -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
             foreach ($D in $Data) {
