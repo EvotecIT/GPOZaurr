@@ -21,6 +21,11 @@
             'Account'
             'SystemServices'
         ),
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
+        [switch] $NoTranslation,
+
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
         [string] $Splitter = [System.Environment]::NewLine,
@@ -78,16 +83,6 @@
         }
         #>
 
-        $GPODitionary = @{
-            'SecuritySettings' = @{
-                Name      = 'Security Settings'
-                Translate = [ordered] @{
-
-                }
-            }
-        }
-
-
 
         #$GPOStoredTypes = Get-XMLGPOTypes -GPOOutput $GPOOutput.GPO
 
@@ -101,7 +96,6 @@
             }
             $Output["$($D.GpoCategory)"]["$($D.GpoSettings)"].Add($D)
         }
-
         <#
         continue
 
@@ -161,5 +155,23 @@
         }
         #>
     }
-    $Output
+    if ($NoTranslation) {
+        $Output
+    } else {
+        $TranslatedOutput = [ordered] @{}
+        foreach ($Category in $Script:GPODitionary.Keys) {
+            if (-not $TranslatedOutput[$Category]) {
+                $TranslatedOutput[$Category] = [ordered] @{}
+            }
+            foreach ($Setting in $Script:GPODitionary[$Category].Keys) {
+                if (-not $TranslatedOutput[$Category][$Setting]) {
+                    $TranslatedOutput[$Category][$Setting] = [ordered] @{}
+                }
+                $TranslatedOutput[$Category][$Setting] = Invoke-GPOTranslation -InputData $Output -Category $Category -Settings $Setting
+            }
+        }
+        $TranslatedOutput
+    }
 }
+
+#Select-Properties -AllProperties -Objects ($Output.SecuritySettings.SecurityOptions | Where-Object { $_.Display -ne $null })

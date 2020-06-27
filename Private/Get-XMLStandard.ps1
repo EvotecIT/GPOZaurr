@@ -18,9 +18,6 @@
                             DisplayName = $GPO.DisplayName
                             DomainName  = $GPO.DomainName
                             GUID        = $GPO.Guid
-                            Linked      = $LinksInformation.Linked
-                            LinksCount  = $LinksInformation.LinksCount
-                            Links       = $LinksInformation.Links
                             GpoType     = $GpoType
                             GpoCategory = $GPOSettingTypeSplit[1]
                             GpoSettings = $GpoSettings
@@ -29,6 +26,9 @@
                         foreach ($Property in $Properties) {
                             $Template["$Property"] = $Key.$Property
                         }
+                        $Template['Linked'] = $LinksInformation.Linked
+                        $Template['LinksCount'] = $LinksInformation.LinksCount
+                        $Template['Links'] = $LinksInformation.Links
                         [PSCustomObject] $Template
                     }
                 }
