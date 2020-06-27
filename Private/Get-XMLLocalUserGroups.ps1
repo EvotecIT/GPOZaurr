@@ -1,17 +1,12 @@
-﻿
-function Get-XMLLocalUserGroups {
+﻿function Get-XMLLocalUserGroups {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,
-        [System.Xml.XmlElement[]] $GPOOutput
+        [System.Xml.XmlElement[]] $GPOOutput,
+        [string] $Splitter = [System.Environment]::NewLine,
+        [switch] $FullObjects
     )
-    if ($GPOOutput.LinksTo) {
-        $Linked = $true
-        $LinksCount = ([Array] $GPOOutput.LinksTo).Count
-    } else {
-        $Linked = $false
-        $LinksCount = 0
-    }
+    $LinksInformation = Get-LinksFromXML -GPOOutput $GPOOutput -Splitter $Splitter -FullObjects:$FullObjects
     foreach ($Type in @('User', 'Computer')) {
         if ($GPOOutput.$Type.ExtensionData.Extension.LocalUsersAndGroups) {
             foreach ($NestedType in @('User', 'Group')) {
@@ -24,8 +19,9 @@ function Get-XMLLocalUserGroups {
                                         DisplayName         = $GPO.DisplayName
                                         DomainName          = $GPO.DomainName
                                         GUID                = $GPO.Guid
-                                        Linked              = $Linked
-                                        LinksCount          = $LinksCount
+                                        Linked              = $LinksInformation.Linked
+                                        LinksCount          = $LinksInformation.LinksCount
+                                        Links               = $LinksInformation.Links
                                         GpoType             = $Type
                                         Name                = $Entry.name
                                         Changed             = [DateTime]  $Entry.changed
@@ -59,8 +55,9 @@ function Get-XMLLocalUserGroups {
                                 DisplayName         = $GPO.DisplayName
                                 DomainName          = $GPO.DomainName
                                 GUID                = $GPO.Guid
-                                Linked              = $Linked
-                                LinksCount          = $LinksCount
+                                Linked              = $LinksInformation.Linked
+                                LinksCount          = $LinksInformation.LinksCount
+                                Links               = $LinksInformation.Links
                                 GpoType             = $Type
                                 Name                = $Entry.name
                                 Changed             = [DateTime] $Entry.changed
