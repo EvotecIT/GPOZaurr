@@ -77,16 +77,32 @@
             UserPolicies     = $GPOOutput.GPO.User.ExtensionData.Name -join ", "
         }
         #>
-        $GPOStoredTypes = Get-XMLGPOTypes -GPOOutput $GPOOutput.GPO
+
+        $GPODitionary = @{
+            'SecuritySettings' = @{
+                Name      = 'Security Settings'
+                Translate = [ordered] @{
+
+                }
+            }
+        }
+
+
+
+        #$GPOStoredTypes = Get-XMLGPOTypes -GPOOutput $GPOOutput.GPO
 
         [Array] $Data = Get-XMLStandard -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
         foreach ($D in $Data) {
-            if (-not $Output["$($D.GpoSubType)"]) {
-                $Output["$($D.GpoSubType)"] = [System.Collections.Generic.List[PSCustomObject]]::new()
+            if (-not $Output["$($D.GpoCategory)"]) {
+                $Output["$($D.GpoCategory)"] = [ordered] @{}
             }
-            $Output["$($D.GpoSubType)"].Add($D)
+            if (-not $Output["$($D.GpoCategory)"]["$($D.GpoSettings)"]) {
+                $Output["$($D.GpoCategory)"]["$($D.GpoSettings)"] = [System.Collections.Generic.List[PSCustomObject]]::new()
+            }
+            $Output["$($D.GpoCategory)"]["$($D.GpoSettings)"].Add($D)
         }
 
+        <#
         continue
 
         if ($Type -contains 'RegistrySettings') {
@@ -143,6 +159,7 @@
                 $Output['SystemServices'].Add($D)
             }
         }
+        #>
     }
     $Output
 }

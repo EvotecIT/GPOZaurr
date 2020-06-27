@@ -3,17 +3,17 @@
     param(
         [PSCustomObject] $GPO,
         [System.Xml.XmlElement[]] $GPOOutput,
-        [string] $Splitter = [System.Environment]::NewLine,
+        [string] $Splitter,
         [switch] $FullObjects
     )
     $LinksInformation = Get-LinksFromXML -GPOOutput $GPOOutput -Splitter $Splitter -FullObjects:$FullObjects
-    foreach ($Type in @('User', 'Computer')) {
-        if ($GPOOutput.$Type.ExtensionData.Extension) {
-            foreach ($ExtensionType in $GPOOutput.$Type.ExtensionData.Extension) {
+    foreach ($GpoType in @('User', 'Computer')) {
+        if ($GPOOutput.$GpoType.ExtensionData.Extension) {
+            foreach ($ExtensionType in $GPOOutput.$GpoType.ExtensionData.Extension) {
                 $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
                 $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] }
-                foreach ($Keys in $KeysToLoop.Name) {
-                    foreach ($Key in $ExtensionType.$Keys) {
+                foreach ($GpoSettings in $KeysToLoop.Name) {
+                    foreach ($Key in $ExtensionType.$GpoSettings) {
                         $Template = [ordered] @{
                             DisplayName = $GPO.DisplayName
                             DomainName  = $GPO.DomainName
@@ -21,8 +21,9 @@
                             Linked      = $LinksInformation.Linked
                             LinksCount  = $LinksInformation.LinksCount
                             Links       = $LinksInformation.Links
-                            GpoType     = $Type
-                            GpoSubType  = $GPOSettingTypeSplit[1]
+                            GpoType     = $GpoType
+                            GpoCategory = $GPOSettingTypeSplit[1]
+                            GpoSettings = $GpoSettings
                         }
                         $Properties = ($Key | Get-Member -MemberType Properties).Name
                         foreach ($Property in $Properties) {
