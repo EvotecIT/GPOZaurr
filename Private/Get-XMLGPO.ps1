@@ -112,6 +112,9 @@
             'UserSettingsVersionIdentical'      = if ($XMLContent.GPO.User.VersionDirectory -eq $XMLContent.GPO.User.VersionSysvol) { $true } else { $false }
             'UserSettings'                      = $XMLContent.GPO.User.ExtensionData.Extension
 
+            ComputerPolicies                    = $XMLContent.GPO.Computer.ExtensionData.Name -join ", "
+            UserPolicies                        = $XMLContent.GPO.User.ExtensionData.Name -join ", "
+
             'CreationTime'                      = [DateTime] $XMLContent.GPO.CreatedTime
             'ModificationTime'                  = [DateTime] $XMLContent.GPO.ModifiedTime
             'ReadTime'                          = [DateTime] $XMLContent.GPO.ReadTime
