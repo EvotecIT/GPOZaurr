@@ -9,12 +9,6 @@
         [switch] $DeleteExisting
     )
     if ($GPOPath) {
-        if (-not $ExtendedForestInformation) {
-            $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
-        } else {
-            $ForestInformation = $ExtendedForestInformation
-        }
-
         if ($DeleteExisting) {
             $Test = Test-Path -LiteralPath $GPOPath
             if ($Test) {
@@ -22,16 +16,18 @@
                 Remove-Item -LiteralPath $GPOPath -Recurse
             }
         }
-
         $null = New-Item -ItemType Directory -Path $GPOPath -Force
-        foreach ($Domain in $ForestInformation.Domains) {
-            Write-Verbose "Save-GPOZaurrFiles - Processing GPO for $Domain"
-            Get-GPO -All -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain | ForEach-Object {
-                $XMLContent = Get-GPOReport -ID $_.ID.Guid -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain
-                $Path = [io.path]::Combine($GPOPath, "$($_.ID.Guid).xml")
-
-                $XMLContent | Set-Content -LiteralPath $Path -Force -Encoding Unicode
+        $GPOs = Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        foreach ($GPO in $GPOS) {
+            $XMLContent = Get-GPOReport -ID $GPO.Guid -ReportType XML -Domain $GPO.DomainName
+            $GPODOmainFolder = [io.path]::Combine($GPOPath, $GPO.DomainName)
+            if (-not (Test-Path -Path $GPODOmainFolder)) {
+                $null = New-Item -ItemType Directory -Path $GPODOmainFolder -Force
             }
+            $Path = [io.path]::Combine($GPODOmainFolder, "$($GPO.Guid).xml")
+            $XMLContent | Set-Content -LiteralPath $Path -Force -Encoding Unicode
         }
+        $GPOListPath = [io.path]::Combine($GPOPath, "GPOList.xml")
+        $GPOs | Export-Clixml -Depth 5 -Path $GPOListPath
     }
 }
