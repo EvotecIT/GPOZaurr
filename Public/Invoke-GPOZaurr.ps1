@@ -56,31 +56,12 @@
         [Array] $GPOs = Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     }
     $Output = [ordered] @{}
-    foreach ($T in $Type) {
-        # $Output[$T] = [System.Collections.Generic.List[PSCustomObject]]::new()
-    }
     foreach ($GPO in $GPOs) {
         if ($GPOPath) {
             $GPOOutput = $GPO.GPOOutput
         } else {
             [xml] $GPOOutput = Get-GPOReport -Guid $GPO.GUID -Domain $GPO.DomainName -ReportType Xml
         }
-        <#
-        [PSCustomobject] @{
-            DisplayName      = $GPO.DisplayName
-            DomainName       = $GPO.DomainName
-            ComputerEnabled  = $GPOOutput.GPO.Computer.Enabled
-            ComputerEmpty    = if ($GPOOutput.GPO.Computer.ExtensionData) { $false } else { $true }
-            ComputerPolicies = $GPOOutput.GPO.Computer.ExtensionData.Name -join ", "
-            UserEnabled      = $GPOOutput.GPO.User.Enabled
-            UserEmpty        = if ($GPOOutput.GPO.User.ExtensionData) { $false } else { $true }
-            UserPolicies     = $GPOOutput.GPO.User.ExtensionData.Name -join ", "
-        }
-        #>
-
-
-        #$GPOStoredTypes = Get-XMLGPOTypes -GPOOutput $GPOOutput.GPO
-
         [Array] $Data = Get-XMLStandard -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
         foreach ($D in $Data) {
             if (-not $Output["$($D.GpoCategory)"]) {
@@ -91,64 +72,6 @@
             }
             $Output["$($D.GpoCategory)"]["$($D.GpoSettings)"].Add($D)
         }
-        <#
-        continue
-
-        if ($Type -contains 'RegistrySettings') {
-            [Array] $Data = Get-XMLRegistrySettings -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
-            foreach ($D in $Data) {
-                $Output['RegistrySettings'].Add($D)
-            }
-        }
-        if ($Type -contains 'RegistryPolicies') {
-            [Array] $Data = Get-XMLRegistryPolicies -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
-            foreach ($D in $Data) {
-                $Output['RegistryPolicies'].Add($D)
-            }
-        }
-        if ($Type -contains 'LocalUsersAndGroups') {
-            [Array] $Data = Get-XMLLocalUserGroups -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
-            foreach ($D in $Data) {
-                $Output['LocalUsersAndGroups'].Add($D)
-            }
-        }
-        if ($Type -contains 'AutoLogon') {
-            [Array] $Data = Get-XMLAutologon -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
-            foreach ($D in $Data) {
-                $Output['AutoLogon'].Add($D)
-            }
-        }
-        if ($Type -contains 'Scripts') {
-            [Array] $Data = Get-XMLScripts -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
-            foreach ($D in $Data) {
-                $Output['Scripts'].Add($D)
-            }
-        }
-        if ($Type -contains 'SoftwareInstallation') {
-            [Array] $Data = Get-XMLSoftwareInstallation -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
-            foreach ($D in $Data) {
-                $Output['SoftwareInstallation'].Add($D)
-            }
-        }
-        if ($Type -contains 'SecurityOptions') {
-            [Array] $Data = Get-XMLSecurityOptions -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
-            foreach ($D in $Data) {
-                $Output['SecurityOptions'].Add($D)
-            }
-        }
-        if ($Type -contains 'Account') {
-            [Array] $Data = Get-XMLAccount -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
-            foreach ($D in $Data) {
-                $Output['Account'].Add($D)
-            }
-        }
-        if ($Type -contains 'SystemServices') {
-            [Array] $Data = Get-XMLSystemServices -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects
-            foreach ($D in $Data) {
-                $Output['SystemServices'].Add($D)
-            }
-        }
-        #>
     }
     if ($NoTranslation) {
         $Output
