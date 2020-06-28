@@ -12,8 +12,6 @@
             GpoType           = $GPOEntry.GpoType       #: Computer
             GpoCategory       = $GPOEntry.GpoCategory   #: SecuritySettings
             GpoSettings       = $GPOEntry.GpoSettings   #: SecurityOptions
-            #Changed           = [DateTime] $Registry.changed
-            GPOSettingOrder   = $Registry.GPOSettingOrder
             AutoAdminLogon    = $null
             DefaultDomainName = $null
             DefaultUserName   = $null

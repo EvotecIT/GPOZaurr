@@ -6,6 +6,20 @@
             ConvertTo-RegistryAutologon -GPOList $GPOList
         }
     }
+    LocalUsersAndGroups        = [ordered] @{
+        Category = 'LugsSettings'
+        Settings = 'LocalUsersAndGroups'
+        Code     = {
+            ConvertTo-LocalUserAndGroups -GPOList $GPOList
+        }
+    }
+    Policies                   = @{
+        Category = 'RegistrySettings'
+        Settings = 'Policy'
+        Code     = {
+            ConvertTo-Policies -GPOList $GPOList
+        }
+    }
     RegistrySettings           = [ordered] @{
         Category = 'RegistrySettings'
         Settings = 'RegistrySettings'
@@ -20,11 +34,25 @@
             ConvertTo-RegistrySettingsCollection -GPOList $GPOList
         }
     }
+    Scripts                    = [ordered] @{
+        Category = 'Scripts'
+        Settings = 'Script'
+        Code     = {
+            ConvertTo-Scripts -GPOList $GPOList
+        }
+    }
     SecurityOptions            = [ordered] @{
         Category = 'SecuritySettings'
         Settings = 'SecurityOptions'
         Code     = {
             ConvertTo-SecurityOptions -GPOList $GPOList
+        }
+    }
+    SoftwareInstallation       = [ordered] @{
+        Category = 'SoftwareInstallationSettings'
+        Settings = 'MsiApplication'
+        Code     = {
+            ConvertTo-SoftwareInstallation -GPOList $GPOList
         }
     }
     SystemServices             = [ordered] @{
