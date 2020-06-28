@@ -52,7 +52,7 @@
                 $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDomainCN
                 $GUID = $_.Name -replace '{' -replace '}'
                 if (($GUID).Length -ne 36) {
-                    Write-Warning "Get-GPOZaurrAD - GPO GUID ($($($GUID -join ' '))) is incorrect. Skipping $($_.DisplayName) / Domain: $($DomainCN)"
+                    Write-Warning "Get-GPOZaurrAD - GPO GUID ($($($GUID.Replace("`n",' ')))) is incorrect. Skipping $($_.DisplayName) / Domain: $($DomainCN)"
                 } else {
                     $Output = [ordered]@{ }
                     $Output['DisplayName'] = $_.DisplayName
