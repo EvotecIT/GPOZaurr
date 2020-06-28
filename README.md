@@ -39,7 +39,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.46 - Unreleased
+- 0.0.46 - 28.06.2020
   - Additional protection for `Get-GPOZaurrAD` for CNF duplicates
   - Update to `Save-GPOZaurrFiles`
   - Added `Invoke-GPOZaurr` (alias: `Find-GPO`) (heavy work in progress)
