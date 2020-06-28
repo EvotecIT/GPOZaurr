@@ -1,6 +1,9 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-$Output = Invoke-GPOZaurr #-NoTranslation
+# Use Save-GPOZaurrFiles -GPOPath $ENV:USERPROFILE\Desktop\GPOExport
+
+$Output = Invoke-GPOZaurr -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExportTest'
+$Output | Format-Table *
 
 New-HTML {
     foreach ($GPOCategory in $Output.Keys) {
@@ -16,4 +19,4 @@ New-HTML {
             }
         }
     }
-} -Online -ShowHTML -FilePath $Env:UserProfile\Desktop\OutputFromFindGPO.html
+} -Online -ShowHTML -FilePath $Env:UserProfile\Desktop\OutputFromFindGPO-FromDisk.html
