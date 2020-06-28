@@ -1,9 +1,25 @@
-﻿$Script:GPODitionary = @{
+﻿$Script:GPODitionary = [ordered] @{
+    AccountPolicies            = [ordered] @{
+        Category = 'SecuritySettings'
+        Settings = 'Account'
+        GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
+        Code     = {
+            ConvertTo-AccountPolicies -GPOList $GPOList
+        }
+    }
     Autologon                  = [ordered] @{
         Category = 'RegistrySettings'
         Settings = 'RegistrySettings'
         Code     = {
             ConvertTo-RegistryAutologon -GPOList $GPOList
+        }
+    }
+    EventLog                   = [ordered] @{
+        Category = 'SecuritySettings'
+        Settings = 'EventLog'
+        #GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
+        Code     = {
+            ConvertTo-EventLog -GPOList $GPOList
         }
     }
     LocalUsersAndGroups        = [ordered] @{
