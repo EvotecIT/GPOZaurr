@@ -15,10 +15,13 @@
     # It's possible given small input of GPOs that I work with that this is not all... and needs updates
     $AllProperties = Select-Properties -AllProperties -Objects $InputData.$Category.$Settings
     $MissingProperties = $AllProperties | Where-Object { $_ -notin 'DisplayName', 'DomainName', 'GUID', 'Linked', 'LinksCount', 'Links', 'GPOType', 'GPOCategory', 'GPOSettings' }
-    foreach ($Property in $MissingProperties) {
+    [Array] $ConsiderAdding = foreach ($Property in $MissingProperties) {
         if ($Property -notin $Script:GPODitionary[$Report]['PossibleProperties']) {
-            Write-Warning "Invoke-Translation - We're missing property for $Category / $Settings - $Property"
+            $Property
         }
+    }
+    if ($ConsiderAdding.Count -gt 0) {
+        Write-Warning "Invoke-Translation - We're missing property for $Category / $Settings - ($($ConsiderAdding -join ','))"
     }
     # Here we try to translate given GPO entries according to predefined dictionary - so called prettify
     # Dictionary will need a lot of work and engine some improvements
