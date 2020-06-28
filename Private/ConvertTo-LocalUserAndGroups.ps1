@@ -14,7 +14,7 @@
                 GpoSettings      = $GPOEntry.GpoSettings   #: SecurityOptions
                 Changed          = [DateTime] $User.Changed
                 GPOSettingOrder  = $User.GPOSettingOrder
-                UserAction       = $User.Properties.action       #: U
+                UserAction       = $Script:Actions["$($User.Properties.action)"]       #: U
                 UserNewName      = $User.Properties.newName      #:
                 UserFullName     = $User.Properties.fullName     #:
                 UserDescription  = $User.Properties.description  #:
@@ -67,7 +67,7 @@
                     #Properties      = $Group.Properties      #: Properties: Properties
                     Filters              = $Group.Filters         #::
 
-                    GroupAction          = $Group.Properties.action          #: U
+                    GroupAction          = $Script:Actions["$($Group.Properties.action)"]          #: U
                     GroupNewName         = $Group.Properties.newName         #:
                     GroupDescription     = $Group.Properties.description     #:
                     GroupDeleteAllUsers  = $Group.Properties.deleteAllUsers  #: 0
