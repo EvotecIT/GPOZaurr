@@ -1,5 +1,6 @@
 ﻿$Script:GPODitionary = @{
-    SecuritySettings = @{
-        SecurityOptions = $SecuritySettingsSecurityOptions
-    }
+    SecurityOptions = $SecurityOptions
+    #LugsSettings    = @{
+    #    LocalUsersAndGroups = $LugsSettingsLocalUsersAndGroups
+
 }

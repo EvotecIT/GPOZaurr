@@ -1,4 +1,5 @@
-﻿function Find-GPO {
+﻿function Invoke-GPOZaurr {
+    [alias('Find-GPO')]
     [cmdletBinding(DefaultParameterSetName = 'Default')]
     param(
         [Parameter(ParameterSetName = 'Default')][alias('ForestName')][string] $Forest,
@@ -10,18 +11,7 @@
 
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
-        [ValidateSet('LocalUsersAndGroups', 'Autologon', 'RegistrySettings', 'RegistryPolicies', 'Scripts')][string[]] $Type = @(
-            'LocalUsersAndGroups'
-            'Autologon'
-            'RegistrySettings'
-            'RegistryPolicies'
-            'Scripts'
-            'SoftwareInstallation'
-            'SecurityOptions'
-            'Account'
-            'SystemServices'
-        ),
-
+        [string[]] $Type,
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
         [switch] $NoTranslation,
@@ -29,8 +19,13 @@
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
         [string] $Splitter = [System.Environment]::NewLine,
-        [switch] $FullObjects
+        [switch] $FullObjects,
+
+        [ValidateSet('HTML', 'Object')][string] $OutputType = 'Object'
     )
+    if ($Type.Count -eq 0) {
+        $Type = $Script:GPODitionary.Keys
+    }
     if ($GPOPath) {
         if (Test-Path -LiteralPath $GPOPath) {
             <#
@@ -159,19 +154,27 @@
         $Output
     } else {
         $TranslatedOutput = [ordered] @{}
-        foreach ($Category in $Script:GPODitionary.Keys) {
-            if (-not $TranslatedOutput[$Category]) {
-                $TranslatedOutput[$Category] = [ordered] @{}
-            }
-            foreach ($Setting in $Script:GPODitionary[$Category].Keys) {
-                if (-not $TranslatedOutput[$Category][$Setting]) {
-                    $TranslatedOutput[$Category][$Setting] = [ordered] @{}
-                }
-                $TranslatedOutput[$Category][$Setting] = Invoke-GPOTranslation -InputData $Output -Category $Category -Settings $Setting
-            }
+        foreach ($Report in $Type) {
+            $Category = $Script:GPODitionary[$Report]['Category']
+            $Settings = $Script:GPODitionary[$Report]['Settings']
+
+            #if (-not $TranslatedOutput[$Report]) {
+            #    $TranslatedOutput[$Report] = [ordered] @{}
+            #}
+            #foreach ($Setting in $Settings) {
+            #    if (-not $TranslatedOutput[$Category][$Settings]) {
+            #        $TranslatedOutput[$Category][$Settings] = [ordered] @{}
+            #    }
+            $TranslatedOutput[$Report] = Invoke-GPOTranslation -InputData $Output -Category $Category -Settings $Settings -Report $Report
+            #}
         }
         $TranslatedOutput
     }
 }
 
-#Select-Properties -AllProperties -Objects ($Output.SecuritySettings.SecurityOptions | Where-Object { $_.Display -ne $null })
+[scriptblock] $SourcesAutoCompleter = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+
+    $Script:GPODitionary.Keys | Sort-Object | Where-Object { $_ -like "*$wordToComplete*" }
+}
+Register-ArgumentCompleter -CommandName Find-GPO -ParameterName Type -ScriptBlock $SourcesAutoCompleter

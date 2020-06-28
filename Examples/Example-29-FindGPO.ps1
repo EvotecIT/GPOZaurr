@@ -1,6 +1,6 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-$Output = Find-GPO #-NoTranslation
+$Output = Invoke-GPOZaurr #-NoTranslation
 
 New-HTML {
     foreach ($GPOCategory in $Output.Keys) {

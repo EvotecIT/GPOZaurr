@@ -2,6 +2,7 @@
     [cmdletBinding()]
     param(
         [System.Collections.IDictionary] $InputData,
+        [string] $Report,
         [string] $Category,
         [string] $Settings
     )
@@ -15,7 +16,7 @@
     $AllProperties = Select-Properties -AllProperties -Objects $InputData.$Category.$Settings
     $MissingProperties = $AllProperties | Where-Object { $_ -notin 'DisplayName', 'DomainName', 'GUID', 'Linked', 'LinksCount', 'Links', 'GPOType', 'GPOCategory', 'GPOSettings' }
     foreach ($Property in $MissingProperties) {
-        if ($Property -notin $Script:GPODitionary[$Category][$Settings]['PossibleProperties']) {
+        if ($Property -notin $Script:GPODitionary[$Report]['PossibleProperties']) {
             Write-Warning "Invoke-Translation - We're missing property for $Category / $Settings - $Property"
         }
     }
@@ -33,9 +34,9 @@
         }
 
         # Lets loop thru each Translate Property
-        foreach ($PropertyName in $Script:GPODitionary[$Category][$Settings]['Translate'].Keys) {
+        foreach ($PropertyName in $Script:GPODitionary[$Report]['Translate'].Keys) {
             # We get property that we expect on our $GPOEntry object
-            $Property = $Script:GPODitionary[$Category][$Settings]['Translate'][$PropertyName]
+            $Property = $Script:GPODitionary[$Report]['Translate'][$PropertyName]
 
             # Since it's possible we may be interested in something that is a nested property we need to do some looping into the object
             $Value = $GPOEntry
@@ -44,9 +45,9 @@
             }
             # Now we simply assing that value to new GPO Entry
             # But before we do so, we need to check if it has required type
-            if ($Script:GPODitionary[$Category][$Settings]['Types'][$PropertyName]) {
+            if ($Script:GPODitionary[$Report]['Types'][$PropertyName]) {
                 # This basically checks in dictionary if we want to convert the type from a string to lets say boolean or something else
-                $CreateGPO["$PropertyName"] = Invoke-Command -Command $Script:GPODitionary[$Category][$Settings]['Types'][$PropertyName] -ArgumentList $Value
+                $CreateGPO["$PropertyName"] = Invoke-Command -Command $Script:GPODitionary[$Report]['Types'][$PropertyName] -ArgumentList $Value
             } else {
                 $CreateGPO["$PropertyName"] = $Value
             }
