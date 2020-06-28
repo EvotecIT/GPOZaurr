@@ -39,6 +39,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.47 - Unreleased
+  - Update to `Get-GPOZaurrAD` for better error reporting
 - 0.0.46 - 28.06.2020
   - Additional protection for `Get-GPOZaurrAD` for CNF duplicates
   - Update to `Save-GPOZaurrFiles`
