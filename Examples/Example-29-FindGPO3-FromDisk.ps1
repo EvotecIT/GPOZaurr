@@ -11,11 +11,11 @@ New-HTML {
             if ($Output["$GPOCategory"] -is [System.Collections.IDictionary]) {
                 foreach ($GpoSettings in $Output["$GPOCategory"].Keys) {
                     New-HTMLTab -Name $GpoSettings {
-                        New-HTMLTable -DataTable $Output[$GPOCategory][$GpoSettings] -ScrollX -DisablePaging -AllProperties -Title $Key
+                        New-HTMLTable -DataTable $Output[$GPOCategory][$GpoSettings] -ScrollX -DisablePaging -AllProperties -Title $GpoSettings
                     }
                 }
             } else {
-                New-HTMLTable -DataTable $Output[$GPOCategory] -ScrollX -DisablePaging -AllProperties -Title $Key
+                New-HTMLTable -DataTable $Output[$GPOCategory] -ScrollX -DisablePaging -AllProperties -Title $GpoSettings
             }
         }
     }

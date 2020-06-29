@@ -7,6 +7,22 @@
             ConvertTo-AccountPolicies -GPOList $GPOList
         }
     }
+    Audit                      = [ordered] @{
+        Category = 'SecuritySettings'
+        Settings = 'Audit'
+        #GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
+        Code     = {
+            ConvertTo-Audit -GPOList $GPOList
+        }
+    }
+    AuditAlternative           = [ordered] @{
+        Category = 'SecuritySettings'
+        Settings = 'Audit'
+        #GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
+        Code     = {
+            ConvertTo-AuditAlternative -GPOList $GPOList
+        }
+    }
     Autologon                  = [ordered] @{
         Category = 'RegistrySettings'
         Settings = 'RegistrySettings'

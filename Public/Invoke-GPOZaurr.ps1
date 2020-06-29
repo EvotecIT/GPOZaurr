@@ -19,9 +19,22 @@
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
         [string] $Splitter = [System.Environment]::NewLine,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
         [switch] $FullObjects,
 
-        [ValidateSet('HTML', 'Object')][string] $OutputType = 'Object'
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
+        [ValidateSet('HTML', 'Object', 'Excel')][string[]] $OutputType = 'Object',
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
+        [string] $OutputPath,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
+        [switch] $Open
     )
     if ($Type.Count -eq 0) {
         $Type = $Script:GPODitionary.Keys
@@ -56,6 +69,7 @@
         [Array] $GPOs = Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     }
     $Output = [ordered] @{}
+    $OutputByGPO = [ordered] @{}
     foreach ($GPO in $GPOs) {
         if ($GPOPath) {
             $GPOOutput = $GPO.GPOOutput
@@ -71,10 +85,20 @@
                 $Output["$($D.GpoCategory)"]["$($D.GpoSettings)"] = [System.Collections.Generic.List[PSCustomObject]]::new()
             }
             $Output["$($D.GpoCategory)"]["$($D.GpoSettings)"].Add($D)
+
+            if (-not $OutputByGPO["$($D.DomainName)"]) {
+                $OutputByGPO["$($D.DomainName)"] = [ordered] @{}
+            }
+            if (-not $OutputByGPO[$D.DomainName][$D.DisplayName]) {
+                $OutputByGPO[$D.DomainName][$D.DisplayName] = [System.Collections.Generic.List[PSCustomObject]]::new()
+            }
+            $OutputByGPO[$D.DomainName][$D.DisplayName].Add($D)
         }
     }
     if ($NoTranslation) {
-        $Output
+        if ($OutputType -contains 'Object') {
+            $OutputByGPO
+        }
     } else {
         $TranslatedOutput = [ordered] @{}
         foreach ($Report in $Type) {
@@ -91,7 +115,63 @@
             $TranslatedOutput[$Report] = Invoke-GPOTranslation -InputData $Output -Category $Category -Settings $Settings -Report $Report
             #}
         }
-        $TranslatedOutput
+        if ($OutputType -contains 'Object') {
+            $TranslatedOutput
+        }
+    }
+    if ($NoTranslation) {
+        $SingleSource = $OutputType
+    } else {
+        $SingleSource = $TranslatedOutput
+    }
+
+    if ($OutputPath) {
+        $FolderPath = $OutputPath
+    } else {
+        $FolderPath = [io.path]::GetTempPath()
+    }
+    if ($OutputType -contains 'HTML') {
+        $FilePathHTML = [io.path]::Combine($FolderPath, "GPOZaurr-Summary-$((Get-Date).ToString('yyyy-MM-dd_HH_mm_ss')).html")
+        Write-Warning "Invoke-GPOZaurr - $FilePathHTML"
+        New-HTML {
+            foreach ($GPOCategory in $SingleSource.Keys) {
+                New-HTMLTab -Name $GPOCategory {
+                    if ($SingleSource["$GPOCategory"] -is [System.Collections.IDictionary]) {
+                        foreach ($GpoSettings in $SingleSource["$GPOCategory"].Keys) {
+                            New-HTMLTab -Name $GpoSettings {
+                                if ($SingleSource[$GPOCategory][$GpoSettings].Count -gt 0) {
+                                    New-HTMLTable -DataTable $SingleSource[$GPOCategory][$GpoSettings] -ScrollX -DisablePaging -AllProperties -Title $GpoSettings
+                                }
+                            }
+                        }
+                    } else {
+                        if ($SingleSource[$GPOCategory].Count -gt 0) {
+                            New-HTMLTable -DataTable $SingleSource[$GPOCategory] -ScrollX -DisablePaging -AllProperties -Title $GpoSettings
+                        }
+                    }
+                }
+            }
+        } -Online -ShowHTML:$Open.IsPresent -FilePath $FilePathHTML
+    }
+    if ($OutputType -contains 'Excel') {
+        $FilePathExcel = [io.path]::Combine($FolderPath, "GPOZaurr-Summary-$((Get-Date).ToString('yyyy-MM-dd_HH_mm_ss')).xlsx")
+        Write-Warning "Invoke-GPOZaurr - $FilePathExcel"
+        foreach ($GPOCategory in $SingleSource.Keys) {
+            if ($SingleSource["$GPOCategory"] -is [System.Collections.IDictionary]) {
+                foreach ($GpoSettings in $SingleSource["$GPOCategory"].Keys) {
+                    if ($SingleSource[$GPOCategory][$GpoSettings].Count -gt 0) {
+                        ConvertTo-Excel -DataTable $SingleSource[$GPOCategory][$GpoSettings] -AllProperties -ExcelWorkSheetName $GpoSettings -FilePath $FilePathExcel -AutoFilter -AutoFit -Option Rename
+                    }
+                }
+            } else {
+                if ($SingleSource[$GPOCategory].Count -gt 0) {
+                    ConvertTo-Excel -DataTable $SingleSource[$GPOCategory] -AllProperties -ExcelWorkSheetName $GPOCategory -FilePath $FilePathExcel -AutoFilter -AutoFit -Option Rename
+                }
+            }
+        }
+        if ($Open) {
+            Invoke-Item -Path $FilePathExcel
+        }
     }
 }
 
