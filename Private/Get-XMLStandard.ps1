@@ -14,7 +14,7 @@
                 if ($ExtensionType) {
                     $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
                     try {
-                        $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] }
+                        $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] -and $_.Name -notin @('Blocked') }
                     } catch {
                         Write-Warning "Get-XMLStandard - things went sideways $($_.Exception.Message)"
                         continue

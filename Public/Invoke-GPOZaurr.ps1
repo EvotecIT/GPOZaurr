@@ -70,6 +70,7 @@
     }
     $Output = [ordered] @{}
     $OutputByGPO = [ordered] @{}
+    $TranslatedOutput = [ordered] @{}
     foreach ($GPO in $GPOs) {
         if ($GPOPath) {
             $GPOOutput = $GPO.GPOOutput
@@ -94,13 +95,13 @@
             }
             $OutputByGPO[$D.DomainName][$D.DisplayName].Add($D)
         }
+
     }
     if ($NoTranslation) {
         if ($OutputType -contains 'Object') {
-            $OutputByGPO
+            $Output
         }
     } else {
-        $TranslatedOutput = [ordered] @{}
         foreach ($Report in $Type) {
             $Category = $Script:GPODitionary[$Report]['Category']
             $Settings = $Script:GPODitionary[$Report]['Settings']
@@ -112,15 +113,16 @@
             #    if (-not $TranslatedOutput[$Category][$Settings]) {
             #        $TranslatedOutput[$Category][$Settings] = [ordered] @{}
             #    }
-            $TranslatedOutput[$Report] = Invoke-GPOTranslation -InputData $Output -Category $Category -Settings $Settings -Report $Report
+            $TranslatedOutput[$Report] = Invoke-GPOTranslationOld -InputData $Output -Category $Category -Settings $Settings -Report $Report
             #}
         }
         if ($OutputType -contains 'Object') {
             $TranslatedOutput
         }
     }
+
     if ($NoTranslation) {
-        $SingleSource = $OutputType
+        $SingleSource = $Output
     } else {
         $SingleSource = $TranslatedOutput
     }
@@ -173,6 +175,7 @@
             Invoke-Item -Path $FilePathExcel
         }
     }
+
 }
 
 [scriptblock] $SourcesAutoCompleter = {
