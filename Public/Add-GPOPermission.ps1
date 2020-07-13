@@ -3,7 +3,7 @@
     param(
         [validateset('WellKnownAdministrative', 'Administrative', 'AuthenticatedUsers', 'Default')][string] $Type = 'Default',
         [Microsoft.GroupPolicy.GPPermissionType] $IncludePermissionType,
-        [alias('Trustee')][Array] $Principal,
+        [alias('Trustee')][string] $Principal,
         [alias('TrusteeType')][validateset('DistinguishedName', 'Name', 'Sid')][string] $PrincipalType = 'DistinguishedName',
         [validateSet('Allow', 'Deny')][string] $PermitType = 'Allow'
     )
