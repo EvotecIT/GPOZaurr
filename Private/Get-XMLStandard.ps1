@@ -41,6 +41,14 @@
                             $Template['Linked'] = $LinksInformation.Linked
                             $Template['LinksCount'] = $LinksInformation.LinksCount
                             $Template['Links'] = $LinksInformation.Links
+                            <#
+                            $Template['IncludeComments'] = $GPOOutput.IncludeComments     # : true #: true
+                            $Template['CreatedTime'] = $GPOOutput.CreatedTime         # : 2020-06-17T11:23:22 #: 2020-06-17T11:23:22
+                            $Template['ModifiedTime'] = $GPOOutput.ModifiedTime        # : 2020-06-28T15:49:52 #: 2020-06-28T15:49:52
+                            $Template['ReadTime'] = $GPOOutput.ReadTime            # : 2020-06-28T16:14:09.2209011Z #: 2020-06-28T16:14:09.2209011Z
+                            $Template['SecurityDescriptor'] = $GPOOutput.SecurityDescriptor  # : SecurityDescriptor #: SecurityDescriptor
+                            $Template['FilterDataAvailable'] = $GPOOutput.FilterDataAvailable # : true #: true
+                            #>
                             [PSCustomObject] $Template
                         }
                     }
