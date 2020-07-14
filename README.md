@@ -40,7 +40,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 ## Changelog
 
 - 0.0.48 - Unreleased
-
+  - Added `Get-GPOZaurrFilesPolicyDefinitions`
+  - Updates to `Invoke-GPOZaurr` - still work in progress
 - 0.0.47 - 29.06.2020
   - Update to `Get-GPOZaurrAD` for better error reporting
   - Updates to `Invoke-GPOZaurr` - still work in progress

@@ -1,50 +1,66 @@
 ﻿$Script:GPODitionary = [ordered] @{
-    AccountPolicies            = [ordered] @{
-        Category = 'SecuritySettings'
-        Settings = 'Account'
-        GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
-        Code     = {
-            ConvertTo-AccountPolicies -GPOList $GPOList
+    AccountPolicies      = [ordered] @{
+        Category   = 'SecuritySettings'
+        Settings   = 'Account'
+        GPOPath    = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
+        Code       = {
+            #ConvertTo-AccountPolicies -GPOList $GPOList
+            ConvertTo-XMLAccountPolicies -GPO $GPO
+        }
+        CodeSingle = {
+            #ConvertTo-AccountPolicies -GPOList $GPOList
+            ConvertTo-XMLAccountPolicies -GPO $GPO
         }
     }
-    Audit                      = [ordered] @{
-        Category = 'SecuritySettings'
-        Settings = 'Audit'
+    Audit                = [ordered] @{
+        Category   = 'SecuritySettings'
+        Settings   = 'Audit'
         #GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
-        Code     = {
-            ConvertTo-Audit -GPOList $GPOList
+        Code       = {
+            ConvertTo-XMLAudit -GPO $GPO
+            #ConvertTo-Audit -GPOList $GPOList
+        }
+        CodeSingle = {
+            ConvertTo-XMLAudit -GPO $GPO
+            #ConvertTo-Audit -GPOList $GPOList
         }
     }
-    AuditAlternative           = [ordered] @{
-        Category = 'SecuritySettings'
-        Settings = 'Audit'
+    Autologon            = [ordered] @{
+        Category   = 'RegistrySettings'
+        Settings   = 'RegistrySettings'
+        Code       = {
+            #ConvertTo-RegistryAutologon -GPOList $GPOList
+            ConvertTo-XMLRegistryAutologon -GPO $GPO
+        }
+        CodeSingle = {
+            #ConvertTo-AccountPolicies -GPOList $GPOList
+            ConvertTo-XMLRegistryAutologon -GPO $GPO
+        }
+    }
+    EventLog             = [ordered] @{
+        Category   = 'SecuritySettings'
+        Settings   = 'EventLog'
         #GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
-        Code     = {
-            ConvertTo-AuditAlternative -GPOList $GPOList
+        Code       = {
+            #ConvertTo-EventLog -GPOList $GPOList
+            ConvertTo-XMLEventLog -GPO $GPO
+        }
+        CodeSingle = {
+            #ConvertTo-EventLog -GPOList $GPOList
+            ConvertTo-XMLEventLog -GPO $GPO
         }
     }
-    Autologon                  = [ordered] @{
-        Category = 'RegistrySettings'
-        Settings = 'RegistrySettings'
-        Code     = {
-            ConvertTo-RegistryAutologon -GPOList $GPOList
-        }
-    }
-    EventLog                   = [ordered] @{
-        Category = 'SecuritySettings'
-        Settings = 'EventLog'
-        #GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
-        Code     = {
-            ConvertTo-EventLog -GPOList $GPOList
-        }
-    }
-    LocalUsersAndGroups        = [ordered] @{
+    <#
+    LocalUsersAndGroups = [ordered] @{
         Category = 'LugsSettings'
         Settings = 'LocalUsersAndGroups'
         Code     = {
-            ConvertTo-LocalUserAndGroups -GPOList $GPOList
+            #ConvertTo-LocalUserAndGroups -GPOList $GPOList
+            ConvertTo-XMLLocalUserAndGroups -GPO $GPO
         }
     }
+    #>
+    <#
     Policies                   = @{
         Category = 'RegistrySettings'
         Settings = 'Policy'
@@ -66,13 +82,19 @@
             ConvertTo-RegistrySettingsCollection -GPOList $GPOList
         }
     }
-    Scripts                    = [ordered] @{
-        Category = 'Scripts'
-        Settings = 'Script'
-        Code     = {
-            ConvertTo-Scripts -GPOList $GPOList
+    #>
+    Scripts              = [ordered] @{
+        Category   = 'Scripts'
+        Settings   = 'Script'
+        Code       = {
+            #ConvertTo-Scripts -GPOList $GPOList
+            ConvertTo-XMLScripts -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLScripts -GPO $GPO -SingleObject
         }
     }
+    <#
     SecurityOptions            = [ordered] @{
         Category = 'SecuritySettings'
         Settings = 'SecurityOptions'
@@ -80,13 +102,19 @@
             ConvertTo-SecurityOptions -GPOList $GPOList
         }
     }
-    SoftwareInstallation       = [ordered] @{
-        Category = 'SoftwareInstallationSettings'
-        Settings = 'MsiApplication'
-        Code     = {
-            ConvertTo-SoftwareInstallation -GPOList $GPOList
+    #>
+    SoftwareInstallation = [ordered] @{
+        Category   = 'SoftwareInstallationSettings'
+        Settings   = 'MsiApplication'
+        Code       = {
+            # ConvertTo-SoftwareInstallation -GPOList $GPOList
+            ConvertTo-XMLSoftwareInstallation -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLSoftwareInstallation -GPO $GPO -SingleObject
         }
     }
+    <#
     SystemServices             = [ordered] @{
         Description = ''
         GPOPath     = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> System Services'
@@ -105,7 +133,5 @@
             ConvertTo-SystemServicesNT -GPOList $GPOList
         }
     }
-    #LugsSettings    = @{
-    #    LocalUsersAndGroups = $LugsSettingsLocalUsersAndGroups
-
+    #>
 }

@@ -1,36 +1,29 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 #Invoke-GPOZaurr -OutputType Excel, Object, HTML -Open | Format-Table
-$Output = Invoke-GPOZaurr -GPOPath $Env:USERPROFILE\Desktop\GPOExport -NoTranslation #| Format-Table
+#$Output = Invoke-GPOZaurr -GPOPath $Env:USERPROFILE\Desktop\GPOExport -NoTranslation #| Format-Table
+$Output = Invoke-GPOZaurr -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExportTest' -NoTranslation
+#$Output = Invoke-GPOZaurr -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExport' -NoTranslation #-OutputType HTML, Object -Open #| Format-Table
+#$Output.Categories | Out-HtmlView
+#$Output.Categories | Format-Table
+$Output | Format-Table
+#$Output.CategoriesFull | Format-Table
 #$Output.Count
 
+$Output.Reports | Format-Table
+#$Output.Reports.Scripts | Format-Table *
+#$Output.Reports.AccountPolicies | Format-Table *
+#$Output.Reports.Audit | Format-Table *
+#$Output.Reports.Autologon | Format-Table *
+#$Output.Reports.EventLog | Format-Table *
+$Output.Reports.SoftwareInstallation | Format-Table *
 
 
-<# 4073 files - 212MB / no translation
+return
+# This is section that treats 1 GPO as single object - if there are 5 scripts in 1 GPO there's only one value
 
-Days              : 0
-Hours             : 0
-Minutes           : 0
-Seconds           : 51
-Milliseconds      : 756
-Ticks             : 517566534
-TotalDays         : 0,000599035340277778
-TotalHours        : 0,0143768481666667
-TotalMinutes      : 0,86261089
-TotalSeconds      : 51,7566534
-TotalMilliseconds : 51756,6534
-#>
-
-<# 4073 files - 212MB / no translation / But with 2 diff types ($OutputByCategory / $OutputByGPO)
-Days              : 0
-Hours             : 0
-Minutes           : 0
-Seconds           : 53
-Milliseconds      : 246
-Ticks             : 532466109
-TotalDays         : 0,00061628021875
-TotalHours        : 0,01479072525
-TotalMinutes      : 0,887443515
-TotalSeconds      : 53,2466109
-TotalMilliseconds : 53246,6109
-#>
+$Output = Invoke-GPOZaurr -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExportTest' -NoTranslation -SingleObject
+$Output
+$Output.Reports | Format-Table
+$Output.Reports.Scripts | Format-Table *
+$Output.Reports.SoftwareInstallation | Format-Table *

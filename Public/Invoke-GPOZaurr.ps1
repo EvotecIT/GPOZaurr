@@ -34,7 +34,15 @@
 
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
-        [switch] $Open
+        [switch] $Open,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
+        [switch] $CategoriesOnly,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
+        [switch] $SingleObject
     )
     if ($Type.Count -eq 0) {
         $Type = $Script:GPODitionary.Keys
@@ -71,6 +79,54 @@
     $Output = [ordered] @{}
     $OutputByGPO = [ordered] @{}
     $TranslatedOutput = [ordered] @{}
+    $CachedCategories = [ordered] @{}
+
+    [Array] $GPOCategories = foreach ($GPO in $GPOs) {
+        if ($GPOPath) {
+            $GPOOutput = $GPO.GPOOutput
+        } else {
+            [xml] $GPOOutput = Get-GPOReport -Guid $GPO.GUID -Domain $GPO.DomainName -ReportType Xml
+        }
+        Get-GPOCategories -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects -CachedCategories $CachedCategories
+    }
+
+    # Return Categories or save it
+    if ($CategoriesOnly) {
+        return $GPOCategories | Select-Object -Property * -ExcludeProperty DataSet
+    } else {
+        $Output['Categories'] = $GPOCategories | Select-Object -Property * -ExcludeProperty DataSet
+    }
+    # Save Cached Categories
+    $Output['CategoriesFull'] = $CachedCategories
+    # Process Reporting
+    $Output['Reports'] = [ordered] @{}
+    foreach ($Report in $Type) {
+        $Category = $Script:GPODitionary[$Report]['Category']
+        $Settings = $Script:GPODitionary[$Report]['Settings']
+
+        $CategorizedGPO = $CachedCategories[$Category][$Settings]
+        foreach ($GPO in $CategorizedGPO) {
+            if (-not $Output['Reports'][$Report]) {
+                $Output['Reports'][$Report] = [System.Collections.Generic.List[PSCustomObject]]::new()
+            }
+            if ($SingleObject) {
+                if ($Script:GPODitionary[$Report]['CodeSingle']) {
+                    $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['CodeSingle']
+                    $Output['Reports'][$Report].Add($TranslatedGpo)
+                }
+            } else {
+                if ($Script:GPODitionary[$Report]['Code']) {
+                    $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['Code']
+                    $Output['Reports'][$Report].Add($TranslatedGpo)
+                }
+            }
+        }
+    }
+
+
+
+    return $Output
+
     foreach ($GPO in $GPOs) {
         if ($GPOPath) {
             $GPOOutput = $GPO.GPOOutput
