@@ -56,9 +56,9 @@ function ConvertTo-XMLSoftwareInstallation {
             #GpoCategory = $GPOEntry.GpoCategory
             #GpoSettings = $GPOEntry.GpoSettings
             Count       = 0
-            Data        = $null
+            Settings    = $null
         }
-        [Array] $CreateGPO['Data'] = foreach ($MsiInstallerr in $GPO.DataSet) {
+        [Array] $CreateGPO['Settings'] = foreach ($MsiInstallerr in $GPO.DataSet) {
             [PSCustomObject] @{
                 Identifier          = $MsiInstallerr.Identifier          #: { 10495e9e-79c1-4a32-b278-a24cd495437f }
                 Name                = $MsiInstallerr.Name                #: Local Administrator Password Solution (2)
@@ -84,7 +84,7 @@ function ConvertTo-XMLSoftwareInstallation {
                 LossOfScopeAction   = $MsiInstallerr.LossOfScopeAction   #: Unmanage
             }
         }
-        $CreateGPO['Count'] = $CreateGPO['Data'].Count
+        $CreateGPO['Count'] = $CreateGPO['Settings'].Count
         $CreateGPO['Linked'] = $GPO.Linked
         $CreateGPO['LinksCount'] = $GPO.LinksCount
         $CreateGPO['Links'] = $GPO.Links

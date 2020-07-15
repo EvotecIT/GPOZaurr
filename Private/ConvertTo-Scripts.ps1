@@ -40,9 +40,9 @@ function ConvertTo-XMLScripts {
             #GpoCategory = $GPOEntry.GpoCategory
             #GpoSettings = $GPOEntry.GpoSettings
             Count       = 0
-            Data        = $null
+            Settings        = $null
         }
-        [Array] $CreateGPO['Data'] = foreach ($Script in $GPO.DataSet) {
+        [Array] $CreateGPO['Settings'] = foreach ($Script in $GPO.DataSet) {
             [PSCustomObject] @{
                 Type       = $GPO.DataSet.Type
                 Command    = $GPO.DataSet.Command
@@ -51,7 +51,7 @@ function ConvertTo-XMLScripts {
                 RunOrder   = $GPO.DataSet.RunOrder
             }
         }
-        $CreateGPO['DataCount'] = $CreateGPO['Data'].Count
+        $CreateGPO['DataCount'] = $CreateGPO['Settings'].Count
         $CreateGPO['Linked'] = $GPO.Linked
         $CreateGPO['LinksCount'] = $GPO.LinksCount
         $CreateGPO['Links'] = $GPO.Links
