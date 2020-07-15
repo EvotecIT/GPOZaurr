@@ -50,39 +50,40 @@
             ConvertTo-XMLEventLog -GPO $GPO
         }
     }
-    <#
-    LocalUsersAndGroups = [ordered] @{
-        Category = 'LugsSettings'
-        Settings = 'LocalUsersAndGroups'
-        Code     = {
+
+    LocalUsersAndGroups  = [ordered] @{
+        Category   = 'LugsSettings'
+        Settings   = 'LocalUsersAndGroups'
+        Code       = {
             #ConvertTo-LocalUserAndGroups -GPOList $GPOList
             ConvertTo-XMLLocalUserAndGroups -GPO $GPO
         }
-    }
-    #>
-    <#
-    Policies                   = @{
-        Category = 'RegistrySettings'
-        Settings = 'Policy'
-        Code     = {
-            ConvertTo-Policies -GPOList $GPOList
+        CodeSingle = {
+            #ConvertTo-EventLog -GPOList $GPOList
+            ConvertTo-XMLLocalUserAndGroups -GPO $GPO -SingleObject
         }
     }
-    RegistrySettings           = [ordered] @{
-        Category = 'RegistrySettings'
-        Settings = 'RegistrySettings'
-        Code     = {
-            ConvertTo-RegistrySettings -GPOList $GPOList
+
+    Policies             = @{
+        Category   = 'RegistrySettings'
+        Settings   = 'Policy'
+        Code       = {
+            ConvertTo-XMLPolicies -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLPolicies -GPO $GPO -SingleObject
         }
     }
-    RegistrySettingsCollection = [ordered] @{
-        Category = 'RegistrySettings'
-        Settings = 'RegistrySettings'
-        Code     = {
-            ConvertTo-RegistrySettingsCollection -GPOList $GPOList
+    RegistrySettings     = [ordered] @{
+        Category   = 'RegistrySettings'
+        Settings   = 'RegistrySettings'
+        Code       = {
+            ConvertTo-XMLRegistrySettings -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLRegistrySettings -GPO $GPO -SingleObject
         }
     }
-    #>
     Scripts              = [ordered] @{
         Category   = 'Scripts'
         Settings   = 'Script'
@@ -94,15 +95,18 @@
             ConvertTo-XMLScripts -GPO $GPO -SingleObject
         }
     }
-    <#
-    SecurityOptions            = [ordered] @{
-        Category = 'SecuritySettings'
-        Settings = 'SecurityOptions'
-        Code     = {
-            ConvertTo-SecurityOptions -GPOList $GPOList
+    SecurityOptions      = [ordered] @{
+        Category   = 'SecuritySettings'
+        Settings   = 'SecurityOptions'
+        Code       = {
+            #ConvertTo-SecurityOptions -GPOList $GPOList
+            ConvertTo-XMLSecurityOptions -GPO $GPO
+        }
+        CodeSingle = {
+            #ConvertTo-SecurityOptions -GPOList $GPOList
+            ConvertTo-XMLSecurityOptions -GPO $GPO -SingleObject
         }
     }
-    #>
     SoftwareInstallation = [ordered] @{
         Category   = 'SoftwareInstallationSettings'
         Settings   = 'MsiApplication'
@@ -114,24 +118,30 @@
             ConvertTo-XMLSoftwareInstallation -GPO $GPO -SingleObject
         }
     }
-    <#
-    SystemServices             = [ordered] @{
+    SystemServices       = [ordered] @{
         Description = ''
         GPOPath     = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> System Services'
         Category    = 'SecuritySettings'
         Settings    = 'SystemServices'
         Code        = {
-            ConvertTo-SystemServices -GPOList $GPOList
+            # ConvertTo-SoftwareInstallation -GPOList $GPOList
+            ConvertTo-XMLSystemServices -GPO $GPO
+        }
+        CodeSingle  = {
+            ConvertTo-XMLSystemServices -GPO $GPO -SingleObject
         }
     }
-    SystemServicesNT           = [ordered] @{
+    SystemServicesNT     = [ordered] @{
         Description = ''
         GPOPath     = 'Computer Configuration -> Preferences -> Control Pannel Settings -> Services'
         Category    = 'ServiceSettings'
         Settings    = 'NTServices'
         Code        = {
-            ConvertTo-SystemServicesNT -GPOList $GPOList
+            # ConvertTo-SoftwareInstallation -GPOList $GPOList
+            ConvertTo-XMLSystemServicesNT -GPO $GPO
+        }
+        CodeSingle  = {
+            ConvertTo-XMLSystemServicesNT -GPO $GPO -SingleObject
         }
     }
-    #>
 }

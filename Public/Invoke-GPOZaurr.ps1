@@ -100,29 +100,41 @@
     $Output['CategoriesFull'] = $CachedCategories
     # Process Reporting
     $Output['Reports'] = [ordered] @{}
-    foreach ($Report in $Type) {
-        $Category = $Script:GPODitionary[$Report]['Category']
-        $Settings = $Script:GPODitionary[$Report]['Settings']
 
-        $CategorizedGPO = $CachedCategories[$Category][$Settings]
-        foreach ($GPO in $CategorizedGPO) {
-            if (-not $Output['Reports'][$Report]) {
-                $Output['Reports'][$Report] = [System.Collections.Generic.List[PSCustomObject]]::new()
+    if ($CachedCategories.Count -gt 0) {
+        foreach ($Report in $Type) {
+            $Category = $Script:GPODitionary[$Report]['Category']
+            $Settings = $Script:GPODitionary[$Report]['Settings']
+
+            # Those are checks for making sure we have data to be even able to process it
+            if (-not $CachedCategories[$Category]) {
+                continue
             }
-            if ($SingleObject) {
-                if ($Script:GPODitionary[$Report]['CodeSingle']) {
-                    $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['CodeSingle']
-                    $Output['Reports'][$Report].Add($TranslatedGpo)
+            if (-not $CachedCategories[$Category][$Settings]) {
+                continue
+            }
+            # Translation
+            $CategorizedGPO = $CachedCategories[$Category][$Settings]
+            foreach ($GPO in $CategorizedGPO) {
+                if (-not $Output['Reports'][$Report]) {
+                    $Output['Reports'][$Report] = [System.Collections.Generic.List[PSCustomObject]]::new()
                 }
-            } else {
-                if ($Script:GPODitionary[$Report]['Code']) {
-                    $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['Code']
-                    $Output['Reports'][$Report].Add($TranslatedGpo)
+                $TranslatedGpo = $null
+                if ($SingleObject) {
+                    if ($Script:GPODitionary[$Report]['CodeSingle']) {
+                        $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['CodeSingle']
+                    }
+                } else {
+                    if ($Script:GPODitionary[$Report]['Code']) {
+                        $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['Code']
+                    }
+                }
+                foreach ($T in $TranslatedGpo) {
+                    $Output['Reports'][$Report].Add($T)
                 }
             }
         }
     }
-
 
 
     return $Output
