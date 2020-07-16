@@ -31,6 +31,17 @@
             ConvertTo-XMLRegistryAutologon -GPO $GPO
         }
     }
+    DriveMapping         = [ordered] @{
+        Category   = 'DriveMapSettings'
+        Settings   = 'DriveMapSettings'
+        GPOPath    = ''
+        Code       = {
+            ConvertTo-XMLDriveMapSettings -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLDriveMapSettings -GPO $GPO -SingleObject
+        }
+    }
     EventLog             = [ordered] @{
         Category   = 'SecuritySettings'
         Settings   = 'EventLog'
