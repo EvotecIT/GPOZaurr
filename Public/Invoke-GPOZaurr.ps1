@@ -181,7 +181,7 @@
             #    if (-not $TranslatedOutput[$Category][$Settings]) {
             #        $TranslatedOutput[$Category][$Settings] = [ordered] @{}
             #    }
-            $TranslatedOutput[$Report] = Invoke-GPOTranslationOld -InputData $Output -Category $Category -Settings $Settings -Report $Report
+            $TranslatedOutput[$Report] = Invoke-GPOTranslation -InputData $Output -Category $Category -Settings $Settings -Report $Report
             #}
         }
         if ($OutputType -contains 'Object') {
