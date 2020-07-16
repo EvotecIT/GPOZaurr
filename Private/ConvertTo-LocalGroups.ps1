@@ -53,7 +53,7 @@ function ConvertTo-XMLLocalGroups {
                     GroupSid        = $Group.Properties.groupSid        #: S - 1 - 5 - 32 - 544
                 }
                 $Last = [ordered] @{
-                    Uid                                   = $Group.uid             #: {8F435B0A-CD15-464E-85F3-B6A55B9E816A}: {8F435B0A-CD15-464E-85F3-B6A55B9E816A}
+                    #Uid                                   = $Group.uid             #: {8F435B0A-CD15-464E-85F3-B6A55B9E816A}: {8F435B0A-CD15-464E-85F3-B6A55B9E816A}
                     RunInLoggedOnUserSecurityContext      = if ($Group.userContext -eq '1') { 'Enabled' } elseif ($Group.userContext -eq '0') { 'Disabled' } else { $Group.userContext };
                     RemoveThisItemWhenItIsNoLongerApplied = if ($Group.removePolicy -eq '1') { 'Enabled' } elseif ($Group.removePolicy -eq '0') { 'Disabled' } else { $Group.removePolicy };
                     Filters                               = $Group.Filters         #::
@@ -109,7 +109,7 @@ function ConvertTo-XMLLocalGroups {
                     GroupSid        = $Group.Properties.groupSid        #: S - 1 - 5 - 32 - 544
                 }
                 $Last = [ordered] @{
-                    Uid                                   = $Group.uid             #: {8F435B0A-CD15-464E-85F3-B6A55B9E816A}: {8F435B0A-CD15-464E-85F3-B6A55B9E816A}
+                    # Uid                                   = $Group.uid             #: {8F435B0A-CD15-464E-85F3-B6A55B9E816A}: {8F435B0A-CD15-464E-85F3-B6A55B9E816A}
                     RunInLoggedOnUserSecurityContext      = if ($Group.userContext -eq '1') { 'Enabled' } elseif ($Group.userContext -eq '0') { 'Disabled' } else { $Group.userContext };
                     RemoveThisItemWhenItIsNoLongerApplied = if ($Group.removePolicy -eq '1') { 'Enabled' } elseif ($Group.removePolicy -eq '0') { 'Disabled' } else { $Group.removePolicy };
                     Filters                               = $Group.Filters         #::
