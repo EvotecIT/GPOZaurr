@@ -4,66 +4,64 @@
         Settings   = 'Account'
         GPOPath    = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
         Code       = {
-            #ConvertTo-AccountPolicies -GPOList $GPOList
             ConvertTo-XMLAccountPolicies -GPO $GPO
         }
         CodeSingle = {
-            #ConvertTo-AccountPolicies -GPOList $GPOList
             ConvertTo-XMLAccountPolicies -GPO $GPO
         }
     }
     Audit                = [ordered] @{
         Category   = 'SecuritySettings'
         Settings   = 'Audit'
-        #GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
+        GPOPath    = ''
         Code       = {
             ConvertTo-XMLAudit -GPO $GPO
-            #ConvertTo-Audit -GPOList $GPOList
         }
         CodeSingle = {
             ConvertTo-XMLAudit -GPO $GPO
-            #ConvertTo-Audit -GPOList $GPOList
         }
     }
     Autologon            = [ordered] @{
         Category   = 'RegistrySettings'
         Settings   = 'RegistrySettings'
         Code       = {
-            #ConvertTo-RegistryAutologon -GPOList $GPOList
             ConvertTo-XMLRegistryAutologon -GPO $GPO
         }
         CodeSingle = {
-            #ConvertTo-AccountPolicies -GPOList $GPOList
             ConvertTo-XMLRegistryAutologon -GPO $GPO
         }
     }
     EventLog             = [ordered] @{
         Category   = 'SecuritySettings'
         Settings   = 'EventLog'
-        #GPOPath  = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
+        GPOPath    = ''
         Code       = {
-            #ConvertTo-EventLog -GPOList $GPOList
             ConvertTo-XMLEventLog -GPO $GPO
         }
         CodeSingle = {
-            #ConvertTo-EventLog -GPOList $GPOList
             ConvertTo-XMLEventLog -GPO $GPO
         }
     }
-
-    LocalUsersAndGroups  = [ordered] @{
+    LocalUsers           = [ordered] @{
         Category   = 'LugsSettings'
         Settings   = 'LocalUsersAndGroups'
         Code       = {
-            #ConvertTo-LocalUserAndGroups -GPOList $GPOList
-            ConvertTo-XMLLocalUserAndGroups -GPO $GPO
+            ConvertTo-XMLLocalUser -GPO $GPO
         }
         CodeSingle = {
-            #ConvertTo-EventLog -GPOList $GPOList
-            ConvertTo-XMLLocalUserAndGroups -GPO $GPO -SingleObject
+            ConvertTo-XMLLocalUser -GPO $GPO -SingleObject
         }
     }
-
+    LocalGroups          = [ordered] @{
+        Category   = 'LugsSettings'
+        Settings   = 'LocalUsersAndGroups'
+        Code       = {
+            ConvertTo-XMLLocalGroups -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLLocalGroups -GPO $GPO -SingleObject
+        }
+    }
     Policies             = @{
         Category   = 'RegistrySettings'
         Settings   = 'Policy'
@@ -88,7 +86,6 @@
         Category   = 'Scripts'
         Settings   = 'Script'
         Code       = {
-            #ConvertTo-Scripts -GPOList $GPOList
             ConvertTo-XMLScripts -GPO $GPO
         }
         CodeSingle = {
@@ -99,11 +96,9 @@
         Category   = 'SecuritySettings'
         Settings   = 'SecurityOptions'
         Code       = {
-            #ConvertTo-SecurityOptions -GPOList $GPOList
             ConvertTo-XMLSecurityOptions -GPO $GPO
         }
         CodeSingle = {
-            #ConvertTo-SecurityOptions -GPOList $GPOList
             ConvertTo-XMLSecurityOptions -GPO $GPO -SingleObject
         }
     }
@@ -111,7 +106,6 @@
         Category   = 'SoftwareInstallationSettings'
         Settings   = 'MsiApplication'
         Code       = {
-            # ConvertTo-SoftwareInstallation -GPOList $GPOList
             ConvertTo-XMLSoftwareInstallation -GPO $GPO
         }
         CodeSingle = {
@@ -124,7 +118,6 @@
         Category    = 'SecuritySettings'
         Settings    = 'SystemServices'
         Code        = {
-            # ConvertTo-SoftwareInstallation -GPOList $GPOList
             ConvertTo-XMLSystemServices -GPO $GPO
         }
         CodeSingle  = {
@@ -137,7 +130,6 @@
         Category    = 'ServiceSettings'
         Settings    = 'NTServices'
         Code        = {
-            # ConvertTo-SoftwareInstallation -GPOList $GPOList
             ConvertTo-XMLSystemServicesNT -GPO $GPO
         }
         CodeSingle  = {
