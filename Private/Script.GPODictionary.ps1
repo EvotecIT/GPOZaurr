@@ -83,6 +83,16 @@
             ConvertTo-XMLPolicies -GPO $GPO -SingleObject
         }
     }
+    Printers             = @{
+        Category   = 'PrintersSettings'
+        Settings   = 'Printers'
+        Code       = {
+            ConvertTo-XMLPrinters -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLPrinters -GPO $GPO -SingleObject
+        }
+    }
     RegistrySettings     = [ordered] @{
         Category   = 'RegistrySettings'
         Settings   = 'RegistrySettings'
