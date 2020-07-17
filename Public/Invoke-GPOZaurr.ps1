@@ -57,10 +57,15 @@
 
             }
             #>
-            $GPOFiles = Get-ChildItem -LiteralPath $GPOPath -Recurse -File
+            $GPOFiles = Get-ChildItem -LiteralPath $GPOPath -Recurse -File -Filter *.xml
             [Array] $GPOs = foreach ($File in $GPOFiles) {
                 if ($File.Name -ne 'GPOList.xml') {
-                    [xml] $GPORead = Get-Content -LiteralPath $File.FullName
+                    try {
+                        [xml] $GPORead = Get-Content -LiteralPath $File.FullName
+                    } catch {
+                        Write-Warning "Invoke-GPOZaurr - Couldn't process $($File.FullName) error: $($_.Exception.message)"
+                        continue
+                    }
                     [PSCustomObject] @{
                         DisplayName = $GPORead.GPO.Name
                         DomainName  = $GPORead.GPO.Identifier.Domain.'#text'
