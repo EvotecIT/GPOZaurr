@@ -1,7 +1,11 @@
 ﻿$Script:GPODitionary = [ordered] @{
     AccountPolicies      = [ordered] @{
-        Category   = 'SecuritySettings'
-        Settings   = 'Account'
+        Types      = @(
+            @{
+                Category = 'SecuritySettings'
+                Settings = 'Account'
+            }
+        )
         GPOPath    = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
         Code       = {
             ConvertTo-XMLAccountPolicies -GPO $GPO
@@ -11,8 +15,12 @@
         }
     }
     Audit                = [ordered] @{
-        Category   = 'SecuritySettings'
-        Settings   = 'Audit'
+        Types      = @(
+            @{
+                Category = 'SecuritySettings'
+                Settings = 'Audit'
+            }
+        )
         GPOPath    = ''
         Code       = {
             ConvertTo-XMLAudit -GPO $GPO
@@ -22,8 +30,12 @@
         }
     }
     Autologon            = [ordered] @{
-        Category   = 'RegistrySettings'
-        Settings   = 'RegistrySettings'
+        Types      = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'RegistrySettings'
+            }
+        )
         Code       = {
             ConvertTo-XMLRegistryAutologon -GPO $GPO
         }
@@ -32,8 +44,12 @@
         }
     }
     DriveMapping         = [ordered] @{
-        Category   = 'DriveMapSettings'
-        Settings   = 'DriveMapSettings'
+        Types      = @(
+            @{
+                Category = 'DriveMapSettings'
+                Settings = 'DriveMapSettings'
+            }
+        )
         GPOPath    = ''
         Code       = {
             ConvertTo-XMLDriveMapSettings -GPO $GPO
@@ -43,8 +59,12 @@
         }
     }
     EventLog             = [ordered] @{
-        Category   = 'SecuritySettings'
-        Settings   = 'EventLog'
+        Types      = @(
+            @{
+                Category = 'SecuritySettings'
+                Settings = 'EventLog'
+            }
+        )
         GPOPath    = ''
         Code       = {
             ConvertTo-XMLEventLog -GPO $GPO
@@ -54,8 +74,12 @@
         }
     }
     LocalUsers           = [ordered] @{
-        Category   = 'LugsSettings'
-        Settings   = 'LocalUsersAndGroups'
+        Types      = @(
+            @{
+                Category = 'LugsSettings'
+                Settings = 'LocalUsersAndGroups'
+            }
+        )
         Code       = {
             ConvertTo-XMLLocalUser -GPO $GPO
         }
@@ -64,8 +88,12 @@
         }
     }
     LocalGroups          = [ordered] @{
-        Category   = 'LugsSettings'
-        Settings   = 'LocalUsersAndGroups'
+        Types      = @(
+            @{
+                Category = 'LugsSettings'
+                Settings = 'LocalUsersAndGroups'
+            }
+        )
         Code       = {
             ConvertTo-XMLLocalGroups -GPO $GPO
         }
@@ -74,8 +102,12 @@
         }
     }
     Policies             = @{
-        Category   = 'RegistrySettings'
-        Settings   = 'Policy'
+        Types      = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
         Code       = {
             ConvertTo-XMLPolicies -GPO $GPO
         }
@@ -84,8 +116,16 @@
         }
     }
     Printers             = @{
-        Category   = 'PrintersSettings'
-        Settings   = 'Printers'
+        Types      = @(
+            @{
+                Category = 'PrintersSettings'
+                Settings = 'Printers'
+            }
+            @{
+                Category = 'PrinterConnectionSettings'
+                Settings = 'PrinterConnection'
+            }
+        )
         Code       = {
             ConvertTo-XMLPrinters -GPO $GPO
         }
@@ -94,8 +134,12 @@
         }
     }
     RegistrySettings     = [ordered] @{
-        Category   = 'RegistrySettings'
-        Settings   = 'RegistrySettings'
+        Types      = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'RegistrySettings'
+            }
+        )
         Code       = {
             ConvertTo-XMLRegistrySettings -GPO $GPO
         }
@@ -104,8 +148,12 @@
         }
     }
     Scripts              = [ordered] @{
-        Category   = 'Scripts'
-        Settings   = 'Script'
+        Types      = @(
+            @{
+                Category = 'Scripts'
+                Settings = 'Script'
+            }
+        )
         Code       = {
             ConvertTo-XMLScripts -GPO $GPO
         }
@@ -114,8 +162,12 @@
         }
     }
     SecurityOptions      = [ordered] @{
-        Category   = 'SecuritySettings'
-        Settings   = 'SecurityOptions'
+        Types      = @(
+            @{
+                Category = 'SecuritySettings'
+                Settings = 'SecurityOptions'
+            }
+        )
         Code       = {
             ConvertTo-XMLSecurityOptions -GPO $GPO
         }
@@ -124,8 +176,12 @@
         }
     }
     SoftwareInstallation = [ordered] @{
-        Category   = 'SoftwareInstallationSettings'
-        Settings   = 'MsiApplication'
+        Types      = @(
+            @{
+                Category = 'SoftwareInstallationSettings'
+                Settings = 'MsiApplication'
+            }
+        )
         Code       = {
             ConvertTo-XMLSoftwareInstallation -GPO $GPO
         }
@@ -134,10 +190,14 @@
         }
     }
     SystemServices       = [ordered] @{
+        Types       = @(
+            @{
+                Category = 'SecuritySettings'
+                Settings = 'SystemServices'
+            }
+        )
         Description = ''
         GPOPath     = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> System Services'
-        Category    = 'SecuritySettings'
-        Settings    = 'SystemServices'
         Code        = {
             ConvertTo-XMLSystemServices -GPO $GPO
         }
@@ -146,15 +206,35 @@
         }
     }
     SystemServicesNT     = [ordered] @{
+        Types       = @(
+            @{
+                Category = 'ServiceSettings'
+                Settings = 'NTServices'
+            }
+        )
         Description = ''
         GPOPath     = 'Computer Configuration -> Preferences -> Control Pannel Settings -> Services'
-        Category    = 'ServiceSettings'
-        Settings    = 'NTServices'
         Code        = {
             ConvertTo-XMLSystemServicesNT -GPO $GPO
         }
         CodeSingle  = {
             ConvertTo-XMLSystemServicesNT -GPO $GPO -SingleObject
+        }
+    }
+    TaskScheduler        = [ordered] @{
+        Types       = @(
+            @{
+                Category = 'ScheduledTasksSettings'
+                Settings = 'ScheduledTasks'
+            }
+        )
+        Description = ''
+        GPOPath     = ''
+        Code        = {
+            ConvertTo-XMLTaskScheduler -GPO $GPO
+        }
+        CodeSingle  = {
+            ConvertTo-XMLTaskScheduler -GPO $GPO -SingleObject
         }
     }
 }
