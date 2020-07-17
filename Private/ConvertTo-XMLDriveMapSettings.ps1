@@ -24,7 +24,7 @@ function ConvertTo-XMLDriveMapSettings {
 
                 Name            = $Entry.Name
                 Status          = $Entry.status
-                Action          = $Entry.Properties.action
+                Action          = $Script:Actions["$($Entry.Properties.action)"]
                 ThisDrive       = $Entry.Properties.thisDrive
                 AllDrives       = $Entry.Properties.allDrives
                 UserName        = $Entry.Properties.userName
@@ -56,7 +56,7 @@ function ConvertTo-XMLDriveMapSettings {
 
                 Name            = $Entry.Name
                 Status          = $Entry.status
-                Action          = $Entry.Properties.action
+                Action          = $Script:Actions["$($Entry.Properties.action)"]
                 ThisDrive       = $Entry.Properties.thisDrive
                 AllDrives       = $Entry.Properties.allDrives
                 UserName        = $Entry.Properties.userName
