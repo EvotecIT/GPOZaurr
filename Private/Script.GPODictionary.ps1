@@ -8,10 +8,10 @@
         )
         GPOPath    = 'Computer Configuration -> Policies -> Windows Settings -> Security Settings -> Account Policies'
         Code       = {
-            ConvertTo-XMLAccountPolicies -GPO $GPO
+            ConvertTo-XMLAccountPolicy -GPO $GPO
         }
         CodeSingle = {
-            ConvertTo-XMLAccountPolicies -GPO $GPO
+            ConvertTo-XMLAccountPolicy -GPO $GPO
         }
     }
     Audit                = [ordered] @{
@@ -127,10 +127,10 @@
             }
         )
         Code       = {
-            ConvertTo-XMLPrinters -GPO $GPO
+            ConvertTo-XMLPrinter -GPO $GPO
         }
         CodeSingle = {
-            ConvertTo-XMLPrinters -GPO $GPO -SingleObject
+            ConvertTo-XMLPrinter -GPO $GPO -SingleObject
         }
     }
     RegistrySettings     = [ordered] @{
