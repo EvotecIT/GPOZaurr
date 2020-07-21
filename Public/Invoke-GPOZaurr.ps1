@@ -144,8 +144,6 @@
             }
         }
     }
-
-
     return $Output
     <#
     foreach ($GPO in $GPOs) {

@@ -3,7 +3,10 @@
     param(
         [ValidateSet('All', 'Netlogon', 'Sysvol')][string[]] $Type = 'All',
         [ValidateSet('None', 'MACTripleDES', 'MD5', 'RIPEMD160', 'SHA1', 'SHA256', 'SHA384', 'SHA512')][string] $HashAlgorithm = 'None',
+        [switch] $Signature,
         [switch] $Limited,
+        [switch] $AsHashTable,
+        [switch] $Extended,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
@@ -48,7 +51,7 @@
                 Name = 'NETLOGON Scripts'
             }
         }
-        Get-ChildItem -Path $Path -ErrorAction SilentlyContinue -Recurse -ErrorVariable err -File | ForEach-Object {
+        Get-ChildItem -Path $Path -ErrorAction SilentlyContinue -Recurse -ErrorVariable err -File -Force | ForEach-Object {
             # Lets reset values just to be sure those are empty
             $GPO = $null
             $BelongsToGPO = $false
@@ -70,35 +73,89 @@
                         $GPODisplayName = $GPO.DisplayName
                     }
                 }
+                $Correct = @(
+                    [System.IO.Path]::Combine($GPO.Path, 'GPT.INI')
+                    [System.IO.Path]::Combine($GPO.Path, 'GPO.cmt')
+                    [System.IO.Path]::Combine($GPO.Path, 'Group Policy', 'GPE.ini')
+                    foreach ($TypeM in @('Machine', 'User')) {
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Registry.pol')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'comment.cmtx')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Registry\Registry.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Printers\Printers.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\ScheduledTasks\ScheduledTasks.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Services\Services.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Groups\Groups.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\RegionalOptions\RegionalOptions.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\FolderOptions\FolderOptions.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Drives\Drives.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\InternetSettings\InternetSettings.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Folders\Folders.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\PowerOptions\PowerOptions.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Shortcuts\Shortcuts.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Files\Files.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\EnvironmentVariables\EnvironmentVariables.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\NetworkOptions\NetworkOptions.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\DataSources\DataSources.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\NetworkShares\NetworkShares.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\StartMenuTaskbar\StartMenuTaskbar.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Applications\Microsoft\TBLayout.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Applications\Microsoft\DefaultApps.xml')
+                        if ($_.Extension -eq '.aas') {
+                            [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Applications', $_.Name)
+                        }
+                    }
+                    [System.IO.Path]::Combine($GPO.Path, 'Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf')
+                    [System.IO.Path]::Combine($GPO.Path, 'Machine\Microsoft\Windows NT\Audit\audit.csv')
+                )
                 if ($GPO) {
-                    $Correct = @(
-                        [System.IO.Path]::Combine($GPO.Path, 'GPT.INI')
-                        [System.IO.Path]::Combine($GPO.Path, 'GPO.cmt')
-                        foreach ($TypeM in @('Machine', 'User')) {
-                            [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Registry\Registry.xml')
-                            [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Printers\Printers.xml')
-                            [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Registry.pol')
-                            [System.IO.Path]::Combine($GPO.Path, $TypeM, 'comment.cmtx')
-                            [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\ScheduledTasks\ScheduledTasks.xml')
-                            [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Services\Services.xml')
-                            [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\Groups\Groups.xml')
-
-                            if ($_.Extension -eq '.aas') {
-                                [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Applications', $_.Name)
+                    if ($_.FullName -in $Correct) {
+                        $SuggestedAction = 'Skip assesment'
+                        $SuggestedActionComment = 'Correctly placed in SYSVOL'
+                    } elseif ($_.Extension -eq '.adm') {
+                        $SuggestedAction = 'Consider deleting'
+                        $SuggestedActionComment = 'Most likely legacy ADM files'
+                    }
+                    if (-not $SuggestedAction) {
+                        foreach ($Ext in @('*old*', '*bak*', '*bck')) {
+                            if ($_.Extension -like $Ext) {
+                                $SuggestedAction = 'Consider deleting'
+                                $SuggestedActionComment = 'Most likely backup files'
+                                break
                             }
                         }
-                        [System.IO.Path]::Combine($GPO.Path, 'Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf')
-                        [System.IO.Path]::Combine($GPO.Path, 'Machine\Microsoft\Windows NT\Audit\audit.csv')
-                    )
+                    }
+                    if (-not $SuggestedAction) {
+                        <#
+                        $IEAK = @(
+                            'microsoft\IEAK\install.ins'
+                            'MICROSOFT\IEAK\BRANDING\cs\connect.ras'
+                            'microsoft\IEAK\BRANDING\cs\connect.set'
+                            'microsoft\IEAK\BRANDING\cs\cs.dat'
+                            'microsoft\IEAK\BRANDING\ADM\inetcorp.iem'
+                            'microsoft\IEAK\BRANDING\ADM\inetcorp.inf'
+                            'microsoft\IEAK\install.ins'
+                            'microsoft\IEAK\BRANDING\favs\Outlook.ico'
+                            'microsoft\IEAK\BRANDING\favs\Bio.ico'
+                            'MICROSOFT\IEAK\BRANDING\favs\$fi380.ico'
+                            'microsoft\IEAK\BRANDING\PROGRAMS\programs.inf'
+                            'MICROSOFT\IEAK\BRANDING\RATINGS\ratings.inf'
+                            'MICROSOFT\IEAK\BRANDING\RATINGS\ratrsop.inf'
+                            'microsoft\IEAK\BRANDING\ZONES\seczones.inf'
+                            'microsoft\IEAK\BRANDING\ZONES\seczrsop.inf'
+                            'microsoft\IEAK\BRANDING\ZONES\seczrsop.inf'
+                        )
+                        #>
+                        if ($_.FullName -like '*microsoft\IEAK*') {
+                            # https://docs.microsoft.com/en-us/internet-explorer/ie11-deploy-guide/missing-internet-explorer-maintenance-settings-for-ie11#:~:text=The%20Internet%20Explorer%20Maintenance%20(IEM,Internet%20Explorer%2010%20or%20newer.
+                            $SuggestedAction = 'Consider deleting whole GPO'
+                            $SuggestedActionComment = 'Internet Explorer Maintenance (IEM) is deprecated for IE 11'
+                        }
+                    }
                 } else {
-                    $Correct = @()
-                }
-                if ($_.FullName -in $Correct) {
-                    $SuggestedAction = 'Skip assesment'
-                    $SuggestedActionComment = 'Correctly placed in SYSVOL'
-                } elseif ($_.Extension -eq '.adm') {
-                    $SuggestedAction = 'Consider deleting'
-                    $SuggestedActionComment = 'Most likely legacy ADM files'
+                    if ($_.FullName -in $Correct) {
+                        $SuggestedAction = 'Consider deleting'
+                        $SuggestedActionComment = 'Most likely orphaned SYSVOL GPO - Investigate'
+                    }
                 }
             } elseif ($FileType.Name -eq 'NETLOGON Scripts') {
                 foreach ($Ext in @('*old*', '*bak*', '*bck')) {
@@ -119,7 +176,7 @@
                     }
                 }
                 if (-not $SuggestedAction) {
-                    foreach ($Name in @('*old*', '*bak*', '*bck*', '*Copy*')) {
+                    foreach ($Name in @('*old*', '*bak*', '*bck*', '*Copy', '*backup*')) {
                         if ($_.Name -like $Name) {
                             $SuggestedAction = 'Consider deleting'
                             $SuggestedActionComment = 'FileName contains backup related names'
@@ -167,20 +224,43 @@
                 $SuggestedActionComment = 'Not able to auto asses'
             }
             if ($Limited) {
-                $MetaData = $_
+                $MetaData = [ordered] @{
+                    LocationType           = $FileType.Name
+                    FullName               = $_.FullName
+                    #Name                   = $_.Name
+                    Extension              = $_.Extension
+                    SuggestedAction        = $SuggestedAction
+                    SuggestedActionComment = $SuggestedActionComment
+                    BelongsToGPO           = $BelongsToGPO
+                    GPODisplayName         = $GPODisplayName
+                    Attributes             = $_.Attributes
+                    CreationTime           = $_.CreationTime
+                    LastAccessTime         = $_.LastAccessTime
+                    LastWriteTime          = $_.LastWriteTime
+                }
             } else {
-                $MetaData = Get-FileMetaData -File $_ -Signature #-HashAlgorithm $HashAlgorithm
+                $MetaData = Get-FileMetaData -File $_ -AsHashTable
             }
-            Add-Member -InputObject $MetaData -Name 'AssesmentType' -Value $FileType.Name -MemberType NoteProperty
-            Add-Member -InputObject $MetaData -Name 'BelongsToGPO' -Value $BelongsToGPO -MemberType NoteProperty
-            Add-Member -InputObject $MetaData -Name 'GPODisplayName' -Value $GPODisplayName -MemberType NoteProperty
-            Add-Member -InputObject $MetaData -Name 'SuggestedAction' -Value $SuggestedAction -MemberType NoteProperty
-            Add-Member -InputObject $MetaData -Name 'SuggestedActionComment' -Value $SuggestedActionComment -MemberType NoteProperty
-
-            if ($Limited) {
-                $MetaData | Select-Object FullName, Name, Extension, SuggestedAction, SuggestedActionComment, AssesmentType, BelongsToGPO, GPODisplayName, IsReadOnly, CreationTime, LastAccessTime, LastWriteTime
-            } else {
+            if ($Signature) {
+                $DigitalSignature = Get-AuthenticodeSignature -FilePath $_.Fullname
+                $MetaData['SignatureStatus'] = $DigitalSignature.Status
+                $MetaData['IsOSBinary'] = $DigitalSignature.IsOSBinary
+                $MetaData['SignatureCertificateSubject'] = $DigitalSignature.SignerCertificate.Subject
+                if ($Extended) {
+                    $MetaData['SignatureCertificateIssuer'] = $DigitalSignature.SignerCertificate.Issuer
+                    $MetaData['SignatureCertificateSerialNumber'] = $DigitalSignature.SignerCertificate.SerialNumber
+                    $MetaData['SignatureCertificateNotBefore'] = $DigitalSignature.SignerCertificate.NotBefore
+                    $MetaData['SignatureCertificateNotAfter'] = $DigitalSignature.SignerCertificate.NotAfter
+                    $MetaData['SignatureCertificateThumbprint'] = $DigitalSignature.SignerCertificate.Thumbprint
+                }
+            }
+            if ($HashAlgorithm -ne 'None') {
+                $MetaData['ChecksumSHA256'] = (Get-FileHash -LiteralPath $_.FullName -Algorithm $HashAlgorithm).Hash
+            }
+            if ($AsHashTable) {
                 $MetaData
+            } else {
+                [PSCustomObject] $MetaData
             }
         }
         foreach ($e in $err) {
@@ -188,5 +268,3 @@
         }
     }
 }
-
-#Get-GPOZaurrFiles -Limited | ConvertTo-Excel -OpenWorkBook -FilePath $Env:USERPROFILE\GPOTesting.xlsx -ExcelWorkSheetName 'GPO Output' -AutoFilter -AutoFit -FreezeTopRowFirstColumn
