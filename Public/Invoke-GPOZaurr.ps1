@@ -147,7 +147,7 @@
 
 
     return $Output
-
+    <#
     foreach ($GPO in $GPOs) {
         if ($GPOPath) {
             $GPOOutput = $GPO.GPOOutput
@@ -182,16 +182,7 @@
         foreach ($Report in $Type) {
             $Category = $Script:GPODitionary[$Report]['Category']
             $Settings = $Script:GPODitionary[$Report]['Settings']
-
-            #if (-not $TranslatedOutput[$Report]) {
-            #    $TranslatedOutput[$Report] = [ordered] @{}
-            #}
-            #foreach ($Setting in $Settings) {
-            #    if (-not $TranslatedOutput[$Category][$Settings]) {
-            #        $TranslatedOutput[$Category][$Settings] = [ordered] @{}
-            #    }
             $TranslatedOutput[$Report] = Invoke-GPOTranslation -InputData $Output -Category $Category -Settings $Settings -Report $Report
-            #}
         }
         if ($OutputType -contains 'Object') {
             $TranslatedOutput
@@ -252,6 +243,7 @@
             Invoke-Item -Path $FilePathExcel
         }
     }
+    #>
 
 }
 
