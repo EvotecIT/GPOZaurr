@@ -50,6 +50,9 @@
             "\\$Domain\NETLOGON"                                  = @{
                 Name = 'NETLOGON Scripts'
             }
+            "\\$Domain\SYSVOL\$Domain"                            = @{
+                Name = 'SYSVOL Root'
+            }
         }
         Get-ChildItem -Path $Path -ErrorAction SilentlyContinue -Recurse -ErrorVariable err -File -Force | ForEach-Object {
             # Lets reset values just to be sure those are empty
@@ -100,6 +103,12 @@
                         [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Preferences\StartMenuTaskbar\StartMenuTaskbar.xml')
                         [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Applications\Microsoft\TBLayout.xml')
                         [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Applications\Microsoft\DefaultApps.xml')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Applications\ADE.CFG')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Scripts\scripts.ini')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Scripts\psscripts.ini')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Documents & Settings\fdeploy.ini')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Documents & Settings\fdeploy1.ini')
+                        [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Documents & Settings\fdeploy2.ini')
                         if ($_.Extension -eq '.aas') {
                             [System.IO.Path]::Combine($GPO.Path, $TypeM, 'Applications', $_.Name)
                         }
@@ -111,12 +120,22 @@
                     if ($_.FullName -in $Correct) {
                         $SuggestedAction = 'Skip assesment'
                         $SuggestedActionComment = 'Correctly placed in SYSVOL'
+                    } elseif ($_.FullName -like '*_NTFRS_*') {
+                        $SuggestedAction = 'Consider deleting'
+                        $SuggestedActionComment = 'Most likely replication error'
                     } elseif ($_.Extension -eq '.adm') {
                         $SuggestedAction = 'Consider deleting'
                         $SuggestedActionComment = 'Most likely legacy ADM files'
                     }
                     if (-not $SuggestedAction) {
-                        foreach ($Ext in @('*old*', '*bak*', '*bck')) {
+                        $FullPathAdmFiles = [System.IO.Path]::Combine($GPO.Path, 'Adm\admfiles.ini')
+                        if ($_.FullName -eq $FullPathAdmFiles) {
+                            $SuggestedAction = 'Consider deleting'
+                            $SuggestedActionComment = 'Most likely legacy ADM files settings file'
+                        }
+                    }
+                    if (-not $SuggestedAction) {
+                        foreach ($Ext in @('*old*', '*bak*', '*bck', '.new')) {
                             if ($_.Extension -like $Ext) {
                                 $SuggestedAction = 'Consider deleting'
                                 $SuggestedActionComment = 'Most likely backup files'
@@ -147,18 +166,29 @@
                         #>
                         if ($_.FullName -like '*microsoft\IEAK*') {
                             # https://docs.microsoft.com/en-us/internet-explorer/ie11-deploy-guide/missing-internet-explorer-maintenance-settings-for-ie11#:~:text=The%20Internet%20Explorer%20Maintenance%20(IEM,Internet%20Explorer%2010%20or%20newer.
-                            $SuggestedAction = 'Consider deleting whole GPO'
+                            $SuggestedAction = 'GPO requires cleanup'
                             $SuggestedActionComment = 'Internet Explorer Maintenance (IEM) is deprecated for IE 11'
                         }
                     }
                 } else {
+                    <#
+                    $FullPathAdmFiles = [System.IO.Path]::Combine($GPO.Path, 'Adm\admfiles.ini')
                     if ($_.FullName -in $Correct) {
                         $SuggestedAction = 'Consider deleting'
-                        $SuggestedActionComment = 'Most likely orphaned SYSVOL GPO - Investigate'
+                        $SuggestedActionComment = 'Most likely orphaned SYSVOL GPO'
+                    } elseif ($_.Extension -eq '.adm') {
+                        $SuggestedAction = 'Consider deleting'
+                        $SuggestedActionComment = 'Most likely orphaned SYSVOL GPO (legacy ADM files)'
+                    } elseif ($_.FullName -eq $FullPathAdmFiles) {
+                        $SuggestedAction = 'Consider deleting'
+                        $SuggestedActionComment = 'Most likely orphaned SYSVOL GPO (legacy ADM files)'
                     }
+                    #>
+                    $SuggestedAction = 'Consider deleting'
+                    $SuggestedActionComment = 'Most likely orphaned SYSVOL GPO'
                 }
             } elseif ($FileType.Name -eq 'NETLOGON Scripts') {
-                foreach ($Ext in @('*old*', '*bak*', '*bck')) {
+                foreach ($Ext in @('*old*', '*bak*', '*bck', '.new')) {
                     if ($_.Extension -like $Ext) {
                         $SuggestedAction = 'Consider deleting'
                         $SuggestedActionComment = 'Most likely backup files'
@@ -167,7 +197,7 @@
                 }
                 if (-not $SuggestedAction) {
                     # We didn't find it in earlier check, lets go deeper
-                    if ($_.Extension.Length -gt 5 -and $_.Extension -ne '.config') {
+                    if ($_.Extension.Length -gt 6 -and $_.Extension -notin @('.config', '.sites', '.ipsec')) {
                         $SuggestedAction = 'Consider deleting'
                         $SuggestedActionComment = 'Extension longer then 5 chars'
                     } elseif ($_.Extension -eq '') {
@@ -177,9 +207,18 @@
                 }
                 if (-not $SuggestedAction) {
                     foreach ($Name in @('*old*', '*bak*', '*bck*', '*Copy', '*backup*')) {
-                        if ($_.Name -like $Name) {
+                        if ($_.BaseName -like $Name) {
                             $SuggestedAction = 'Consider deleting'
-                            $SuggestedActionComment = 'FileName contains backup related names'
+                            $SuggestedActionComment = "FileName contains backup related names ($Name)"
+                            break
+                        }
+                    }
+                }
+                if (-not $SuggestedAction) {
+                    foreach ($FullName in @('*backup*', '*Delete*', '*Obsoleet*', '*Obsolete*', '*Archive*')) {
+                        if ($_.FullName -like $FullName) {
+                            $SuggestedAction = 'Consider deleting'
+                            $SuggestedActionComment = "Fullname contains backup related names ($FullName)"
                             break
                         }
                     }
@@ -190,7 +229,7 @@
                     $StrippedNumbers = $_.Name -replace "[^0-9]" , ''
                     if ($StrippedNumbers.Length -gt 5) {
                         $SuggestedAction = 'Consider deleting'
-                        $SuggestedActionComment = 'FileName contains date related names'
+                        $SuggestedActionComment = 'FileName contains over 5 numbers (date?)'
                     }
                 }
             } elseif ($FileType.Name -eq 'SYSVOL PolicyDefinitions') {
