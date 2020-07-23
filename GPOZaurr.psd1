@@ -7,7 +7,7 @@
     Description          = 'Group Policy Eater is a PowerShell module that aims to gather information about Group Policies but also allows fixing issues that you may find in them.'
     FunctionsToExport    = 'Add-GPOPermission', 'Add-GPOZaurrPermission', 'Backup-GPOZaurr', 'Get-GPOZaurr', 'Get-GPOZaurrAD', 'Get-GPOZaurrBackupInformation', 'Get-GPOZaurrEmptyFolders', 'Get-GPOZaurrFiles', 'Get-GPOZaurrFilesPolicyDefinitions', 'Get-GPOZaurrLegacyFiles', 'Get-GPOZaurrLink', 'Get-GPOZaurrLinkSummary', 'Get-GPOZaurrOwner', 'Get-GPOZaurrPassword', 'Get-GPOZaurrPermission', 'Get-GPOZaurrPermissionConsistency', 'Get-GPOZaurrSysvol', 'Get-WMIFilter', 'Get-GPOZaurrWMI', 'Invoke-GPOZaurr', 'Invoke-GPOZaurrPermission', 'New-GPOZaurrWMI', 'Remove-GPOPermission', 'Remove-GPOZaurr', 'Remove-GPOZaurrEmptyFolders', 'Remove-GPOZaurrLegacyFiles', 'Remove-GPOZaurrOrphanedSysvolFolders', 'Remove-GPOZaurrPermission', 'Remove-GPOZaurrWMI', 'Repair-GPOZaurrPermissionConsistency', 'Restore-GPOZaurr', 'Save-GPOZaurrFiles', 'Select-GPOTranslation', 'Set-GPOOwner', 'Set-GPOZaurrOwner'
     GUID                 = 'f7d4c9e4-0298-4f51-ad77-e8e3febebbde'
-    ModuleVersion        = '0.0.48'
+    ModuleVersion        = '0.0.49'
     PowerShellVersion    = '5.1'
     PrivateData          = @{
         PSData = @{
@@ -17,11 +17,11 @@
         }
     }
     RequiredModules      = @{
-        ModuleVersion = '0.0.160'
+        ModuleVersion = '0.0.161'
         ModuleName    = 'PSSharedGoods'
         Guid          = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe'
     }, @{
-        ModuleVersion = '0.0.63'
+        ModuleVersion = '0.0.65'
         ModuleName    = 'ADEssentials'
         Guid          = '9fc9fd61-7f11-4f4b-a527-084086f1905f'
     }, 'ActiveDirectory', 'GroupPolicy', 'CimCmdlets', 'Microsoft.PowerShell.Management', 'Microsoft.PowerShell.Utility'
