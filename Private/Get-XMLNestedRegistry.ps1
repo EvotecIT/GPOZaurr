@@ -12,7 +12,8 @@ function Get-XMLNestedRegistry {
             if ($Limited) {
                 [PSCustomObject] @{
                     Collection      = $Collection
-                    Changed         = [DateTime] $Registry.changed
+                    Description     = $Registry.descr
+                    Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
                     GPOSettingOrder = $Registry.GPOSettingOrder
                     Hive            = $Registry.Properties.hive #: HKEY_LOCAL_MACHINE
                     Key             = $Registry.Properties.key  #: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
@@ -30,7 +31,8 @@ function Get-XMLNestedRegistry {
                     #GpoCategory = $GPOEntry.GpoCategory
                     #GpoSettings = $GPOEntry.GpoSettings
                     Collection      = $Collection
-                    Changed         = [DateTime] $Registry.changed
+                    Description     = $Registry.descr
+                    Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
                     GPOSettingOrder = $Registry.GPOSettingOrder
                     Hive            = $Registry.Properties.hive #: HKEY_LOCAL_MACHINE
                     Key             = $Registry.Properties.key  #: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
@@ -52,7 +54,8 @@ function Get-XMLNestedRegistry {
                 if ($Limited) {
                     [PSCustomObject] @{
                         Collection      = $Collection
-                        Changed         = [DateTime] $Registry.changed
+                        Description     = $Registry.descr
+                        Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
                         GPOSettingOrder = $Registry.GPOSettingOrder
                         Hive            = $Registry.Properties.hive #: HKEY_LOCAL_MACHINE
                         Key             = $Registry.Properties.key  #: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
@@ -70,7 +73,8 @@ function Get-XMLNestedRegistry {
                         #GpoCategory = $GPOEntry.GpoCategory
                         #GpoSettings = $GPOEntry.GpoSettings
                         Collection      = $Collection
-                        Changed         = [DateTime] $Registry.changed
+                        Description     = $Registry.descr
+                        Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
                         GPOSettingOrder = $Registry.GPOSettingOrder
                         Hive            = $Registry.Properties.hive #: HKEY_LOCAL_MACHINE
                         Key             = $Registry.Properties.key  #: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
