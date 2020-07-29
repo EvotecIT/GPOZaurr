@@ -50,6 +50,9 @@
             "\\$Domain\NETLOGON"                                  = @{
                 Name = 'NETLOGON Scripts'
             }
+            "\\$Domain\SYSVOL\$Domain\DfsrPrivate"                = @{
+                Name = 'DfsrPrivate'
+            }
             "\\$Domain\SYSVOL\$Domain"                            = @{
                 Name = 'SYSVOL Root'
             }

@@ -1,5 +1,7 @@
 Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-Get-GPOZaurrEmptyFolders | Where-Object { $_.Name -eq 'Adm' } | Format-Table *
+# Report on empty folders
+Get-GPOZaurrFolders -FolderType Empty | Format-Table *
 
-Remove-GPOZaurrEmptyFolders -Folders Adm -Verbose -LimitProcessing 1
+# ! NOT READY FOR EMPTY
+#Remove-GPOZaurrFolders -FolderType Empty -Verbose -BackupPath $Env:USERPROFILE\Desktop\SomeBackup1 -WhatIf
