@@ -5,15 +5,33 @@
         [Microsoft.GroupPolicy.Gpo] $GPO,
         [switch] $PermissionsOnly,
         [switch] $OwnerOnly,
-        [System.Collections.IDictionary] $ADAdministrativeGroups
+        [System.Collections.IDictionary] $ADAdministrativeGroups,
+        [string] $Splitter = [System.Environment]::NewLine
     )
     if ($XMLContent.GPO.LinksTo) {
-        $Linked = $true
-        $LinksCount = ([Array] $XMLContent.GPO.LinksTo).Count
+        $LinkSplit = ([Array] $XMLContent.GPO.LinksTo).Where( { $_.Enabled -eq $true }, 'Split')
+        [Array] $LinksEnabled = $LinkSplit[0]
+        [Array] $LinksDisabled = $LinkSplit[1]
+        $LinksEnabledCount = $LinksEnabled.Count
+        $LinksDisabledCount = $LinksDisabled.Count
+        $LinksTotalCount = ([Array] $XMLContent.GPO.LinksTo).Count
+        if ($LinksEnabledCount -eq 0) {
+            $Linked = $false
+        } else {
+            $Linked = $true
+        }
     } else {
         $Linked = $false
-        $LinksCount = 0
+        $LinksEnabledCount = 0
+        $LinksDisabledCount = 0
+        $LinksTotalCount = 0
     }
+    if ($null -eq $XMLContent.GPO.Computer.ExtensionData -and $null -eq $XMLContent.GPO.User.ExtensionData) {
+        $Empty = $true
+    } else {
+        $Empty = $false
+    }
+
 
     # Find proper values for enabled/disabled user/computer settings
     if ($XMLContent.GPO.Computer.Enabled -eq 'False') {
@@ -98,8 +116,11 @@
             'DisplayName'                       = $XMLContent.GPO.Name
             'DomainName'                        = $XMLContent.GPO.Identifier.Domain.'#text'
             'GUID'                              = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
+            'Empty'                             = $Empty
             'Linked'                            = $Linked
-            'LinksCount'                        = $LinksCount
+            'LinksCount'                        = $LinksTotalCount
+            'LinksEnabledCount'                 = $LinksEnabledCount
+            'LinksDisabledCount'                = $LinksDisabledCount
             'Enabled'                           = $Enabled
             'ComputerEnabled'                   = $ComputerEnabled
             'UserEnabled'                       = $UserEnabled
@@ -111,14 +132,11 @@
             'UserSettingsStatus'                = if ($XMLContent.GPO.User.VersionDirectory -eq 0 -and $XMLContent.GPO.User.VersionSysvol -eq 0) { "NeverModified" } else { "Modified" }
             'UserSettingsVersionIdentical'      = if ($XMLContent.GPO.User.VersionDirectory -eq $XMLContent.GPO.User.VersionSysvol) { $true } else { $false }
             'UserSettings'                      = $XMLContent.GPO.User.ExtensionData.Extension
-
-            ComputerPolicies                    = $XMLContent.GPO.Computer.ExtensionData.Name -join ", "
-            UserPolicies                        = $XMLContent.GPO.User.ExtensionData.Name -join ", "
-
+            'ComputerPolicies'                  = $XMLContent.GPO.Computer.ExtensionData.Name -join ", "
+            'UserPolicies'                      = $XMLContent.GPO.User.ExtensionData.Name -join ", "
             'CreationTime'                      = [DateTime] $XMLContent.GPO.CreatedTime
             'ModificationTime'                  = [DateTime] $XMLContent.GPO.ModifiedTime
             'ReadTime'                          = [DateTime] $XMLContent.GPO.ReadTime
-
             'WMIFilter'                         = $GPO.WmiFilter.name
             'WMIFilterDescription'              = $GPO.WmiFilter.Description
             'GPODistinguishedName'              = $GPO.Path
@@ -147,7 +165,14 @@
                 }
             )
             'Auditing'                          = if ($XMLContent.GPO.SecurityDescriptor.AuditingPresent.'#text' -eq 'true') { $true } else { $false }
-            'Links'                             = $XMLContent.GPO.LinksTo | ForEach-Object -Process {
+            'Links'                             = @(
+                $XMLContent.GPO.LinksTo | ForEach-Object -Process {
+                    if ($_) {
+                        $_.SOMPath
+                    }
+                }
+            ) -join $Splitter
+            'LinksObjects'                      = $XMLContent.GPO.LinksTo | ForEach-Object -Process {
                 if ($_) {
                     [PSCustomObject] @{
                         CanonicalName = $_.SOMPath
@@ -156,15 +181,6 @@
                     }
                 }
             }
-            <#
-        SOMName SOMPath       Enabled NoOverride
-        ------- -------       ------- ----------
-        ad      ad.evotec.xyz true    false
-        #>
-
-            #| Select-Object -ExpandProperty SOMPath
-
         }
     }
-    #break
 }
