@@ -108,9 +108,9 @@ function Get-XMLNestedRegistry {
                 }
             } else {
                 if ($Registry.Registry) {
-                    if ($Registry.Name.Count -gt 1) {
-                        Write-Verbose "Registry Name count more than 1"
-                    }
+                    #if ($Registry.Name.Count -gt 1) {
+                    #Write-Verbose "Registry Name count more than 1"
+                    #}
                     $TempCollection = $Collection
                     if ($Collection) {
                         $Collection = "$Collection/$($Registry.name)"
@@ -122,18 +122,18 @@ function Get-XMLNestedRegistry {
                 }
                 if ($Registry.Collection) {
                     $TempCollection = $Collection
-                    if ($Registry.Collection.Count -gt 1) {
-                        Write-Verbose "Registry collection count more than 1"
-                    }
+                    #if ($Registry.Collection.Count -gt 1) {
+                    # Write-Verbose "Registry collection count more than 1"
+                    #}
                     foreach ($MyCollection in $Registry.Collection) {
                         if ($Collection) {
                             #Write-Verbose "Collection1: $Collection - $($Registry.name) - $($MyCollection.name) - $($($MyCollection.name).Count)"
                             $Collection = "$Collection/$($Registry.name)/$($MyCollection.name)"
-                            Write-Verbose "Collection2: $Collection"
+                            #Write-Verbose "Collection2: $Collection"
                         } else {
                             #Write-Verbose "Collection3: $Collection - $($Registry.name) - $($MyCollection.name)"
                             $Collection = "$($Registry.name)/$($MyCollection.name)"
-                            Write-Verbose "Collection4: $Collection"
+                            #Write-Verbose "Collection4: $Collection"
                         }
 
                         Get-XMLNestedRegistry -GPO $GPO -DataSet $MyCollection -Collection $Collection
