@@ -179,7 +179,7 @@
             }
         }
     }
-    #Remove-EmptyValue -Hashtable $Output -Recursive
+    Remove-EmptyValue -Hashtable $Output -Recursive
     return $Output
     <#
     foreach ($GPO in $GPOs) {
