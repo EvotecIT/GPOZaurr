@@ -30,17 +30,32 @@
         }
     }
     Autologon            = [ordered] @{
+        # We want to process this based on other report called RegistrySettings
+        # This is because registry settings can be stored in Collections or nested within other registry settings
+        # The original function ConvertTo-XMLRegistryAutologon was processing it in limited ordered and potentially would skip some entries.
+        <#
         Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'RegistrySettings'
             }
         )
+        #>
+        ByReports  = @(
+            @{
+                Report = 'RegistrySettings'
+            }
+        )
+        <#
         Code       = {
             ConvertTo-XMLRegistryAutologon -GPO $GPO
         }
         CodeSingle = {
             ConvertTo-XMLRegistryAutologon -GPO $GPO
+        }
+        #>
+        CodeReport = {
+            ConvertTo-XMLRegistryAutologonOnReport -GPO $GPO
         }
     }
     DriveMapping         = [ordered] @{
