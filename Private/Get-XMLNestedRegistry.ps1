@@ -15,17 +15,17 @@ function Get-XMLNestedRegistry {
                         Collection      = $Collection
                         Description     = $Registry.descr
                         Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
-                        GPOSettingOrder = $Registry.GPOSettingOrder
+                        GPOSettingOrder = [int] $Registry.GPOSettingOrder
                         Action          = $Script:Actions[$Registry.Properties.action]
-                        DisplayDecimal  = $Registry.Properties.displayDecimal
-                        Default         = $Registry.Properties.default
+                        DisplayDecimal  = if ($Registry.Properties.displayDecimal -eq '1') { $true } else { $false };
+                        Default         = if ($Registry.Properties.default -eq '1') { $true } else { $false };
                         Hive            = $Registry.Properties.hive #: HKEY_LOCAL_MACHINE
                         Key             = $Registry.Properties.key  #: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
                         Name            = $Registry.Properties.name #: AutoAdminLogon
                         Type            = $Registry.Properties.type #: REG_SZ
                         Value           = $Registry.Properties.value #
                         Filters         = $Registry.Filters
-                        BypassErrors    = $Registry.bypassErrors
+                        BypassErrors    = if ($Registry.bypassErrors -eq '1') { $true } else { $false };
                     }
                 } else {
                     $CreateGPO = [ordered]@{
@@ -38,42 +38,22 @@ function Get-XMLNestedRegistry {
                         Collection      = $Collection
                         Description     = $Registry.descr
                         Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
-                        GPOSettingOrder = $Registry.GPOSettingOrder
+                        GPOSettingOrder = [int] $Registry.GPOSettingOrder
                         Action          = $Script:Actions[$Registry.Properties.action]
-                        DisplayDecimal  = $Registry.Properties.displayDecimal
-                        Default         = $Registry.Properties.default
+                        DisplayDecimal  = if ($Registry.Properties.displayDecimal -eq '1') { $true } else { $false };
+                        Default         = if ($Registry.Properties.default -eq '1') { $true } else { $false };
                         Hive            = $Registry.Properties.hive #: HKEY_LOCAL_MACHINE
                         Key             = $Registry.Properties.key  #: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
                         Name            = $Registry.Properties.name #: AutoAdminLogon
                         Type            = $Registry.Properties.type #: REG_SZ
                         Value           = $Registry.Properties.value #
                         Filters         = $Registry.Filters
-                        BypassErrors    = $Registry.bypassErrors
+                        BypassErrors    = if ($Registry.bypassErrors -eq '1') { $true } else { $false };
                     }
                     $CreateGPO['Linked'] = $GPO.Linked
                     $CreateGPO['LinksCount'] = $GPO.LinksCount
                     $CreateGPO['Links'] = $GPO.Links
                     [PSCustomObject] $CreateGPO
-                }
-            } else {
-                if ($Registry.Registry) {
-                    #$Collection = $Registry.name
-                    $TempCollection = $Collection
-                    if ($Collection) {
-                        $Collection = "$Collection\$($Registry.name)"
-                    } else {
-                        $Collection = $Registry.name
-                    }
-                    Get-XMLNestedRegistry -GPO $GPO -DataSet $Registry.Registry -Collection $Collection
-                    $Collection = $TempCollection
-                }
-                if ($Registry.Collection) {
-                    if ($Collection) {
-                        $Collection = "$Collection\$($Registry.Collection.name)"
-                    } else {
-                        $Collection = "$($Registry.name)\$($Registry.Collection.name)"
-                    }
-                    Get-XMLNestedRegistry -GPO $GPO -DataSet $Registry.Collection -Collection $Collection
                 }
             }
         }
@@ -86,17 +66,17 @@ function Get-XMLNestedRegistry {
                         Collection      = $Collection
                         Description     = $Registry.descr
                         Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
-                        GPOSettingOrder = $Registry.GPOSettingOrder
+                        GPOSettingOrder = [int] $Registry.GPOSettingOrder
                         Action          = $Script:Actions[$Registry.Properties.action]
-                        DisplayDecimal  = $Registry.Properties.displayDecimal
-                        Default         = $Registry.Properties.default
+                        DisplayDecimal  = if ($Registry.Properties.displayDecimal -eq '1') { $true } else { $false };
+                        Default         = if ($Registry.Properties.default -eq '1') { $true } else { $false };
                         Hive            = $Registry.Properties.hive #: HKEY_LOCAL_MACHINE
                         Key             = $Registry.Properties.key  #: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
                         Name            = $Registry.Properties.name #: AutoAdminLogon
                         Type            = $Registry.Properties.type #: REG_SZ
                         Value           = $Registry.Properties.value #
                         Filters         = $Registry.Filters
-                        BypassErrors    = $Registry.bypassErrors
+                        BypassErrors    = if ($Registry.bypassErrors -eq '1') { $true } else { $false };
                     }
                 } else {
                     $CreateGPO = [ordered]@{
@@ -109,30 +89,17 @@ function Get-XMLNestedRegistry {
                         Collection      = $Collection
                         Description     = $Registry.descr
                         Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
-                        GPOSettingOrder = $Registry.GPOSettingOrder
+                        GPOSettingOrder = [int] $Registry.GPOSettingOrder
                         Action          = $Script:Actions[$Registry.Properties.action]
-                        DisplayDecimal  = $Registry.Properties.displayDecimal
-                        Default         = $Registry.Properties.default
+                        DisplayDecimal  = if ($Registry.Properties.displayDecimal -eq '1') { $true } else { $false }; ;
+                        Default         = if ($Registry.Properties.default -eq '1') { $true } else { $false };
                         Hive            = $Registry.Properties.hive #: HKEY_LOCAL_MACHINE
                         Key             = $Registry.Properties.key  #: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
                         Name            = $Registry.Properties.name #: AutoAdminLogon
                         Type            = $Registry.Properties.type #: REG_SZ
                         Value           = $Registry.Properties.value #
                         Filters         = $Registry.Filters
-                        BypassErrors    = $Registry.bypassErrors
-
-                        <#
-                        action         : D
-                        displayDecimal : 1
-                        default        : 0
-                        hive           : HKEY_LOCAL_MACHINE
-                        key            : SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}
-                        name           :
-                        type           : REG_SZ
-                        value          :
-                        Values         :
-                        #>
-
+                        BypassErrors    = if ($Registry.bypassErrors -eq '1') { $true } else { $false };
                     }
                     $CreateGPO['Linked'] = $GPO.Linked
                     $CreateGPO['LinksCount'] = $GPO.LinksCount
@@ -141,10 +108,12 @@ function Get-XMLNestedRegistry {
                 }
             } else {
                 if ($Registry.Registry) {
-                    #$Collection = $Registry.name
+                    if ($Registry.Name.Count -gt 1) {
+                        Write-Verbose "Registry Name count more than 1"
+                    }
                     $TempCollection = $Collection
                     if ($Collection) {
-                        $Collection = "$Collection\$($Registry.name)"
+                        $Collection = "$Collection/$($Registry.name)"
                     } else {
                         $Collection = $Registry.name
                     }
@@ -152,12 +121,24 @@ function Get-XMLNestedRegistry {
                     $Collection = $TempCollection
                 }
                 if ($Registry.Collection) {
-                    if ($Collection) {
-                        $Collection = "$Collection\$($Registry.Collection.name)"
-                    } else {
-                        $Collection = "$($Registry.name)\$($Registry.Collection.name)"
+                    $TempCollection = $Collection
+                    if ($Registry.Collection.Count -gt 1) {
+                        Write-Verbose "Registry collection count more than 1"
                     }
-                    Get-XMLNestedRegistry -GPO $GPO -DataSet $Registry.Collection -Collection $Collection
+                    foreach ($MyCollection in $Registry.Collection) {
+                        if ($Collection) {
+                            #Write-Verbose "Collection1: $Collection - $($Registry.name) - $($MyCollection.name) - $($($MyCollection.name).Count)"
+                            $Collection = "$Collection/$($Registry.name)/$($MyCollection.name)"
+                            Write-Verbose "Collection2: $Collection"
+                        } else {
+                            #Write-Verbose "Collection3: $Collection - $($Registry.name) - $($MyCollection.name)"
+                            $Collection = "$($Registry.name)/$($MyCollection.name)"
+                            Write-Verbose "Collection4: $Collection"
+                        }
+
+                        Get-XMLNestedRegistry -GPO $GPO -DataSet $MyCollection -Collection $Collection
+                        $Collection = $TempCollection
+                    }
                 }
             }
         }
