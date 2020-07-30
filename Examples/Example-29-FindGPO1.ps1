@@ -1,20 +1,18 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-$Output = Invoke-GPOZaurr #-NoTranslation
+$Output = Invoke-GPOZaurr
 $Output | Format-Table
 
+# Report to Excel of translated reports
+foreach ($Key in $Output.Reports.Keys) {
+    $Output.Reports[$Key] | ConvertTo-Excel -FilePath $Env:USERPROFILE\Desktop\GPOAnalysis.xlsx -ExcelWorkSheetName $Key -AutoFilter -AutoFit -FreezeTopRowFirstColumn
+}
+
+# Report to HTML of translated reports
 New-HTML {
-    foreach ($GPOCategory in $Output.Keys) {
-        New-HTMLTab -Name $GPOCategory {
-            if ($Output["$GPOCategory"] -is [System.Collections.IDictionary]) {
-                foreach ($GpoSettings in $Output["$GPOCategory"].Keys) {
-                    New-HTMLTab -Name $GpoSettings {
-                        New-HTMLTable -DataTable $Output[$GPOCategory][$GpoSettings] -ScrollX -DisablePaging -AllProperties -Title $GpoSettings
-                    }
-                }
-            } else {
-                New-HTMLTable -DataTable $Output[$GPOCategory] -ScrollX -DisablePaging -AllProperties -Title $GpoSettings
-            }
+    foreach ($Key in $Output.Reports.Keys) {
+        New-HTMLTab -Name $Key {
+            New-HTMLTable -DataTable $Output.Reports[$Key]  -Filtering
         }
     }
-} -Online -ShowHTML -FilePath $Env:UserProfile\Desktop\OutputFromFindGPO.html
+} -FilePath $Env:USERPROFILE\Desktop\GPOAnalysis.html -ShowHTML -Online
