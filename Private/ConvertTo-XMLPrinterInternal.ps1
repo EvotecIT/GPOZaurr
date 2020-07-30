@@ -10,7 +10,7 @@ function ConvertTo-XMLPrinterInternal {
         $CreateGPO = [ordered]@{
             Changed              = try { [DateTime] $Entry.changed } catch { $Entry.Changed };
             #uid             = $Entry.uid
-            BypassErrors         = if ($Entry.bypassErrors -eq '1') { $true } elseif ($Entry.bypassErrors -eq '0') { $false } else { $Entry.bypassErrors };
+            BypassErrors         = if ($Entry.bypassErrors -eq '1') { $true } else { $false };
             GPOSettingOrder      = $Entry.GPOSettingOrder
             Filter               = $Entry.Filter
             type                 = $Type
@@ -54,7 +54,7 @@ function ConvertTo-XMLPrinterInternal {
             GpoSettings          = $GPO.GpoSettings
             Changed              = try { [DateTime] $Entry.changed } catch { $Entry.Changed };
             #uid             = $Entry.uid
-            BypassErrors         = if ($Entry.bypassErrors -eq '1') { $true } elseif ($Entry.bypassErrors -eq '0') { $false } else { $Entry.bypassErrors };
+            BypassErrors         = if ($Entry.bypassErrors -eq '1') { $true } else { $false };
             GPOSettingOrder      = $Entry.GPOSettingOrder
             Filter               = $Entry.Filter
             type                 = $Type
