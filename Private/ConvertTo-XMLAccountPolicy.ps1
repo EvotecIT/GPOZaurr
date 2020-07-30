@@ -29,7 +29,7 @@
         if ($GPOEntry.SettingBoolean) {
             $CreateGPO[$($GPOEntry.Name)] = if ($GPOEntry.SettingBoolean -eq 'true') { 'Enabled' } elseif ($GPOEntry.SettingBoolean -eq 'false') { 'Disabled' } else { 'Not set' };
         } elseif ($GPOEntry.SettingNumber) {
-            $CreateGPO[$($GPOEntry.Name)] = $GPOEntry.SettingNumber
+            $CreateGPO[$($GPOEntry.Name)] = [int] $GPOEntry.SettingNumber
         }
     }
     $CreateGPO['Linked'] = $GPO.Linked
