@@ -20,6 +20,10 @@
                 Category = 'SecuritySettings'
                 Settings = 'Audit'
             }
+            @{
+                Category = 'AuditSettings'
+                Settings = 'AuditSetting'
+            }
         )
         GPOPath    = ''
         Code       = {
