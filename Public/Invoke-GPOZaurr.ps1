@@ -75,7 +75,7 @@
                 }
             }
         } else {
-            Write-Warning "Find-GPO - $GPOPath doesn't exists."
+            Write-Warning "Invoke-GPOZaurr - $GPOPath doesn't exists."
             return
         }
     } else {
