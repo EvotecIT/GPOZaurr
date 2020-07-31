@@ -134,6 +134,20 @@
             ConvertTo-XMLLocalGroups -GPO $GPO -SingleObject
         }
     }
+    LithnetFilter        = @{
+        Types      = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code       = {
+            ConvertTo-XMLLithnetFilter -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLLithnetFilter -GPO $GPO
+        }
+    }
     Policies             = @{
         Types      = @(
             @{
