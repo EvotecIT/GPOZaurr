@@ -92,6 +92,20 @@
             ConvertTo-XMLEventLog -GPO $GPO
         }
     }
+    LAPS                 = @{
+        Types      = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code       = {
+            ConvertTo-XMLLaps -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLLaps -GPO $GPO
+        }
+    }
     LocalUsers           = [ordered] @{
         Types      = @(
             @{
