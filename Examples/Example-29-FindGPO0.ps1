@@ -1,4 +1,4 @@
-﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
+﻿#Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 # Asses GPO based on exported data
 $Output = Invoke-GPOZaurr -GPOPath $Env:USERPROFILE\Desktop\GPOExport -Verbose
