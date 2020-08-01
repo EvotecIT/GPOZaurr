@@ -1,5 +1,5 @@
 ﻿$Script:GPODitionary = [ordered] @{
-    AccountPolicies      = [ordered] @{
+    AccountPolicies         = [ordered] @{
         Types      = @(
             @{
                 Category = 'SecuritySettings'
@@ -14,7 +14,7 @@
             ConvertTo-XMLAccountPolicy -GPO $GPO
         }
     }
-    Audit                = [ordered] @{
+    Audit                   = [ordered] @{
         Types      = @(
             @{
                 Category = 'SecuritySettings'
@@ -33,7 +33,7 @@
             ConvertTo-XMLAudit -GPO $GPO
         }
     }
-    Autologon            = [ordered] @{
+    Autologon               = [ordered] @{
         # We want to process this based on other report called RegistrySettings
         # This is because registry settings can be stored in Collections or nested within other registry settings
         # The original function ConvertTo-XMLRegistryAutologon was processing it in limited ordered and potentially would skip some entries.
@@ -62,7 +62,64 @@
             ConvertTo-XMLRegistryAutologonOnReport -GPO $GPO
         }
     }
-    DriveMapping         = [ordered] @{
+    Biometrics              = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            #ConvertTo-XMLBitlocker -GPO $GPO
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Biometrics*'
+        }
+    }
+    Bitlocker               = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            #ConvertTo-XMLBitlocker -GPO $GPO
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/BitLocker Drive Encryption*'
+        }
+    }
+    CredentialsDelegation   = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Credentials Delegation*'
+        }
+    }
+    Desktop                 = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Desktop*'
+        }
+    }
+    DnsClient               = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Network/DNS Client*'
+        }
+    }
+    DriveMapping            = [ordered] @{
         Types      = @(
             @{
                 Category = 'DriveMapSettings'
@@ -77,7 +134,7 @@
             ConvertTo-XMLDriveMapSettings -GPO $GPO -SingleObject
         }
     }
-    EventLog             = [ordered] @{
+    EventLog                = [ordered] @{
         Types      = @(
             @{
                 Category = 'SecuritySettings'
@@ -92,21 +149,64 @@
             ConvertTo-XMLEventLog -GPO $GPO
         }
     }
-    LAPS                 = @{
-        Types      = @(
+    FileExplorer            = @{
+        Types = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        Code       = {
-            ConvertTo-XMLLaps -GPO $GPO
-        }
-        CodeSingle = {
-            ConvertTo-XMLLaps -GPO $GPO
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/File Explorer*'
         }
     }
-    LocalUsers           = [ordered] @{
+    GroupPolicy             = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Group Policy*'
+        }
+    }
+    InternetExplorer        = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Internet Explorer*'
+        }
+    }
+    LAPS                    = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            #ConvertTo-XMLLaps -GPO $GPO
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'LAPS'
+        }
+    }
+    Lithnet                 = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            #ConvertTo-XMLLithnetFilter -GPO $GPO
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Lithnet/Password Protection for Active Directory*'
+        }
+    }
+    LocalUsers              = [ordered] @{
         Types      = @(
             @{
                 Category = 'LugsSettings'
@@ -120,7 +220,7 @@
             ConvertTo-XMLLocalUser -GPO $GPO -SingleObject
         }
     }
-    LocalGroups          = [ordered] @{
+    LocalGroups             = [ordered] @{
         Types      = @(
             @{
                 Category = 'LugsSettings'
@@ -134,21 +234,37 @@
             ConvertTo-XMLLocalGroups -GPO $GPO -SingleObject
         }
     }
-    LithnetFilter        = @{
-        Types      = @(
+    Logon                   = @{
+        Types = @(
+            @{ Category = 'RegistrySettings'; Settings = 'Policy' }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Logon*'
+        }
+    }
+    MicrosoftOutlook2010    = @{
+        Types = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        Code       = {
-            ConvertTo-XMLLithnetFilter -GPO $GPO
-        }
-        CodeSingle = {
-            ConvertTo-XMLLithnetFilter -GPO $GPO
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2010*'
         }
     }
-    Policies             = @{
+    MicrosoftOutlook2016    = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2016*'
+        }
+    }
+    Policies                = @{
         Types      = @(
             @{
                 Category = 'RegistrySettings'
@@ -162,7 +278,7 @@
             ConvertTo-XMLPolicies -GPO $GPO -SingleObject
         }
     }
-    Printers             = @{
+    Printers                = @{
         Types      = @(
             @{
                 Category = 'PrintersSettings'
@@ -180,7 +296,18 @@
             ConvertTo-XMLPrinter -GPO $GPO -SingleObject
         }
     }
-    RegistrySettings     = [ordered] @{
+    PrintersPolicies        = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Printers*', 'Control Panel/Printers*'
+        }
+    }
+    RegistrySettings        = [ordered] @{
         Types      = @(
             @{
                 Category = 'RegistrySettings'
@@ -194,7 +321,18 @@
             ConvertTo-XMLRegistrySettings -GPO $GPO -SingleObject
         }
     }
-    Scripts              = [ordered] @{
+    RemoteDesktopServices   = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Remote Desktop Services*'
+        }
+    }
+    Scripts                 = [ordered] @{
         Types      = @(
             @{
                 Category = 'Scripts'
@@ -208,7 +346,7 @@
             ConvertTo-XMLScripts -GPO $GPO -SingleObject
         }
     }
-    SecurityOptions      = [ordered] @{
+    SecurityOptions         = [ordered] @{
         Types      = @(
             @{
                 Category = 'SecuritySettings'
@@ -222,7 +360,7 @@
             ConvertTo-XMLSecurityOptions -GPO $GPO -SingleObject
         }
     }
-    SoftwareInstallation = [ordered] @{
+    SoftwareInstallation    = [ordered] @{
         Types      = @(
             @{
                 Category = 'SoftwareInstallationSettings'
@@ -236,7 +374,7 @@
             ConvertTo-XMLSoftwareInstallation -GPO $GPO -SingleObject
         }
     }
-    SystemServices       = [ordered] @{
+    SystemServices          = [ordered] @{
         Types       = @(
             @{
                 Category = 'SecuritySettings'
@@ -252,7 +390,7 @@
             ConvertTo-XMLSystemServices -GPO $GPO -SingleObject
         }
     }
-    SystemServicesNT     = [ordered] @{
+    SystemServicesNT        = [ordered] @{
         Types       = @(
             @{
                 Category = 'ServiceSettings'
@@ -268,7 +406,7 @@
             ConvertTo-XMLSystemServicesNT -GPO $GPO -SingleObject
         }
     }
-    TaskScheduler        = [ordered] @{
+    TaskScheduler           = [ordered] @{
         Types       = @(
             @{
                 Category = 'ScheduledTasksSettings'
@@ -282,6 +420,39 @@
         }
         CodeSingle  = {
             ConvertTo-XMLTaskScheduler -GPO $GPO -SingleObject
+        }
+    }
+    WindowsHelloForBusiness = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Hello For Business*'
+        }
+    }
+    WindowsRemoteManagement = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Remote Management (WinRM)*'
+        }
+    }
+    WindowsUpdate           = @{
+        Types = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        Code  = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Update*', 'Windows Components/Delivery Optimization*'
         }
     }
 }
