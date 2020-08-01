@@ -1,11 +1,4 @@
-﻿function Get-WMIFilter {
-    param(
-
-    )
-
-}
-
-function Get-GPOZaurrWMI {
+﻿function Get-GPOZaurrWMI {
     [cmdletBinding()]
     Param(
         [Guid[]] $Guid,
@@ -15,7 +8,7 @@ function Get-GPOZaurrWMI {
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
-    $wmiFilterAttr = "msWMI-Name", "msWMI-Parm1", "msWMI-Parm2", "msWMI-Author", "msWMI-ID", 'CanonicalName', 'Created', 'Modified'
+    $wmiFilterAttr = 'msWMI-Name', 'msWMI-Parm1', 'msWMI-Parm2', 'msWMI-Author', 'msWMI-ID', 'CanonicalName', 'Created', 'Modified'
 
     $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     foreach ($Domain in $ForestInformation.Domains) {
@@ -41,7 +34,7 @@ function Get-GPOZaurrWMI {
                 }
             } else {
                 try {
-                    $ldapFilter = "(objectClass=msWMI-Som)"
+                    $ldapFilter = '(objectClass=msWMI-Som)'
                     Get-ADObject -LDAPFilter $ldapFilter -Properties $wmiFilterAttr -Server $QueryServer
                 } catch {
                     Write-Warning "Get-GPOZaurrWMI - Error processing WMI for $Domain`: $($_.Error.Exception)"
@@ -66,7 +59,7 @@ function Get-GPOZaurrWMI {
                 #NameSpace         = $WMI[$i + 5]
                 #Query             = $WMI[$i + 6]
                 QueryCount        = $Data.Count
-                Query             = $Data -join ","
+                Query             = $Data -join ','
                 Author            = $_.'msWMI-Author'
                 ID                = $_.'msWMI-ID'
                 Created           = $_.Created
