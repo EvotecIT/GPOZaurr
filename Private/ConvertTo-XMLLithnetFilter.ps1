@@ -73,14 +73,14 @@ function ConvertTo-XMLLithnetFilter {
     $UsedNames = [System.Collections.Generic.List[string]]::new()
     if ($GPO.DataSet.Category -like 'Lithnet/Password Protection for Active Directory*') {
         foreach ($Policy in $GPO.DataSet) {
-            $Name = Format-ToTitleCase -Text $Policy.Name -RemoveWhiteSpace -RemoveChars ',', '-', "'", '\(', '\)', ':'
+            $Name = Format-ToTitleCase -Text $Policy.Name -RemoveWhiteSpace -RemoveChar ',', '-', "'", '\(', '\)', ':'
             $CreateGPO[$Name] = $Policy.State
 
             foreach ($Setting in @('DropDownList', 'Numeric', 'EditText', 'Text', 'CheckBox')) {
                 if ($Policy.$Setting) {
                     foreach ($Value in $Policy.$Setting) {
                         if ($Value.Name) {
-                            $SubName = Format-ToTitleCase -Text $Value.Name -RemoveWhiteSpace -RemoveChars ',', '-', "'", '\(', '\)', ':'
+                            $SubName = Format-ToTitleCase -Text $Value.Name -RemoveWhiteSpace -RemoveChar ',', '-', "'", '\(', '\)', ':'
                             $SubName = -join ($Name, $SubName)
                             if ($SubName -notin $UsedNames) {
                                 $UsedNames.Add($SubName)
