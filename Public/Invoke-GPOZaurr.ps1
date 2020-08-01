@@ -25,7 +25,7 @@
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
         [ValidateSet('HTML', 'Object', 'Excel')][string[]] $OutputType = 'Object',
-        #>
+
 
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
@@ -34,6 +34,7 @@
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
         [switch] $Open,
+        #>
 
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
@@ -41,21 +42,21 @@
 
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
-        [switch] $SingleObject
+        [switch] $SingleObject,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
+        [switch] $SkipNormalize,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
+        [switch] $SkipCleanup
     )
     if ($Type.Count -eq 0) {
         $Type = $Script:GPODitionary.Keys
     }
     if ($GPOPath) {
         if (Test-Path -LiteralPath $GPOPath) {
-            <#
-            $GPOListPath = [io.path]::Combine($GPOPath, "GPOList.xml")
-            if ($GPOListPath) {
-                $GPOs = Import-Clixml -Path $GPOListPath
-            } else {
-
-            }
-            #>
             $GPOFiles = Get-ChildItem -LiteralPath $GPOPath -Recurse -File -Filter *.xml
             [Array] $GPOs = foreach ($File in $GPOFiles) {
                 if ($File.Name -ne 'GPOList.xml') {
@@ -134,6 +135,12 @@
                     if ($SingleObject -or ($Report -in $FindRequiredSingle)) {
                         # We either create 1 GPO with multiple settings to return it as user requested it
                         # Or we process it only because we need to base it for reports based on other reports
+                        if (-not $Script:GPODitionary[$Report]['CodeSingle']) {
+                            # sometimes code and code single are identical. To not define things two times, one can just skip it
+                            If ($Script:GPODitionary[$Report]['Code']) {
+                                $Script:GPODitionary[$Report]['CodeSingle'] = $Script:GPODitionary[$Report]['Code']
+                            }
+                        }
                         if ($Script:GPODitionary[$Report]['CodeSingle']) {
                             $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['CodeSingle']
                             if ($Report -in $FindRequiredSingle) {
@@ -179,7 +186,30 @@
             }
         }
     }
-    Remove-EmptyValue -Hashtable $Output -Recursive
+    # Normalize - meaning that before we return each GPO report we make sure that each entry has the same column names regardless which one is first.
+    # Normally if you would have a GPO with just 2 entries for given subject (say LAPS), and then another GPO having 5 settings for the same type
+    # and you would display them one after another - all entries would be shown using first object which has less properties then 2nd or 3rd object
+    # to make sure all objects are having same (even empty) properties we "normalize" it
+    if (-not $SkipNormalize) {
+        foreach ($Report in [string[]] $Output['Reports'].Keys) {
+            $Properties = $Output['Reports'][$Report] | Select-Properties -ExcludeProperty DisplayName, DomainName, GUID, GpoType, Linked, LinksCount, Links -AllProperties -WarningAction SilentlyContinue
+            $DisplayProperties = @(
+                'DisplayName', 'DomainName', 'GUID', 'GpoType'
+                foreach ($Property in $Properties) {
+                    $Property
+                }
+                'Linked', 'LinksCount', 'Links'
+            )
+            $Output['Reports'][$Report] = $Output['Reports'][$Report] | Select-Object -Property $DisplayProperties
+        }
+    }
+
+    $Output['PoliciesTotal'] = $Output.Reports.Policies.PolicyCategory | Group-Object | Select-Object Name, Count | Sort-Object -Property Name #-Descending
+    #$Output['PoliciesTotal'] = $Output.Reports.Policies.PolicyCategory | Group-Object | Select-Object Name, Count | Sort-Object -Property Count -Descending
+
+    if (-not $SkipCleanup) {
+        Remove-EmptyValue -Hashtable $Output -Recursive
+    }
     return $Output
     <#
     foreach ($GPO in $GPOs) {
