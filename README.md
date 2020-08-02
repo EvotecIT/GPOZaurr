@@ -39,6 +39,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.51 - 2.08.2020
+  - Updates to `Invoke-GPOZaurr` - still work in progress
+  - Added `Get-GPOZaurrSysvolDFSR`
+  - Added `Clear-GPOZaurrSysvolDFSR` (requires testing)
 - 0.0.50 - 29.07.2020
   - Updates to couple of commands
 - 0.0.49 - 23.07.2020
