@@ -4,7 +4,7 @@ Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 # Get dfsr information
 $DFSR = Get-GPOZaurrSysvolDFSR
-$DFSR | Format-Table
+$DFSR | Format-Table *
 
 # Cleanup DFSR Conflict Path
 Clear-GPOZaurrSysvolDFSR -WhatIf
