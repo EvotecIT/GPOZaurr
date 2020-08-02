@@ -3,14 +3,11 @@ function Get-GPOZaurrSysvolDFSR {
     param(
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
-        [string[]] $ExcludeDomainControllers,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
-        [alias('DomainControllers')][string[]] $IncludeDomainControllers,
-        [switch] $SkipRODC,
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [string] $SearchDFSR = 'SYSVOL Share'
     )
-    $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExcludeDomainControllers $ExcludeDomainControllers -IncludeDomainControllers $IncludeDomainControllers -SkipRODC:$SkipRODC -ExtendedForestInformation $ExtendedForestInformation
+    $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     foreach ($Domain in $ForestInformation.Domains) {
         Write-Verbose "Get-GPOZaurrSysvolDFSR - Processing $Domain"
         $QueryServer = $ForestInformation['QueryServers']["$Domain"].HostName[0]
