@@ -41,9 +41,9 @@ function ConvertTo-XMLRegistryAutologonOnReport {
         $null -ne $CreateGPO['DefaultUserName'] -or
         $null -ne $CreateGPO['DefaultPassword']
     ) {
-        $CreateGPO['Linked'] = $GPOEntry.Linked        #: True
-        $CreateGPO['LinksCount'] = $GPOEntry.LinksCount    #: 1
-        $CreateGPO['Links'] = $GPOEntry.Links         #: area1.local
+        $CreateGPO['Linked'] = $GPO.Linked        #: True
+        $CreateGPO['LinksCount'] = $GPO.LinksCount    #: 1
+        $CreateGPO['Links'] = $GPO.Links         #: area1.local
         [PSCustomObject] $CreateGPO
     }
 }
