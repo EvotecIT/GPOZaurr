@@ -17,7 +17,6 @@ function ConvertTo-XMLGenericPolicy {
     [Array] $Policies = foreach ($Cat in $Category) {
         $GPO.DataSet | Where-Object { $_.Category -like $Cat }
     }
-    #if ($GPO.DataSet.Category -like $Category) {
     if ($Policies.Count -gt 0) {
         foreach ($Policy in $Policies) {
             #if ($Policy.Category -notlike $Category) {
@@ -88,25 +87,3 @@ function ConvertTo-XMLGenericPolicy {
         #}
     }
 }
-
-<# ListBox - $Value
-Name          : Items to run at logon
-State         : Enabled
-ExplicitValue : false
-Additive      : false
-ValuePrefix   :
-Value         : Value
-
-ListBox - $Value.Value
-
-Element
--------
-Element
-
-ListBox - $Value.Value.Element
-
-Data
-----
-C:\Program Files (x86)\NetPhone Client\NetPhone Client.exe
-
-#>
