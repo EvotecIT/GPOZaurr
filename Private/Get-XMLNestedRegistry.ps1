@@ -15,6 +15,7 @@ function Get-XMLNestedRegistry {
                         Collection      = $Collection
                         Description     = $Registry.descr
                         Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
+                        Disabled        = if ($Registry.disabled -eq '1') { $true } else { $false };
                         GPOSettingOrder = [int] $Registry.GPOSettingOrder
                         Action          = $Script:Actions[$Registry.Properties.action]
                         DisplayDecimal  = if ($Registry.Properties.displayDecimal -eq '1') { $true } else { $false };
@@ -38,6 +39,7 @@ function Get-XMLNestedRegistry {
                         Collection      = $Collection
                         Description     = $Registry.descr
                         Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
+                        Disabled        = if ($Registry.disabled -eq '1') { $true } else { $false };
                         GPOSettingOrder = [int] $Registry.GPOSettingOrder
                         Action          = $Script:Actions[$Registry.Properties.action]
                         DisplayDecimal  = if ($Registry.Properties.displayDecimal -eq '1') { $true } else { $false };
@@ -66,6 +68,7 @@ function Get-XMLNestedRegistry {
                         Collection      = $Collection
                         Description     = $Registry.descr
                         Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
+                        Disabled        = if ($Registry.disabled -eq '1') { $true } else { $false };
                         GPOSettingOrder = [int] $Registry.GPOSettingOrder
                         Action          = $Script:Actions[$Registry.Properties.action]
                         DisplayDecimal  = if ($Registry.Properties.displayDecimal -eq '1') { $true } else { $false };
@@ -89,6 +92,7 @@ function Get-XMLNestedRegistry {
                         Collection      = $Collection
                         Description     = $Registry.descr
                         Changed         = try { [DateTime] $Registry.changed } catch { $Registry.changed };
+                        Disabled        = if ($Registry.disabled -eq '1') { $true } else { $false };
                         GPOSettingOrder = [int] $Registry.GPOSettingOrder
                         Action          = $Script:Actions[$Registry.Properties.action]
                         DisplayDecimal  = if ($Registry.Properties.displayDecimal -eq '1') { $true } else { $false }; ;
