@@ -2,8 +2,10 @@
     [cmdletBinding()]
     param(
         [ValidateSet('XML', 'Object')][string] $Type = 'Object',
-        [string] $ComputerName,
-        [string] $Path
+        [alias('Server')][string] $ComputerName,
+        [alias('User')][string] $UserName,
+        [string] $Path,
+        [string] $Splitter = [System.Environment]::NewLine
     )
 
     $SplatPolicy = @{
@@ -14,7 +16,7 @@
         $SplatPolicy['Computer'] = $ComputerName
     }
     if ($PSBoundParameters.ContainsKey('UserName')) {
-        $SplatPolicy['User'] = 'przemyslaw.klys'
+        $SplatPolicy['User'] = $UserName
     }
     try {
         $ResultantSetPolicy = Get-GPResultantSetOfPolicy @SplatPolicy
@@ -38,6 +40,15 @@
     if ($Type -eq 'XML') {
         $PolicyContent.Rsop
     } else {
-        ConvertFrom-XMLRSOP -Content $PolicyContent.Rsop -ComputerName $ComputerName -ResultantSetPolicy $ResultantSetPolicy
+        $Output = [ordered] @{
+            ResultantSetPolicy = $ResultantSetPolicy
+        }
+        if ($PolicyContent.Rsop.ComputerResults) {
+            $Output.ComputerResults = ConvertFrom-XMLRSOP -Content $PolicyContent.Rsop -ComputerName $ComputerName -ResultantSetPolicy $ResultantSetPolicy -ResultsType 'ComputerResults' -Splitter $Splitter
+        }
+        if ($PolicyContent.Rsop.UserResults) {
+            $Output.UserResults = ConvertFrom-XMLRSOP -Content $PolicyContent.Rsop -ComputerName $ComputerName -ResultantSetPolicy $ResultantSetPolicy -ResultsType 'UserResults' -Splitter $Splitter
+        }
+        $Output
     }
 }

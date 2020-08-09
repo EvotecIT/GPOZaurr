@@ -2,8 +2,10 @@
     [cmdletBinding()]
     param(
         [System.Xml.XmlElement]$Content,
-        $ResultantSetPolicy,
-        [string] $ComputerName
+        [string] $ResultsType,
+        [Microsoft.GroupPolicy.GPRsop] $ResultantSetPolicy,
+        [string] $ComputerName,
+        [string] $Splitter = [System.Environment]::NewLine
     )
     $GPOPrimary = [ordered] @{
         Summary            = $null
@@ -14,21 +16,22 @@
     $Object = [ordered] @{
         ComputerName       = $ComputerName
         ReadTime           = [DateTime] $Content.ReadTime
-        ComputerName1      = $Content.ComputerResults.Name
-        DomainName         = $Content.ComputerResults.Domain
-        OrganizationalUnit = $Content.ComputerResults.SOM
-        Site               = $Content.ComputerResults.Site
-        SlowLink           = if ($Content.ComputerResults.SlowLink -eq 'true') { $true } else { $false };
+        ComputerName1      = $Content.$ResultsType.Name
+        DomainName         = $Content.$ResultsType.Domain
+        OrganizationalUnit = $Content.$ResultsType.SOM
+        Site               = $Content.$ResultsType.Site
+        GPOTypes           = $Content.$ResultsType.ExtensionData.Name -join $Splitter
+        SlowLink           = if ($Content.$ResultsType.SlowLink -eq 'true') { $true } else { $false };
     }
 
     $GPOPrimary['Summary'] = $Object
-    [Array] $GPOPrimary['SecurityGroups'] = foreach ($Group in $Content.ComputerResults.SecurityGroup) {
+    [Array] $GPOPrimary['SecurityGroups'] = foreach ($Group in $Content.$ResultsType.SecurityGroup) {
         [PSCustomObject] @{
             Name = $Group.Name.'#Text'
             SID  = $Group.SID.'#Text'
         }
     }
-    [Array] $GPOPrimary['GroupPolicies'] = foreach ($GPO in $Content.ComputerResults.GPO) {
+    [Array] $GPOPrimary['GroupPolicies'] = foreach ($GPO in $Content.$ResultsType.GPO) {
         [PSCustomObject] @{
             Name             = $GPO.Name
             #Path             = $GPO.Path
@@ -43,21 +46,32 @@
         }
     }
 
-    $GPOPrimary['SummaryDetails'] = [Ordered] @{
-        ActivityId                      = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.ActivityId                      # : {6400d0bf-ac88-4ee6-b2c2-ca2cbbab0695}
-        ProcessingTrigger               = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.ProcessingTrigger               # : Periodic
-        ProcessingAppMode               = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.ProcessingAppMode               # : Background
-        LinkSpeedInKbps                 = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.LinkSpeedInKbps                 # : 0
-        SlowLinkThresholdInKbps         = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.SlowLinkThresholdInKbps         # : 500
-        DomainControllerName            = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.DomainControllerName            # : AD1.ad.evotec.xyz
-        DomainControllerIPAddress       = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.DomainControllerIPAddress       # : 192.168.240.189
-        PolicyProcessingMode            = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.PolicyProcessingMode            # : None
-        PolicyElapsedTimeInMilliseconds = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.PolicyElapsedTimeInMilliseconds # : 1202
-        ErrorCount                      = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.ErrorCount                      # : 0
-        WarningCount                    = $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.WarningCount                    # : 0
+    [Array] $GPOPrimary['ScopeOfManagement'] = foreach ($SOM in $Content.$ResultsType.SearchedSOM) {
+        [PSCustomObject] @{
+            Path              = $SOM.Path
+            Type              = $SOM.Type
+            Order             = $SOM.Order
+            BlocksInheritance = if ($SOM.BlocksInheritance -eq 'true') { $true } else { $false };
+            Blocked           = if ($SOM.Blocked -eq 'true') { $true } else { $false };
+            Reason            = if ($SOM.Reason -eq 'true') { $true } else { $false };
+        }
     }
 
-    [Array] $GPOPrimary['ProcessingTime'] = foreach ($Details in $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.ExtensionProcessingTime) {
+    $GPOPrimary['SummaryDetails'] = [Ordered] @{
+        ActivityId                      = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.ActivityId                      # : {6400d0bf-ac88-4ee6-b2c2-ca2cbbab0695}
+        ProcessingTrigger               = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.ProcessingTrigger               # : Periodic
+        ProcessingAppMode               = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.ProcessingAppMode               # : Background
+        LinkSpeedInKbps                 = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.LinkSpeedInKbps                 # : 0
+        SlowLinkThresholdInKbps         = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.SlowLinkThresholdInKbps         # : 500
+        DomainControllerName            = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.DomainControllerName            # : AD1.ad.evotec.xyz
+        DomainControllerIPAddress       = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.DomainControllerIPAddress       # : 192.168.240.189
+        PolicyProcessingMode            = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.PolicyProcessingMode            # : None
+        PolicyElapsedTimeInMilliseconds = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.PolicyElapsedTimeInMilliseconds # : 1202
+        ErrorCount                      = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.ErrorCount                      # : 0
+        WarningCount                    = $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.WarningCount                    # : 0
+    }
+
+    [Array] $GPOPrimary['ProcessingTime'] = foreach ($Details in $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.ExtensionProcessingTime) {
         [PSCustomObject] @{
             ExtensionName             = $Details.ExtensionName
             ExtensionGuid             = $Details.ExtensionGuid
@@ -65,7 +79,19 @@
             ProcessedTimeStamp        = $Details.ProcessedTimeStamp
         }
     }
-    [Array] $GPOPrimary['Events'] = foreach ($Event in $Content.ComputerResults.EventsDetails.SinglePassEventsDetails.EventRecord) {
+    [Array] $GPOPrimary['ExtensionStatus'] = foreach ($Details in $Content.$ResultsType.ExtensionStatus) {
+        [PSCustomObject] @{
+            Name          = $Details.Name          # : Registry
+            Identifier    = $Details.Identifier    # : {35378EAC-683F-11D2-A89A-00C04FBBCFA2}
+            BeginTime     = $Details.BeginTime     # : 2020-04-02T12:05:10
+            EndTime       = $Details.EndTime       # : 2020-04-02T12:05:10
+            LoggingStatus = $Details.LoggingStatus # : Complete
+            Error         = $Details.Error         # : 0
+        }
+    }
+    [Array] $GPOPrimary['ExtensionData'] = $Content.$ResultsType.ExtensionData.Extension
+
+    [Array] $GPOPrimary['Events'] = foreach ($Event in $Content.$ResultsType.EventsDetails.SinglePassEventsDetails.EventRecord) {
         [xml] $EventDetails = $Event.EventXML
         $EventInformation = [ordered] @{
             Description   = $Event.EventDescription
