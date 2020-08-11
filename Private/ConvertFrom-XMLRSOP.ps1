@@ -20,7 +20,7 @@
         DomainName         = $Content.$ResultsType.Domain
         OrganizationalUnit = $Content.$ResultsType.SOM
         Site               = $Content.$ResultsType.Site
-        GPOTypes           = $Content.$ResultsType.ExtensionData.Name -join $Splitter
+        GPOTypes           = $Content.$ResultsType.ExtensionData.Name.'#text' -join $Splitter
         SlowLink           = if ($Content.$ResultsType.SlowLink -eq 'true') { $true } else { $false };
     }
 
