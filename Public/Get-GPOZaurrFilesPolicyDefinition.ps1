@@ -1,4 +1,5 @@
-function Get-GPOZaurrFilesPolicyDefinitions {
+function Get-GPOZaurrFilesPolicyDefinition {
+    [alias('Get-GPOZaurrFilesPolicyDefinitions')]
     [cmdletbinding()]
     param(
         [alias('ForestName')][string] $Forest,
@@ -55,7 +56,7 @@ function Get-GPOZaurrFilesPolicyDefinitions {
                     if ($FilesCache[$Domain][$FileLanguage.BaseName]) {
                         $FilesCache[$Domain][$FileLanguage.BaseName][$Directory.Name] = $true
                     } else {
-                        #Write-Warning "Get-GPOZaurrFilesPolicyDefinitions - File $($FileLanguage.FullName) doesn't have a match."
+                        #Write-Warning "Get-GPOZaurrFilesPolicyDefinition - File $($FileLanguage.FullName) doesn't have a match."
                         $Output.FilesToDelete.Add(
                             [PSCustomobject] @{
                                 Name           = $FileLanguage.BaseName
