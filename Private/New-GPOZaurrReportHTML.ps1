@@ -13,9 +13,9 @@ function New-GPOZaurrReportHTML {
         $Path = [io.path]::GetTempFileName().Replace('.tmp', ".html")
     }
     $ComputerName = $($Support.ResultantSetPolicy.LoggingComputer)
-    $UserName = $($Support.ResultantSetPolicy.UserName)
-    $LoggingMode = $($Support.ResultantSetPolicy.LoggingMode)
-    New-HTML -TitleText "Group Policy Report - $ComputerName / $UserName / $LoggingMode" {
+    #$UserName = $($Support.ResultantSetPolicy.UserName)
+    #$LoggingMode = $($Support.ResultantSetPolicy.LoggingMode)
+    New-HTML -TitleText "Group Policy Report - $ComputerName" {
         #New-HTMLTabOptions -SlimTabs -Transition -LinearGradient -SelectorColor Akaroa
         New-HTMLTabOptions -SlimTabs `
             -BorderBottomStyleActive solid -BorderBottomColorActive LightSkyBlue -BackgroundColorActive none `
@@ -56,6 +56,9 @@ function New-GPOZaurrReportHTML {
                     }
                     New-HTMLSection -HeaderText 'Group Policies' {
                         New-HTMLTable -DataTable $Support.$Key.GroupPolicies -Filtering
+                    }
+                    New-HTMLSection -HeaderText 'Group Policies Links' {
+                        New-HTMLTable -DataTable $Support.$Key.GroupPoliciesLinks -Filtering
                     }
                     New-HTMLSection -HeaderText 'Group Policies Applied' {
                         New-HTMLTable -DataTable $Support.$Key.GroupPoliciesApplied -Filtering
