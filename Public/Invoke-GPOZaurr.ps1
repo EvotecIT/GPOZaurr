@@ -192,13 +192,15 @@
     # to make sure all objects are having same (even empty) properties we "normalize" it
     if (-not $SkipNormalize) {
         foreach ($Report in [string[]] $Output['Reports'].Keys) {
-            $Properties = $Output['Reports'][$Report] | Select-Properties -ExcludeProperty DisplayName, DomainName, GUID, GpoType, Linked, LinksCount, Links -AllProperties -WarningAction SilentlyContinue
+            $FirstProperties = 'DisplayName', 'DomainName', 'GUID', 'GpoType'
+            $EndProperties = 'CreatedTime', 'ModifiedTime', 'ReadTime', 'Filters', 'Linked', 'LinksCount', 'Links'
+            $Properties = $Output['Reports'][$Report] | Select-Properties -ExcludeProperty $EndProperties -AllProperties -WarningAction SilentlyContinue
             $DisplayProperties = @(
-                'DisplayName', 'DomainName', 'GUID', 'GpoType'
+                $FirstProperties
                 foreach ($Property in $Properties) {
                     $Property
                 }
-                'Linked', 'LinksCount', 'Links'
+                $EndProperties
             )
             $Output['Reports'][$Report] = $Output['Reports'][$Report] | Select-Object -Property $DisplayProperties
         }
