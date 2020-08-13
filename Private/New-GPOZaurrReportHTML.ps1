@@ -38,7 +38,10 @@ function New-GPOZaurrReportHTML {
                             New-HTMLTable -DataTable $Support.$Key.SecurityGroups -Filtering -PagingOptions @(7, 14)
                         }
                     }
-                    New-HTMLSection -HeaderText 'Part of Security Groups' {
+                    New-HTMLSection -HeaderText 'Summary Downloads' {
+                        New-HTMLTable -DataTable $Support.$Key.SummaryDownload -HideFooter
+                    }
+                    New-HTMLSection -HeaderText 'Resultant Set Policy' {
                         New-HTMLTable -DataTable $Support.$Key.ResultantSetPolicy -HideFooter
                     }
                 }
@@ -61,8 +64,8 @@ function New-GPOZaurrReportHTML {
                         New-HTMLTable -DataTable $Support.$Key.GroupPoliciesDenied -Filtering
                     }
                 }
-                New-HTMLTab -Name 'ExtensionData' {
-                    New-HTMLSection -HeaderText 'ExtensionData' {
+                New-HTMLTab -Name 'Extension Data' {
+                    New-HTMLSection -HeaderText 'Extension Data' {
                         New-HTMLTable -DataTable $Support.$Key.ExtensionData -Filtering
                     }
                 }

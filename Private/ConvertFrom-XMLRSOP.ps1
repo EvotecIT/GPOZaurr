@@ -158,14 +158,19 @@
         if ($GPOPrimary['EventsByID']['5312']) {
             [xml] $GPODetailsApplied = -join ('<Details>', $GPOPrimary['EventsByID']['5312'].GPOinfoList, '</Details>')
             foreach ($GPO in $GPODetailsApplied.Details.GPO) {
-                [PSCustomObject] @{
+                $ReturnObject = [ordered] @{
                     GUID        = $GPO.ID         # : { 4E1F9C70-1DDB-4AB6-BBA3-14A8E07F0B4B }
                     DisplayName = $GPO.Name       # : DC | Event Log Settings
                     Version     = $GPO.Version    # : 851981
                     Link        = $GPO.SOM        # : LDAP: / / OU = Domain Controllers, DC = ad, DC = evotec, DC = xyz
                     SysvolPath  = $GPO.FSPath     # : \\ad.evotec.xyz\SysVol\ad.evotec.xyz\Policies\ { 4E1F9C70-1DDB-4AB6-BBA3-14A8E07F0B4B }\Machine
-                    GPOTypes    = $GPO.Extensions -join '; ' # : [ { 35378EAC-683F-11D2-A89A-00C04FBBCFA2 } { D02B1F72 - 3407 - 48AE-BA88-E8213C6761F1 }]
+                    #GPOTypes    = $GPO.Extensions -join '; ' # : [ { 35378EAC-683F-11D2-A89A-00C04FBBCFA2 } { D02B1F72 - 3407 - 48AE-BA88-E8213C6761F1 }]
                 }
+                $TranslatedExtensions = foreach ($Extension in $GPO.Extensions) {
+                    ConvertFrom-CSExtension -CSE $Extension -Limited
+                }
+                $ReturnObject['GPOTypes'] = $TranslatedExtensions -join '; '
+                [PSCustomObject] $ReturnObject
             }
         }
     }
@@ -179,7 +184,7 @@
                     Version     = $GPO.Version #: 131074
                     Link        = $GPO.SOM     #: LDAP: / / OU = Domain Controllers, DC = ad, DC = evotec, DC = xyz
                     SysvolPath  = $GPO.FSPath  #: \\ad.evotec.xyz\sysvol\ad.evotec.xyz\Policies\ { 6AC1786C-016F-11D2-945F-00C04fB984F9 }\Machine
-                    GPOTypes    = $EventsReason["$($GPO.Reason)"]  #: DENIED-WMIFILTER
+                    Reason      = $EventsReason["$($GPO.Reason)"]  #: DENIED-WMIFILTER
                 }
             }
         }
@@ -188,70 +193,14 @@
     $GPOPrimary['SummaryDownload'] = & {
         if ($GPOPrimary['EventsByID']['5126']) {
             [PSCustomObject] @{
-                IsBackgroundProcessing               = $GPOPrimary['EventsByID']['5126'].IsBackgroundProcessing               # : true
-                IsAsyncProcessing                    = $GPOPrimary['EventsByID']['5126'].IsAsyncProcessing                    # : false
-                NumberOfGPOsDownloaded               = $GPOPrimary['EventsByID']['5126'].NumberOfGPOsDownloaded               # : 7
-                NumberOfGPOsApplicable               = $GPOPrimary['EventsByID']['5126'].NumberOfGPOsApplicable               # : 6
-                GPODownloadTimeElapsedInMilliseconds = $GPOPrimary['EventsByID']['5126'].GPODownloadTimeElapsedInMilliseconds # : 375
+                IsBackgroundProcessing  = if ($GPOPrimary['EventsByID']['5126'].IsBackgroundProcessing -eq 'true') { $true } else { $false }; # : true
+                IsAsyncProcessing       = if ($GPOPrimary['EventsByID']['5126'].IsAsyncProcessing -eq 'true') { $true } else { $false }; # : false
+                Downloaded              = $GPOPrimary['EventsByID']['5126'].NumberOfGPOsDownloaded               # : 7
+                Applicable              = $GPOPrimary['EventsByID']['5126'].NumberOfGPOsApplicable               # : 6
+                DownloadTimeMiliseconds = $GPOPrimary['EventsByID']['5126'].GPODownloadTimeElapsedInMilliseconds # : 375
             }
 
         }
     }
     $GPOPrimary
 }
-
-
-<#
-Description                          : Group Policy successfully got applicable GPOs from the domain controller.
-Provider                             : Microsoft-Windows-GroupPolicy
-ProviderGUID                         : {aea1b4fa-97d1-45f2-a64c-4d69fffd92c9}
-EventID                              : 5126
-Computer                             : AD1.ad.evotec.xyz
-IsBackgroundProcessing               : true
-IsAsyncProcessing                    : false
-NumberOfGPOsDownloaded               : 7
-NumberOfGPOsApplicable               : 6
-GPODownloadTimeElapsedInMilliseconds : 375
-#>
-
-<#
-Description       : List of applicable Group Policy objects:
-
-                    ALL | Certificates
-                    New Group Policy Object
-                    COMPUTERS | Enable Sets
-                    Default Domain Policy
-                    DC | Event Log Audit Rules
-                    DC | Event Log Settings
-
-Provider          : Microsoft-Windows-GroupPolicy
-ProviderGUID      : {aea1b4fa-97d1-45f2-a64c-4d69fffd92c9}
-EventID           : 5312
-Version           : 0
-Level             : 4
-Task              : 0
-Opcode            : 0
-Keywords          : 0x4000000000000000
-TimeCreated       : 12.08.2020 14:07:07
-EventRecordID     : 10675722
-Correlation       : {c2ca0749-6bb7-474e-8ff5-372d18279493}
-Execution         : ProcessID: 1368 ThreadID: 3720
-Channel           : Microsoft-Windows-GroupPolicy/Operational
-Computer          : AD1.ad.evotec.xyz
-Security          : S-1-5-18
-DescriptionString : ALL | Certificates
-                    New Group Policy Object
-                    COMPUTERS | Enable Sets
-                    Default Domain Policy
-                    DC | Event Log Audit Rules
-                    DC | Event Log Settings
-
-GPOInfoList       : <GPO ID="{2C7652BB-C1A1-42C1-BBA6-D620A70E0356}"><Name>ALL | Certificates</Name><Version>131074</Version><SOM>LDAP://DC=ad,DC=evotec,DC=xyz</SOM><FSPath>\\ad.evotec.xyz\SysVol\ad.evotec.xyz\Policies\{2C7652BB-C1A1-42C1-BBA6-D620A70E0356}\Machine</FSPath><Extensions>[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{53D6AB1D-2488-11D1-A28C-00C04FB94F17}][{
-                    B1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}{53D6AB1D-2488-11D1-A28C-00C04FB94F17}]</Extensions></GPO><GPO ID="{8A7BC515-D7FD-4D1F-90B8-E47C15F89295}"><Name>New Group Policy Object</Name><Version>65537</Version><SOM>LDAP://DC=ad,DC=evotec,DC=xyz</SOM><FSPath>\\ad.evotec.xyz\SysVol\ad.evotec.xyz\Policies\{8A7BC515-D7FD-4D1F-90B8-E47C15F89295}\Machine</
-                    FSPath><Extensions>[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]</Extensions></GPO><GPO ID="{64AD41CA-BF07-4DB3-BFC0-20F9999ADAD6}"><Name>COMPUTERS | Enable Sets</Name><Version>65537</Version><SOM>LDAP://DC=ad,DC=evotec,DC=xyz</SOM><FSPath>\\ad.evotec.xyz\SysVol\ad.evotec.xyz\Policies\{64AD41CA-BF07-4DB3-BFC0-20
-                    F9999ADAD6}\Machine</FSPath><Extensions>[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]</Extensions></GPO><GPO ID="{31B2F340-016D-11D2-945F-00C04FB984F9}"><Name>Default Domain Policy</Name><Version>2293795</Version><SOM>LDAP://DC=ad,DC=evotec,DC=xyz</SOM><FSPath>\\ad.evotec.xyz\sysvol\ad.evotec.xyz\Policies\{31B2F
-                    340-016D-11D2-945F-00C04FB984F9}\Machine</FSPath><Extensions>[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{53D6AB1B-2488-11D1-A28C-00C04FB94F17}][{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0D0-00A0C90F574B}][{B1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}{53D6AB1B-2488-11D1-A28C-00C04FB94F17}]</Extensions></GPO><GPO ID="{55FB3860-74C9-4262-AD7
-                    7-30197EAB9999}"><Name>DC | Event Log Audit Rules</Name><Version>655370</Version><SOM>LDAP://OU=Domain Controllers,DC=ad,DC=evotec,DC=xyz</SOM><FSPath>\\ad.evotec.xyz\SysVol\ad.evotec.xyz\Policies\{55FB3860-74C9-4262-AD77-30197EAB9999}\Machine</FSPath><Extensions>[{F3CCC681-B74C-4060-9F26-CD84525DCA2A}{0F3F3735-573D-9804-99E4-AB2A69BA5FD4}]</Ex
-                    tensions></GPO><GPO ID="{4E1F9C70-1DDB-4AB6-BBA3-14A8E07F0B4B}"><Name>DC | Event Log Settings</Name><Version>851981</Version><SOM>LDAP://OU=Domain Controllers,DC=ad,DC=evotec,DC=xyz</SOM><FSPath>\\ad.evotec.xyz\SysVol\ad.evotec.xyz\Policies\{4E1F9C70-1DDB-4AB6-BBA3-14A8E07F0B4B}\Machine</FSPath><Extensions>[{35378EAC-683F-11D2-A89A-00C04FBBCFA2
-                    }{D02B1F72-3407-48AE-BA88-E8213C6761F1}]</Extensions></GPO>
-#>
