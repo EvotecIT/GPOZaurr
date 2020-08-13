@@ -1,7 +1,8 @@
 function ConvertFrom-CSExtension {
     [cmdletBinding()]
     param(
-        [string] $CSE
+        [string[]] $CSE,
+        [switch] $Limited
     )
     $GUIDs = @{
         # https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpreg/f0dba6b8-704f-45d5-999f-1a0a694a6df9
@@ -70,9 +71,19 @@ function ConvertFrom-CSExtension {
         '{B1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}' = 'EFS Recovery'
         '{A2E30F80-D7DE-11d2-BBDE-00C04F86AE3B}' = 'Internet Explorer Settings'
     }
-    if ($GUIDs[$CSE]) {
-        return $GUIDs[$CSE]
-    } else {
-        return $CSE
+    foreach ($C in $CSE) {
+        if (-not $Limited) {
+            if ($GUIDs[$C]) {
+                [PSCustomObject] @{ Name = $C; Description = $GUIDs[$C] }
+            } else {
+                [PSCustomObject] @{ Name = $C; Description = $C }
+            }
+        } else {
+            if ($GUIDs[$C]) {
+                $GUIDs[$C]
+            } else {
+                $CSE
+            }
+        }
     }
 }
