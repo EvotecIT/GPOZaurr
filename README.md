@@ -43,6 +43,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
   - Added `Invoke-GPOZaurrSupport` (WIP)
   - Added `ConvertFrom-CSExtension`
   - Added `Find-CSExtension`
+  - Added `Get-GPOZaurrInheritance`
 - 0.0.51 - 2.08.2020
   - Updates to `Invoke-GPOZaurr` - still work in progress
   - Added `Get-GPOZaurrSysvolDFSR`
