@@ -194,7 +194,7 @@
         foreach ($Report in [string[]] $Output['Reports'].Keys) {
             $FirstProperties = 'DisplayName', 'DomainName', 'GUID', 'GpoType'
             $EndProperties = 'CreatedTime', 'ModifiedTime', 'ReadTime', 'Filters', 'Linked', 'LinksCount', 'Links'
-            $Properties = $Output['Reports'][$Report] | Select-Properties -ExcludeProperty $EndProperties -AllProperties -WarningAction SilentlyContinue
+            $Properties = $Output['Reports'][$Report] | Select-Properties -ExcludeProperty ($FirstProperties + $EndProperties) -AllProperties -WarningAction SilentlyContinue
             $DisplayProperties = @(
                 $FirstProperties
                 foreach ($Property in $Properties) {
