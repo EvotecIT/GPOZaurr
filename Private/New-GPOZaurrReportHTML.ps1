@@ -38,18 +38,22 @@ function New-GPOZaurrReportHTML {
                             New-HTMLTable -DataTable $Support.$Key.SecurityGroups -Filtering -PagingOptions @(7, 14)
                         }
                     }
+                    <#
                     New-HTMLSection -HeaderText 'Summary Downloads' {
                         New-HTMLTable -DataTable $Support.$Key.SummaryDownload -HideFooter
                     }
+                    #>
                     New-HTMLSection -HeaderText 'Resultant Set Policy' {
                         New-HTMLTable -DataTable $Support.$Key.ResultantSetPolicy -HideFooter
                     }
                 }
                 New-HTMLTab -Name 'Group Policies' {
                     New-HTMLSection -Invisible {
+                        <#
                         New-HTMLSection -HeaderText 'Processing Time' {
                             New-HTMLTable -DataTable $Support.$Key.ProcessingTime -Filtering
                         }
+                        #>
                         New-HTMLSection -HeaderText 'ExtensionStatus' {
                             New-HTMLTable -DataTable $Support.$Key.ExtensionStatus -Filtering
                         }
@@ -60,12 +64,14 @@ function New-GPOZaurrReportHTML {
                     New-HTMLSection -HeaderText 'Group Policies Links' {
                         New-HTMLTable -DataTable $Support.$Key.GroupPoliciesLinks -Filtering
                     }
+                    <#
                     New-HTMLSection -HeaderText 'Group Policies Applied' {
                         New-HTMLTable -DataTable $Support.$Key.GroupPoliciesApplied -Filtering
                     }
                     New-HTMLSection -HeaderText 'Group Policies Denied' {
                         New-HTMLTable -DataTable $Support.$Key.GroupPoliciesDenied -Filtering
                     }
+                    #>
                 }
                 New-HTMLTab -Name 'Extension Data' {
                     New-HTMLSection -HeaderText 'Extension Data' {
@@ -77,6 +83,7 @@ function New-GPOZaurrReportHTML {
                         New-HTMLTable -DataTable $Support.$Key.ScopeOfManagement -Filtering
                     }
                 }
+                <#
                 New-HTMLTab -Name 'Events By ID' {
                     foreach ($ID in $Support.$Key.EventsByID.Keys) {
                         New-HTMLSection -HeaderText "Event ID $ID" {
@@ -87,6 +94,42 @@ function New-GPOZaurrReportHTML {
                 New-HTMLTab -Name 'Events' {
                     New-HTMLSection -HeaderText 'Events' {
                         New-HTMLTable -DataTable $Support.$Key.Events -Filtering -AllProperties
+                    }
+                }
+                #>
+            }
+        }
+        if ($Support.ComputerResults.Results) {
+            New-HTMLTab -Name 'Details' {
+                foreach ($Detail in $Support.ComputerResults.Results.Keys) {
+                    $ShortDetails = $Support.ComputerResults.Results[$Detail]
+                    New-HTMLTab -Name $Detail {
+                        New-HTMLTab -Name 'Test' {
+                            New-HTMLSection -HeaderText 'Summary Downloads' {
+                                New-HTMLTable -DataTable $ShortDetails.SummaryDownload -HideFooter
+                            }
+                            New-HTMLSection -HeaderText 'Processing Time' {
+                                New-HTMLTable -DataTable $ShortDetails.ProcessingTime -Filtering
+                            }
+                            New-HTMLSection -HeaderText 'Group Policies Applied' {
+                                New-HTMLTable -DataTable $ShortDetails.GroupPoliciesApplied -Filtering
+                            }
+                            New-HTMLSection -HeaderText 'Group Policies Denied' {
+                                New-HTMLTable -DataTable $ShortDetails.GroupPoliciesDenied -Filtering
+                            }
+                        }
+                        New-HTMLTab -Name 'Events By ID' {
+                            foreach ($ID in $ShortDetails.EventsByID.Keys) {
+                                New-HTMLSection -HeaderText "Event ID $ID" {
+                                    New-HTMLTable -DataTable $ShortDetails.EventsByID[$ID] -Filtering -AllProperties
+                                }
+                            }
+                        }
+                        New-HTMLTab -Name 'Events' {
+                            New-HTMLSection -HeaderText 'Events' {
+                                New-HTMLTable -DataTable $ShortDetails.Events -Filtering -AllProperties
+                            }
+                        }
                     }
                 }
             }
