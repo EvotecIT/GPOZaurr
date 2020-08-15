@@ -8,7 +8,7 @@
     )
     $GPOPrimary = [ordered] @{
         Summary              = $null
-        SummaryDetails       = $null
+        SummaryDetails       = [System.Collections.Generic.List[PSCustomObject]]::new()
         SummaryDownload      = $null
         ResultantSetPolicy   = $ResultantSetPolicy
 
@@ -37,24 +37,43 @@
         }
     }
     [Array] $GPOPrimary['GroupPolicies'] = foreach ($GPO in $Content.$ResultsType.GPO) {
-        [PSCustomObject] @{
+
+        <#
+        $EventsReason = @{
+            'NOTAPPLIED-EMPTY' = 'Not Applied (Empty)'
+            'DENIED-WMIFILTER' = 'Denied (WMI Filter)'
+            'DENIED-SECURITY'  = 'Denied (Security)'
+        }
+        #>
+        # Lets translate CSE extensions as some didn't translate automatically
+        $ExtensionName = $GPO.ExtensionName | ForEach-Object {
+            ConvertFrom-CSExtension -CSE $_ -Limited
+        }
+        $GPOObject = [PSCustomObject] @{
             Name           = $GPO.Name
             #Path             = $GPO.Path
             GUID           = $GPO.Path.Identifier.'#text'
-            DomainName     = $GPO.Path.Domain.'#text'
+            DomainName     = if ($GPO.Path.Domain.'#text') { $GPO.Path.Domain.'#text' } else { 'Local Policy' };
             #VersionDirectory = $GPO.VersionDirectory
             #VersionSysvol    = $GPO.VersionSysvol
             Revision       = -join ('AD (', $GPO.VersionDirectory, '), SYSVOL (', $GPO.VersionSysvol, ')')
             IsValid        = if ($GPO.IsValid -eq 'true') { $true } else { $false };
-            Status         = if ($GPO.FilterAllowed -eq 'true' -and $GPO.AccessDenied -eq 'false') { 'Applied' } else { 'Denied' }
+            Status         = if ($GPO.FilterAllowed -eq 'true' -and $GPO.AccessDenied -eq 'false') { 'Applied' } else { 'Denied' };
             FilterAllowed  = if ($GPO.FilterAllowed -eq 'true') { $true } else { $false };
             AccessAllowed  = if ($GPO.AccessDenied -eq 'true') { $false } else { $true };
-            FilterId       = $GPO.FilterID #   : MSFT_SomFilter.ID="{ff08bc72-dae6-4890-b4cf-85a9c3b00056}",Domain="ad.evotec.xyz"
             FilterName     = $GPO.FilterName  # : Test
+            ExtensionName  = ($ExtensionName | Sort-Object -Unique) -join '; '
+            # This isn't really pretty for large amount of links but can be useful for assesing things
+            SOMOrder       = $GPO.Link.SOMOrder -join '; '
+            AppliedOrder   = $GPO.Link.AppliedOrder -join '; '
+            LinkOrder      = $GPO.Link.LinkOrder -join '; '
+            Enabled        = ($GPO.Link.Enabled | ForEach-Object { if ($_ -eq 'true') { $true } else { $false }; }) -join '; '
+            Enforced       = ($GPO.Link.NoOverride | ForEach-Object { if ($_ -eq 'true') { $true } else { $false }; }) -join '; ' # : true
             SecurityFilter = $GPO.SecurityFilter -join '; ' # SecurityFilter   : {NT AUTHORITY\Authenticated Users, EVOTEC\GDS-TestGroup3}
-            Link           = $GPO.Link
-            ExtensionName  = $GPO.ExtensionName -join '; '
+            FilterId       = $GPO.FilterID #   : MSFT_SomFilter.ID="{ff08bc72-dae6-4890-b4cf-85a9c3b00056}",Domain="ad.evotec.xyz"
+            Links          = $GPO.Link.SOMPath -join '; '
         }
+        $GPOObject
     }
     [Array] $GPOPrimary['GroupPoliciesLinks'] = foreach ($GPO in $Content.$ResultsType.GPO) {
         foreach ($Link in $GPO.Link) {
@@ -67,7 +86,7 @@
                 AppliedOrder = $Link.AppliedOrder # : 0
                 LinkOrder    = $Link.LinkOrder    # : 4
                 Enabled      = if ($Link.Enabled -eq 'true') { $true } else { $false }; # : true
-                NoOverride   = if ($Link.NoOverride -eq 'true') { $true } else { $false }; # : true
+                Enforced     = if ($Link.NoOverride -eq 'true') { $true } else { $false }; # : true
             }
         }
     }
@@ -97,6 +116,7 @@
 
     foreach ($Single in $Content.$ResultsType.EventsDetails.SinglePassEventsDetails) {
         $GPOPrimary['Results']["$($Single.ActivityId)"] = [ordered] @{}
+
         $GPOPrimary['Results']["$($Single.ActivityId)"]['SummaryDetails'] = [Ordered] @{
             ActivityId                      = $Single.ActivityId                      # : {6400d0bf-ac88-4ee6-b2c2-ca2cbbab0695}
             ProcessingTrigger               = $Single.ProcessingTrigger               # : Periodic
@@ -110,6 +130,8 @@
             ErrorCount                      = $Single.ErrorCount                      # : 0
             WarningCount                    = $Single.WarningCount                    # : 0
         }
+
+        $GPOPrimary['SummaryDetails'].Add([PSCustomObject] $GPOPrimary['Results']["$($Single.ActivityId)"]['SummaryDetails'])
 
         [Array] $GPOPrimary['Results']["$($Single.ActivityId)"]['ProcessingTime'] = foreach ($Details in $Single.ExtensionProcessingTime) {
             [PSCustomObject] @{
