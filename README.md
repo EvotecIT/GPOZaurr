@@ -21,6 +21,16 @@
 
 ## To install
 
+GPOZaurr requires `RSAT` installed to provide results. If you don't have them you can install them as below. Keep in mind it also installs GUI tools so it shouldn't be installed on user workstations.
+
+```powershell
+# Windows 10 Latest
+Add-WindowsCapability -Online -Name 'Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0'
+Add-WindowsCapability -Online -Name 'Rsat.GroupPolicy.Management.Tools~~~~0.0.1.0'
+```
+
+Finally just install module:
+
 ```powershell
 Install-Module -Name GPOZaurr -AllowClobber -Force
 ```
