@@ -6,10 +6,11 @@
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
-        [System.Collections.IDictionary] $ExtendedForestInformation
+        [System.Collections.IDictionary] $ExtendedForestInformation,
+        [switch] $AsHashtable
     )
+    $Dictionary = [ordered] @{}
     $wmiFilterAttr = 'msWMI-Name', 'msWMI-Parm1', 'msWMI-Parm2', 'msWMI-Author', 'msWMI-ID', 'CanonicalName', 'Created', 'Modified'
-
     $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     foreach ($Domain in $ForestInformation.Domains) {
         $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
@@ -52,7 +53,7 @@
                     -join ($WMI[$i + 5], ';' , $WMI[$i + 6])
                 }
             }
-            [PSCustomObject] @{
+            $WMIObject = [PSCustomObject] @{
                 DisplayName       = $_.'msWMI-Name'
                 Description       = $_.'msWMI-Parm1'
                 DomainName        = $Domain
@@ -68,8 +69,16 @@
                 CanonicalName     = $_.CanonicalName
                 DistinguishedName = $_.'DistinguishedName'
             }
+            if (-not $AsHashtable) {
+                $WMIObject
+            } else {
+                $Dictionary[$WMIObject.ID] = $WMIObject
+            }
         }
 
+    }
+    if ($AsHashtable) {
+        $Dictionary
     }
 }
 <#

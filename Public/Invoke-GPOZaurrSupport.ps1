@@ -52,13 +52,14 @@
     }
     try {
         #Write-Verbose "Request-GPOZaurr - ComputerName: $($SplatPolicy['Computer']) UserName: $($SplatPolicy['User'])"
-        $ResultantSetPolicy = Get-GPResultantSetOfPolicy @SplatPolicy
+        $ResultantSetPolicy = Get-GPResultantSetOfPolicy @SplatPolicy -ErrorAction Stop
     } catch {
         if ($_.Exception.Message -eq 'Exception from HRESULT: 0x80041003') {
             Write-Warning "Request-GPOZaurr - Are you running as admin? $($_.Exception.Message)"
             return
         } else {
-            Write-Warning "Request-GPOZaurr - Error: $($_.Exception.Message)"
+            $ErrorMessage = $($_.Exception.Message).Replace([Environment]::NewLine, ' ')
+            Write-Warning "Request-GPOZaurr - Error: $ErrorMessage"
             return
         }
     }
@@ -100,9 +101,11 @@
         if ($PolicyContent.Rsop.UserResults) {
             $Output.UserResults = ConvertFrom-XMLRSOP -Content $PolicyContent.Rsop -ResultantSetPolicy $ResultantSetPolicy -ResultsType 'UserResults' -Splitter $Splitter
         }
-        if ($Type -eq 'Object') {
+
+        New-GPOZaurrReportConsole -Results $Output
+        if ($Type -contains 'Object') {
             $Output
-        } elseif ($Type -eq 'HTML') {
+        } elseif ($Type -contains 'HTML') {
             New-GPOZaurrReportHTML -Path $Path -Offline:$Offline -Open:(-not $PreventShow) -Support $Output
         }
     }
