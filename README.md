@@ -55,9 +55,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
   - Added `Find-CSExtension`
   - Added `Get-GPOZaurrInheritance`
 - 0.0.53 - 16.08.2020
-  - Missing few functions
+  - Bad release
 - 0.0.52 - 16.08.2020
-  - Missing few functions
+  - Bad release
 - 0.0.51 - 2.08.2020
   - Updates to `Invoke-GPOZaurr` - still work in progress
   - Added `Get-GPOZaurrSysvolDFSR`
