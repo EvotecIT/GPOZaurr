@@ -6,12 +6,6 @@ function ConvertTo-XMLGenericPublicKey {
     )
 
     $SkipNames = ('Name', 'LocalName', 'NamespaceURI', 'Prefix', 'NodeType', 'ParentNode', 'OwnerDocument', 'IsEmpty', 'Attributes', 'HasAttributes', 'SchemaInfo', 'InnerXml', 'InnerText', 'NextSibling', 'PreviousSibling', 'ChildNodes', 'FirstChild', 'LastChild', 'HasChildNodes', 'IsReadOnly', 'OuterXml', 'BaseURI', 'PreviousText')
-    <#
-    $UsedNames = [System.Collections.Generic.List[string]]::new()
-    [Array] $Settings = foreach ($Cat in $Category) {
-        $GPO.DataSet | Where-Object { $null -ne $_.$Cat }
-    }
-    #>
     foreach ($Setting in $GPO.DataSet) {
         $CreateGPO = [ordered]@{
             DisplayName = $GPO.DisplayName
@@ -28,8 +22,6 @@ function ConvertTo-XMLGenericPublicKey {
         $CreateGPO['SecurityDescriptor'] = $GPO.SecurityDescriptor  # : SecurityDescriptor
         $CreateGPO['FilterDataAvailable'] = $GPO.FilterDataAvailable # : True
 
-
-        #$Divider = $SettingName[0]
         $Name = $SettingName[1]
         #$Name = Format-ToTitleCase -Text $Setting.Name -RemoveWhiteSpace -RemoveChar ',', '-', "'", '\(', '\)', ':'
         $CreateGPO['Name'] = $Name # $Setting.Name
@@ -37,6 +29,8 @@ function ConvertTo-XMLGenericPublicKey {
 
         #foreach ($Property in ($Setting.Properties | Get-Member -MemberType Properties).Name) {
 
+        ConvertTo-XMLNested -CreateGPO $CreateGPO -Setting $Setting -SkipNames $SkipNames #-Name $Name
+        <#
         $Properties = $Setting.PSObject.Properties.Name | Where-Object { $_ -notin $SkipNames }
         foreach ($Property in $Properties) {
             If ($Property -eq 'Value') {
@@ -54,26 +48,20 @@ function ConvertTo-XMLGenericPublicKey {
                     } else {
                         throw
                     }
-
-                    <#
-                    foreach ($SubProperty in $SubProperties) {
-                        if ($SubProperty -eq 'Name') {
-
-                        } elseif ($SubProperty -eq 'String') {
-
-                        } elseif ($SubProperty -eq 'Number') {
-
-                        }
-                        #$Name = Format-CamelCaseToDisplayName -Text $SubProperty #-RemoveWhiteSpace -RemoveChar ',', '-', "'", '\(', '\)', ':'
-                        #$CreateGPO[$Name] = $Setting.$Property.$SubProperty
-                    }
-                    #>
                 }
             } else {
                 $Name = Format-CamelCaseToDisplayName -Text $Property #-RemoveWhiteSpace -RemoveChar ',', '-', "'", '\(', '\)', ':'
-                $CreateGPO[$Name] = $Setting.$Property
+                if ($Setting.$Property -is [System.Xml.XmlElement]) {
+                    $SubPropeties = $Setting.$Property.PSObject.Properties.Name | Where-Object { $_ -notin $SkipNames }
+
+
+
+                } else {
+                    $CreateGPO[$Name] = $Setting.$Property
+                }
             }
         }
+        #>
 
 
         $CreateGPO['Filters'] = $Setting.Filters
