@@ -17,7 +17,6 @@
             $OrganizationalUnits = Get-ADOrganizationalUnit -Filter * -Properties gpOptions, canonicalName -Server $ForestInformation['QueryServers'][$Domain]['HostName'][0]
             foreach ($OU in $OrganizationalUnits) {
                 $InheritanceInformation = [Ordered] @{
-                    DistinguishedName  = $OU.DistinguishedName
                     CanonicalName      = $OU.canonicalName
                     BlockedInheritance = if ($OU.gpOptions -eq 1) { $true } else { $false }
                 }
@@ -34,8 +33,8 @@
                         if ($InheritanceInformation.BlockedInheritance -eq $true) {
                             $InheritanceInformation['UsersCount'] = $null
                             $InheritanceInformation['ComputersCount'] = $null
-                            $InheritanceInformation['Users'] = Get-ADUser -SearchBase $InheritanceInformation.DistinguishedName -Server $ForestInformation['QueryServers'][$Domain]['HostName'][0] -Filter *
-                            $InheritanceInformation['Computers'] = Get-ADComputer -SearchBase $InheritanceInformation.DistinguishedName -Server $ForestInformation['QueryServers'][$Domain]['HostName'][0] -Filter *
+                            [Array] $InheritanceInformation['Users'] = (Get-ADUser -SearchBase $OU.DistinguishedName -Server $ForestInformation['QueryServers'][$Domain]['HostName'][0] -Filter *).SamAccountName
+                            [Array] $InheritanceInformation['Computers'] = (Get-ADComputer -SearchBase $OU.DistinguishedName -Server $ForestInformation['QueryServers'][$Domain]['HostName'][0] -Filter *).SamAccountName
                             $InheritanceInformation['UsersCount'] = $InheritanceInformation['Users'].Count
                             $InheritanceInformation['ComputersCount'] = $InheritanceInformation['Computers'].Count
                         } else {
@@ -53,6 +52,7 @@
                         [PSCustomObject] $InheritanceInformation
                     }
                 }
+                $InheritanceInformation['DistinguishedName'] = $OU.DistinguishedName
             }
         }
     }
