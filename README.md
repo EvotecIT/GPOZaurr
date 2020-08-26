@@ -49,7 +49,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.56 - Unreleased
+- 0.0.56 - 26.08.2020
   - Added `Get-GPOZaurrPermissionSummary`
 - 0.0.55 - 17.08.2020
   - Improved `Get-GPOZaurrInheritance`
