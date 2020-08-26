@@ -30,7 +30,18 @@
     }
     $Entries | Group-Object -Property Permission, SidType, Name, DomainName, PermissionType | ForEach-Object {
         $Property = $_.Name -split ', '
-        if ($Property.Count -eq 5) {
+
+        if ($Property[0] -eq 'GpoOwner') {
+            [PSCustomObject] @{
+                Permission     = $Property[0]
+                Type           = $Property[1]
+                Name           = $Property[2]
+                DomainName     = $Property[3]
+                PermissionType = 'Allow'
+                GPOCount       = $_.Count
+                GPONames       = if ($Separator) { $_.Group.DisplayName -join $Separator } else { $_.Group.DisplayName }
+            }
+        } elseif ($Property.Count -eq 5) {
             [PSCustomObject] @{
                 Permission     = $Property[0]
                 Type           = $Property[1]
