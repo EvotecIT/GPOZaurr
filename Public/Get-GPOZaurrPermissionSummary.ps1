@@ -28,15 +28,28 @@
             Domain         = $Domain
         }
     }
-    $Entries | Group-Object -Property Permission, Name, DomainName, PermissionType | ForEach-Object {
+    $Entries | Group-Object -Property Permission, SidType, Name, DomainName, PermissionType | ForEach-Object {
         $Property = $_.Name -split ', '
-        [PSCustomObject] @{
-            Permission     = $Property[0]
-            Name           = $Property[1]
-            DomainName     = $Property[2]
-            PermissionType = if ($Property[3]) { $Property[3] } else { 'Owner' }
-            GPOCount       = $_.Count
-            GPONames       = if ($Separator) { $_.Group.DisplayName -join $Separator } else { $_.Group.DisplayName }
+        if ($Property.Count -eq 5) {
+            [PSCustomObject] @{
+                Permission     = $Property[0]
+                Type           = $Property[1]
+                Name           = $Property[2]
+                DomainName     = $Property[3]
+                PermissionType = if ($Property[4]) { $Property[4] } else { 'Owner' }
+                GPOCount       = $_.Count
+                GPONames       = if ($Separator) { $_.Group.DisplayName -join $Separator } else { $_.Group.DisplayName }
+            }
+        } else {
+            [PSCustomObject] @{
+                Permission     = $Property[0]
+                Type           = $Property[1]
+                Name           = ''
+                DomainName     = $Property[2]
+                PermissionType = if ($Property[3]) { $Property[3] } else { 'Owner' }
+                GPOCount       = $_.Count
+                GPONames       = if ($Separator) { $_.Group.DisplayName -join $Separator } else { $_.Group.DisplayName }
+            }
         }
     }
 }
