@@ -18,23 +18,25 @@
     $Permissions = Get-GPOZaurrPermission -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -IncludePermissionType $IncludePermissionType -ExcludePermissionType $ExcludePermissionType -Type $Type -PermitType $PermitType -IncludeOwner:$IncludeOwner
     $Entries = foreach ($Permission in $Permissions) {
         [PSCustomObject] @{
-            Name        = $Permission.Name
-            Permission  = $Permission.Permission
-            Sid         = $Permission.Sid
-            SidType     = $Permission.SidType
-            DisplayName = $Permission.DisplayName
-            DomainName  = $Permission.DomainName
-            Domain      = $Domain
+            Name           = $Permission.Name
+            Permission     = $Permission.Permission
+            PermissionType = $Permission.PermissionType
+            Sid            = $Permission.Sid
+            SidType        = $Permission.SidType
+            DisplayName    = $Permission.DisplayName
+            DomainName     = $Permission.DomainName
+            Domain         = $Domain
         }
     }
-    $Entries | Group-Object -Property Permission, Name, DomainName | ForEach-Object {
+    $Entries | Group-Object -Property Permission, Name, DomainName, PermissionType | ForEach-Object {
         $Property = $_.Name -split ', '
         [PSCustomObject] @{
-            Permission = $Property[0]
-            Name       = $Property[1]
-            DomainName = $Property[2]
-            GPOCount   = $_.Count
-            GPONames   = if ($Separator) { $_.Group.DisplayName -join $Separator } else { $_.Group.DisplayName }
+            Permission     = $Property[0]
+            Name           = $Property[1]
+            DomainName     = $Property[2]
+            PermissionType = if ($Property[3]) { $Property[3] } else { 'Owner' }
+            GPOCount       = $_.Count
+            GPONames       = if ($Separator) { $_.Group.DisplayName -join $Separator } else { $_.Group.DisplayName }
         }
     }
 }
