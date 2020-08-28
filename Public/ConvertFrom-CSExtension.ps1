@@ -69,7 +69,8 @@ function ConvertFrom-CSExtension {
         '{D76B9641-3288-4f75-942D-087DE603E3EA}' = 'AdmPwd'
         '{9650FDBC-053A-4715-AD14-FC2DC65E8330}' = 'Unknown'
         '{B1BE8D72-6EAC-11D2-A4EA-00C04F79F83A}' = 'EFS Recovery'
-        '{A2E30F80-D7DE-11d2-BBDE-00C04F86AE3B}' = 'Internet Explorer Settings'
+        '{A2E30F80-D7DE-11d2-BBDE-00C04F86AE3B}' = 'Internet Explorer Maintenance Policy Processing'
+        '{FC715823-C5FB-11D1-9EEF-00A0C90347FF}' = 'Internet Explorer Maintenance Extension Protocol' # https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpie/f566a58a-4114-4981-b1e2-30b9d1a3c0e6
     }
     foreach ($C in $CSE) {
         if (-not $Limited) {
