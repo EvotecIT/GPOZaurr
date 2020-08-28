@@ -9,7 +9,7 @@ function Find-CSExtension {
     foreach ($Key in $Keys.PSSubKeys) {
         $RegistryKey = Get-PSRegistry -RegistryPath "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\GPExtensions\$Key" -ComputerName $ComputerName
         if ($CSE) {
-            foreach ($C in CSE) {
+            foreach ($C in $CSE) {
                 if ($RegistryKey.DefaultKey -eq $Key) {
                     [PSCustomObject] @{ Name = $Key; Description = $RegistryKey.DefaultKey }
                 }
