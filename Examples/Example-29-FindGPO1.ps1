@@ -1,9 +1,22 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-$Output = Invoke-GPOZaurr -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExportEvotec1'
+$Output = Invoke-GPOZaurr -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPODefender'
+#$Output = Invoke-GPOZaurr -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExport'
+
 $Output | Format-Table
-$Output.Reports.RegistrySettings | Format-Table *
-$Output.Reports.InternetExplorerZones | Format-Table *
+$Output.Reports | Format-Table
+$Output.Reports.WindowsDefenderExploitGuard
+#$Output.Reports.RegistrySetting | Format-Table
+#$Output.CategoriesFull | Format-Table
+<#
+$Output.Reports.Policies | Format-Table
+$Output.Reports.SecurityOptions | Format-Table
+$Output.Reports.PublicKeyPoliciesCertificates | Format-Table
+$Output.Reports.PublicKeyPoliciesEnrollmentPolicy | Format-Table
+$Output.Reports.PublicKeyPoliciesAuto | Format-Table *
+#>
+
+return
 
 # Report to Excel of translated reports
 foreach ($Key in $Output.Reports.Keys) {
