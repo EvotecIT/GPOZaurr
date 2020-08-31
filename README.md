@@ -49,11 +49,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.62 - 28.08.2020
-  - Improvement to `Get-GPOZaurrPermissionSummary`
-  - Update to `ConvertFrom-CSExtension`
-  - Update to `Find-CSExtension`
-- 0.0.61 - 26.08.2020
+- 0.0.61 - 31.08.2020
   - Improvement to `Get-GPOZaurrPermissionSummary`
   - Fixes to `ConvertFrom-CSExtension`
   - Fixes to `Find-CSExtension`
