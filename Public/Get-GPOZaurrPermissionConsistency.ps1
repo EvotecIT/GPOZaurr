@@ -46,23 +46,25 @@
                 } catch {
                     $ErrorMessage = $_.Exception.Message
                     Write-Warning "Get-GPOZaurrPermissionConsistency - Failed to get consistency: $($_.Exception.Message)."
-                    $IsConsistent = 'Not available.'
+                    $IsConsistent = 'Not available'
                 }
                 $SysVolpath = -join ('\\', $Domain, '\sysvol\', $Domain, '\Policies\{', $_.ID.GUID, '}')
                 if ($VerifyInheritance) {
                     $FolderPermissions = Get-WinADSharePermission -Path $SysVolpath
-                    [Array] $NotInheritedPermissions = foreach ($File in $FolderPermissions) {
-                        if ($File.Path -ne $SysVolpath -and $File.IsInherited -eq $false) {
-                            $File
+                    if ($FolderPermissions) {
+                        [Array] $NotInheritedPermissions = foreach ($File in $FolderPermissions) {
+                            if ($File.Path -ne $SysVolpath -and $File.IsInherited -eq $false) {
+                                $File
+                            }
                         }
-                    }
-                    if ($NotInheritedPermissions.Count -eq 0) {
-                        $ACLConsistentInside = $true
+                        if ($NotInheritedPermissions.Count -eq 0) {
+                            $ACLConsistentInside = $true
+                        } else {
+                            $ACLConsistentInside = $false
+                        }
                     } else {
-                        $ACLConsistentInside = $false
+                        $ACLConsistentInside = 'Not available'
                     }
-                } else {
-                    $ACLConsistentInside = $null
                 }
                 $Object = [ordered] @{
                     DisplayName   = $_.DisplayName     # : New Group Policy Object
@@ -94,21 +96,21 @@
                     [PSCustomObject] $Object
                 } elseif ($Type -eq 'Inconsistent') {
                     if ($VerifyInheritance) {
-                        if (-not $IsConsistent -or -not $ACLConsistentInside) {
+                        if (-not ($IsConsistent -eq $true) -or (-not $ACLConsistentInside -eq $true)) {
                             [PSCustomObject] $Object
                         }
                     } else {
-                        if (-not $IsConsistent) {
+                        if (-not ($IsConsistent -eq $true)) {
                             [PSCustomObject] $Object
                         }
                     }
                 } elseif ($Type -eq 'Consistent') {
                     if ($VerifyInheritance) {
-                        if ($IsConsistent -and $ACLConsistentInside) {
+                        if ($IsConsistent -eq $true -and $ACLConsistentInside -eq $true) {
                             [PSCustomObject] $Object
                         }
                     } else {
-                        if ($IsConsistent) {
+                        if ($IsConsistent -eq $true) {
                             [PSCustomObject] $Object
                         }
                     }
