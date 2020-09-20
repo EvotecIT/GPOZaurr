@@ -49,6 +49,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.62 - Unreleased
+  - Improvements to `Get-GPOZaurrPermissionConsistency` for GPOs without SYSVOL to be reported properly
 - 0.0.61 - 31.08.2020
   - Improvement to `Get-GPOZaurrPermissionSummary`
   - Fixes to `ConvertFrom-CSExtension`
