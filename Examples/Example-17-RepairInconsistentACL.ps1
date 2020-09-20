@@ -2,4 +2,4 @@
 
 Get-GPOZaurrPermissionConsistency -GPOName 'Default Domain Controllers Policy' -IncludeDomains 'ad.evotec.xyz'
 
-Repair-GPOZaurrPermissionConsistency -GPOName 'Default Domain Controllers Policy' -IncludeDomains 'ad.evotec.xyz' -Verbose #-WhatIf -Verbose
+Repair-GPOZaurrPermissionConsistency -GPOName 'Default Domain Controllers Policy' -IncludeDomains 'ad.evotec.xyz' -Verbose -WhatIf
