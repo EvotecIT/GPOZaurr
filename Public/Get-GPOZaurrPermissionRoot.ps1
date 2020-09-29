@@ -7,8 +7,6 @@
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {
-        #$Owners = [System.Collections.Generic.List[object]]::new()
-        #$Modify = [System.Collections.Generic.List[object]]::new()
         $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Extended
     }
     Process {
@@ -22,43 +20,39 @@
                 ADRightsAsArray                = $true
                 ResolveTypes                   = $true
             }
-            $GPOPermissionsGlobal = Get-ADACL @getADACLSplat
-            #$GPOPermissionsGlobal | Format-Table
+            $GPOPermissionsGlobal = Get-ADACL @getADACLSplat #-Verbose
             foreach ($Permission in $GPOPermissionsGlobal) {
                 if ($Permission.ActiveDirectoryRights | ForEach-Object {
                         $_ -in 'WriteDACL', 'WriteOwner', 'GenericAll'
                     }) {
                     [PSCustomObject] @{
-                        Permission     = 'GpoCustomOwner'
-                        Type           = $Permission.PrincipalObjectType
-                        Name           = $Permission.Principal
-                        DomainName     = $Permission.PrincipalObjectDomain
-                        PermissionType = $Permission.AccessControlType
-                        GPOCount       = 'N/A'
-                        GPONames       = 'All'
+                        PrincipalName       = $Permission.Principal
+                        Permission          = 'GpoCustomOwner'
+                        PermissionType      = $Permission.AccessControlType
+                        PrincipalSid        = $Permission.PrincipalObjectSid
+                        PrincipalSidType    = $Permission.PrincipalObjectType
+                        PrincipalDomainName = $Permission.PrincipalObjectDomain
+                        GPOCount            = 'N/A'
+                        GPONames            = -join ("All-", $Domain.ToUpper())
+                        DomainName          = $Domain
                     }
-                    #$Owners.Add($Permission)
                 }
                 if ($Permission.ActiveDirectoryRights | ForEach-Object {
                         $_ -in 'CreateChild', 'GenericAll'
                     }) {
-
                     [PSCustomObject] @{
-                        Permission     = 'GpoCustomCreate'
-                        Type           = $Permission.PrincipalObjectType
-                        Name           = $Permission.Principal
-                        DomainName     = $Permission.PrincipalObjectDomain
-                        PermissionType = $Permission.AccessControlType
-                        GPOCount       = 'N/A'
-                        GPONames       = 'All'
+                        PrincipalName       = $Permission.Principal
+                        Permission          = 'GpoCustomCreate'
+                        PermissionType      = $Permission.AccessControlType
+                        PrincipalSid        = $Permission.PrincipalObjectSid
+                        PrincipalSidType    = $Permission.PrincipalObjectType
+                        PrincipalDomainName = $Permission.PrincipalObjectDomain
+                        GPOCount            = 'N/A'
+                        GPONames            = -join ("All-", $Domain.ToUpper())
+                        DomainName          = $Domain
                     }
-
-                    #$Modify.Add($Permission)
                 }
             }
-            #$Owners | Format-Table
-
-            #$Modify | Format-Table
         }
     }
     End {}
