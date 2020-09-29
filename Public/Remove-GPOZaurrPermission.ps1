@@ -8,7 +8,7 @@
         [alias('GUID', 'GPOID')][string] $GPOGuid,
 
         [string[]] $Principal,
-        [validateset('DistinguishedName', 'Name', 'Sid')][string] $PrincipalType = 'Sid',
+        [validateset('DistinguishedName', 'Name', 'NetbiosName', 'Sid')][string] $PrincipalType = 'Sid',
 
         [validateset('Unknown', 'NotAdministrative', 'Default')][string[]] $Type = 'Default',
 

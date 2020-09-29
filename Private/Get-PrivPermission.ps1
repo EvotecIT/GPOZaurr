@@ -5,7 +5,7 @@
         [Object] $SecurityRights,
 
         [string[]] $Principal,
-        [validateset('DistinguishedName', 'Name', 'Sid')][string] $PrincipalType = 'Sid',
+        [validateset('DistinguishedName', 'Name', 'NetbiosName', 'Sid')][string] $PrincipalType = 'Sid',
 
         [switch] $SkipWellKnown,
         [switch] $SkipAdministrative,
@@ -20,7 +20,7 @@
         [switch] $IncludeGPOObject,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
         [validateSet('AuthenticatedUsers', 'DomainComputers', 'Unknown', 'WellKnownAdministrative', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All')][string[]] $Type = 'All',
-        [System.Collections.IDictionary] $Accounts,
+        #[System.Collections.IDictionary] $Accounts,
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {
@@ -100,6 +100,11 @@
                     return
                 }
             }
+            if ($GPOPermission.Trustee.Domain) {
+                $UserMerge = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
+            } else {
+                $UserMerge = $null
+            }
             if ($Principal) {
                 if ($PrincipalType -eq 'Sid') {
                     if ($Principal -notcontains $GPOPermission.Trustee.Sid.Value) {
@@ -110,8 +115,11 @@
                         return
                     }
                 } elseif ($PrincipalType -eq 'Name') {
-                    $UserMerge = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
-                    if ($Principal -notcontains $UserMerge -and $Principal -notcontains $GPOPermission.Trustee.Name) {
+                    if ($Principal -notcontains $GPOPermission.Trustee.Name) {
+                        return
+                    }
+                } elseif ($PrincipalType -eq 'NetbiosName') {
+                    if ($Principal -notcontains $UserMerge) {
                         return
                     }
                 }
@@ -126,56 +134,76 @@
                         return
                     }
                 } elseif ($ExcludePrincipalType -eq 'Name') {
-                    $UserMerge = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
-                    if ($ExcludePrincipal -contains $UserMerge -or $ExcludePrincipal -contains $GPOPermission.Trustee.Name) {
+                    if ($ExcludePrincipal -contains $GPOPermission.Trustee.Name) {
+                        return
+                    }
+                } elseif ($ExcludePrincipalType -eq 'NetbiosName') {
+                    if ($ExcludePrincipal -contains $UserMerge) {
                         return
                     }
                 }
             }
-            $ReturnObject = [ordered] @{
-                DisplayName       = $GPO.DisplayName #      : ALL | Enable RDP
-                GUID              = $GPO.ID
-                DomainName        = $GPO.DomainName  #      : ad.evotec.xyz
-                Enabled           = $GPO.GpoStatus
-                Description       = $GPO.Description
-                CreationDate      = $GPO.CreationTime
-                ModificationTime  = $GPO.ModificationTime
-                PermissionType    = if ($GPOPermission.Denied -eq $true) { 'Deny' } else { 'Allow' }
-                Permission        = $GPOPermission.Permission  # : GpoEditDeleteModifySecurity
-                Inherited         = $GPOPermission.Inherited   # : False
-                Domain            = $GPOPermission.Trustee.Domain  #: EVOTEC
-                DistinguishedName = $GPOPermission.Trustee.DSPath  #: CN = Domain Admins, CN = Users, DC = ad, DC = evotec, DC = xyz
-                Name              = $GPOPermission.Trustee.Name    #: Domain Admins
-                Sid               = $GPOPermission.Trustee.Sid.Value     #: S - 1 - 5 - 21 - 853615985 - 2870445339 - 3163598659 - 512
-                SidType           = $GPOPermission.Trustee.SidType #: Group
-            }
-            if ($Accounts) {
-                $A = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
-                if ($A -and $Accounts[$A]) {
-                    $ReturnObject['UserPrincipalName'] = $Accounts[$A].UserPrincipalName
-                    $ReturnObject['AccountEnabled'] = $Accounts[$A].Enabled
-                    $ReturnObject['DistinguishedName'] = $Accounts[$A].DistinguishedName
-                    $ReturnObject['PasswordLastSet'] = if ($Accounts[$A].PasswordLastSet) { $Accounts[$A].PasswordLastSet } else { '' }
-                    $ReturnObject['LastLogonDate'] = if ($Accounts[$A].LastLogonDate ) { $Accounts[$A].LastLogonDate } else { '' }
-                    if (-not $ReturnObject['Sid']) {
-                        $ReturnObject['Sid'] = $Accounts[$A].Sid.Value
-                    }
-                    if ($Accounts[$A].ObjectClass -eq 'group') {
-                        $ReturnObject['SidType'] = 'Group'
-                    } elseif ($Accounts[$A].ObjectClass -eq 'user') {
-                        $ReturnObject['SidType'] = 'User'
-                    } elseif ($Accounts[$A].ObjectClass -eq 'computer') {
-                        $ReturnObject['SidType'] = 'Computer'
-                    } else {
-                        $ReturnObject['SidType'] = 'EmptyOrUnknown'
+
+            <#
+            # Sets permissions name, domain, distinguishedname to proper values
+            if ($GPOPermission.Trustee.Name) {
+                $DomainPlusName = -join ($GPOPermission.Trustee.Domain, '\', $GPOPermission.Trustee.Name)
+                if ($GPOPermission.Trustee.DSPath) {
+                    $NetbiosConversion = ConvertFrom-NetbiosName -Identity $DomainPlusName
+                    if ($NetbiosConversion.DomainName) {
+                        $UserNameDomain = $NetbiosConversion.DomainName
+                        $UserName = $NetbiosConversion.Name
                     }
                 } else {
-                    $ReturnObject['UserPrincipalName'] = ''
-                    $ReturnObject['AccountEnabled'] = ''
-                    $ReturnObject['PasswordLastSet'] = ''
-                    $ReturnObject['LastLogonDate'] = ''
+                    $UserNameDomain = ''
+                    $Username = $DomainPlusName
+                }
+            } else {
+                $DomainPlusName = ''
+                $UserNameDomain = ''
+                $Username = ''
+            }
+            #>
+
+            # I don't trust the returned data, some stuff like 'alias' shows up for groups. To unify it with everything else... using my own function
+            $PermissionAccount = Get-WinADObject -Identity $GPOPermission.Trustee.Sid.Value -AddType -Cache
+            if ($PermissionAccount) {
+                $UserNameDomain = $PermissionAccount.DomainName
+                $UserName = $PermissionAccount.Name
+                $SidType = $PermissionAccount.Type
+                $ObjectClass = $PermissionAccount.ObjectClass
+            } else {
+                $ConvertFromSID = ConvertFrom-SID -SID $GPOPermission.Trustee.Sid.Value
+                $UserNameDomain = ''
+                $Username = $ConvertFromSID.Name
+                $SidType = $ConvertFromSID.Type
+                if ($SidType -eq 'Unknown') {
+                    $ObjectClass = 'unknown'
+                } else {
+                    $ObjectClass = 'foreignSecurityPrincipal'
                 }
             }
+            $ReturnObject = [ordered] @{
+                DisplayName                = $GPO.DisplayName #      : ALL | Enable RDP
+                GUID                       = $GPO.ID
+                DomainName                 = $GPO.DomainName  #      : ad.evotec.xyz
+                Enabled                    = $GPO.GpoStatus
+                Description                = $GPO.Description
+                CreationDate               = $GPO.CreationTime
+                ModificationTime           = $GPO.ModificationTime
+                PermissionType             = if ($GPOPermission.Denied -eq $true) { 'Deny' } else { 'Allow' }
+                Permission                 = $GPOPermission.Permission  # : GpoEditDeleteModifySecurity
+                Inherited                  = $GPOPermission.Inherited   # : False
+                PrincipalNetBiosName       = $UserMerge
+                PrincipalDistinguishedName = $GPOPermission.Trustee.DSPath  #: CN = Domain Admins, CN = Users, DC = ad, DC = evotec, DC = xyz
+                PrincipalDomainName        = $UserNameDomain  #: EVOTEC
+                PrincipalName              = $UserName    #: Domain Admins
+                PrincipalSid               = $GPOPermission.Trustee.Sid.Value     #: S - 1 - 5 - 21 - 853615985 - 2870445339 - 3163598659 - 512
+                PrincipalSidType           = $SidType #$GPOPermission.Trustee.SidType #: Group
+                PrincipalObjectClass       = $ObjectClass
+            }
+
+
             if ($IncludeGPOObject) {
                 $ReturnObject['GPOObject'] = $GPO
                 $ReturnObject['GPOSecurity'] = $SecurityRights
@@ -183,68 +211,138 @@
             }
             [PSCustomObject] $ReturnObject
         }
-        if ($IncludeOwner.IsPresent) {
+        if ($IncludeOwner) {
             if ($GPO.Owner) {
-                $SplittedOwner = $GPO.Owner.Split('\')
-                $DomainOwner = $SplittedOwner[0]  #: EVOTEC
-                $DomainUserName = $SplittedOwner[1]   #: Domain Admins
-                $SID = $ADAdministrativeGroups['ByNetBIOS']["$($GPO.Owner)"].Sid.Value
-                if ($SID) {
-                    $SIDType = 'Group'
-                    $DistinguishedName = $ADAdministrativeGroups['ByNetBIOS']["$($GPO.Owner)"].DistinguishedName
+                # I don't trust the returned data, some stuff like 'alias' shows up for groups. To unify it with everything else... using my own function
+                $OwnerAccount = Get-WinADObject -Identity $GPO.Owner -AddType -Cache
+                if ($OwnerAccount) {
+                    $UserNameDomain = $OwnerAccount.DomainName
+                    $UserName = $OwnerAccount.Name
+                    $SidType = $OwnerAccount.Type
+                    $ObjectClass = $OwnerAccount.ObjectClass
+                    $SID = $OwnerAccount.ObjectSID
                 } else {
-                    $SIDType = ''
-                    $DistinguishedName = ''
+                    $ConvertFromSID = ConvertFrom-SID -SID $GPO.Owner
+                    $UserNameDomain = ''
+                    $Username = $ConvertFromSID.Name
+                    $SidType = $ConvertFromSID.Type
+                    if ($SidType -eq 'Unknown') {
+                        $ObjectClass = 'unknown'
+                    } else {
+                        $ObjectClass = 'foreignSecurityPrincipal'
+                    }
+                    $SID = $ConvertFromSID.SID
                 }
             } else {
-                $DomainOwner = $GPO.Owner
-                $DomainUserName = ''
+                $UserName = ''
+                $UserNameDomain = ''
                 $SID = ''
-                $SIDType = 'EmptyOrUnknown'
+                $SIDType = 'Unknown'
                 $DistinguishedName = ''
+                $OwnerObjectClass = 'unknown'
             }
-            $ReturnObject = [ordered] @{
-                DisplayName       = $GPO.DisplayName #      : ALL | Enable RDP
-                GUID              = $GPO.Id
-                DomainName        = $GPO.DomainName  #      : ad.evotec.xyz
-                Enabled           = $GPO.GpoStatus
-                Description       = $GPO.Description
-                CreationDate      = $GPO.CreationTime
-                ModificationTime  = $GPO.ModificationTime
-                Permission        = 'GpoOwner'  # : GpoEditDeleteModifySecurity
-                Inherited         = $false  # : False
-                Domain            = $DomainOwner
-                DistinguishedName = $DistinguishedName  #: CN = Domain Admins, CN = Users, DC = ad, DC = evotec, DC = xyz
-                Name              = $DomainUserName
-                Sid               = $SID     #: S - 1 - 5 - 21 - 853615985 - 2870445339 - 3163598659 - 512
-                SidType           = $SIDType #  #: Group
-            }
-            if ($Accounts) {
-                $A = $GPO.Owner
-                if ($A -and $Accounts[$A]) {
-                    $ReturnObject['UserPrincipalName'] = $Accounts[$A].UserPrincipalName
-                    $ReturnObject['AccountEnabled'] = $Accounts[$A].Enabled
-                    $ReturnObject['DistinguishedName'] = $Accounts[$A].DistinguishedName
-                    $ReturnObject['PasswordLastSet'] = if ($Accounts[$A].PasswordLastSet) { $Accounts[$A].PasswordLastSet } else { '' }
-                    $ReturnObject['LastLogonDate'] = if ($Accounts[$A].LastLogonDate ) { $Accounts[$A].LastLogonDate } else { '' }
-                    if (-not $ReturnObject['Sid']) {
-                        $ReturnObject['Sid'] = $Accounts[$A].Sid.Value
-                    }
-                    if ($Accounts[$A].ObjectClass -eq 'group') {
-                        $ReturnObject['SidType'] = 'Group'
-                    } elseif ($Accounts[$A].ObjectClass -eq 'user') {
-                        $ReturnObject['SidType'] = 'User'
-                    } elseif ($Accounts[$A].ObjectClass -eq 'computer') {
-                        $ReturnObject['SidType'] = 'Computer'
-                    } else {
-                        $ReturnObject['SidType'] = 'EmptyOrUnknown'
+            # We have to process it for owners after querying user because $Owners are not as established as standard permissions so we don't know a lot
+
+            if ($Type -contains 'Administrative' -and $Type -notcontains 'All') {
+                if ($SID) {
+                    $IsAdministrative = $ADAdministrativeGroups['BySID'][$SID]
+                    if (-not $IsAdministrative) {
+                        return
                     }
                 } else {
-                    $ReturnObject['UserPrincipalName'] = ''
-                    $ReturnObject['AccountEnabled'] = ''
-                    $ReturnObject['PasswordLastSet'] = ''
-                    $ReturnObject['LastLogonDate'] = ''
+                    # if there is no SID, it's not administrative
+                    return
                 }
+            }
+            if ($Type -contains 'NotWellKnownAdministrative' -and $Type -notcontains 'All') {
+                # We check for SYSTEM account
+                # Maybe we should make it a function and provide more
+                if ($SID -eq 'S-1-5-18') {
+                    return
+                }
+            }
+            if ($Type -contains 'WellKnownAdministrative' -and $Type -notcontains 'All') {
+                # We check for SYSTEM account
+                # Maybe we should make it a function and provide more
+                if ($SID -ne 'S-1-5-18') {
+                    return
+                }
+            }
+            if ($Type -contains 'Unknown' -and $Type -notcontains 'All') {
+                # May need updates if there's more types
+                if ($SidType -ne 'Unknown') {
+                    return
+                }
+            }
+            if ($Type -contains 'AuthenticatedUsers' -and $Type -notcontains 'All') {
+                if ($SID -ne 'S-1-5-11') {
+                    return
+                }
+            }
+            if ($Type -contains 'DomainComputers' -and $Type -notcontains 'All') {
+                $DomainComputersSID = -join ($ExtendedForestInformation['DomainsExtended'][$GPO.DomainName].DomainSID, '-515')
+                if ($SID -ne $DomainComputersSID) {
+                    return
+                }
+            }
+
+            if ($Principal) {
+                if ($PrincipalType -eq 'Sid') {
+                    if ($Principal -notcontains $SID) {
+                        return
+                    }
+                } elseif ($PrincipalType -eq 'DistinguishedName') {
+                    if ($Principal -notcontains $DistinguishedName) {
+                        return
+                    }
+                } elseif ($PrincipalType -eq 'Name') {
+                    if ($Principal -notcontains $UserName) {
+                        return
+                    }
+                } elseif ($PrincipalType -eq 'NetbiosName') {
+                    if ($Principal -notcontains $GPO.Owner) {
+                        return
+                    }
+                }
+            }
+            if ($ExcludePrincipal) {
+                if ($ExcludePrincipalType -eq 'Sid') {
+                    if ($ExcludePrincipal -contains $SID) {
+                        return
+                    }
+                } elseif ($ExcludePrincipalType -eq 'DistinguishedName') {
+                    if ($ExcludePrincipal -contains $DistinguishedName) {
+                        return
+                    }
+                } elseif ($ExcludePrincipalType -eq 'Name') {
+                    if ($ExcludePrincipal -contains $UserName) {
+                        return
+                    }
+                } elseif ($ExcludePrincipalType -eq 'NetbiosName') {
+                    if ($ExcludePrincipal -contains $GPO.Owner) {
+                        return
+                    }
+                }
+            }
+
+            $ReturnObject = [ordered] @{
+                DisplayName                = $GPO.DisplayName #      : ALL | Enable RDP
+                GUID                       = $GPO.Id
+                DomainName                 = $GPO.DomainName  #      : ad.evotec.xyz
+                Enabled                    = $GPO.GpoStatus
+                Description                = $GPO.Description
+                CreationDate               = $GPO.CreationTime
+                ModificationTime           = $GPO.ModificationTime
+                PermissionType             = 'Allow'
+                Permission                 = 'GpoOwner'  # : GpoEditDeleteModifySecurity
+                Inherited                  = $false  # : False
+                PrincipalNetBiosName       = $GPO.Owner
+                PrincipalDistinguishedName = $DistinguishedName  #: CN = Domain Admins, CN = Users, DC = ad, DC = evotec, DC = xyz
+                PrincipalDomainName        = $UserNameDomain
+                PrincipalName              = $UserName
+                PrincipalSid               = $SID     #: S - 1 - 5 - 21 - 853615985 - 2870445339 - 3163598659 - 512
+                PrincipalSidType           = $SIDType #  #: Group
+                PrincipalObjectClass       = $OwnerObjectClass
             }
             if ($IncludeGPOObject) {
                 $ReturnObject['GPOObject'] = $GPO

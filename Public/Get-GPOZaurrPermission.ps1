@@ -8,13 +8,13 @@
         [alias('GUID', 'GPOID')][string] $GPOGuid,
 
         [string[]] $Principal,
-        [validateset('DistinguishedName', 'Name', 'Sid')][string] $PrincipalType = 'Sid',
+        [validateset('DistinguishedName', 'Name', 'NetbiosName', 'Sid')][string] $PrincipalType = 'Sid',
 
         [validateSet('AuthenticatedUsers', 'DomainComputers', 'Unknown', 'WellKnownAdministrative', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All')][string[]] $Type = 'All',
 
         [switch] $SkipWellKnown,
         [switch] $SkipAdministrative,
-        [switch] $ResolveAccounts,
+        #[switch] $ResolveAccounts,
 
         [switch] $IncludeOwner,
         [Microsoft.GroupPolicy.GPPermissionType[]] $IncludePermissionType,
@@ -43,6 +43,7 @@
                 Write-Warning "Get-GPOZaurrPermission - Using SkipAdministrative or SkipWellKnown while looking for Unknown doesn't make sense as only Unknown will be displayed."
             }
         }
+        <#
         if ($ResolveAccounts) {
             $Accounts = @{ }
             foreach ($Domain in $ForestInformation.Domains) {
@@ -60,6 +61,7 @@
                 }
             }
         }
+        #>
     }
     Process {
         foreach ($Domain in $ForestInformation.Domains) {
@@ -96,7 +98,7 @@
                         Principal                 = $Principal
                         PrincipalType             = $PrincipalType
                         PermitType                = $PermitType
-                        Accounts                  = $Accounts
+                        #Accounts                  = $Accounts
                         Type                      = $Type
                         GPO                       = $_
                         SkipWellKnown             = $SkipWellKnown.IsPresent

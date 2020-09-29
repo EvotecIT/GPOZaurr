@@ -56,6 +56,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
   - Improved `Remove-GPOZaurrOrphaned` to deal with orphaned folders but also orphaned AD GPO (No sysvol data)
   - Improved `Get-GPOZaurrSysVol` to detect orphaned SYSVOL or AD GPO objects
   - Improved `Get-GPOZaurrSysVol` to detect permissions issue when reading AD GPO objects
+  - Added `Get-GPOZaurrPermissionRoot` to show which users/groups have control over all GPOs (allowed to create/modify)
+  - Improved `Get-GPOZaurrPermissionSummary` to include `Get-GPOZaurrPermissionRoot` custom permissions
+  - Updated `Remove-GPOZaurrPermission`
+  - Updated `Get-GpoZaurrPermission`
 - 0.0.61 - 31.08.2020
   - Improvement to `Get-GPOZaurrPermissionSummary`
   - Fixes to `ConvertFrom-CSExtension`
