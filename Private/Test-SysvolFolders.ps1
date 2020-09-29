@@ -3,7 +3,9 @@
     param(
         [Array] $GPOs,
         [string] $Server,
-        [string] $Domain
+        [string] $Domain,
+        [System.Collections.IDictionary] $PoliciesAD,
+        $PoliciesSearchBase
     )
     $Differences = @{ }
     $SysvolHash = @{ }
@@ -22,12 +24,20 @@
     if ($Files) {
         $Comparing = Compare-Object -ReferenceObject $GPOGUIDS -DifferenceObject $Files -IncludeEqual
         foreach ($_ in $Comparing) {
+            if ($_.InputObject -eq 'PolicyDefinitions') {
+                # we skip policy definitions
+                continue
+            }
             if ($_.SideIndicator -eq '==') {
                 $Found = 'Exists'
             } elseif ($_.SideIndicator -eq '<=') {
                 $Found = 'Not available on SYSVOL'
             } elseif ($_.SideIndicator -eq '=>') {
-                $Found = 'Orphaned GPO'
+                if ($PoliciesAD[$_.InputObject]) {
+                    $Found = $PoliciesAD[$_.InputObject]
+                } else {
+                    $Found = 'Not available in AD'
+                }
             } else {
                 $Found = 'Orphaned GPO'
             }
@@ -52,33 +62,34 @@
                 $ACL = $null
             }
             if ($null -eq $Differences[$GPO.Id.Guid]) {
-                $SysVolStatus = 'Not available on SYSVOL'
+                $SysVolStatus = 'Unknown Issue'
             } else {
                 $SysVolStatus = $Differences[$GPO.Id.Guid]
             }
             [PSCustomObject] @{
-                DisplayName      = $GPO.DisplayName
-                Status           = $Differences[$GPO.Id.Guid]
-                DomainName       = $GPO.DomainName
-                SysvolServer     = $Server
-                SysvolStatus     = $SysVolStatus
-                Owner            = $GPO.Owner
-                FileOwner        = $Owner
-                Id               = $GPO.Id.Guid
-                GpoStatus        = $GPO.GpoStatus
-                Path             = $FullPath
-                Description      = $GPO.Description
-                CreationTime     = $GPO.CreationTime
-                ModificationTime = $GPO.ModificationTime
-                UserVersion      = $GPO.UserVersion
-                ComputerVersion  = $GPO.ComputerVersion
-                WmiFilter        = $GPO.WmiFilter
-                Error            = $ErrorMessage
+                DisplayName       = $GPO.DisplayName
+                Status            = $SysVolStatus
+                DomainName        = $GPO.DomainName
+                SysvolServer      = $Server
+                SysvolStatus      = $SysVolStatus
+                GpoStatus         = $GPO.GpoStatus
+                Owner             = $GPO.Owner
+                FileOwner         = $Owner
+                Id                = $GPO.Id.Guid
+                Path              = $FullPath
+                DistinguishedName = -join ("CN={", $GPO.Id.Guid, "},", $PoliciesSearchBase)
+                Description       = $GPO.Description
+                CreationTime      = $GPO.CreationTime
+                ModificationTime  = $GPO.ModificationTime
+                UserVersion       = $GPO.UserVersion
+                ComputerVersion   = $GPO.ComputerVersion
+                WmiFilter         = $GPO.WmiFilter
+                Error             = $ErrorMessage
             }
         }
         # Now we need to list thru Sysvol files and fine those that do not exists as GPO and create dummy GPO objects to show orphaned gpos
         foreach ($_ in $Differences.Keys) {
-            if ($Differences[$_] -eq 'Orphaned GPO') {
+            if ($Differences[$_] -in 'Not available in AD', 'Permissions issue') {
                 if ($SysvolHash[$_].BaseName -notcontains 'PolicyDefinitions') {
                     $FullPath = $SysvolHash[$_].FullName
                     try {
@@ -94,15 +105,16 @@
 
                     [PSCustomObject] @{
                         DisplayName      = $SysvolHash[$_].BaseName
-                        Status           = 'Orphaned GPO'
+                        Status           = $Differences[$_]
                         DomainName       = $Domain
                         SysvolServer     = $Server
-                        SysvolStatus     = $Differences[$GPO.Id.Guid]
+                        SysvolStatus     = 'Exists' #$Differences[$GPO.Id.Guid]
+                        GpoStatus        = $Differences[$_]
                         Owner            = ''
                         FileOwner        = $Owner
                         Id               = $_
-                        GpoStatus        = 'Orphaned'
                         Path             = $FullPath
+                        DistinguishedName = -join ("CN={", $_, "},", $PoliciesSearchBase)
                         Description      = $null
                         CreationTime     = $SysvolHash[$_].CreationTime
                         ModificationTime = $SysvolHash[$_].LastWriteTime

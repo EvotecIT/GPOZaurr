@@ -52,6 +52,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 - 0.0.62 - Unreleased
   - Improvements to `Get-GPOZaurrPermissionConsistency` for GPOs without SYSVOL to be reported properly
   - Added `Get-GPOZaurrPermissionRoot`
+  - Renamed `Remove-GPOZaurrOrphanedSysvolFolders` to `Remove-GPOZaurrOrphaned`
+  - Improved `Remove-GPOZaurrOrphaned` to deal with orphaned folders but also orphaned AD GPO (No sysvol data)
+  - Improved `Get-GPOZaurrSysVol` to detect orphaned SYSVOL or AD GPO objects
+  - Improved `Get-GPOZaurrSysVol` to detect permissions issue when reading AD GPO objects
 - 0.0.61 - 31.08.2020
   - Improvement to `Get-GPOZaurrPermissionSummary`
   - Fixes to `ConvertFrom-CSExtension`

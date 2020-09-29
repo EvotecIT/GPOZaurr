@@ -11,10 +11,26 @@
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [switch] $VerifyDomainControllers
     )
-    $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExcludeDomainControllers $ExcludeDomainControllers -IncludeDomainControllers $IncludeDomainControllers -SkipRODC:$SkipRODC -ExtendedForestInformation $ExtendedForestInformation
+    $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExcludeDomainControllers $ExcludeDomainControllers -IncludeDomainControllers $IncludeDomainControllers -SkipRODC:$SkipRODC -ExtendedForestInformation $ExtendedForestInformation -Extended
     foreach ($Domain in $ForestInformation.Domains) {
         Write-Verbose "Get-WinADGPOSysvolFolders - Processing $Domain"
         $QueryServer = $ForestInformation['QueryServers']["$Domain"].HostName[0]
+        $SystemsContainer = $ForestInformation['DomainsExtended'][$Domain].SystemsContainer
+        $PoliciesAD = @{}
+        if ($SystemsContainer) {
+            $PoliciesSearchBase = -join ("CN=Policies,", $SystemsContainer)
+            $PoliciesInAD = Get-ADObject -SearchBase $PoliciesSearchBase -SearchScope OneLevel -Filter * -Server $QueryServer
+            foreach ($Policy in $PoliciesInAD) {
+                $GUIDFromDN = ConvertFrom-DistinguishedName -DistinguishedName $Policy.DistinguishedName
+                $GUIDFromDN = $GUIDFromDN -replace '{' -replace '}'
+                $GUID = $Policy.Name -replace '{' -replace '}'
+                if ($GUID -and $GUIDFromDN) {
+                    $PoliciesAD[$GUIDFromDN] = 'Exists'
+                } else {
+                    $PoliciesAD[$GUIDFromDN] = 'Permissions issue'
+                }
+            }
+        }
         Try {
             [Array]$GPOs = Get-GPO -All -Domain $Domain -Server $QueryServer
         } catch {
@@ -23,11 +39,11 @@
         }
         if ($GPOs.Count -ge 2) {
             if (-not $VerifyDomainControllers) {
-                Test-SysVolFolders -GPOs $GPOs -Server $Domain -Domain $Domain
+                Test-SysVolFolders -GPOs $GPOs -Server $Domain -Domain $Domain -PoliciesAD $PoliciesAD -PoliciesSearchBase $PoliciesSearchBase
             } else {
                 foreach ($Server in $ForestInformation['DomainDomainControllers']["$Domain"]) {
                     Write-Verbose "Get-GPOZaurrSysvol - Processing $Domain \ $($Server.HostName.Trim())"
-                    Test-SysVolFolders -GPOs $GPOs -Server $Server.Hostname -Domain $Domain
+                    Test-SysVolFolders -GPOs $GPOs -Server $Server.Hostname -Domain $Domain -PoliciesAD $PoliciesAD -PoliciesSearchBase $PoliciesSearchBase
                 }
             }
         } else {
