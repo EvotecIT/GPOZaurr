@@ -3,9 +3,8 @@
     param(
         [validateSet('AuthenticatedUsers', 'DomainComputers', 'Unknown', 'WellKnownAdministrative', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All')][string[]] $Type = 'All',
         [validateSet('Allow', 'Deny', 'All')][string] $PermitType = 'All',
-        [ValidateSet('GpoApply', 'GpoEdit', 'GpoCustom', 'GpoEditDeleteModifySecurity', 'GpoRead', 'GpoOwner', 'GpoCustomCreate', 'GpoCustomOwner')][string[]] $IncludePermissionType,
-        [ValidateSet('GpoApply', 'GpoEdit', 'GpoCustom', 'GpoEditDeleteModifySecurity', 'GpoRead', 'GpoOwner', 'GpoCustomCreate', 'GpoCustomOwner')][string[]] $ExcludePermissionType,
-
+        [ValidateSet('GpoApply', 'GpoEdit', 'GpoCustom', 'GpoEditDeleteModifySecurity', 'GpoRead', 'GpoOwner', 'GpoRootCreate', 'GpoRootOwner')][string[]] $IncludePermissionType,
+        [ValidateSet('GpoApply', 'GpoEdit', 'GpoCustom', 'GpoEditDeleteModifySecurity', 'GpoRead', 'GpoOwner', 'GpoRootCreate', 'GpoRootOwner')][string[]] $ExcludePermissionType,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
@@ -22,7 +21,7 @@
             $IncludePermTypes.Add([Microsoft.GroupPolicy.GPPermissionType]::$PermType)
         } elseif ($PermType -in 'GpoOwner') {
             $IncludeOwner = $true
-        } elseif ($PermType -in 'GpoCustomCreate', 'GpoCustomOwner') {
+        } elseif ($PermType -in 'GpoRootCreate', 'GpoRootOwner') {
             $CustomPermissions.Add($PermType)
         }
     }
@@ -31,7 +30,7 @@
             $ExcludePermTypes.Add([Microsoft.GroupPolicy.GPPermissionType]::$PermType)
         } elseif ($PermType -in 'GpoOwner') {
             $IncludeOwner = $false
-        } elseif ($PermType -in 'GpoCustomCreate', 'GpoCustomOwner') {
+        } elseif ($PermType -in 'GpoRootCreate', 'GpoRootOwner') {
             $CustomPermissions.Add($PermType)
         }
     }

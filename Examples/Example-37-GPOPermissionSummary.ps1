@@ -5,7 +5,6 @@
 # If you want to see also owners
 # 'GpoOwner'
 # If you want to include Root Level Permissions
-# 'GpoCustomCreate', 'GpoCustomOwner'
-
-$SummaryPermission = Get-GPOZaurrPermissionSummary -IncludePermissionType 'GPOCustom', 'GpoEdit', 'GpoEditDeleteModifySecurity', 'GpoOwner', 'GpoCustomCreate', 'GpoCustomOwner'
+# 'GpoRootCreate', 'GpoRootOwner'
+$SummaryPermission = Get-GPOZaurrPermissionSummary -IncludePermissionType 'GpoCustom', 'GpoEdit', 'GpoEditDeleteModifySecurity', 'GpoOwner', 'GpoRootCreate', 'GpoRootOwner'
 $SummaryPermission | Sort-Object -Property Permission | Format-Table

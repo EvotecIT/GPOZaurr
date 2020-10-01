@@ -1,8 +1,8 @@
 ﻿function Get-GPOZaurrPermissionRoot {
     [cmdletBinding()]
     param(
-        [ValidateSet('GpoCustomCreate', 'GpoCustomOwner')][string[]] $IncludePermissionType,
-        [ValidateSet('GpoCustomCreate', 'GpoCustomOwner')][string[]] $ExcludePermissionType,
+        [ValidateSet('GpoRootCreate', 'GpoRootOwner')][string[]] $IncludePermissionType,
+        [ValidateSet('GpoRootCreate', 'GpoRootOwner')][string[]] $ExcludePermissionType,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
@@ -29,10 +29,10 @@
             foreach ($Permission in $GPOPermissionsGlobal) {
                 $CustomPermission = foreach ($_ in $Permission.ActiveDirectoryRights) {
                     if ($_ -in 'WriteDACL', 'WriteOwner', 'GenericAll' ) {
-                        'GpoCustomOwner'
+                        'GpoRootOwner'
                     }
                     if ($_ -in 'CreateChild', 'GenericAll') {
-                        'GpoCustomCreate'
+                        'GpoRootCreate'
                     }
                 }
                 $CustomPermission = $CustomPermission | Sort-Object -Unique
