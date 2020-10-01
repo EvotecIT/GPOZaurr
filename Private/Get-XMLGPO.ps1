@@ -66,7 +66,7 @@
                 $OwnerType = 'NotAdministrative'
             }
         } else {
-            $OwnerType = 'EmptyOrUnknown'
+            $OwnerType = 'Unknown'
         }
     }
     if ($PermissionsOnly) {
