@@ -219,7 +219,7 @@
                     $UserNameDomain = $OwnerAccount.DomainName
                     $UserName = $OwnerAccount.Name
                     $SidType = $OwnerAccount.Type
-                    $ObjectClass = $OwnerAccount.ObjectClass
+                    $OwnerObjectClass = $OwnerAccount.ObjectClass
                     $SID = $OwnerAccount.ObjectSID
                 } else {
                     $ConvertFromSID = ConvertFrom-SID -SID $GPO.Owner
@@ -227,9 +227,9 @@
                     $Username = $ConvertFromSID.Name
                     $SidType = $ConvertFromSID.Type
                     if ($SidType -eq 'Unknown') {
-                        $ObjectClass = 'unknown'
+                        $OwnerObjectClass = 'unknown'
                     } else {
-                        $ObjectClass = 'foreignSecurityPrincipal'
+                        $OwnerObjectClass = 'foreignSecurityPrincipal'
                     }
                     $SID = $ConvertFromSID.SID
                 }
