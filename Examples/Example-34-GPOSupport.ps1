@@ -1,6 +1,8 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-#Invoke-GPOZaurrSupport -ComputerName 'AD1' -UserName 'przemyslaw.klys' -Type HTML
+Invoke-GPOZaurrSupport -ComputerName 'ad1.ad.evotec.xyz' -UserName 'EVOTEC\przemyslaw.klys' -Type NativeHTML -ForceGPResult -Verbose
+
+return
 #$Support1 = Invoke-GPOZaurrSupport -ComputerName 'AD1' -UserName 'przemyslaw.klys' -Type Object
 #$Support = Invoke-GPOZaurrSupport -ComputerName 'AD1' -UserName 'EVOTEC\Administrator' -Type Object
 #$Support.ComputerResults.ExtensionData
@@ -45,7 +47,7 @@ foreach ($GpoType in @('UserResults', 'ComputerResults')) {
 #Add-WindowsCapability -Online -Name 'Rsat.GroupPolicy.Management.Tools~~~~0.0.1.0'
 #Remove-WindowsCapability -Online -Name 'Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0'
 
-echo %logonserver%
+Write-Output %logonserver%
 nltest /dsgetsite
 nltest /dclist:
 
@@ -53,3 +55,27 @@ $env:LOGONSERVER
 [System.DirectoryServices.ActiveDirectory.ActiveDirectorySite]::GetComputerSite().Name
 nslookup -type=srv _ldap._tcp.ad.colmore.com.
 nslookup -type=srv _ldap._tcp.birmingham._sites.dc._msdcs.ad.colmore.com.
+
+
+function Get-PreData {
+    param(
+
+    )
+    [PSCustomObject] @{
+        Site = [System.DirectoryServices.ActiveDirectory.ActiveDirectorySite]::GetComputerSite().Name
+    }
+}
+
+function Get-ComputerDataInformation {
+    [cmdletBinding()]
+    param(
+        [string] $ComputerName = $Env:COMPUTERNAME
+    )
+    [PSCustomObject] @{
+        Bios        = Get-ComputerBios -ComputerName $ComputerName
+        Network     = Get-ComputerNetwork -ComputerName $ComputerName
+        NetworkCard = Get-ComputerNetworkCard -ComputerName $ComputerName
+    }
+}
+Get-ComputerDataInformation -ComputerName 'AD1.AD.EVOTEC.XYZ'
+#Get-ComputerNetwork -ComputerName 'AD1.AD.EVOTEC.XYZ' #| Format-Table
