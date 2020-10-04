@@ -56,6 +56,7 @@
         $Type = $Script:GPODitionary.Keys
     }
     if ($GPOPath) {
+        Write-Verbose "Invoke-GPOZaurr - Reading GPOs from $GPOPath"
         if (Test-Path -LiteralPath $GPOPath) {
             $GPOFiles = Get-ChildItem -LiteralPath $GPOPath -Recurse -File -Filter *.xml
             [Array] $GPOs = foreach ($File in $GPOFiles) {
@@ -79,6 +80,7 @@
             return
         }
     } else {
+        Write-Verbose "Invoke-GPOZaurr - Query AD for GPOs"
         [Array] $GPOs = Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     }
     # This caches single reports.
@@ -89,6 +91,7 @@
     $Output['Reports'] = [ordered] @{}
     $Output['CategoriesFull'] = [ordered] @{}
 
+    Write-Verbose "Invoke-GPOZaurr - Loading GPO Report to Categories"
     [Array] $GPOCategories = foreach ($GPO in $GPOs) {
         if ($GPOPath) {
             $GPOOutput = $GPO.GPOOutput
@@ -109,6 +112,7 @@
     # Build reports based on categories
     if ($Output['CategoriesFull'].Count -gt 0) {
         foreach ($Report in $Type) {
+            Write-Verbose "Invoke-GPOZaurr - Processing report type $Report"
             foreach ($CategoryType in $Script:GPODitionary[$Report].Types) {
                 $Category = $CategoryType.Category
                 $Settings = $CategoryType.Settings
@@ -142,6 +146,7 @@
                             }
                         }
                         if ($Script:GPODitionary[$Report]['CodeSingle']) {
+                            #Write-Verbose "Invoke-GPOZaurr - Processing $Report single entry mode"
                             $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['CodeSingle']
                             if ($Report -in $FindRequiredSingle) {
                                 foreach ($T in $TranslatedGpo) {
@@ -160,6 +165,7 @@
                         # think drive mapping - showing 1 mapping of a drive per object even if there are 50 drive mappings within 1 gpo
                         # this would result in 50 objects created
                         if ($Script:GPODitionary[$Report]['Code']) {
+                            #Write-Verbose "Invoke-GPOZaurr - Processing $Report multi entry mode"
                             $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['Code']
                             foreach ($T in $TranslatedGpo) {
                                 $Output['Reports'][$Report].Add($T)
@@ -178,7 +184,9 @@
                 $Output['Reports'][$Report] = [System.Collections.Generic.List[PSCustomObject]]::new()
             }
             $FindReport = $ReportType.Report
+            Write-Verbose "Invoke-GPOZaurr - Processing reports based on other report $Report ($FindReport)"
             foreach ($GPO in $TemporaryCachedSingleReports['ReportsSingle'][$FindReport]) {
+                Write-Verbose "Invoke-GPOZaurr - Processing $Report"
                 $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['CodeReport']
                 foreach ($T in $TranslatedGpo) {
                     $Output['Reports'][$Report].Add($T)
@@ -193,7 +201,8 @@
     if (-not $SkipNormalize) {
         foreach ($Report in [string[]] $Output['Reports'].Keys) {
             $FirstProperties = 'DisplayName', 'DomainName', 'GUID', 'GpoType'
-            $EndProperties = 'CreatedTime', 'ModifiedTime', 'ReadTime', 'Filters', 'Linked', 'LinksCount', 'Links'
+            #$EndProperties = 'CreatedTime', 'ModifiedTime', 'ReadTime', 'Filters', 'Linked', 'LinksCount', 'Links'
+            $EndProperties = 'Filters', 'Linked', 'LinksCount', 'Links'
             $Properties = $Output['Reports'][$Report] | Select-Properties -ExcludeProperty ($FirstProperties + $EndProperties) -AllProperties -WarningAction SilentlyContinue
             $DisplayProperties = @(
                 $FirstProperties
