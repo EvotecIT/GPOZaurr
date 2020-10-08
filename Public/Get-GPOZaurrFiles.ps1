@@ -284,16 +284,33 @@
                 $MetaData = Get-FileMetaData -File $_ -AsHashTable
             }
             if ($Signature) {
-                $DigitalSignature = Get-AuthenticodeSignature -FilePath $_.Fullname
-                $MetaData['SignatureStatus'] = $DigitalSignature.Status
-                $MetaData['IsOSBinary'] = $DigitalSignature.IsOSBinary
-                $MetaData['SignatureCertificateSubject'] = $DigitalSignature.SignerCertificate.Subject
-                if ($Extended) {
-                    $MetaData['SignatureCertificateIssuer'] = $DigitalSignature.SignerCertificate.Issuer
-                    $MetaData['SignatureCertificateSerialNumber'] = $DigitalSignature.SignerCertificate.SerialNumber
-                    $MetaData['SignatureCertificateNotBefore'] = $DigitalSignature.SignerCertificate.NotBefore
-                    $MetaData['SignatureCertificateNotAfter'] = $DigitalSignature.SignerCertificate.NotAfter
-                    $MetaData['SignatureCertificateThumbprint'] = $DigitalSignature.SignerCertificate.Thumbprint
+                try {
+                    $DigitalSignature = Get-AuthenticodeSignature -FilePath $_.Fullname -ErrorAction Stop
+                } catch {
+                    Write-Warning "Get-GPOZaurrFiles - Error when reading signature: $($_.Exception.Message)"
+                }
+                if ($DigitalSignature) {
+                    $MetaData['SignatureStatus'] = $DigitalSignature.Status
+                    $MetaData['IsOSBinary'] = $DigitalSignature.IsOSBinary
+                    $MetaData['SignatureCertificateSubject'] = $DigitalSignature.SignerCertificate.Subject
+                    if ($Extended) {
+                        $MetaData['SignatureCertificateIssuer'] = $DigitalSignature.SignerCertificate.Issuer
+                        $MetaData['SignatureCertificateSerialNumber'] = $DigitalSignature.SignerCertificate.SerialNumber
+                        $MetaData['SignatureCertificateNotBefore'] = $DigitalSignature.SignerCertificate.NotBefore
+                        $MetaData['SignatureCertificateNotAfter'] = $DigitalSignature.SignerCertificate.NotAfter
+                        $MetaData['SignatureCertificateThumbprint'] = $DigitalSignature.SignerCertificate.Thumbprint
+                    }
+                } else {
+                    $MetaData['SignatureStatus'] = 'Not available'
+                    $MetaData['IsOSBinary'] = $null
+                    $MetaData['SignatureCertificateSubject'] = $null
+                    if ($Extended) {
+                        $MetaData['SignatureCertificateIssuer'] = $null
+                        $MetaData['SignatureCertificateSerialNumber'] = $null
+                        $MetaData['SignatureCertificateNotBefore'] = $null
+                        $MetaData['SignatureCertificateNotAfter'] = $null
+                        $MetaData['SignatureCertificateThumbprint'] = $null
+                    }
                 }
             }
             if ($HashAlgorithm -ne 'None') {
