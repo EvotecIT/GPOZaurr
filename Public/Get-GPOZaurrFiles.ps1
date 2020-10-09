@@ -4,9 +4,9 @@
         [ValidateSet('All', 'Netlogon', 'Sysvol')][string[]] $Type = 'All',
         [ValidateSet('None', 'MACTripleDES', 'MD5', 'RIPEMD160', 'SHA1', 'SHA256', 'SHA384', 'SHA512')][string] $HashAlgorithm = 'None',
         [switch] $Signature,
-        [switch] $Limited,
         [switch] $AsHashTable,
         [switch] $Extended,
+        [switch] $ExtendedMetaData,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
@@ -265,7 +265,7 @@
                 $SuggestedAction = 'Requires verification'
                 $SuggestedActionComment = 'Not able to auto asses'
             }
-            if ($Limited) {
+            if (-not $ExtendedMetaData) {
                 $MetaData = [ordered] @{
                     LocationType           = $FileType.Name
                     FullName               = $_.FullName
@@ -282,6 +282,10 @@
                 }
             } else {
                 $MetaData = Get-FileMetaData -File $_ -AsHashTable
+                $MetaData['SuggestedAction'] = $SuggestedAction
+                $MetaData['SuggestedActionComment'] = $SuggestedActionComment
+                $MetaData['BelongsToGPO'] = $BelongsToGPO
+                $MetaData['GPODisplayName'] = $GPODisplayName
             }
             if ($Signature) {
                 try {

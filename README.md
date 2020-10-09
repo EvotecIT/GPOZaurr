@@ -60,6 +60,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
   - Improved `Get-GPOZaurrPermissionSummary` to include `Get-GPOZaurrPermissionRoot` custom permissions
   - Updated `Remove-GPOZaurrPermission`
   - Updated `Get-GpoZaurrPermission`
+  - Updated `Get-GPOZaurrFiles` to better handle access issue
+  - Reversed parameters `Get-GPOZaurrFiles` from `Limited` to `ExtendedMetaData` and fixed missing columns
 - 0.0.61 - 31.08.2020
   - Improvement to `Get-GPOZaurrPermissionSummary`
   - Fixes to `ConvertFrom-CSExtension`
