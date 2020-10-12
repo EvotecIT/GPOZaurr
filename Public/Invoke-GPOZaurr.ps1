@@ -50,7 +50,9 @@
 
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
-        [switch] $SkipCleanup
+        [switch] $SkipCleanup,
+
+        [switch] $Extended
     )
     if ($Type.Count -eq 0) {
         $Type = $Script:GPODitionary.Keys
@@ -219,9 +221,18 @@
     #$Output['PoliciesTotal'] = $Output.Reports.Policies.PolicyCategory | Group-Object | Select-Object Name, Count | Sort-Object -Property Count -Descending
 
     if (-not $SkipCleanup) {
+        Write-Verbose "Invoke-GPOZaurr - Cleaning up output"
         Remove-EmptyValue -Hashtable $Output -Recursive
     }
-    return $Output
+    if ($Extended) {
+        $Output
+    } else {
+        if ($Output.Reports) {
+            $Output.Reports
+        } else {
+            Write-Warning "Invoke-GPOZaurr - There was no data output for requested types."
+        }
+    }
 }
 
 [scriptblock] $SourcesAutoCompleter = {

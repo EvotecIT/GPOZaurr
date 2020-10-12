@@ -2,11 +2,11 @@ function ConvertTo-XMLGenericPublicKey {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,
-        [string[]] $Category
+        [string[]] $Category,
+        [switch] $SingleObject
     )
-
     $SkipNames = ('Name', 'LocalName', 'NamespaceURI', 'Prefix', 'NodeType', 'ParentNode', 'OwnerDocument', 'IsEmpty', 'Attributes', 'HasAttributes', 'SchemaInfo', 'InnerXml', 'InnerText', 'NextSibling', 'PreviousSibling', 'ChildNodes', 'FirstChild', 'LastChild', 'HasChildNodes', 'IsReadOnly', 'OuterXml', 'BaseURI', 'PreviousText')
-    foreach ($Setting in $GPO.DataSet) {
+    if ($SingleObject) {
         $CreateGPO = [ordered]@{
             DisplayName = $GPO.DisplayName
             DomainName  = $GPO.DomainName
@@ -14,23 +14,57 @@ function ConvertTo-XMLGenericPublicKey {
             GpoType     = $GPO.GpoType
             #GpoCategory = $GPOEntry.GpoCategory
             #GpoSettings = $GPOEntry.GpoSettings
+            Count       = 0
+            Settings    = $null
         }
-        $SettingName = $Setting.Name -split ":"
-        $CreateGPO['CreatedTime'] = $GPO.CreatedTime         # : 06.06.2020 18:03:36
-        $CreateGPO['ModifiedTime'] = $GPO.ModifiedTime        # : 17.06.2020 16:08:10
-        $CreateGPO['ReadTime'] = $GPO.ReadTime            # : 13.08.2020 10:15:37
-        $CreateGPO['SecurityDescriptor'] = $GPO.SecurityDescriptor  # : SecurityDescriptor
-        $CreateGPO['FilterDataAvailable'] = $GPO.FilterDataAvailable # : True
+        [Array] $CreateGPO['Settings'] = foreach ($Setting in $GPO.DataSet) {
+            $SettingName = $Setting.Name -split ":"
+            $MySettings = [ordered] @{
+                CreatedTime         = $GPO.CreatedTime         # : 06.06.2020 18:03:36
+                ModifiedTime        = $GPO.ModifiedTime        # : 17.06.2020 16:08:10
+                ReadTime            = $GPO.ReadTime            # : 13.08.2020 10:15:37
+                SecurityDescriptor  = $GPO.SecurityDescriptor  # : SecurityDescriptor
+                FilterDataAvailable = $GPO.FilterDataAvailable # : True
+            }
+            $Name = $SettingName[1]
+            #$Name = Format-ToTitleCase -Text $Setting.Name -RemoveWhiteSpace -RemoveChar ',', '-', "'", '\(', '\)', ':'
+            $MySettings['Name'] = $Name # $Setting.Name
 
-        $Name = $SettingName[1]
-        #$Name = Format-ToTitleCase -Text $Setting.Name -RemoveWhiteSpace -RemoveChar ',', '-', "'", '\(', '\)', ':'
-        $CreateGPO['Name'] = $Name # $Setting.Name
-        #$CreateGPO['GPOSettingOrder'] = $Setting.GPOSettingOrder
+            ConvertTo-XMLNested -CreateGPO $MySettings -Setting $Setting -SkipNames $SkipNames #-Name $Name
+            [PSCustomObject] $MySettings
+        }
 
-        #foreach ($Property in ($Setting.Properties | Get-Member -MemberType Properties).Name) {
+        $CreateGPO['Count'] = $CreateGPO['Settings'].Count
+        $CreateGPO['Linked'] = $GPO.Linked
+        $CreateGPO['LinksCount'] = $GPO.LinksCount
+        $CreateGPO['Links'] = $GPO.Links
+        [PSCustomObject] $CreateGPO
+    } else {
+        foreach ($Setting in $GPO.DataSet) {
+            $CreateGPO = [ordered]@{
+                DisplayName = $GPO.DisplayName
+                DomainName  = $GPO.DomainName
+                GUID        = $GPO.GUID
+                GpoType     = $GPO.GpoType
+                #GpoCategory = $GPOEntry.GpoCategory
+                #GpoSettings = $GPOEntry.GpoSettings
+            }
+            $SettingName = $Setting.Name -split ":"
+            $CreateGPO['CreatedTime'] = $GPO.CreatedTime         # : 06.06.2020 18:03:36
+            $CreateGPO['ModifiedTime'] = $GPO.ModifiedTime        # : 17.06.2020 16:08:10
+            $CreateGPO['ReadTime'] = $GPO.ReadTime            # : 13.08.2020 10:15:37
+            $CreateGPO['SecurityDescriptor'] = $GPO.SecurityDescriptor  # : SecurityDescriptor
+            $CreateGPO['FilterDataAvailable'] = $GPO.FilterDataAvailable # : True
 
-        ConvertTo-XMLNested -CreateGPO $CreateGPO -Setting $Setting -SkipNames $SkipNames #-Name $Name
-        <#
+            $Name = $SettingName[1]
+            #$Name = Format-ToTitleCase -Text $Setting.Name -RemoveWhiteSpace -RemoveChar ',', '-', "'", '\(', '\)', ':'
+            $CreateGPO['Name'] = $Name # $Setting.Name
+            #$CreateGPO['GPOSettingOrder'] = $Setting.GPOSettingOrder
+
+            #foreach ($Property in ($Setting.Properties | Get-Member -MemberType Properties).Name) {
+
+            ConvertTo-XMLNested -CreateGPO $CreateGPO -Setting $Setting -SkipNames $SkipNames #-Name $Name
+            <#
         $Properties = $Setting.PSObject.Properties.Name | Where-Object { $_ -notin $SkipNames }
         foreach ($Property in $Properties) {
             If ($Property -eq 'Value') {
@@ -62,13 +96,11 @@ function ConvertTo-XMLGenericPublicKey {
             }
         }
         #>
-
-
-        $CreateGPO['Filters'] = $Setting.Filters
-
-        $CreateGPO['Linked'] = $GPO.Linked
-        $CreateGPO['LinksCount'] = $GPO.LinksCount
-        $CreateGPO['Links'] = $GPO.Links
-        [PSCustomObject] $CreateGPO
+            $CreateGPO['Filters'] = $Setting.Filters
+            $CreateGPO['Linked'] = $GPO.Linked
+            $CreateGPO['LinksCount'] = $GPO.LinksCount
+            $CreateGPO['Links'] = $GPO.Links
+            [PSCustomObject] $CreateGPO
+        }
     }
 }
