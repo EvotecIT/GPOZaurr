@@ -1,9 +1,11 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 # Use Save-GPOZaurrFiles -GPOPath $ENV:USERPROFILE\Desktop\GPOExportAudit
-$Output = Invoke-GPOZaurr -GPOPath $ENV:USERPROFILE\Desktop\GPOExportAudit -Verbose #-SkipCleanup #-Type PoliciesPrinters, Policies
-$Output | Format-Table *
 
+# This will allow you to process offline data more than once
+# It's useful for when you want to request different types
+$Output = Invoke-GPOZaurr -GPOPath $ENV:USERPROFILE\Desktop\GPOExportAudit -Extended -Verbose
+$Output | Format-Table *
 $Output.Reports | Format-Table
 
 # Export to Excel
