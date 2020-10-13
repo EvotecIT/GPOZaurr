@@ -11,7 +11,7 @@
             ConvertTo-XMLAccountPolicy -GPO $GPO
         }
         CodeSingle = {
-            ConvertTo-XMLAccountPolicy -GPO $GPO
+            ConvertTo-XMLAccountPolicy -GPO $GPO -SingleObject
         }
     }
     Audit                             = [ordered] @{
@@ -33,7 +33,7 @@
             ConvertTo-XMLAudit -GPO $GPO
         }
         CodeSingle = {
-            ConvertTo-XMLAudit -GPO $GPO
+            ConvertTo-XMLAudit -GPO $GPO -SingleObject
         }
     }
     Autologon                         = [ordered] @{
@@ -51,15 +51,18 @@
         }
     }
     AutoPlay                          = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/AutoPlay Policies'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/AutoPlay Policies'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/AutoPlay Policies*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/AutoPlay Policies*' -SingleObject
         }
     }
     Biometrics                        = @{
@@ -76,148 +79,185 @@
         }
     }
     Bitlocker                         = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/BitLocker Drive Encryption'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/BitLocker Drive Encryption'
+        Code       = {
             #ConvertTo-XMLBitlocker -GPO $GPO
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/BitLocker Drive Encryption*'
         }
+        CodeSingle = {
+            #ConvertTo-XMLBitlocker -GPO $GPO
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/BitLocker Drive Encryption*' -SingleObject
+        }
     }
     ControlPanel                      = [ordered]@{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Controol Panel'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Controol Panel'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel' -SingleObject
         }
     }
     ControlPanelAddRemove             = [ordered]@{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Control Panel/Add or Remove Programs'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Control Panel/Add or Remove Programs'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Add or Remove Programs'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Add or Remove Programs' -SingleObject
         }
     }
     ControlPanelDisplay               = [ordered]@{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Control Panel/Display'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Control Panel/Display'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Display'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Display' -SingleObject
         }
     }
     ControlPanelPersonalization       = [ordered]@{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Control Panel/Personalization'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Control Panel/Personalization'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Personalization'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Personalization' -SingleObject
         }
     }
     ControlPanelPrinters              = [ordered]@{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Control Panel/Printers'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Control Panel/Printers'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Printers'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Printers' -SingleObject
         }
     }
     ControlPanelPrograms              = [ordered]@{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Control Panel/Programs'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Control Panel/Programs'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Programs'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Programs' -SingleObject
         }
     }
     ControlPanelRegional              = [ordered]@{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Control Panel/Regional and Language Options'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Control Panel/Regional and Language Options'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Regional and Language Options'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Control Panel/Regional and Language Options' -SingleObject
         }
     }
     CredentialsDelegation             = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> System/Credentials Delegation'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> System/Credentials Delegation'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Credentials Delegation*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Credentials Delegation*' -SingleObject
         }
     }
     CustomInternationalSettings       = [ordered]@{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Custom International Settings'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Custom International Settings'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Custom International Settings*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Custom International Settings*' -SingleObject
         }
     }
     Desktop                           = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Desktop'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Desktop'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Desktop*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Desktop*' -SingleObject
         }
     }
     DnsClient                         = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Network/DNS Client'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Network/DNS Client'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Network/DNS Client*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Network/DNS Client*' -SingleObject
         }
     }
     DriveMapping                      = [ordered] @{
@@ -251,115 +291,142 @@
         }
     }
     EventForwarding                   = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Event Forwarding'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Event Forwarding'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Event Forwarding*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Event Forwarding*' -SingleObject
         }
     }
     EventLogService                   = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Event Log Service'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Event Log Service'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Event Log Service*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Event Log Service*' -SingleObject
         }
     }
     FileExplorer                      = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/File Explorer'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/File Explorer'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/File Explorer*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/File Explorer*' -SingleObject
         }
     }
     FolderRedirection                 = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> System/Folder Redirection'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> System/Folder Redirection'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Folder Redirection'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Folder Redirection' -SingleObject
         }
     }
     FSLogix                           = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> FSLogix'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> FSLogix'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'FSLogix'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'FSLogix' -SingleObject
         }
     }
     GoogleChrome                      = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = @(
+        GPOPath    = @(
             'Policies -> Administrative Templates -> Google Chrome'
             'Policies -> Administrative Templates -> Google/Google Chrome'
             'Policies -> Administrative Templates -> Google Chrome - Default Settings (users can override)'
         )
-        Code    = {
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Google Chrome', 'Google/Google Chrome', 'Google Chrome - Default Settings (users can override)'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Google Chrome', 'Google/Google Chrome', 'Google Chrome - Default Settings (users can override)' -SingleObject
         }
     }
     GroupPolicy                       = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> System/Group Policy'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> System/Group Policy'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Group Policy*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Group Policy*' -SingleObject
         }
     }
     InternetCommunicationManagement   = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> System/Internet Communication Management'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> System/Internet Communication Management'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Internet Communication Management*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Internet Communication Management*' -SingleObject
         }
     }
     InternetExplorer                  = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Internet Explorer'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Internet Explorer'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Internet Explorer*', 'Composants Windows/Celle Internet Explorer'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Internet Explorer*', 'Composants Windows/Celle Internet Explorer' -SingleObject
         }
     }
     InternetExplorerZones             = [ordered] @{
@@ -374,40 +441,49 @@
         }
     }
     KDC                               = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> System/KDC'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> System/KDC'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/KDC'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/KDC' -SingleObject
         }
     }
     LAPS                              = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> LAPS'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> LAPS'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'LAPS'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'LAPS' -SingleObject
         }
     }
     Lithnet                           = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Lithnet/Password Protection for Active Directory'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Lithnet/Password Protection for Active Directory'
+        Code       = {
             #ConvertTo-XMLLithnetFilter -GPO $GPO
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Lithnet/Password Protection for Active Directory*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Lithnet/Password Protection for Active Directory*' -SingleObject
         }
     }
     LocalUsers                        = [ordered] @{
@@ -441,151 +517,187 @@
         }
     }
     Logon                             = @{
-        Types   = @(
+        Types      = @(
             @{ Category = 'RegistrySettings'; Settings = 'Policy' }
         )
-        GPOPath = 'Policies -> Administrative Templates -> System/Logon'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> System/Logon'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Logon*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Logon*' -SingleObject
         }
     }
     MicrosoftOutlook2002              = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Microsoft Outlook 2002'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Microsoft Outlook 2002'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2002*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2002*' -SingleObject
         }
     }
     MicrosoftEdge                     = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = @(
+        GPOPath    = @(
             'Policies -> Administrative Templates -> Microsoft Edge'
             'Policies -> Administrative Templates -> Windows Components/Edge UI'
             'Policies -> Administrative Templates -> Windows Components/Microsoft Edge'
         )
-        Code    = {
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Edge*', 'Windows Components/Microsoft Edge', 'Windows Components/Edge UI'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Edge*', 'Windows Components/Microsoft Edge', 'Windows Components/Edge UI' -SingleObject
         }
     }
     MicrosoftOutlook2003              = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = @(
+        GPOPath    = @(
             'Policies -> Administrative Templates -> Microsoft Office Outlook 2003'
             'Policies -> Administrative Templates -> Outlook 2003 RPC Encryption'
         )
-        Code    = {
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Office Outlook 2003*', 'Outlook 2003 RPC Encryption'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Office Outlook 2003*', 'Outlook 2003 RPC Encryption' -SingleObject
         }
     }
     MicrosoftOutlook2010              = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Microsoft Outlook 2010'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Microsoft Outlook 2010'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2010*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2010*' -SingleObject
         }
     }
     MicrosoftOutlook2013              = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Microsoft Outlook 2013'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Microsoft Outlook 2013'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2013*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2013*' -SingleObject
         }
     }
     MicrosoftOutlook2016              = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Microsoft Outlook 2016'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Microsoft Outlook 2016'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2016*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Microsoft Outlook 2016*' -SingleObject
         }
     }
     MicrosoftManagementConsole        = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Microsoft Management Console'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Microsoft Management Console'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Microsoft Management Console*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Microsoft Management Console*' -SingleObject
         }
     }
     NetMeeting                        = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/NetMeeting'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/NetMeeting'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/NetMeeting*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/NetMeeting*' -SingleObject
         }
     }
     MSSLegacy                         = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> MSS (Legacy)'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> MSS (Legacy)'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'MSS (Legacy)'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'MSS (Legacy)' -SingleObject
         }
     }
     MSSecurityGuide                   = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> MS Security Guide'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> MS Security Guide'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'MS Security Guide'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'MS Security Guide' -SingleObject
         }
     }
     OneDrive                          = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/OneDrive'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/OneDrive'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/OneDrive*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/OneDrive*' -SingleObject
         }
     }
     Policies                          = @{
@@ -624,18 +736,21 @@
         }
     }
     PrintersPolicies                  = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = @(
+        GPOPath    = @(
             'Policies -> Administrative Templates -> Printers'
             'Policies -> Administrative Templates -> Control Panel/Printers'
         )
-        Code    = {
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Printers*', 'Control Panel/Printers*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Printers*', 'Control Panel/Printers*' -SingleObject
         }
     }
     PublicKeyPoliciesCertificates     = [ordered] @{
@@ -736,17 +851,20 @@
         }
     }
     PublicKeyPoliciesEnrollmentPolicy = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = @(
+        GPOPath    = @(
             'Policies -> Windows Settings -> Security Settings -> Public Key Policies'
         )
-        Code    = {
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Internet Communication Management*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Internet Communication Management*' -SingleObject
         }
     }
     RegistrySetting                   = [ordered] @{
@@ -780,51 +898,63 @@
         }
     }
     OnlineAssistance                  = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Online Assistance'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Online Assistance'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Online Assistance*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Online Assistance*' -SingleObject
         }
     }
     RemoteAssistance                  = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> System/Remote Assistance'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> System/Remote Assistance'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Remote Assistance*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Remote Assistance*' -SingleObject
         }
     }
     RemoteDesktopServices             = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Remote Desktop Services'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Remote Desktop Services'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Remote Desktop Services*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Remote Desktop Services*' -SingleObject
         }
     }
     RSSFeeds                          = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/RSS Feeds'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/RSS Feeds'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/RSS Feeds*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/RSS Feeds*' -SingleObject
         }
     }
     Scripts                           = [ordered] @{
@@ -939,15 +1069,18 @@
         }
     }
     TaskSchedulerPolicies             = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Task Scheduler'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Task Scheduler'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Task Scheduler*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Task Scheduler*' -SingleObject
         }
     }
     <#
@@ -984,127 +1117,157 @@
         }
     }
     WindowsDefender                   = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Windows Defender'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Windows Defender'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*' -SingleObject
         }
     }
     WindowsDefenderExploitGuard       = @{
         # this needs improvements because of DropDownList
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard*' -SingleObject
         }
     }
     WindowsHelloForBusiness           = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Windows Hello For Business'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Windows Hello For Business'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Hello For Business*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Hello For Business*' -SingleObject
         }
     }
     WindowsInstaller                  = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Windows Installer'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Windows Installer'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Installer*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Installer*' -SingleObject
         }
     }
     WindowsLogon                      = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Windows Logon Options'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Windows Logon Options'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Logon Options*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Logon Options*' -SingleObject
         }
     }
     WindowsMediaPlayer                = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Windows Media Player'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Windows Media Player'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Media Player*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Media Player*' -SingleObject
         }
     }
     WindowsMessenger                  = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Windows Messenger'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Windows Messenger'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Messenger*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Messenger*' -SingleObject
         }
     }
     WindowsPowerShell                 = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Windows PowerShell'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Windows PowerShell'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows PowerShell*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows PowerShell*' -SingleObject
         }
     }
     WindowsRemoteManagement           = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = 'Policies -> Administrative Templates -> Windows Components/Windows Remote Management (WinRM)'
-        Code    = {
+        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Windows Remote Management (WinRM)'
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Remote Management (WinRM)*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Remote Management (WinRM)*' -SingleObject
         }
     }
     WindowsUpdate                     = @{
-        Types   = @(
+        Types      = @(
             @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
         )
-        GPOPath = @(
+        GPOPath    = @(
             'Policies -> Administrative Templates -> Windows Components/Windows Update'
             #'Policies -> Administrative Templates -> Windows Components/Delivery Optimization'
         )
-        Code    = {
+        Code       = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Update*', 'Windows Components/Delivery Optimization*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Update*', 'Windows Components/Delivery Optimization*' -SingleObject
         }
     }
 }

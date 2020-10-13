@@ -5,7 +5,7 @@ function ConvertTo-XMLGenericSecuritySettings {
         [string[]] $Category
     )
     $SkipNames = ('Name', 'LocalName', 'NamespaceURI', 'Prefix', 'NodeType', 'ParentNode', 'OwnerDocument', 'IsEmpty', 'Attributes', 'HasAttributes', 'SchemaInfo', 'InnerXml', 'InnerText', 'NextSibling', 'PreviousSibling', 'Value', 'ChildNodes', 'FirstChild', 'LastChild', 'HasChildNodes', 'IsReadOnly', 'OuterXml', 'BaseURI', 'PreviousText')
-    $UsedNames = [System.Collections.Generic.List[string]]::new()
+    #$UsedNames = [System.Collections.Generic.List[string]]::new()
     [Array] $Settings = foreach ($Cat in $Category) {
         $GPO.DataSet | Where-Object { $null -ne $_.$Cat }
     }
