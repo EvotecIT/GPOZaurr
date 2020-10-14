@@ -1,4 +1,4 @@
-﻿function Invoke-GPOZaurr {
+﻿function Invoke-GPOZaurrContent {
     [alias('Find-GPO')]
     [cmdletBinding(DefaultParameterSetName = 'Default')]
     param(

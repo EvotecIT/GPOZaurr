@@ -50,6 +50,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 ## Changelog
 
 - 0.0.62 - Unreleased
+  - Renamed `Invoke-GPOZaurr` to `Invoke-GPOZaurrContent` - I want to use `Invoke-GPOZaurr` for something else
   - Improvements to `Get-GPOZaurrPermissionConsistency` for GPOs without SYSVOL to be reported properly
   - Added `Get-GPOZaurrPermissionRoot`
   - Renamed `Remove-GPOZaurrOrphanedSysvolFolders` to `Remove-GPOZaurrOrphaned`
