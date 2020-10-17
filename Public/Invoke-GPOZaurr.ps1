@@ -1,4 +1,4 @@
-﻿function Invoke-GPOZaurrContent {
+﻿function Invoke-GPOZaurr {
     [alias('Find-GPO')]
     [cmdletBinding(DefaultParameterSetName = 'Default')]
     param(
@@ -21,11 +21,9 @@
         [Parameter(ParameterSetName = 'Local')]
         [switch] $FullObjects,
 
-        <#
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
-        [ValidateSet('HTML', 'Object', 'Excel')][string[]] $OutputType = 'Object',
-
+        [ValidateSet('HTML', 'Object')][string[]] $OutputType = 'Object',
 
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
@@ -34,7 +32,10 @@
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
         [switch] $Open,
-        #>
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Parameter(ParameterSetName = 'Local')]
+        [switch] $Online,
 
         [Parameter(ParameterSetName = 'Default')]
         [Parameter(ParameterSetName = 'Local')]
@@ -228,7 +229,25 @@
         $Output
     } else {
         if ($Output.Reports) {
-            $Output.Reports
+            if ($OutputType -eq 'Object') {
+                $Output.Reports
+            }
+            if ($OutputType -eq 'HTML') {
+                if (-not $OutputPath) {
+                    $OutputPath = Get-FileName -Extension 'html' -Temporary
+                    Write-Warning "Invoke-GPOZaurr - OutputPath not given. Using $OutputPath"
+                }
+                New-HTML {
+                    New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
+                    New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
+                    New-HTMLTableOption -DataStore JavaScript
+                    foreach ($Key in  $Output.Reports.Keys) {
+                        New-HTMLTab -Name $Key {
+                            New-HTMLTable -DataTable $Output.Reports[$Key] -Filtering -Title $Key
+                        }
+                    }
+                } -FilePath $OutputPath -ShowHTML:$Open -Online:$Online
+            }
         } else {
             Write-Warning "Invoke-GPOZaurr - There was no data output for requested types."
         }

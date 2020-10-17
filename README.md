@@ -49,6 +49,11 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.63 - Unreleased
+  - Renamed `Invoke-GPOZaurrContent` back to `Invoke-GPOZaurr`
+  - Added `Show-GPOZaurr` (WIP)
+  - Added `OutputType`,`OutputType`,`Open`,`Online` parameters to `Invoke-GPOZaurr`
+  - Improved `Get-GPOZaurrOwner`
 - 0.0.62 - 14.10.2020
   - Renamed `Invoke-GPOZaurr` to `Invoke-GPOZaurrContent` - I want to use `Invoke-GPOZaurr` for something else
   - Improvements to `Get-GPOZaurrPermissionConsistency` for GPOs without SYSVOL to be reported properly

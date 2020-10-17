@@ -49,6 +49,9 @@
                 $Object['SysvolType'] = $FileOwner.OwnerType
                 $Object['SysvolPath'] = $_.Path
                 $Object['IsOwnerConsistent'] = if ($ACL.OwnerName -eq $FileOwner.OwnerName) { $true } else { $false }
+                $Object['IsOwnerAdministrative'] = if ($Object['SysvolType'] -eq 'Administrative' -and $Object['OwnerType'] -eq 'Administrative') { $true } else { $false }
+            } else {
+                $Object['IsOwnerAdministrative'] = if ($Object['OwnerType'] -eq 'Administrative') { $true } else { $false }
             }
             $Object['DistinguishedName'] = $_.GPODistinguishedName
             [PSCUstomObject] $Object
