@@ -236,12 +236,14 @@
                     $OutputPath = Get-FileName -Extension 'html' -Temporary
                     Write-Warning "Invoke-GPOZaurr - OutputPath not given. Using $OutputPath"
                 }
+                Write-Verbose "Invoke-GPOZaurr - Generating HTML output"
                 New-HTML {
                     New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
                     New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
                     New-HTMLTableOption -DataStore JavaScript
                     foreach ($Key in  $Output.Reports.Keys) {
                         New-HTMLTab -Name $Key {
+                            Write-Verbose "Invoke-GPOZaurr - Generating HTML Table for $Key"
                             New-HTMLTable -DataTable $Output.Reports[$Key] -Filtering -Title $Key
                         }
                     }
