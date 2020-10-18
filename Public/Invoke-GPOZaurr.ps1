@@ -189,7 +189,6 @@
             $FindReport = $ReportType.Report
             Write-Verbose "Invoke-GPOZaurr - Processing reports based on other report $Report ($FindReport)"
             foreach ($GPO in $TemporaryCachedSingleReports['ReportsSingle'][$FindReport]) {
-                Write-Verbose "Invoke-GPOZaurr - Processing $Report"
                 $TranslatedGpo = Invoke-Command -ScriptBlock $Script:GPODitionary[$Report]['CodeReport']
                 foreach ($T in $TranslatedGpo) {
                     $Output['Reports'][$Report].Add($T)

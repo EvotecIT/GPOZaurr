@@ -1,8 +1,9 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 # Asses GPO based on exported data
-$Output = Invoke-GPOZaurr -GPOPath $Env:USERPROFILE\Desktop\GPOExport_2020.10.12 -Verbose
+$Output = Invoke-GPOZaurr -GPOPath $Env:USERPROFILE\Desktop\GPOExport_2020.10.12 -Verbose -Type RegistrySetting
 $Output | Format-Table *
+
 
 # Export to Excel
 foreach ($Key in $Output.Keys) {

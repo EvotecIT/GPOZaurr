@@ -4,14 +4,26 @@
         [string] $FilePath
     )
 
-    $GPOContent = Invoke-GPOZaurr
+    Write-Verbose -Message "Show-GPOZaurr - Processing GPO List"
     $GPOSummary = Get-GPOZaurr
+
+    Write-Verbose -Message "Show-GPOZaurr - Processing GPO Sysvol"
     $GPOOrphans = Get-GPOZaurrSysvol
+
+    Write-Verbose -Message "Show-GPOZaurr - Processing GPO Permissions"
     $GPOPermissions = Get-GPOZaurrPermission -Type All -IncludePermissionType GpoEditDeleteModifySecurity, GpoEdit, GpoCustom -IncludeOwner
+
+    Write-Verbose -Message "Show-GPOZaurr - Processing GPO Permissions Consistency"
     $GPOPermissionsConsistency = Get-GPOZaurrPermissionConsistency -Type All -VerifyInheritance
+
+    Write-Verbose -Message "Show-GPOZaurr - Processing GPO Permissions Root"
     $GPOPermissionsRoot = Get-GPOZaurrPermissionRoot
 
+    Write-Verbose "Show-GPOZaurr - Processing GPO Owners"
     $GPOOwners = Get-GPOZaurrOwner -IncludeSysvol
+
+    Write-Verbose "Show-GPOZaurr - Processing GPO Analysis"
+    $GPOContent = Invoke-GPOZaurr
 
     $GPOLinked = $GPOSummary.Where( { $_.Linked -eq $true }, 'split')
     $GPOEmpty = $GPOSummary.Where( { $_.Empty -eq $true, 'split' })
@@ -23,6 +35,7 @@
     [Array] $Inconsistent = $GPOPermissionsConsistency.Where( { $_.ACLConsistent -eq $true } , 'split' )
     [Array] $InconsistentInside = $GPOPermissionsConsistency.Where( { $_.ACLConsistentInside -eq $true }, 'split' )
 
+    Write-Verbose "Show-GPOZaurr - Generating HTML"
     New-HTML {
         New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
         New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
@@ -31,7 +44,7 @@
             New-HTMLSection -Invisible {
                 New-HTMLPanel {
                     New-HTMLChart -Title 'Group Policies Summary' {
-                        New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color FireEngineRed, MediumSpringGreen, RedRobin, BlueDiamond
+                        New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
                         New-ChartBar -Name 'Group Policies' -Value $GPOLinked[1].Count, $GPOLinked[0].Count, $GPOEmpty[1].Count, $GPOTotal
 
                         #New-ChartBar -Name 'Linked' -Value $GPOLinked[0].Count
@@ -54,7 +67,7 @@
                         "It's also important that owner in Active Directory matches owner on SYSVOL (file system)."
                     New-HTMLChart {
                         New-ChartBarOptions -Type barStacked
-                        New-ChartLegend -Name 'Yes', 'No' -Color Green, Red
+                        New-ChartLegend -Name 'Yes', 'No' -Color PaleGreen, Orchid
                         New-ChartBar -Name 'Is administrative' -Value $IsOwnerAdministrative[0].Count, $IsOwnerAdministrative[1].Count
                         New-ChartBar -Name 'Is consistent' -Value $IsOwnerConsistent[0].Count, $IsOwnerConsistent[1].Count
                     } -Title 'Group Policy Owners'
@@ -66,8 +79,8 @@
         }
         New-HTMLTab -Name 'Group Policies Summary' {
             New-HTMLTable -DataTable $GPOSummary -Filtering {
-                New-HTMLTableCondition -Name 'Empty' -Value $false -BackgroundColor RedOxide -TextTransform capitalize -ComparisonType bool
-                New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor RedOxide -TextTransform capitalize -ComparisonType bool
+                New-HTMLTableCondition -Name 'Empty' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
+                New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
             }
         }
         New-HTMLTab -Name 'Sysvol' {
