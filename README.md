@@ -49,7 +49,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.63 - Unreleased
+- 0.0.63 - 19.10.2020
   - Renamed `Invoke-GPOZaurrContent` back to `Invoke-GPOZaurr`
   - Added `Show-GPOZaurr` (WIP)
   - Added `OutputType`,`OutputType`,`Open`,`Online` parameters to `Invoke-GPOZaurr`
