@@ -5,14 +5,15 @@
         [string] $Server,
         [string] $Domain,
         [System.Collections.IDictionary] $PoliciesAD,
-        $PoliciesSearchBase
+        [string] $PoliciesSearchBase
     )
     $Differences = @{ }
     $SysvolHash = @{ }
 
     $GPOGUIDS = $GPOs.ID.GUID
+    $SysVolPath = "\\$($Server)\SYSVOL\$Domain\Policies"
     try {
-        $SYSVOL = Get-ChildItem -Path "\\$($Server)\SYSVOL\$Domain\Policies" -ErrorAction Stop
+        $SYSVOL = Get-ChildItem -Path "\\$($Server)\SYSVOL\$Domain\Policies" -Exclude 'PolicyDefinitions' -ErrorAction Stop
     } catch {
         $Sysvol = $Null
     }
@@ -59,7 +60,10 @@
                     $ErrorMessage = $_.Exception.Message
                 }
             } else {
+                $FullPath = -join ($SysVolPath, "\{$($GPO.Id.Guid)}")
                 $ACL = $null
+                $Owner = ''
+                $ErrorMessage = 'Not found on SYSVOL'
             }
             if ($null -eq $Differences[$GPO.Id.Guid]) {
                 $SysVolStatus = 'Unknown Issue'
@@ -90,39 +94,37 @@
         # Now we need to list thru Sysvol files and fine those that do not exists as GPO and create dummy GPO objects to show orphaned gpos
         foreach ($_ in $Differences.Keys) {
             if ($Differences[$_] -in 'Not available in AD', 'Permissions issue') {
-                if ($SysvolHash[$_].BaseName -notcontains 'PolicyDefinitions') {
-                    $FullPath = $SysvolHash[$_].FullName
-                    try {
-                        $ACL = Get-Acl -Path $FullPath -ErrorAction Stop
-                        $Owner = $ACL.Owner
-                        $ErrorMessage = ''
-                    } catch {
-                        Write-Warning "Get-GPOZaurrSysvol - ACL reading (2) failed for $FullPath with error: $($_.Exception.Message)"
-                        $ACL = $null
-                        $Owner = $null
-                        $ErrorMessage = $_.Exception.Message
-                    }
+                $FullPath = $SysvolHash[$_].FullName
+                try {
+                    $ACL = Get-Acl -Path $FullPath -ErrorAction Stop
+                    $Owner = $ACL.Owner
+                    $ErrorMessage = ''
+                } catch {
+                    Write-Warning "Get-GPOZaurrSysvol - ACL reading (2) failed for $FullPath with error: $($_.Exception.Message)"
+                    $ACL = $null
+                    $Owner = $null
+                    $ErrorMessage = $_.Exception.Message
+                }
 
-                    [PSCustomObject] @{
-                        DisplayName      = $SysvolHash[$_].BaseName
-                        Status           = $Differences[$_]
-                        DomainName       = $Domain
-                        SysvolServer     = $Server
-                        SysvolStatus     = 'Exists' #$Differences[$GPO.Id.Guid]
-                        GpoStatus        = $Differences[$_]
-                        Owner            = ''
-                        FileOwner        = $Owner
-                        Id               = $_
-                        Path             = $FullPath
-                        DistinguishedName = -join ("CN={", $_, "},", $PoliciesSearchBase)
-                        Description      = $null
-                        CreationTime     = $SysvolHash[$_].CreationTime
-                        ModificationTime = $SysvolHash[$_].LastWriteTime
-                        UserVersion      = $null
-                        ComputerVersion  = $null
-                        WmiFilter        = $null
-                        Error            = $ErrorMessage
-                    }
+                [PSCustomObject] @{
+                    DisplayName       = $SysvolHash[$_].BaseName
+                    Status            = $Differences[$_]
+                    DomainName        = $Domain
+                    SysvolServer      = $Server
+                    SysvolStatus      = 'Exists' #$Differences[$GPO.Id.Guid]
+                    GpoStatus         = $Differences[$_]
+                    Owner             = ''
+                    FileOwner         = $Owner
+                    Id                = $_
+                    Path              = $FullPath
+                    DistinguishedName = -join ("CN={", $_, "},", $PoliciesSearchBase)
+                    Description       = $null
+                    CreationTime      = $SysvolHash[$_].CreationTime
+                    ModificationTime  = $SysvolHash[$_].LastWriteTime
+                    UserVersion       = $null
+                    ComputerVersion   = $null
+                    WmiFilter         = $null
+                    Error             = $ErrorMessage
                 }
             }
         }
