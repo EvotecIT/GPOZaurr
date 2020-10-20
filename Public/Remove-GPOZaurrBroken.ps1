@@ -1,4 +1,5 @@
-﻿function Remove-GPOZaurrOrphaned {
+﻿function Remove-GPOZaurrBroken {
+    [alias('Remove-GPOZaurrOrphaned')]
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [ValidateSet('SYSVOL', 'AD')][string[]] $Type = @('SYSVOL', 'AD'),
@@ -33,41 +34,41 @@
         }
     } | Select-Object | Select-Object -First $LimitProcessing | ForEach-Object {
         if ($_.Status -eq 'Not available in AD') {
-            Write-Verbose "Remove-GPOZaurrOrphaned - Processing $($_.Path)"
+            Write-Verbose "Remove-GPOZaurrBroken - Processing $($_.Path)"
             if ($BackupFinalPath) {
                 Try {
-                    Write-Verbose "Remove-GPOZaurrOrphaned - Backing up $($_.Path)"
+                    Write-Verbose "Remove-GPOZaurrBroken - Backing up $($_.Path)"
                     Copy-Item -LiteralPath $_.Path -Recurse -Destination $BackupFinalPath -ErrorAction Stop
                     $BackupWorked = $true
                 } catch {
-                    Write-Warning "Remove-GPOZaurrOrphaned - Error backing up error: $($_.Exception.Message)"
+                    Write-Warning "Remove-GPOZaurrBroken - Error backing up error: $($_.Exception.Message)"
                     $BackupWorked = $false
                 }
             }
             if ($BackupWorked -or $BackupFinalPath -eq '') {
-                Write-Verbose "Remove-GPOZaurrOrphaned - Deleting $($_.Path)"
+                Write-Verbose "Remove-GPOZaurrBroken - Deleting $($_.Path)"
                 try {
                     Remove-Item -Recurse -Force -LiteralPath $_.Path
                 } catch {
-                    Write-Warning "Remove-GPOZaurrOrphaned - Failed to remove file $($_.Path): $($_.Exception.Message)."
+                    Write-Warning "Remove-GPOZaurrBroken - Failed to remove file $($_.Path): $($_.Exception.Message)."
                 }
             }
         } elseif ($_.Status -eq 'Not available on SYSVOL') {
             try {
                 $ExistingObject = Get-ADObject -Identity $_.DistinguishedName -Server $_.DomainName -ErrorAction Stop
             } catch {
-                Write-Warning "Remove-GPOZaurrOrphaned - Error getting $($_.DistinguishedName) from AD error: $($_.Exception.Message)"
+                Write-Warning "Remove-GPOZaurrBroken - Error getting $($_.DistinguishedName) from AD error: $($_.Exception.Message)"
                 $ExistingObject = $null
             }
             if ($ExistingObject -and $ExistingObject.ObjectClass -eq 'groupPolicyContainer') {
-                Write-Verbose "Remove-GPOZaurrOrphaned - Removing DN: $($_.DistinguishedName) / ObjectClass: $($ExistingObject.ObjectClass)"
+                Write-Verbose "Remove-GPOZaurrBroken - Removing DN: $($_.DistinguishedName) / ObjectClass: $($ExistingObject.ObjectClass)"
                 try {
                     Remove-ADObject -Server $_.DomainName -Identity $_.DistinguishedName -Recursive -Confirm:$false
                 } catch {
-                    Write-Warning "Remove-GPOZaurrOrphaned - Failed to remove $($_.DistinguishedName) from AD error: $($_.Exception.Message)"
+                    Write-Warning "Remove-GPOZaurrBroken - Failed to remove $($_.DistinguishedName) from AD error: $($_.Exception.Message)"
                 }
             } else {
-                Write-Warning "Remove-GPOZaurrOrphaned - DistinguishedName $($_.DistinguishedName) not found or ObjectClass is not groupPolicyContainer ($($ExistingObject.ObjectClass))"
+                Write-Warning "Remove-GPOZaurrBroken - DistinguishedName $($_.DistinguishedName) not found or ObjectClass is not groupPolicyContainer ($($ExistingObject.ObjectClass))"
             }
         }
     }

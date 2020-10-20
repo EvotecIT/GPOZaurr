@@ -49,6 +49,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.64 - Unreleased
+  - Renamed `Remove-GPOZaurrOrphaned` to `Remove-GPOZaurrBroken` keeping it as an alias
+  - Renamed `Get-GPOZaurrSysvol` to `Get-GPOZaurrBroken` keeping it as an alias
 - 0.0.63 - 19.10.2020
   - Renamed `Invoke-GPOZaurrContent` back to `Invoke-GPOZaurr`
   - Added `Show-GPOZaurr` (WIP)

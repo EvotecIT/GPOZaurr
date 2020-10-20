@@ -1,4 +1,5 @@
-﻿function Get-GPOZaurrSysvol {
+﻿function Get-GPOZaurrBroken {
+    [alias('Get-GPOZaurrSysvol')]
     [cmdletBinding()]
     param(
         [alias('ForestName')][string] $Forest,
