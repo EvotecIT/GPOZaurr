@@ -11,7 +11,7 @@
         Write-Verbose -Message "Show-GPOZaurr - Processing GPO List"
         $GPOSummary = Get-GPOZaurr
         $GPOLinked = $GPOSummary.Where( { $_.Linked -eq $true }, 'split')
-        $GPOEmpty = $GPOSummary.Where( { $_.Empty -eq $true, 'split' })
+        $GPOEmpty = $GPOSummary.Where( { $_.Empty -eq $true }, 'split' )
         $GPOTotal = $GPOSummary.Count
     }
     if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
@@ -71,6 +71,14 @@
                 New-HTMLSection -Invisible {
                     if ($Type -contains 'GPOList' -or $null -eq $Type) {
                         New-HTMLPanel {
+                            New-HTMLText -Text 'Following chart presents ', 'Linked / Empty and Unlinked Group Policies' -FontSize 10pt -FontWeight normal, bold
+                            New-HTMLList -Type Unordered {
+                                New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Group Policies linked: ', $GPOLinked[0].Count -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPOLinked[1].Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty[1].Count -FontWeight normal, bold
+                            } -FontSize 10pt
+                            New-HTMLText -FontSize 10pt -Text 'Usually empty or unlinked Group Policies are safe to delete.'
                             New-HTMLChart -Title 'Group Policies Summary' {
                                 New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
                                 New-ChartBar -Name 'Group Policies' -Value $GPOLinked[1].Count, $GPOLinked[0].Count, $GPOEmpty[1].Count, $GPOTotal
@@ -79,6 +87,14 @@
                     }
                     if ($Type -contains 'GPOConsistency' -or $null -eq $Type) {
                         New-HTMLPanel {
+                            New-HTMLText -Text 'Following chart presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
+                            New-HTMLList -Type Unordered {
+                                New-HTMLListItem -Text 'Top level permissions consistency: ', $Inconsistent[0].Count -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Inherited permissions consistency: ', $InconsistentInside[0].Count -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Inconsistent[1].Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "Inconsistent inherited permissions: ", $InconsistentInside[1].Count -FontWeight normal, bold
+                            } -FontSize 10pt
+                            New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them.'
                             New-HTMLChart {
                                 New-ChartBarOptions -Type barStacked
                                 New-ChartLegend -Name 'Consistent', 'Inconsistent'
@@ -124,9 +140,32 @@
         }
         if ($Type -contains 'GPOList' -or $null -eq $Type) {
             New-HTMLTab -Name 'Group Policies Summary' {
-                New-HTMLTable -DataTable $GPOSummary -Filtering {
-                    New-HTMLTableCondition -Name 'Empty' -Value $true -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
-                    New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
+                New-HTMLPanel {
+                    New-HTMLText -Text 'Following table shows a list of group policies. ', 'By using following table you can easily find which GPOs can be safely deleted because those are empty or unlinked.' -FontSize 10pt -FontWeight normal, bold
+                    New-HTMLList -Type Unordered {
+                        New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
+                        New-HTMLListItem -Text 'Group Policies linked: ', $GPOLinked[0].Count -FontWeight normal, bold
+                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPOLinked[1].Count -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty[1].Count -FontWeight normal, bold
+                    } -FontSize 10pt
+                }
+                New-HTMLSection -Name 'Group Policies List' {
+                    New-HTMLTable -DataTable $GPOSummary -Filtering {
+                        New-HTMLTableCondition -Name 'Empty' -Value $true -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
+                        New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
+                    }
+                }
+                New-HTMLSection -Name 'Steps to fix - Empty & Unlinked Group Policies' {
+                    New-HTMLContainer {
+                        New-HTMLSpanStyle -FontSize 10pt {
+                            New-HTMLText -Text 'Following steps will guide you how to remove empty or unlinked group policies'
+                            New-HTMLWizard {
+                                New-HTMLWizardStep {
+
+                                }
+                            } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                        }
+                    }
                 }
             }
         }
@@ -148,6 +187,7 @@
                     New-HTMLTable -DataTable $GPOOrphans -Filtering {
                         New-HTMLTableCondition -Name 'Status' -Value "Not available in AD" -BackgroundColor Salmon -ComparisonType string
                         New-HTMLTableCondition -Name 'Status' -Value "Not available on SYSVOL" -BackgroundColor LightCoral -ComparisonType string
+                        New-HTMLTableCondition -Name 'Status' -Value "Permissions issue" -BackgroundColor MediumVioletRed -ComparisonType string -Color White
                     } -PagingLength 10 -PagingOptions 10, 20, 30, 50
                 }
                 New-HTMLSection -Name 'Steps to fix - Not available on SYSVOL / Active Directory' {
@@ -259,9 +299,36 @@
                 }
                 if ($Type -contains 'GPOConsistency' -or $null -eq $Type) {
                     New-HTMLTab -Name 'Permissions Consistency' {
-                        New-HTMLTable -DataTable $GPOPermissionsConsistency -Filtering {
-                            New-HTMLTableCondition -Name 'ACLConsistent' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
-                            New-HTMLTableCondition -Name 'ACLConsistentInside' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
+                        New-HTMLPanel {
+                            New-HTMLText -Text 'Following table presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
+                            New-HTMLList -Type Unordered {
+                                New-HTMLListItem -Text 'Top level permissions consistency: ', $Inconsistent[0].Count -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Inherited permissions consistency: ', $InconsistentInside[0].Count -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Inconsistent[1].Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "Inconsistent inherited permissions: ", $InconsistentInside[1].Count -FontWeight normal, bold
+                            } -FontSize 10pt
+                            New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them. Please notice that if ', `
+                                ' Not available ', 'is visible in the table you should first fix related, more pressing issue, before fixing permissions inconsistency.' -FontWeight normal, bold, normal
+                        }
+                        New-HTMLSection -Name 'Group Policy Permissions Consistency' {
+                            New-HTMLTable -DataTable $GPOPermissionsConsistency -Filtering {
+                                New-HTMLTableCondition -Name 'ACLConsistent' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
+                                New-HTMLTableCondition -Name 'ACLConsistentInside' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType bool
+                                New-HTMLTableCondition -Name 'ACLConsistent' -Value 'Not available' -BackgroundColor Crimson -ComparisonType string
+                                New-HTMLTableCondition -Name 'ACLConsistentInside' -Value 'Not available' -BackgroundColor Crimson -ComparisonType string
+                            }
+                        }
+                        New-HTMLSection -Name 'Steps to fix - Permissions Consistency' {
+                            New-HTMLContainer {
+                                New-HTMLSpanStyle -FontSize 10pt {
+                                    New-HTMLText -Text 'Following steps will guide you how to fix permissions consistency'
+                                    New-HTMLWizard {
+                                        New-HTMLWizardStep {
+
+                                        }
+                                    } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                                }
+                            }
                         }
                     }
                 }
