@@ -29,9 +29,13 @@
         if (-not $GPOPath) {
             foreach ($Domain in $ForestInformation.Domains) {
                 $QueryServer = $ForestInformation.QueryServers[$Domain]['HostName'][0]
+                $Count = 0
                 if ($GPOName) {
-                    Get-GPO -Name $GPOName -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue | ForEach-Object {
-                        Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
+                    $GroupPolicies = Get-GPO -Name $GPOName -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue
+                    $GroupPolicies | ForEach-Object {
+                        $Count++
+                        #Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
+                        Write-Verbose "Get-GPOZaurr - Processing [$($_.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
                         if (-not $Limited) {
                             try {
                                 $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
@@ -45,8 +49,11 @@
                         }
                     }
                 } elseif ($GPOGuid) {
-                    Get-GPO -Guid $GPOGuid -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue | ForEach-Object {
-                        Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
+                    $GroupPolicies = Get-GPO -Guid $GPOGuid -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue
+                    $GroupPolicies | ForEach-Object {
+                        $Count++
+                        #Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
+                        Write-Verbose "Get-GPOZaurr - Processing [$($_.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
                         if (-not $Limited) {
                             try {
                                 $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
@@ -60,8 +67,11 @@
                         }
                     }
                 } else {
-                    Get-GPO -All -Server $QueryServer -Domain $Domain -ErrorAction SilentlyContinue | ForEach-Object {
-                        Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
+                    $GroupPolicies = Get-GPO -All -Server $QueryServer -Domain $Domain -ErrorAction SilentlyContinue
+                    $GroupPolicies | ForEach-Object {
+                        $Count++
+                        #Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
+                        Write-Verbose "Get-GPOZaurr - Processing [$($_.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
                         if (-not $Limited) {
                             try {
                                 $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
@@ -78,11 +88,13 @@
             }
         } else {
             foreach ($Path in $GPOPath) {
+                Write-Verbose "Get-GPOZaurr - Getting GPO content from XML files"
                 Get-ChildItem -LiteralPath $Path -Recurse -Filter *.xml | ForEach-Object {
                     $XMLContent = [XML]::new()
                     $XMLContent.Load($_.FullName)
                     Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -PermissionsOnly:$PermissionsOnly.IsPresent
                 }
+                Write-Verbose "Get-GPOZaurr - Finished GPO content from XML files"
             }
         }
     }

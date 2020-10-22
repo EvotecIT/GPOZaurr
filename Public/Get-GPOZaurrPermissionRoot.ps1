@@ -56,44 +56,6 @@
                         DomainName           = $Domain
                     }
                 }
-
-                <#
-
-                if ($Permission.ActiveDirectoryRights | ForEach-Object {
-                        $_
-                    }) {
-
-                    [PSCustomObject] @{
-                        PrincipalName        = $Permission.Principal
-                        Permission           = 'GpoCustomOwner'
-                        PermissionType       = $Permission.AccessControlType
-                        PrincipalSidType     = $Permission.PrincipalType
-                        PrincipalObjectClass = $Permission.PrincipalObjectType
-                        PrincipalDomainName  = $Permission.PrincipalObjectDomain
-                        PrincipalSid         = $Permission.PrincipalObjectSid
-                        GPOCount             = 'N/A'
-                        GPONames             = -join ("All-", $Domain.ToUpper())
-                        DomainName           = $Domain
-                    }
-                }
-                if ($Permission.ActiveDirectoryRights | ForEach-Object {
-                        $_ -in 'CreateChild', 'GenericAll'
-                    }) {
-                    [PSCustomObject] @{
-                        PrincipalName        = $Permission.Principal
-                        Permission           = 'GpoCustomCreate'
-                        PermissionType       = $Permission.AccessControlType
-                        PrincipalSidType     = $Permission.PrincipalType
-                        PrincipalObjectClass = $Permission.PrincipalObjectType
-                        PrincipalDomainName  = $Permission.PrincipalObjectDomain
-                        PrincipalSid         = $Permission.PrincipalObjectSid
-                        GPOCount             = 'N/A'
-                        GPONames             = -join ("All-", $Domain.ToUpper())
-                        DomainName           = $Domain
-                    }
-
-                }
-                #>
             }
         }
     }

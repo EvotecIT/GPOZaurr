@@ -39,7 +39,11 @@
                     ErrorAction = 'SilentlyContinue'
                 }
             }
-            Get-GPO @getGPOSplat | ForEach-Object -Process {
+            $GroupPolicies = Get-GPO @getGPOSplat
+            $Count = 0
+            $GroupPolicies | ForEach-Object -Process {
+                $Count++
+                Write-Verbose "Get-GPOZaurrPermissionConsistency - Processing [$($_.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
                 try {
                     $IsConsistent = $_.IsAclConsistent()
                     $ErrorMessage = ''
@@ -50,7 +54,7 @@
                 }
                 $SysVolpath = -join ('\\', $Domain, '\sysvol\', $Domain, '\Policies\{', $_.ID.GUID, '}')
                 if ($VerifyInheritance) {
-                    $FolderPermissions = Get-WinADSharePermission -Path $SysVolpath
+                    $FolderPermissions = Get-WinADSharePermission -Path $SysVolpath -Verbose:$false
                     if ($FolderPermissions) {
                         [Array] $NotInheritedPermissions = foreach ($File in $FolderPermissions) {
                             if ($File.Path -ne $SysVolpath -and $File.IsInherited -eq $false) {

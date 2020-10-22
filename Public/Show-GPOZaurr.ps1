@@ -8,6 +8,7 @@
         )][string[]] $Type
     )
     if ($Type -contains 'GPOList' -or $null -eq $Type) {
+        #Write-Color -Text "[Info] ", "Processing GPO List" -Color Yellow, White
         Write-Verbose -Message "Show-GPOZaurr - Processing GPO List"
         $GPOSummary = Get-GPOZaurr
         $GPOLinked = $GPOSummary.Where( { $_.Linked -eq $true }, 'split')
@@ -15,6 +16,7 @@
         $GPOTotal = $GPOSummary.Count
     }
     if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
+        #Write-Color -Text "[Info] ", "Processing GPOOrphans" -Color Yellow, White
         Write-Verbose -Message "Show-GPOZaurr - Processing GPO Sysvol"
         $GPOOrphans = Get-GPOZaurrBroken
 
@@ -32,6 +34,7 @@
         }
     }
     if ($Type -contains 'GPOPermissions' -or $null -eq $Type) {
+        #Write-Color -Text "[Info] ", "Processing GPOPermissions" -Color Yellow, White
         Write-Verbose -Message "Show-GPOZaurr - Processing GPO Permissions"
         $GPOPermissions = Get-GPOZaurrPermission -Type All -IncludePermissionType GpoEditDeleteModifySecurity, GpoEdit, GpoCustom -IncludeOwner
     }
@@ -41,7 +44,7 @@
         [Array] $Inconsistent = $GPOPermissionsConsistency.Where( { $_.ACLConsistent -eq $true } , 'split' )
         [Array] $InconsistentInside = $GPOPermissionsConsistency.Where( { $_.ACLConsistentInside -eq $true }, 'split' )
     }
-    if ($Type -contains 'GPOConsistency' -or $null -eq $Type) {
+    if ($Type -contains 'GPOPermissionsRoot' -or $null -eq $Type) {
         Write-Verbose -Message "Show-GPOZaurr - Processing GPO Permissions Root"
         $GPOPermissionsRoot = Get-GPOZaurrPermissionRoot
     }
