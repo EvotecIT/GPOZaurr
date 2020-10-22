@@ -13,7 +13,7 @@
     # Provide version check for easy use
     $GPOZaurrVersion = Get-Command -Name 'Show-GPOZaurr' -ErrorAction SilentlyContinue
 
-    [Array] $GitHubReleases = (Get-GitHubLatestRelease -Url "https://api.github.com/repos/evotecit/GpoZaurr/releases")
+    [Array] $GitHubReleases = (Get-GitHubLatestRelease -Url "https://api.github.com/repos/evotecit/GpoZaurr/releases" -Verbose:$false)
 
     $LatestVersion = $GitHubReleases[0]
     if (-not $LatestVersion.Errors) {
@@ -101,7 +101,7 @@
     New-HTML {
         New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
         New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
-        New-HTMLPanelStyle -BorderRadius 0px -RemoveShadow
+        New-HTMLPanelStyle -BorderRadius 0px
         New-HTMLTableOption -DataStore JavaScript -BoolAsString
 
         New-HTMLHeader {
@@ -129,11 +129,12 @@
                             } -FontSize 10pt
                             New-HTMLText -FontSize 10pt -Text 'Usually empty or unlinked Group Policies are safe to delete.'
                             New-HTMLChart -Title 'Group Policies Summary' {
-                                New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
+                                New-ChartBarOptions -Type barStacked
+                                #New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
+                                New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
                                 #New-ChartBar -Name 'Group Policies' -Value $GPONotLinked.Count, $GPOLinked.Count, $GPOEmpty.Count, $GPOTotal
                                 New-ChartBar -Name 'Linked' -Value $GPOLinked.Count, $GPONotLinked.Count
-                                New-ChartBar -Name 'Empty' -Value $GPOEmpty.Count, $GPONotEmpty.Count
-                                New-ChartBar
+                                New-ChartBar -Name 'Empty' -Value $GPONotEmpty.Count, $GPOEmpty.Count
                             } -TitleAlignment center
                         }
                     }
@@ -148,6 +149,7 @@
                             } -FontSize 10pt
                             New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them.'
                             New-HTMLChart {
+                                New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
                                 New-ChartBarOptions -Type barStacked
                                 New-ChartLegend -Name 'Consistent', 'Inconsistent'
                                 New-ChartBar -Name 'TopLevel' -Value $Inconsistent[0].Count, $Inconsistent[1].Count
