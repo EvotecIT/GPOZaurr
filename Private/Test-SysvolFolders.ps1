@@ -13,7 +13,7 @@
     $GPOGUIDS = $GPOs.ID.GUID
     $SysVolPath = "\\$($Server)\SYSVOL\$Domain\Policies"
     try {
-        $SYSVOL = Get-ChildItem -Path "\\$($Server)\SYSVOL\$Domain\Policies" -Exclude 'PolicyDefinitions' -ErrorAction Stop
+        $SYSVOL = Get-ChildItem -Path "\\$($Server)\SYSVOL\$Domain\Policies" -Exclude 'PolicyDefinitions' -ErrorAction Stop -Verbose:$false
     } catch {
         $Sysvol = $Null
     }
@@ -50,11 +50,11 @@
             if ($null -ne $SysvolHash[$GPO.Id.GUID].FullName) {
                 $FullPath = $SysvolHash[$GPO.Id.GUID].FullName
                 try {
-                    $ACL = Get-Acl -Path $SysvolHash[$GPO.Id.GUID].FullName -ErrorAction Stop
+                    $ACL = Get-Acl -Path $SysvolHash[$GPO.Id.GUID].FullName -ErrorAction Stop -Verbose:$false
                     $Owner = $ACL.Owner
                     $ErrorMessage = ''
                 } catch {
-                    Write-Warning "Get-GPOZaurrSysvol - ACL reading (1) failed for $FullPath with error: $($_.Exception.Message)"
+                    Write-Warning "Get-GPOZaurrBroken - ACL reading (1) failed for $FullPath with error: $($_.Exception.Message)"
                     $ACL = $null
                     $Owner = ''
                     $ErrorMessage = $_.Exception.Message
@@ -100,7 +100,7 @@
                     $Owner = $ACL.Owner
                     $ErrorMessage = ''
                 } catch {
-                    Write-Warning "Get-GPOZaurrSysvol - ACL reading (2) failed for $FullPath with error: $($_.Exception.Message)"
+                    Write-Warning "Get-GPOZaurrBroken - ACL reading (2) failed for $FullPath with error: $($_.Exception.Message)"
                     $ACL = $null
                     $Owner = $null
                     $ErrorMessage = $_.Exception.Message

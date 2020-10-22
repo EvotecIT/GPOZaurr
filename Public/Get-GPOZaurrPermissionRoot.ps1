@@ -23,9 +23,8 @@
                 ADRightsAsArray                = $true
                 ResolveTypes                   = $true
             }
-            $GPOPermissionsGlobal = Get-ADACL @getADACLSplat #-Verbose
-
-            $GPOs = Get-ADObject -SearchBase "CN=Policies,CN=System,$DomainDistinguishedName" -SearchScope OneLevel -Filter * -Properties DisplayName -Server $QueryServer
+            $GPOPermissionsGlobal = Get-ADACL @getADACLSplat -Verbose:$false
+            $GPOs = Get-ADObject -SearchBase "CN=Policies,CN=System,$DomainDistinguishedName" -SearchScope OneLevel -Filter * -Properties DisplayName -Server $QueryServer -Verbose:$false
             foreach ($Permission in $GPOPermissionsGlobal) {
                 $CustomPermission = foreach ($_ in $Permission.ActiveDirectoryRights) {
                     if ($_ -in 'WriteDACL', 'WriteOwner', 'GenericAll' ) {

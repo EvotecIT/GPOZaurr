@@ -7,8 +7,31 @@
             'GPOConsistency', 'GPOOwners', 'GPOAnalysis', 'NetLogon'
         )][string[]] $Type
     )
+    $Script:Reporting = [ordered] @{
+
+    }
+    # Provide version check for easy use
+    $GPOZaurrVersion = Get-Command -Name 'Show-GPOZaurr' -ErrorAction SilentlyContinue
+
+    [Array] $GitHubReleases = (Get-GitHubLatestRelease -Url "https://api.github.com/repos/evotecit/GpoZaurr/releases")
+
+    $LatestVersion = $GitHubReleases[0]
+    if (-not $LatestVersion.Errors) {
+        if ($GPOZaurrVersion.Version -eq $LatestVersion.Version) {
+            $Script:Reporting['Version'] = "GPOZaurr Current/Latest: $($LatestVersion.Version) at $($LatestVersion.PublishDate)"
+        } elseif ($GPOZaurrVersion.Version -lt $LatestVersion.Version) {
+            $Script:Reporting['Version'] = "GPOZaurr Current: $($GPOZaurrVersion.Version), Published: $($LatestVersion.Version) at $($LatestVersion.PublishDate). Update?"
+        } elseif ($GPOZaurrVersion.Version -gt $LatestVersion.Version) {
+            $Script:Reporting['Version'] = "GPOZaurr Current: $($GPOZaurrVersion.Version), Published: $($LatestVersion.Version) at $($LatestVersion.PublishDate). Lucky you!"
+        }
+    } else {
+        $Script:Reporting['Version'] = "GPOZaurr Current: $($GPOZaurrVersion.Version)"
+    }
+
+    # Gather data
+    $TimeLog = Start-TimeLog
     if ($Type -contains 'GPOList' -or $null -eq $Type) {
-        #Write-Color -Text "[Info] ", "Processing GPO List" -Color Yellow, White
+        $TimeLogGPOList = Start-TimeLog
         Write-Verbose -Message "Show-GPOZaurr - Processing GPO List"
         $GPOSummary = Get-GPOZaurr
         $GPOLinkedStatus = $GPOSummary.Where( { $_.Linked -eq $true }, 'split')
@@ -18,6 +41,7 @@
         [Array] $GPOEmpty = $GPOEmptyStatus[0]
         [Array] $GPONotEmpty = $GPOEmptyStatus[1]
         $GPOTotal = $GPOSummary.Count
+        $TimeEndGPOList = Stop-TimeLog -Time $TimeLog -Option OneLiner
     }
     if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
         #Write-Color -Text "[Info] ", "Processing GPOOrphans" -Color Yellow, White
@@ -70,13 +94,27 @@
         Write-Verbose "Show-GPOZaurr - Processing GPOFiles"
         $GPOFiles = Get-GPOZaurrFiles
     }
+    $TimeEnd = Stop-TimeLog -Time $TimeLog -Option OneLiner
 
+    # Generate pretty HTML
     Write-Verbose "Show-GPOZaurr - Generating HTML"
     New-HTML {
         New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
         New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
         New-HTMLPanelStyle -BorderRadius 0px -RemoveShadow
         New-HTMLTableOption -DataStore JavaScript -BoolAsString
+
+        New-HTMLHeader {
+            New-HTMLSection -Invisible {
+                New-HTMLSection {
+                    New-HTMLText -Text "Report generated on $(Get-Date)" -Color Blue
+                } -JustifyContent flex-start -Invisible
+                New-HTMLSection {
+                    New-HTMLText -Text $Script:Reporting['Version'] -Color Blue
+                } -JustifyContent flex-end -Invisible
+            }
+        }
+
         New-HTMLTab -Name 'Overview' {
             if ($Type -contains 'GPOConsistency' -or $Type -contains 'GPOList' -or $null -eq $Type) {
                 New-HTMLSection -Invisible {

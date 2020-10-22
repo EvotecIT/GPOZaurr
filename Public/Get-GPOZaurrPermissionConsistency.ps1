@@ -16,6 +16,8 @@
     }
     Process {
         foreach ($Domain in $ForestInformation.Domains) {
+            $TimeLog = Start-TimeLog
+            Write-Verbose "Get-GPOZaurrPermissionConsistency - Starting process for $Domain"
             $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
             if ($GPOName) {
                 $getGPOSplat = @{
@@ -120,6 +122,8 @@
                     }
                 }
             }
+            $TimeEnd = Stop-TimeLog -Time $TimeLog -Option OneLiner
+            Write-Verbose "Get-GPOZaurrPermissionConsistency - Finishing process for $Domain (Time to process: $TimeEnd)"
         }
     }
     End {
