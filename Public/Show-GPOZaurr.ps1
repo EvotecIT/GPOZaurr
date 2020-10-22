@@ -3,7 +3,7 @@
     param(
         [string] $FilePath,
         [ValidateSet(
-            'GPOList', 'GPOOrphans', 'GPOPermissions', 'GPOPermissionsRoot',
+            'GPOList', 'GPOOrphans', 'GPOPermissions', 'GPOPermissionsRoot', 'GPOFiles',
             'GPOConsistency', 'GPOOwners', 'GPOAnalysis', 'NetLogon'
         )][string[]] $Type
     )
@@ -11,8 +11,12 @@
         #Write-Color -Text "[Info] ", "Processing GPO List" -Color Yellow, White
         Write-Verbose -Message "Show-GPOZaurr - Processing GPO List"
         $GPOSummary = Get-GPOZaurr
-        $GPOLinked = $GPOSummary.Where( { $_.Linked -eq $true }, 'split')
-        $GPOEmpty = $GPOSummary.Where( { $_.Empty -eq $true }, 'split' )
+        $GPOLinkedStatus = $GPOSummary.Where( { $_.Linked -eq $true }, 'split')
+        [Array] $GPONotLinked = $GPOLinkedStatus[1]
+        [Array] $GPOLinked = $GPOLinkedStatus[0]
+        $GPOEmptyStatus = $GPOSummary.Where( { $_.Empty -eq $true }, 'split' )
+        [Array] $GPOEmpty = $GPOEmptyStatus[0]
+        [Array] $GPONotEmpty = $GPOEmptyStatus[1]
         $GPOTotal = $GPOSummary.Count
     }
     if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
@@ -62,6 +66,10 @@
         Write-Verbose "Show-GPOZaurr - Processing GPO Analysis"
         $GPOContent = Invoke-GPOZaurr
     }
+    if ($Type -contains 'GPOFiles') {
+        Write-Verbose "Show-GPOZaurr - Processing GPOFiles"
+        $GPOFiles = Get-GPOZaurrFiles
+    }
 
     Write-Verbose "Show-GPOZaurr - Generating HTML"
     New-HTML {
@@ -77,14 +85,17 @@
                             New-HTMLText -Text 'Following chart presents ', 'Linked / Empty and Unlinked Group Policies' -FontSize 10pt -FontWeight normal, bold
                             New-HTMLList -Type Unordered {
                                 New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
-                                New-HTMLListItem -Text 'Group Policies linked: ', $GPOLinked[0].Count -FontWeight normal, bold
-                                New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPOLinked[1].Count -FontWeight normal, bold
-                                New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty[1].Count -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Group Policies linked: ', $GPOLinked.Count -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
                             } -FontSize 10pt
                             New-HTMLText -FontSize 10pt -Text 'Usually empty or unlinked Group Policies are safe to delete.'
                             New-HTMLChart -Title 'Group Policies Summary' {
                                 New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
-                                New-ChartBar -Name 'Group Policies' -Value $GPOLinked[1].Count, $GPOLinked[0].Count, $GPOEmpty[1].Count, $GPOTotal
+                                #New-ChartBar -Name 'Group Policies' -Value $GPONotLinked.Count, $GPOLinked.Count, $GPOEmpty.Count, $GPOTotal
+                                New-ChartBar -Name 'Linked' -Value $GPOLinked.Count, $GPONotLinked.Count
+                                New-ChartBar -Name 'Empty' -Value $GPOEmpty.Count, $GPONotEmpty.Count
+                                New-ChartBar
                             } -TitleAlignment center
                         }
                     }
@@ -147,9 +158,9 @@
                     New-HTMLText -Text 'Following table shows a list of group policies. ', 'By using following table you can easily find which GPOs can be safely deleted because those are empty or unlinked.' -FontSize 10pt -FontWeight normal, bold
                     New-HTMLList -Type Unordered {
                         New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
-                        New-HTMLListItem -Text 'Group Policies linked: ', $GPOLinked[0].Count -FontWeight normal, bold
-                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPOLinked[1].Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty[1].Count -FontWeight normal, bold
+                        New-HTMLListItem -Text 'Group Policies linked: ', $GPOLinked.Count -FontWeight normal, bold
+                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
                     } -FontSize 10pt
                 }
                 New-HTMLSection -Name 'Group Policies List' {
