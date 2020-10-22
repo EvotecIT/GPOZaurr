@@ -74,7 +74,7 @@
     }
     if ($Type -contains 'GPOPermissionsRoot' -or $null -eq $Type) {
         Write-Verbose -Message "Show-GPOZaurr - Processing GPO Permissions Root"
-        $GPOPermissionsRoot = Get-GPOZaurrPermissionRoot
+        $GPOPermissionsRoot = Get-GPOZaurrPermissionRoot -SkipNames
     }
     if ($Type -contains 'GPOOwners' -or $null -eq $Type) {
         Write-Verbose "Show-GPOZaurr - Processing GPO Owners"
@@ -131,7 +131,7 @@
                             New-HTMLChart -Title 'Group Policies Summary' {
                                 New-ChartBarOptions -Type barStacked
                                 #New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
-                                New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
+                                New-ChartLegend -Names 'Good', 'Bad' -Color PaleGreen, Salmon
                                 #New-ChartBar -Name 'Group Policies' -Value $GPONotLinked.Count, $GPOLinked.Count, $GPOEmpty.Count, $GPOTotal
                                 New-ChartBar -Name 'Linked' -Value $GPOLinked.Count, $GPONotLinked.Count
                                 New-ChartBar -Name 'Empty' -Value $GPONotEmpty.Count, $GPOEmpty.Count
@@ -326,9 +326,18 @@
                 }
             }
         }
-        if ($Type -contains 'NetLogon' -or $null -eq $Type) {
-            New-HTMLTab -Name 'NetLogon' {
-                New-HTMLTable -DataTable $Netlogon -Filtering
+        if ($Type -contains 'NetLogon' -or $Type -contains 'GPOFiles' -or $null -eq $Type) {
+            New-HTMLTab -Name 'Files (SysVol / NetLogon)' {
+                if ($Type -contains 'NetLogon' -or $null -eq $Type) {
+                    New-HTMLTab -Name 'NetLogon Permissions' {
+                        New-HTMLTable -DataTable $Netlogon -Filtering
+                    }
+                }
+                if ($Type -contains 'GPOFiles' -or $null -eq $Type) {
+                    New-HTMLTab -Name 'SysVol Files Assesment' {
+                        New-HTMLTable -DataTable $GPOFiles -Filtering
+                    }
+                }
             }
         }
         if ($Type -contains 'GPOPermissionsRoot' -or $Type -contains 'GPOOwners' -or

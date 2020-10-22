@@ -6,7 +6,8 @@
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
-        [System.Collections.IDictionary] $ExtendedForestInformation
+        [System.Collections.IDictionary] $ExtendedForestInformation,
+        [switch] $SkipNames
     )
     Begin {
         $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Extended
@@ -42,7 +43,7 @@
                     if ($IncludePermissionType.Count -gt 0 -and $SinglePermission -notin $IncludePermissionType) {
                         continue
                     }
-                    [PSCustomObject] @{
+                    $OutputEntry = [ordered] @{
                         PrincipalName        = $Permission.Principal
                         Permission           = $SinglePermission
                         PermissionType       = $Permission.AccessControlType
@@ -50,10 +51,13 @@
                         PrincipalObjectClass = $Permission.PrincipalObjectType
                         PrincipalDomainName  = $Permission.PrincipalObjectDomain
                         PrincipalSid         = $Permission.PrincipalObjectSid
-                        GPOCount             = $GPOs.Count
-                        GPONames             = $GPOs.DisplayName
                         DomainName           = $Domain
+                        GPOCount             = $GPOs.Count
                     }
+                    if (-not $SkipNames) {
+                        $OutputEntry['GPONames'] = $GPOs.DisplayName
+                    }
+                    [PSCustomObject] $OutputEntry
                 }
             }
         }
