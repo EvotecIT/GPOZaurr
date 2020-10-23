@@ -56,20 +56,27 @@
                 }
                 $SysVolpath = -join ('\\', $Domain, '\sysvol\', $Domain, '\Policies\{', $_.ID.GUID, '}')
                 if ($VerifyInheritance) {
-                    $FolderPermissions = Get-WinADSharePermission -Path $SysVolpath -Verbose:$false
-                    if ($FolderPermissions) {
-                        [Array] $NotInheritedPermissions = foreach ($File in $FolderPermissions) {
-                            if ($File.Path -ne $SysVolpath -and $File.IsInherited -eq $false) {
-                                $File
+                    if ($IsConsistent -eq $true) {
+                        $FolderPermissions = Get-WinADSharePermission -Path $SysVolpath -Verbose:$false
+                        if ($FolderPermissions) {
+                            [Array] $NotInheritedPermissions = foreach ($File in $FolderPermissions) {
+                                if ($File.Path -ne $SysVolpath -and $File.IsInherited -eq $false) {
+                                    $File
+                                }
                             }
-                        }
-                        if ($NotInheritedPermissions.Count -eq 0) {
-                            $ACLConsistentInside = $true
+                            if ($NotInheritedPermissions.Count -eq 0) {
+                                $ACLConsistentInside = $true
+                            } else {
+                                $ACLConsistentInside = $false
+                            }
                         } else {
-                            $ACLConsistentInside = $false
+                            $ACLConsistentInside = 'Not available'
+                            $NotInheritedPermissions = $null
                         }
                     } else {
-                        $ACLConsistentInside = 'Not available'
+                        # Since top level permissions are inconsistent we don't even try to asses inside permissions
+                        $ACLConsistentInside = $IsConsistent
+                        $NotInheritedPermissions = $null
                     }
                 }
                 $Object = [ordered] @{
