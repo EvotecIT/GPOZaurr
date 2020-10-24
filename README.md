@@ -49,6 +49,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.69
+  - Renamed `Show-GPOZaurr` to `Invoke-GPOZaurr`
+  - Renamed `Invoke-GPOZaurr` to `Invoke-GPOZaurrContent`
+  - Hopefully no more renames
 - 0.0.68
   - Improvements to `Get-GPOZaurrPermissionConsistency` - don't check for inherited permissions if top level ones are inconsistent
 - 0.0.67 - 22.10.2020
