@@ -4,7 +4,7 @@
 
 # This will allow you to process offline data more than once
 # It's useful for when you want to request different types
-$Output = Invoke-GPOZaurr -GPOPath $ENV:USERPROFILE\Desktop\GPOExportAudit -Extended -Verbose
+$Output = Invoke-GPOZaurrContent -GPOPath $ENV:USERPROFILE\Desktop\GPOExportAudit -Extended -Verbose
 $Output | Format-Table *
 $Output.Reports | Format-Table
 

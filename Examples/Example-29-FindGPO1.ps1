@@ -1,7 +1,7 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-#$Output = Invoke-GPOZaurr -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPODefender'
-$Output = Invoke-GPOZaurr -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExport' -Type WindowsHelloForBusiness
+#$Output = Invoke-GPOZaurrContent -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPODefender'
+$Output = Invoke-GPOZaurrContent -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExport' -Type WindowsHelloForBusiness
 $Output | Format-Table
 $Output.WindowsDefenderExploitGuard | Format-Table
 $Output.Reports.RegistrySetting | Format-Table
