@@ -1,5 +1,5 @@
 ﻿@{
-    AliasesToExport      = @('Get-GPOZaurrSysvol', 'Get-GPOZaurrFilesPolicyDefinitions', 'Show-GPOZaurr', 'Find-GPO', 'Remove-GPOZaurrOrphaned')
+    AliasesToExport      = @('Get-GPOZaurrSysvol', 'Get-GPOZaurrFilesPolicyDefinitions', 'Show-GPOZaurr', 'Show-GPO', 'Find-GPO', 'Remove-GPOZaurrOrphaned')
     Author               = 'Przemyslaw Klys'
     CmdletsToExport      = @()
     CompanyName          = 'Evotec'
@@ -26,7 +26,7 @@
             ModuleName    = 'ADEssentials'
             Guid          = '9fc9fd61-7f11-4f4b-a527-084086f1905f'
         }, @{
-            ModuleVersion = '0.0.116'
+            ModuleVersion = '0.0.117'
             ModuleName    = 'PSWriteHTML'
             Guid          = 'a7bdf640-f5cb-4acf-9de0-365b322d245c'
         }, 'CimCmdlets', 'Microsoft.PowerShell.Management', 'Microsoft.PowerShell.Utility')
