@@ -20,7 +20,7 @@
             }
         }
         foreach ($e in $err) {
-            Write-Warning "Get-GPOZaurrLegacy - $($e.Exception.Message) ($($e.CategoryInfo.Reason))"
+            Write-Warning "Get-GPOZaurrLegacyFiles - $($e.Exception.Message) ($($e.CategoryInfo.Reason))"
         }
     }
 }

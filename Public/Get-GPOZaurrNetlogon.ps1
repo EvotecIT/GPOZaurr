@@ -7,7 +7,7 @@
     $ForestInformation = Get-WinADForestDetails -Extended
     $FilesAll = foreach ($Domain in $ForestInformation.Domains) {
         $Path = -join ("\\", $Domain, '\Netlogon')
-        $Files = Get-ChildItem -LiteralPath $Path -Recurse
+        $Files = Get-ChildItem -LiteralPath $Path -Recurse -Force
         foreach ($_ in $Files) {
             $ACL = Get-Acl -Path $_.FullName
             if ($ACL.Owner) {

@@ -5,7 +5,9 @@
         [string] $FilePath,
         [ValidateSet(
             'GPOList', 'GPOOrphans', 'GPOPermissions', 'GPOPermissionsRoot', 'GPOFiles',
-            'GPOConsistency', 'GPOOwners', 'GPOAnalysis', 'NetLogon'
+            'GPOConsistency', 'GPOOwners', 'GPOAnalysis',
+            'NetLogon',
+            'LegacyAdm'
         )][string[]] $Type
     )
     $Script:Reporting = [ordered] @{
@@ -35,14 +37,51 @@
         $TimeLogGPOList = Start-TimeLog
         Write-Verbose -Message "Invoke-GPOZaurr - Processing GPO List"
         $GPOSummary = Get-GPOZaurr
-        $GPOLinkedStatus = $GPOSummary.Where( { $_.Linked -eq $true }, 'split')
-        [Array] $GPONotLinked = $GPOLinkedStatus[1]
-        [Array] $GPOLinked = $GPOLinkedStatus[0]
-        $GPOEmptyStatus = $GPOSummary.Where( { $_.Empty -eq $true }, 'split' )
-        [Array] $GPOEmpty = $GPOEmptyStatus[0]
-        [Array] $GPONotEmpty = $GPOEmptyStatus[1]
+        $GPONotLinked = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $GPOLinked = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $GPOEmpty = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $GPONotEmpty = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $GPOEmptyAndUnlinked = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $GPOEmptyOrUnlinked = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $GPOLinkedButEmpty = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $GPOValid = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $GPOLinkedButLinkDisabled = [System.Collections.Generic.List[PSCustomObject]]::new()
+        foreach ($GPO in $GPOSummary) {
+            if ($GPO.Linked -eq $false -and $GPO.Empty -eq $true) {
+                # Not linked, Empty
+                $GPOEmptyAndUnlinked.Add($GPO)
+                $GPOEmptyOrUnlinked.Add($GPO)
+                $GPONotLinked.Add($GPO)
+                $GPOEmpty.Add($GPO)
+            } elseif ($GPO.Linked -eq $true -and $GPO.Empty -eq $true) {
+                # Linked, But EMPTY
+                $GPOLinkedButEmpty.Add($GPO)
+                $GPOEmptyOrUnlinked.Add($GPO)
+                $GPOEmpty.Add($GPO)
+                $GPOLinked.Add($GPO)
+            } elseif ($GPO.Linked -eq $false) {
+                # Not linked, but not EMPTY
+                $GPONotLinked.Add($GPO)
+                $GPOEmptyOrUnlinked.Add($GPO)
+                $GPONotEmpty.Add($GPO)
+            } elseif ($GPO.Empty -eq $true) {
+                # Linked, But EMPTY
+                $GPOEmpty.Add($GPO)
+                $GPOEmptyOrUnlinked.Add($GPO)
+                $GPOLinked.Add($GPO)
+            } else {
+                # Linked, not EMPTY
+                $GPOValid.Add($GPO)
+                $GPOLinked.Add($GPO)
+                $GPONotEmpty.Add($GPO)
+            }
+            if ($GPO.LinksDisabledCount -eq $GPO.LinksCount -and $GPO.LinksCount -gt 0) {
+                $GPOLinkedButLinkDisabled.Add($GPO)
+            }
+        }
         $GPOTotal = $GPOSummary.Count
-        $TimeEndGPOList = Stop-TimeLog -Time $TimeLog -Option OneLiner
+        $TimeEndGPOList = Stop-TimeLog -Time $TimeLogGPOList -Option OneLiner
+        Write-Verbose -Message "Invoke-GPOZaurr - Processing GPO List $TimeEndGPOList"
     }
     if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
         #Write-Color -Text "[Info] ", "Processing GPOOrphans" -Color Yellow, White
@@ -84,8 +123,39 @@
         $IsOwnerAdministrative = $GPOOwners.Where( { $_.IsOwnerAdministrative -eq $true } , 'split' )
     }
     if ($Type -contains 'NetLogon' -or $null -eq $Type) {
+        $TimeLogSection = Start-TimeLog
         Write-Verbose "Get-GPOZaurrNetLogon - Processing NETLOGON Share"
-        $Netlogon = Get-GPOZaurrNetLogon
+        $NetLogon = Get-GPOZaurrNetLogon
+        $NetLogonOwners = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersAdministrators = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersNotAdministrative = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersAdministrative = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersAdministrativeNotAdministrators = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersToFix = [System.Collections.Generic.List[PSCustomObject]]::new()
+        foreach ($File in $Netlogon) {
+            if ($File.FileSystemRights -eq 'Owner') {
+                $NetLogonOwners.Add($File)
+
+                if ($File.PrincipalType -eq 'WellKnownAdministrative') {
+                    $NetLogonOwnersAdministrative.Add($File)
+                } elseif ($File.PrincipalType -eq 'Administrative') {
+                    $NetLogonOwnersAdministrative.Add($File)
+                } else {
+                    $NetLogonOwnersNotAdministrative.Add($File)
+                }
+
+                if ($File.PrincipalSid -eq 'S-1-5-32-544') {
+                    $NetLogonOwnersAdministrators.Add($File)
+                } elseif ($File.PrincipalType -in 'WellKnownAdministrative', 'Administrative') {
+                    $NetLogonOwnersAdministrativeNotAdministrators.Add($File)
+                    $NetLogonOwnersToFix.Add($File)
+                } else {
+                    $NetLogonOwnersToFix.Add($File)
+                }
+            }
+        }
+        $TimeLogSectionEnd = Stop-TimeLog -Time $TimeLogSection -Option OneLiner
+        Write-Verbose "Get-GPOZaurrNetLogon - Processing NETLOGON Share $TimeLogSectionEnd"
     }
     if ($Type -contains 'GPOAnalysis' -or $null -eq $Type) {
         Write-Verbose "Invoke-GPOZaurr - Processing GPO Analysis"
@@ -95,8 +165,12 @@
         Write-Verbose "Invoke-GPOZaurr - Processing GPOFiles"
         $GPOFiles = Get-GPOZaurrFiles
     }
+    if ($Type -contains 'LegacyADM') {
+        Write-Verbose "Invoke-GPOZaurr - Processing GPOFiles"
+        $ADMLegacyFiles = Get-GPOZaurrLegacyFiles
+    }
     $TimeEnd = Stop-TimeLog -Time $TimeLog -Option OneLiner
-
+    Write-Verbose "Invoke-GPOZaurr - Data gathering time $TimeEnd"
     # Generate pretty HTML
     Write-Verbose "Invoke-GPOZaurr - Generating HTML"
     New-HTML {
@@ -124,9 +198,15 @@
                             New-HTMLText -Text 'Following chart presents ', 'Linked / Empty and Unlinked Group Policies' -FontSize 10pt -FontWeight normal, bold
                             New-HTMLList -Type Unordered {
                                 New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
-                                New-HTMLListItem -Text 'Group Policies linked: ', $GPOLinked.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "Group Policies valid: ", $GPOValid.Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "Group Policies to delete: ", $GPOEmptyOrUnlinked.Count -FontWeight normal, bold {
+                                    New-HTMLList -Type Unordered {
+                                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
+                                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
+                                        New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOLinkedButEmpty.Count -FontWeight normal, bold
+                                        New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOLinkedButLinkDisabled.Count -FontWeight normal, bold
+                                    }
+                                }
                             } -FontSize 10pt
                             New-HTMLText -FontSize 10pt -Text 'Usually empty or unlinked Group Policies are safe to delete.'
                             New-HTMLChart -Title 'Group Policies Summary' {
@@ -136,6 +216,7 @@
                                 #New-ChartBar -Name 'Group Policies' -Value $GPONotLinked.Count, $GPOLinked.Count, $GPOEmpty.Count, $GPOTotal
                                 New-ChartBar -Name 'Linked' -Value $GPOLinked.Count, $GPONotLinked.Count
                                 New-ChartBar -Name 'Empty' -Value $GPONotEmpty.Count, $GPOEmpty.Count
+                                New-ChartBar -Name 'Valid' -Value $GPOValid.Count, $GPOEmptyOrUnlinked.Count
                             } -TitleAlignment center
                         }
                     }
@@ -192,17 +273,57 @@
                     }
                 }
             }
+            if ($Type -contains 'NetLogon' -or $null -eq $Type) {
+                New-HTMLSection -Invisible {
+                    New-HTMLPanel {
+                        New-HTMLText -Text 'Following chart presents ', 'NetLogon Summary' -FontSize 10pt -FontWeight normal, bold
+                        New-HTMLList -Type Unordered {
+                            New-HTMLListItem -Text 'NetLogon Files in Total: ', $NetLogonOwners.Count -FontWeight normal, bold
+                            New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $NetLogonOwnersAdministrators.Count -FontWeight normal, bold
+                            New-HTMLListItem -Text "NetLogon Owners requiring change: ", $NetLogonOwnersToFix.Count -FontWeight normal, bold {
+                                New-HTMLList -Type Unordered {
+                                    New-HTMLListItem -Text 'Not Administrative: ', $NetLogonOwnersNotAdministrative.Count -FontWeight normal, bold
+                                    New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $NetLogonOwnersAdministrativeNotAdministrators.Count -FontWeight normal, bold
+                                }
+                            }
+                        } -FontSize 10pt
+                        #New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
+                        New-HTMLChart {
+                            New-ChartPie -Name 'Correct Owners' -Value $NetLogonOwnersAdministrators.Count -Color LightGreen
+                            New-ChartPie -Name 'Incorrect Owners' -Value $NetLogonOwnersToFix.Count -Color Crimson
+                        } -Title 'NetLogon Owners' -TitleAlignment center
+                    }
+                    New-HTMLPanel {
+
+                    }
+                }
+            }
         }
         if ($Type -contains 'GPOList' -or $null -eq $Type) {
             New-HTMLTab -Name 'Group Policies Summary' {
                 New-HTMLPanel {
-                    New-HTMLText -Text 'Following table shows a list of group policies. ', 'By using following table you can easily find which GPOs can be safely deleted because those are empty or unlinked.' -FontSize 10pt -FontWeight normal, bold
+                    $newHTMLTextSplat = @{
+                        Text       = @(
+                            'Following table shows a list of group policies.',
+                            'By using following table you can easily find which GPOs can be safely deleted because those are empty or unlinked or linked, but link disabled.'
+                        )
+                        FontSize   = '10pt'
+                        FontWeight = 'normal', 'bold'
+                    }
+                    New-HTMLText @newHTMLTextSplat
                     New-HTMLList -Type Unordered {
                         New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
-                        New-HTMLListItem -Text 'Group Policies linked: ', $GPOLinked.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies valid: ", $GPOValid.Count -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies to delete: ", $GPOEmptyOrUnlinked.Count -FontWeight normal, bold {
+                            New-HTMLList -Type Unordered {
+                                New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOLinkedButEmpty.Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOLinkedButLinkDisabled.Count -FontWeight normal, bold
+                            }
+                        }
                     } -FontSize 10pt
+                    New-HTMLText -Text 'All those mentioned Group Policies can be automatically deleted following the steps below the table.' -FontSize 10pt
                 }
                 New-HTMLSection -Name 'Group Policies List' {
                     New-HTMLTable -DataTable $GPOSummary -Filtering {
@@ -258,8 +379,48 @@
         if ($Type -contains 'NetLogon' -or $Type -contains 'GPOFiles' -or $null -eq $Type) {
             New-HTMLTab -Name 'Files (SysVol / NetLogon)' {
                 if ($Type -contains 'NetLogon' -or $null -eq $Type) {
+                    New-HTMLTab -Name 'NetLogon Owners' {
+                        New-HTMLPanel {
+                            New-HTMLText -TextBlock {
+                                "Following table shows NetLogon file owners. It's important that NetLogon file owners are set to BUILTIN\Administrators (SID: S-1-5-32-544). "
+                                "Owners have full control over the file object. Current owner of the file may be an Administrator but it doesn't guarentee that he will be in the future. "
+                                "That's why as a best-practice it's recommended to change any non-administrative owners to BUILTIN\Administrators, and even Administrative accounts should be replaced with it. "
+                            } -FontSize 10pt
+                            New-HTMLList -Type Unordered {
+                                New-HTMLListItem -Text 'NetLogon Files in Total: ', $NetLogonOwners.Count -FontWeight normal, bold
+                                New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $NetLogonOwnersAdministrators.Count -FontWeight normal, bold
+                                New-HTMLListItem -Text "NetLogon Owners requiring change: ", $NetLogonOwnersToFix.Count -FontWeight normal, bold {
+                                    New-HTMLList -Type Unordered {
+                                        New-HTMLListItem -Text 'Not Administrative: ', $NetLogonOwnersNotAdministrative.Count -FontWeight normal, bold
+                                        New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $NetLogonOwnersAdministrativeNotAdministrators.Count -FontWeight normal, bold
+                                    }
+                                }
+                            } -FontSize 10pt
+                            New-HTMLText -Text "Follow the steps below table to get NetLogon Owners into compliant state." -FontSize 10pt
+                        }
+                        New-HTMLSection -Name 'NetLogon Files List' {
+                            New-HTMLTable -DataTable $NetLogonOwners -Filtering {
+                                New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor LightGreen -ComparisonType string
+                                New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor Salmon -ComparisonType string -Operator ne
+                                New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
+                            }
+                        }
+                        New-HTMLSection -Name 'Steps to fix - Owners ' {
+                            New-HTMLContainer {
+                                New-HTMLSpanStyle -FontSize 10pt {
+                                    New-HTMLText -Text 'Following steps will guide you how to fix NetLogon Owners and make them compliant.'
+                                    New-HTMLWizard {
+                                        #& $Script:GPOConfiguration['GPOOrphans']['Wizard']
+                                    } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                                }
+                            }
+                        }
+
+                    }
                     New-HTMLTab -Name 'NetLogon Permissions' {
-                        New-HTMLTable -DataTable $Netlogon -Filtering
+                        New-HTMLSection -Name 'NetLogon Files List' {
+                            New-HTMLTable -DataTable $Netlogon -Filtering
+                        }
                     }
                 }
                 if ($Type -contains 'GPOFiles' -or $null -eq $Type) {
@@ -317,63 +478,7 @@
                                 New-HTMLSpanStyle -FontSize 10pt {
                                     New-HTMLText -Text 'Following steps will guide you how to fix permissions consistency'
                                     New-HTMLWizard {
-                                        New-HTMLWizardStep -Name 'Prepare environment' {
-                                            New-HTMLText -Text "To be able to execute actions in automated way please install required modules. Those modules will be installed straight from Microsoft PowerShell Gallery."
-                                            New-HTMLCodeBlock -Code {
-                                                Install-Module GPOZaurr -Force
-                                                Import-Module GPOZaurr -Force
-                                            } -Style powershell
-                                            New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
-                                        }
-                                        New-HTMLWizardStep -Name 'Prepare report' {
-                                            New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding fixing permissions inconsistencies. To generate new report please use:"
-                                            New-HTMLCodeBlock -Code {
-                                                Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrPermissionsInconsistentBefore.html -Verbose -Type GPOConsistency
-                                            }
-                                            New-HTMLText -Text {
-                                                "When executed it will take a while to generate all data and provide you with new report depending on size of environment."
-                                                "Once confirmed that data is still showing issues and requires fixing please proceed with next step."
-                                            }
-                                            New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
-                                            New-HTMLCodeBlock -Code {
-                                                $GPOOutput = Get-GPOZaurrPermissionConsistency
-                                                $GPOOutput | Format-Table # do your actions as desired
-                                            }
-                                            New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
-                                        }
-                                        New-HTMLWizardStep -Name 'Fix inconsistent permissions' {
-                                            New-HTMLText -Text "Following command when executed fixes inconsistent permissions."
-                                            New-HTMLText -Text "Make sure when running it for the first time to run it with ", "WhatIf", " parameter as shown below to prevent accidental removal." -FontWeight normal, bold, normal -Color Black, Red, Black
-                                            New-HTMLText -Text "Make sure to fill in TargetDomain to match your Domain Admin permission account"
-
-                                            New-HTMLCodeBlock -Code {
-                                                Repair-GPOZaurrPermissionConsistency -IncludeDomains "TargetDomain" -Verbose -WhatIf
-                                            }
-                                            New-HTMLText -TextBlock {
-                                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. Once happy with results please follow with command: "
-                                            }
-                                            New-HTMLCodeBlock -Code {
-                                                Repair-GPOZaurrPermissionConsistency -LimitProcessing 2 -IncludeDomains "TargetDomain"
-                                            }
-                                            New-HTMLText -TextBlock {
-                                                "This command when executed repairs only first X inconsistent permissions. Use LimitProcessing parameter to prevent mass fixing and increase the counter when no errors occur."
-                                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly."
-                                            }
-                                            New-HTMLText -Text "If there's nothing else to be fixed, we can skip to next step step"
-                                        }
-                                        New-HTMLWizardStep -Name 'Fix inconsistent downlevel permissions' {
-                                            New-HTMLText -Text "Unfortunetly this step is manual until automation is developed. "
-                                            New-HTMLText -Text "If there are inconsistent permissions found inside GPO one has to fix them manually by going into SYSVOL and making sure inheritance is enabled, and that permissions are consistent across all files."
-                                        }
-                                        New-HTMLWizardStep -Name 'Verification report' {
-                                            New-HTMLText -TextBlock {
-                                                "Once cleanup task was executed properly, we need to verify that report now shows no problems."
-                                            }
-                                            New-HTMLCodeBlock -Code {
-                                                Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrPermissionsInconsistentAfter.html -Verbose -Type GPOConsistency
-                                            }
-                                            New-HTMLText -Text "If everything is health in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
-                                        }
+                                        & $Script:GPOConfiguration['GPOConsistency']['Wizard']
                                     } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
                                 }
                             }
