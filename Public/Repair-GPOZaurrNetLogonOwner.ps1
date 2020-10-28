@@ -15,7 +15,16 @@
         return
     }
     $Principal = $Identity.Name
-    Get-GPOZaurrNetLogon -OwnerOnly | Select-Object -First $LimitProcessing | Where-Object {
+
+    $getGPOZaurrNetLogonSplat = @{
+        OwnerOnly = $true
+        Forest = $Forest
+        IncludeDomains = $IncludeDomains
+        ExcludeDomains = $ExcludeDomains
+        ExtendedForestInformation = $ExtendedForestInformation
+    }
+
+    Get-GPOZaurrNetLogon @getGPOZaurrNetLogonSplat | Select-Object -First $LimitProcessing | Where-Object {
         if ($_.OwnerSid -ne 'S-1-5-32-544') {
             $_
         }

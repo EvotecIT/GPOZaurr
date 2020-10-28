@@ -2,9 +2,14 @@
     [cmdletBinding(DefaultParameterSetName = 'Default')]
     param(
         [parameter(ParameterSetName = 'OwnerOnly')][switch] $OwnerOnly,
-        [parameter(ParameterSetName = 'SkipOwner')][switch] $SkipOwner
+        [parameter(ParameterSetName = 'SkipOwner')][switch] $SkipOwner,
+
+        [alias('ForestName')][string] $Forest,
+        [string[]] $ExcludeDomains,
+        [alias('Domain', 'Domains')][string[]] $IncludeDomains,
+        [System.Collections.IDictionary] $ExtendedForestInformation
     )
-    $ForestInformation = Get-WinADForestDetails -Extended
+    $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     $FilesAll = foreach ($Domain in $ForestInformation.Domains) {
         $Path = -join ("\\", $Domain, '\Netlogon')
         $PathOnSysvol = -join ("\\", $Domain, "\SYSVOL\", $Domain, "\Scripts")
