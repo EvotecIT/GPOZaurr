@@ -202,4 +202,5 @@
             }
         }
     }
+    NetLogon       = $ScriptGPOConfigurationNetLogon
 }

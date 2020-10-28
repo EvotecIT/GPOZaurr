@@ -49,6 +49,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.69 - Unreleased
+  - Added `Repair-GPOZaurrNetLogonOwner`
 - 0.0.68 - 28.10.2020
   - Renamed `Show-GPOZaurr` to `Invoke-GPOZaurr`
   - Renamed `Invoke-GPOZaurr` to `Invoke-GPOZaurrContent`

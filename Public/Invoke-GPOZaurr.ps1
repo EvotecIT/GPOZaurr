@@ -278,14 +278,7 @@
                     New-HTMLPanel {
                         New-HTMLText -Text 'Following chart presents ', 'NetLogon Summary' -FontSize 10pt -FontWeight normal, bold
                         New-HTMLList -Type Unordered {
-                            New-HTMLListItem -Text 'NetLogon Files in Total: ', $NetLogonOwners.Count -FontWeight normal, bold
-                            New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $NetLogonOwnersAdministrators.Count -FontWeight normal, bold
-                            New-HTMLListItem -Text "NetLogon Owners requiring change: ", $NetLogonOwnersToFix.Count -FontWeight normal, bold {
-                                New-HTMLList -Type Unordered {
-                                    New-HTMLListItem -Text 'Not Administrative: ', $NetLogonOwnersNotAdministrative.Count -FontWeight normal, bold
-                                    New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $NetLogonOwnersAdministrativeNotAdministrators.Count -FontWeight normal, bold
-                                }
-                            }
+                            & $Script:GPOConfiguration['NetLogon']['List']
                         } -FontSize 10pt
                         #New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
                         New-HTMLChart {
@@ -387,14 +380,7 @@
                                 "That's why as a best-practice it's recommended to change any non-administrative owners to BUILTIN\Administrators, and even Administrative accounts should be replaced with it. "
                             } -FontSize 10pt
                             New-HTMLList -Type Unordered {
-                                New-HTMLListItem -Text 'NetLogon Files in Total: ', $NetLogonOwners.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $NetLogonOwnersAdministrators.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text "NetLogon Owners requiring change: ", $NetLogonOwnersToFix.Count -FontWeight normal, bold {
-                                    New-HTMLList -Type Unordered {
-                                        New-HTMLListItem -Text 'Not Administrative: ', $NetLogonOwnersNotAdministrative.Count -FontWeight normal, bold
-                                        New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $NetLogonOwnersAdministrativeNotAdministrators.Count -FontWeight normal, bold
-                                    }
-                                }
+                                & $Script:GPOConfiguration['NetLogon']['List']
                             } -FontSize 10pt
                             New-HTMLText -Text "Follow the steps below table to get NetLogon Owners into compliant state." -FontSize 10pt
                         }
@@ -405,12 +391,12 @@
                                 New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
                             }
                         }
-                        New-HTMLSection -Name 'Steps to fix - Owners ' {
+                        New-HTMLSection -Name 'Steps to fix NetLogon Owners ' {
                             New-HTMLContainer {
                                 New-HTMLSpanStyle -FontSize 10pt {
                                     New-HTMLText -Text 'Following steps will guide you how to fix NetLogon Owners and make them compliant.'
                                     New-HTMLWizard {
-                                        #& $Script:GPOConfiguration['GPOOrphans']['Wizard']
+                                        & $Script:GPOConfiguration['NetLogon']['Wizard']
                                     } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
                                 }
                             }
