@@ -1,10 +1,10 @@
 ﻿function Set-GPOZaurrOwner {
     <#
     .SYNOPSIS
-    Short description
+    Sets GPO Owner to Domain Admins or other choosen account
 
     .DESCRIPTION
-    Long description
+    Sets GPO Owner to Domain Admins or other choosen account. GPO Owner is set in AD and SYSVOL unless specified otherwise. If account doesn't require change, no change is done.
 
     .PARAMETER Type
     Unknown - finds unknown Owners and sets them to Administrative (Domain Admins) or chosen principal
@@ -12,34 +12,34 @@
     NotAdministrative - combination of Unknown/NotMatching and NotAdministrative - replace with chosen principal or Domain Admins if not specified
     All - if Owner is known it checks if it's Administrative, if it sn't it fixes that. If owner is unknown it fixes it
     .PARAMETER GPOName
-    Parameter description
+    Name of GPO. By default all GPOs are targetted
 
     .PARAMETER GPOGuid
-    Parameter description
+    GUID of GPO. By default all GPOs are targetted
 
     .PARAMETER Forest
-    Parameter description
+    Target different Forest
 
     .PARAMETER ExcludeDomains
-    Parameter description
+    Exclude domain from search, by default whole forest is scanned
 
     .PARAMETER IncludeDomains
-    Parameter description
+    Include only specific domains, by default whole forest is scanned
 
     .PARAMETER ExtendedForestInformation
-    Parameter description
+    Ability to provide Forest Information from another command to speed up processing
 
     .PARAMETER Principal
     Parameter description
 
     .PARAMETER SkipSysvol
-    Parameter description
+    Set GPO Owner only in Active Directory. By default GPO Owner is being set in both places
 
     .PARAMETER LimitProcessing
-    Parameter description
+    Allows to specify maximum number of items that will be fixed in a single run. It doesn't affect amount of GPOs processed
 
     .EXAMPLE
-    An example
+    Set-GPOZaurrOwner -Type All -Verbose -WhatIf -LimitProcessing 2
 
     .NOTES
     General notes
@@ -92,13 +92,16 @@
             ExtendedForestInformation = $ExtendedForestInformation
             ADAdministrativeGroups    = $ADAdministrativeGroups
             Verbose                   = $VerbosePreference
+            SkipBroken                = $true
         }
         if ($GPOName) {
             $getGPOZaurrOwnerSplat['GPOName'] = $GPOName
         } elseif ($GPOGuid) {
             $getGPOZaurrOwnerSplat['GPOGuid'] = $GPOGUiD
         }
+        $Count = 0
         Get-GPOZaurrOwner @getGPOZaurrOwnerSplat | Where-Object {
+            $Count++
             if ($_.Owner) {
                 $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($_.Owner)"]
             } else {
@@ -161,15 +164,15 @@
             }
             if ($Action -eq 'OnlyGPO') {
                 Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) (SID: $($GPO.OwnerSID)) to $DefaultPrincipal"
-                Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal  -Verbose:$false -WhatIf:$WhatIfPreference
+                Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
             } elseif ($Action -eq 'OnlyFileSystem') {
                 if (-not $SkipSysvol) {
                     Write-Verbose "Set-GPOZaurrOwner - Changing Sysvol Owner GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.SysvolOwner) (SID: $($GPO.SysvolSid)) to $DefaultPrincipal"
-                    Set-FileOwner -JustPath -Path $GPO.SysvolPath -Owner $DefaultPrincipal  -Verbose:$true -WhatIf:$WhatIfPreference
+                    Set-FileOwner -JustPath -Path $GPO.SysvolPath -Owner $DefaultPrincipal -Verbose:$true -WhatIf:$WhatIfPreference
                 }
             } else {
                 Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) (SID: $($GPO.OwnerSID)) to $DefaultPrincipal"
-                Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal  -Verbose:$false -WhatIf:$WhatIfPreference
+                Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
                 if (-not $SkipSysvol) {
                     Write-Verbose "Set-GPOZaurrOwner - Changing Sysvol Owner GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.SysvolOwner) (SID: $($GPO.SysvolSid)) to $DefaultPrincipal"
                     Set-FileOwner -JustPath -Path $GPO.SysvolPath -Owner $DefaultPrincipal -Verbose:$true -WhatIf:$WhatIfPreference

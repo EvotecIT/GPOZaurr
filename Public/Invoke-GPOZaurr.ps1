@@ -10,9 +10,7 @@
             'LegacyAdm'
         )][string[]] $Type
     )
-    $Script:Reporting = [ordered] @{
-
-    }
+    $Script:Reporting = [ordered] @{}
     # Provide version check for easy use
     $GPOZaurrVersion = Get-Command -Name 'Invoke-GPOZaurr' -ErrorAction SilentlyContinue
 
@@ -117,10 +115,12 @@
         $GPOPermissionsRoot = Get-GPOZaurrPermissionRoot -SkipNames
     }
     if ($Type -contains 'GPOOwners' -or $null -eq $Type) {
+        $TimeLogGPOList = Start-TimeLog
         Write-Verbose "Invoke-GPOZaurr - Processing GPO Owners"
-        $GPOOwners = Get-GPOZaurrOwner -IncludeSysvol
-        $IsOwnerConsistent = $GPOOwners.Where( { $_.IsOwnerConsistent -eq $true } , 'split' )
-        $IsOwnerAdministrative = $GPOOwners.Where( { $_.IsOwnerAdministrative -eq $true } , 'split' )
+        $Script:GpoZaurrOwners['Data'] = & $Script:GpoZaurrOwners['Execute']
+        & $Script:GpoZaurrOwners['Processing']
+        $TimeEndGPOList = Stop-TimeLog -Time $TimeLogGPOList -Option OneLiner
+        Write-Verbose -Message "Invoke-GPOZaurr - Processing GPO Owners $TimeEndGPOList"
     }
     if ($Type -contains 'NetLogon' -or $null -eq $Type) {
         $TimeLogSection = Start-TimeLog
@@ -224,18 +224,11 @@
                         New-HTMLPanel {
                             New-HTMLText -Text 'Following chart presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
                             New-HTMLList -Type Unordered {
-                                New-HTMLListItem -Text 'Top level permissions consistency: ', $Inconsistent[0].Count -FontWeight normal, bold
-                                New-HTMLListItem -Text 'Inherited permissions consistency: ', $InconsistentInside[0].Count -FontWeight normal, bold
-                                New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Inconsistent[1].Count -FontWeight normal, bold
-                                New-HTMLListItem -Text "Inconsistent inherited permissions: ", $InconsistentInside[1].Count -FontWeight normal, bold
+                                & $Script:GPOConfiguration['GPOConsistency']['List']
                             } -FontSize 10pt
                             New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them.'
                             New-HTMLChart {
-                                New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
-                                New-ChartBarOptions -Type barStacked
-                                New-ChartLegend -Name 'Consistent', 'Inconsistent'
-                                New-ChartBar -Name 'TopLevel' -Value $Inconsistent[0].Count, $Inconsistent[1].Count
-                                New-ChartBar -Name 'Inherited' -Value $InconsistentInside[0].Count, $InconsistentInside[1].Count
+                                & $Script:GPOConfiguration['GPOConsistency']['Chart']
                             } -Title 'Permissions Consistency' -TitleAlignment center
                         }
                     }
@@ -244,15 +237,8 @@
             if ($Type -contains 'GPOOwners' -or $Type -contains 'GPOOrphans' -or $null -eq $Type) {
                 New-HTMLSection -Invisible {
                     if ($Type -contains 'GPOOwners' -or $null -eq $Type) {
-                        New-HTMLPanel {
-                            New-HTMLText -Text 'Following chart presents Group Policy owners and whether they are administrative and consistent. By design an owner of Group Policy should be Domain Admins or Enterprise Admins group only to prevent malicious takeover. ', `
-                                "It's also important that owner in Active Directory matches owner on SYSVOL (file system)."
-                            New-HTMLChart {
-                                New-ChartBarOptions -Type barStacked
-                                New-ChartLegend -Name 'Yes', 'No' -Color PaleGreen, Orchid
-                                New-ChartBar -Name 'Is administrative' -Value $IsOwnerAdministrative[0].Count, $IsOwnerAdministrative[1].Count
-                                New-ChartBar -Name 'Is consistent' -Value $IsOwnerConsistent[0].Count, $IsOwnerConsistent[1].Count
-                            } -Title 'Group Policy Owners'
+                        if ($Script:GpoZaurrOwners['Overview']) {
+                            & $Script:GpoZaurrOwners['Overview']
                         }
                     }
                     if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
@@ -428,7 +414,9 @@
                 }
                 if ($Type -contains 'GPOOwners' -or $null -eq $Type) {
                     New-HTMLTab -Name 'Owners' {
-                        New-HTMLTable -DataTable $GPOOwners -Filtering
+                        if ($Script:GpoZaurrOwners['Solution']) {
+                            & $Script:GpoZaurrOwners['Solution']
+                        }
                     }
                 }
                 if ($Type -contains 'GPOPermissions' -or $null -eq $Type) {
