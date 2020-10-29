@@ -49,6 +49,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.70 - 29.10.2020
+  - Added `Get-GPOZaurrDuplicateObject`
+  - Added `Remove-GPOZaurrDuplicateObject`
 - 0.0.69 - 29.10.2020
   - Improved `Invoke-GPOZaurr` (WIP)
   - Improved `Get-GPOZaurrNetLogon`
