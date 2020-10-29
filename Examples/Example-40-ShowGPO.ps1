@@ -1,4 +1,4 @@
-﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
+﻿#Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurr.html -Verbose -Type NetLogon, GPOOrphans, GPOList, GPOConsistency
 
@@ -8,7 +8,7 @@ Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurr.html -Verbose -Type Net
 #Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurrEmptyUnlinked.html -Verbose -Type GPOConsistency
 #Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurr.html -Verbose -Type NetLogon
 
-
+#Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurr.html -Verbose -Type GPOOwners
 
 #Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurr.html -Verbose -Type GPOPermissionsRoot
 
