@@ -1,24 +1,26 @@
-﻿$Script:GpoZaurrOwners = @{
+﻿$GPOZaurrOwners = [ordered] @{
+    Name       = 'GPO Owners'
+    Enabled    = $true
     Data       = $null
     Execute    = { Get-GPOZaurrOwner -IncludeSysvol }
     Processing = {
-        foreach ($GPO in $Script:GpoZaurrOwners['Data']) {
+        foreach ($GPO in $GpoZaurrOwners['Data']) {
             if ($GPO.IsOwnerConsistent) {
-                $Script:GpoZaurrOwners['Variables']['IsConsistent']++
+                $GpoZaurrOwners['Variables']['IsConsistent']++
             } else {
-                $Script:GpoZaurrOwners['Variables']['IsNotConsistent']++
+                $GpoZaurrOwners['Variables']['IsNotConsistent']++
             }
             if ($GPO.IsOwnerAdministrative) {
-                $Script:GpoZaurrOwners['Variables']['IsAdministrative']++
+                $GpoZaurrOwners['Variables']['IsAdministrative']++
             } else {
-                $Script:GpoZaurrOwners['Variables']['IsNotAdministrative']++
+                $GpoZaurrOwners['Variables']['IsNotAdministrative']++
             }
             if (($GPO.IsOwnerAdministrative -eq $false -or $GPO.IsOwnerConsistent -eq $false) -and $GPO.SysvolExists -eq $true) {
-                $Script:GpoZaurrOwners['Variables']['WillFix']++
+                $GpoZaurrOwners['Variables']['WillFix']++
             } elseif ($GPO.SysvolExists -eq $false) {
-                $Script:GpoZaurrOwners['Variables']['RequiresDiffFix']++
+                $GpoZaurrOwners['Variables']['RequiresDiffFix']++
             } else {
-                $Script:GpoZaurrOwners['Variables']['WillNotTouch']++
+                $GpoZaurrOwners['Variables']['WillNotTouch']++
             }
         }
     }
@@ -36,16 +38,16 @@
             New-HTMLText -Text 'Following chart presents Group Policy owners and whether they are administrative and consistent. By design an owner of Group Policy should be Domain Admins or Enterprise Admins group only to prevent malicious takeover. ', `
                 "It's also important that owner in Active Directory matches owner on SYSVOL (file system)." -FontSize 10pt
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Administrative Owners: ', $Script:GpoZaurrOwners['Variables']['IsAdministrative'] -FontWeight normal, bold
-                New-HTMLListItem -Text 'Non-Administrative Owners: ', $Script:GpoZaurrOwners['Variables']['IsNotAdministrative'] -FontWeight normal, bold
-                New-HTMLListItem -Text "Owners consistent in AD and SYSVOL: ", $Script:GpoZaurrOwners['Variables']['IsConsistent'] -FontWeight normal, bold
-                New-HTMLListItem -Text "Owners not-consistent in AD and SYSVOL: ", $Script:GpoZaurrOwners['Variables']['IsNotConsistent'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Administrative Owners: ', $GpoZaurrOwners['Variables']['IsAdministrative'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Non-Administrative Owners: ', $GpoZaurrOwners['Variables']['IsNotAdministrative'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Owners consistent in AD and SYSVOL: ", $GpoZaurrOwners['Variables']['IsConsistent'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Owners not-consistent in AD and SYSVOL: ", $GpoZaurrOwners['Variables']['IsNotConsistent'] -FontWeight normal, bold
             } -FontSize 10pt
             New-HTMLChart {
                 New-ChartBarOptions -Type barStacked
                 New-ChartLegend -Name 'Yes', 'No' -Color PaleGreen, Orchid
-                New-ChartBar -Name 'Is administrative' -Value $Script:GpoZaurrOwners['Variables']['IsAdministrative'], $Script:GpoZaurrOwners['Variables']['IsNotAdministrative']
-                New-ChartBar -Name 'Is consistent' -Value $Script:GpoZaurrOwners['Variables']['IsConsistent'], $Script:GpoZaurrOwners['Variables']['IsNotConsistent']
+                New-ChartBar -Name 'Is administrative' -Value $GpoZaurrOwners['Variables']['IsAdministrative'], $GpoZaurrOwners['Variables']['IsNotAdministrative']
+                New-ChartBar -Name 'Is consistent' -Value $GpoZaurrOwners['Variables']['IsConsistent'], $GpoZaurrOwners['Variables']['IsNotConsistent']
             } -Title 'Group Policy Owners' -TitleAlignment center
         }
     }
@@ -66,29 +68,29 @@
                 }
                 New-HTMLText -Text "Here's a short summary of ", "Group Policy Owners", ": " -FontSize 10pt -FontWeight normal, bold, normal
                 New-HTMLList -Type Unordered {
-                    New-HTMLListItem -Text 'Administrative Owners: ', $Script:GpoZaurrOwners['Variables']['IsAdministrative'] -FontWeight normal, bold
-                    New-HTMLListItem -Text 'Non-Administrative Owners: ', $Script:GpoZaurrOwners['Variables']['IsNotAdministrative'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Owners consistent in AD and SYSVOL: ", $Script:GpoZaurrOwners['Variables']['IsConsistent'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Owners not-consistent in AD and SYSVOL: ", $Script:GpoZaurrOwners['Variables']['IsNotConsistent'] -FontWeight normal, bold
+                    New-HTMLListItem -Text 'Administrative Owners: ', $GpoZaurrOwners['Variables']['IsAdministrative'] -FontWeight normal, bold
+                    New-HTMLListItem -Text 'Non-Administrative Owners: ', $GpoZaurrOwners['Variables']['IsNotAdministrative'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Owners consistent in AD and SYSVOL: ", $GpoZaurrOwners['Variables']['IsConsistent'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Owners not-consistent in AD and SYSVOL: ", $GpoZaurrOwners['Variables']['IsNotConsistent'] -FontWeight normal, bold
                 } -FontSize 10pt
                 New-HTMLText -FontSize 10pt -Text "This gives us: "
                 New-HTMLList -Type Unordered {
-                    New-HTMLListItem -Text 'Group Policies requiring owner change: ', $Script:GpoZaurrOwners['Variables']['WillFix'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Group Policies which can't be fixed (no SYSVOL?): ", $Script:GpoZaurrOwners['Variables']['RequiresDiffFix'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Group Policies unaffected: ", $Script:GpoZaurrOwners['Variables']['WillNotTouch'] -FontWeight normal, bold
+                    New-HTMLListItem -Text 'Group Policies requiring owner change: ', $GpoZaurrOwners['Variables']['WillFix'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies which can't be fixed (no SYSVOL?): ", $GpoZaurrOwners['Variables']['RequiresDiffFix'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies unaffected: ", $GpoZaurrOwners['Variables']['WillNotTouch'] -FontWeight normal, bold
                 } -FontSize 10pt
             }
             New-HTMLPanel {
                 New-HTMLChart {
                     New-ChartBarOptions -Type barStacked
                     New-ChartLegend -Name 'Yes', 'No' -Color LightGreen, Salmon
-                    New-ChartBar -Name 'Is administrative' -Value $Script:GpoZaurrOwners['Variables']['IsAdministrative'], $Script:GpoZaurrOwners['Variables']['IsNotAdministrative']
-                    New-ChartBar -Name 'Is consistent' -Value $Script:GpoZaurrOwners['Variables']['IsConsistent'], $Script:GpoZaurrOwners['Variables']['IsNotConsistent']
+                    New-ChartBar -Name 'Is administrative' -Value $GpoZaurrOwners['Variables']['IsAdministrative'], $GpoZaurrOwners['Variables']['IsNotAdministrative']
+                    New-ChartBar -Name 'Is consistent' -Value $GpoZaurrOwners['Variables']['IsConsistent'], $GpoZaurrOwners['Variables']['IsNotConsistent']
                 } -Title 'Group Policy Owners' -TitleAlignment center
             }
         }
         New-HTMLSection -Name 'Group Policy Owners' {
-            New-HTMLTable -DataTable $Script:GpoZaurrOwners['Data'] -Filtering {
+            New-HTMLTable -DataTable $GpoZaurrOwners['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'IsOwnerConsistent' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
                 New-HTMLTableCondition -Name 'IsOwnerAdministrative' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
             } -PagingOptions 10, 20, 30, 40, 50

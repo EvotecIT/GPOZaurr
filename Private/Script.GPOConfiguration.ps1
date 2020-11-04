@@ -1,4 +1,5 @@
-﻿$Script:GPOConfiguration = [ordered] @{
+﻿<#
+$Script:GPOConfiguration = [ordered] @{
     GPOOrphans     = [ordered] @{
         Wizard = {
             New-HTMLWizardStep -Name 'Prepare environment' {
@@ -144,4 +145,10 @@
     GPOConsistency = $ScriptGPOConfigurationGPOConsistency
     NetLogon       = $ScriptGPOConfigurationNetLogon
     GPOOwners      = $ScriptGPOConfigurationGPOOwners
+}
+#>
+
+$Script:GPOConfiguration = @{
+    GPOConsistency = $GPOZaurrConsistency
+    GPOOwners      = $GPOZaurrOwners
 }

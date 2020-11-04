@@ -3,13 +3,18 @@
     [cmdletBinding()]
     param(
         [string] $FilePath,
+        [string[]] $Type
+        <#
         [ValidateSet(
             'GPOList', 'GPOOrphans', 'GPOPermissions', 'GPOPermissionsRoot', 'GPOFiles',
             'GPOConsistency', 'GPOOwners', 'GPOAnalysis',
             'NetLogon',
             'LegacyAdm'
         )][string[]] $Type
+        #>
     )
+    Reset-GPOZaurrStatus # This makes sure types are at it's proper status
+
     $Script:Reporting = [ordered] @{}
     # Provide version check for easy use
     $GPOZaurrVersion = Get-Command -Name 'Invoke-GPOZaurr' -ErrorAction SilentlyContinue
@@ -29,6 +34,27 @@
         $Script:Reporting['Version'] = "GPOZaurr Current: $($GPOZaurrVersion.Version)"
     }
 
+    # Lets disable all current ones
+    foreach ($T in $Script:GPOConfiguration.Keys) {
+        $Script:GPOConfiguration[$T].Enabled = $false
+    }
+    foreach ($T in $Type) {
+        $Script:GPOConfiguration[$T].Enabled = $true
+    }
+
+    foreach ($T in $Script:GPOConfiguration.Keys) {
+        if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+            $TimeLogGPOList = Start-TimeLog
+            Write-Color -Text '[i]', '[Start] ', $($Script:GPOConfiguration[$T]['Name']) -Color Yellow, DarkGray, Yellow
+            $Script:GPOConfiguration[$T]['Data'] = & $Script:GPOConfiguration[$T]['Execute']
+            & $Script:GPOConfiguration[$T]['Processing']
+
+            $TimeEndGPOList = Stop-TimeLog -Time $TimeLogGPOList -Option OneLiner
+            Write-Color -Text '[i]', '[End  ] ', $($Script:GPOConfiguration[$T]['Name']), " [Time to execute: $TimeEndGPOList]" -Color Yellow, DarkGray, Yellow, DarkGray
+        }
+    }
+
+    <#
     # Gather data
     $TimeLog = Start-TimeLog
     if ($Type -contains 'GPOList' -or $null -eq $Type) {
@@ -106,9 +132,8 @@
     }
     if ($Type -contains 'GPOConsistency' -or $null -eq $Type) {
         Write-Verbose -Message "Invoke-GPOZaurr - Processing GPO Permissions Consistency"
-        $GPOPermissionsConsistency = Get-GPOZaurrPermissionConsistency -Type All -VerifyInheritance
-        [Array] $Inconsistent = $GPOPermissionsConsistency.Where( { $_.ACLConsistent -eq $true } , 'split' )
-        [Array] $InconsistentInside = $GPOPermissionsConsistency.Where( { $_.ACLConsistentInside -eq $true }, 'split' )
+        $Script:GPOZaurrConsistency['Data'] = & $Script:GPOZaurrConsistency['Execute']
+        & $Script:GPOZaurrConsistency['Processing']
     }
     if ($Type -contains 'GPOPermissionsRoot' -or $null -eq $Type) {
         Write-Verbose -Message "Invoke-GPOZaurr - Processing GPO Permissions Root"
@@ -171,6 +196,7 @@
     }
     $TimeEnd = Stop-TimeLog -Time $TimeLog -Option OneLiner
     Write-Verbose "Invoke-GPOZaurr - Data gathering time $TimeEnd"
+    #>
     # Generate pretty HTML
     Write-Verbose "Invoke-GPOZaurr - Generating HTML"
     New-HTML {
@@ -190,242 +216,251 @@
             }
         }
 
-        New-HTMLTab -Name 'Overview' {
-            if ($Type -contains 'GPOConsistency' -or $Type -contains 'GPOList' -or $null -eq $Type) {
-                New-HTMLSection -Invisible {
-                    if ($Type -contains 'GPOList' -or $null -eq $Type) {
-                        New-HTMLPanel {
-                            New-HTMLText -Text 'Following chart presents ', 'Linked / Empty and Unlinked Group Policies' -FontSize 10pt -FontWeight normal, bold
-                            New-HTMLList -Type Unordered {
-                                New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
-                                New-HTMLListItem -Text "Group Policies valid: ", $GPOValid.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text "Group Policies to delete: ", $GPOEmptyOrUnlinked.Count -FontWeight normal, bold {
-                                    New-HTMLList -Type Unordered {
-                                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
-                                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
-                                        New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOLinkedButEmpty.Count -FontWeight normal, bold
-                                        New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOLinkedButLinkDisabled.Count -FontWeight normal, bold
-                                    }
-                                }
-                            } -FontSize 10pt
-                            New-HTMLText -FontSize 10pt -Text 'Usually empty or unlinked Group Policies are safe to delete.'
-                            New-HTMLChart -Title 'Group Policies Summary' {
-                                New-ChartBarOptions -Type barStacked
-                                #New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
-                                New-ChartLegend -Names 'Good', 'Bad' -Color PaleGreen, Salmon
-                                #New-ChartBar -Name 'Group Policies' -Value $GPONotLinked.Count, $GPOLinked.Count, $GPOEmpty.Count, $GPOTotal
-                                New-ChartBar -Name 'Linked' -Value $GPOLinked.Count, $GPONotLinked.Count
-                                New-ChartBar -Name 'Empty' -Value $GPONotEmpty.Count, $GPOEmpty.Count
-                                New-ChartBar -Name 'Valid' -Value $GPOValid.Count, $GPOEmptyOrUnlinked.Count
-                            } -TitleAlignment center
-                        }
-                    }
-                    if ($Type -contains 'GPOConsistency' -or $null -eq $Type) {
-                        New-HTMLPanel {
-                            New-HTMLText -Text 'Following chart presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
-                            New-HTMLList -Type Unordered {
-                                & $Script:GPOConfiguration['GPOConsistency']['List']
-                            } -FontSize 10pt
-                            New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them.'
-                            New-HTMLChart {
-                                & $Script:GPOConfiguration['GPOConsistency']['Chart']
-                            } -Title 'Permissions Consistency' -TitleAlignment center
-                        }
+        if ($Type.Count -eq 1) {
+            foreach ($T in $Script:GPOConfiguration.Keys) {
+                if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+                    if ($Script:GPOConfiguration[$T]['Data']) {
+                        & $Script:GPOConfiguration[$T]['Solution']
                     }
                 }
             }
-            if ($Type -contains 'GPOOwners' -or $Type -contains 'GPOOrphans' -or $null -eq $Type) {
-                New-HTMLSection -Invisible {
-                    if ($Type -contains 'GPOOwners' -or $null -eq $Type) {
-                        if ($Script:GpoZaurrOwners['Overview']) {
-                            & $Script:GpoZaurrOwners['Overview']
-                        }
-                    }
-                    if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
-                        New-HTMLPanel {
-                            New-HTMLText -Text 'Following chart presents ', 'Broken / Orphaned Group Policies' -FontSize 10pt -FontWeight normal, bold
-                            New-HTMLList -Type Unordered {
-                                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $NotAvailableInAD.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $NotAvailableOnSysvol.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $NotAvailablePermissionIssue.Count -FontWeight normal, bold
-                            } -FontSize 10pt
-                            New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
-                            New-HTMLChart {
-                                New-ChartBarOptions -Type barStacked
-                                New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'Permissions Issue' -Color Crimson, LightCoral, IndianRed
-                                New-ChartBar -Name 'Orphans' -Value $NotAvailableInAD.Count, $NotAvailableOnSysvol.Count, $NotAvailablePermissionIssue.Count
-                            } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
-                        }
-                    }
-                }
-            }
-            if ($Type -contains 'NetLogon' -or $null -eq $Type) {
-                New-HTMLSection -Invisible {
-                    New-HTMLPanel {
-                        New-HTMLText -Text 'Following chart presents ', 'NetLogon Summary' -FontSize 10pt -FontWeight normal, bold
-                        New-HTMLList -Type Unordered {
-                            & $Script:GPOConfiguration['NetLogon']['List']
-                        } -FontSize 10pt
-                        #New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
-                        New-HTMLChart {
-                            New-ChartPie -Name 'Correct Owners' -Value $NetLogonOwnersAdministrators.Count -Color LightGreen
-                            New-ChartPie -Name 'Incorrect Owners' -Value $NetLogonOwnersToFix.Count -Color Crimson
-                        } -Title 'NetLogon Owners' -TitleAlignment center
-                    }
-                    New-HTMLPanel {
+        } else {
+            New-HTMLTab -Name 'Overview' {
+                if ($Type -contains 'GPOConsistency' -or $Type -contains 'GPOList' -or $null -eq $Type) {
+                    New-HTMLSection -Invisible {
+                        if ($Type -contains 'GPOList' -or $null -eq $Type) {
 
-                    }
-                }
-            }
-        }
-        if ($Type -contains 'GPOList' -or $null -eq $Type) {
-            New-HTMLTab -Name 'Group Policies Summary' {
-                New-HTMLPanel {
-                    $newHTMLTextSplat = @{
-                        Text       = @(
-                            'Following table shows a list of group policies.',
-                            'By using following table you can easily find which GPOs can be safely deleted because those are empty or unlinked or linked, but link disabled.'
-                        )
-                        FontSize   = '10pt'
-                        FontWeight = 'normal', 'bold'
-                    }
-                    New-HTMLText @newHTMLTextSplat
-                    New-HTMLList -Type Unordered {
-                        New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies valid: ", $GPOValid.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies to delete: ", $GPOEmptyOrUnlinked.Count -FontWeight normal, bold {
-                            New-HTMLList -Type Unordered {
-                                New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOLinkedButEmpty.Count -FontWeight normal, bold
-                                New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOLinkedButLinkDisabled.Count -FontWeight normal, bold
+                            New-HTMLPanel {
+                                New-HTMLText -Text 'Following chart presents ', 'Linked / Empty and Unlinked Group Policies' -FontSize 10pt -FontWeight normal, bold
+                                New-HTMLList -Type Unordered {
+                                    New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
+                                    New-HTMLListItem -Text "Group Policies valid: ", $GPOValid.Count -FontWeight normal, bold
+                                    New-HTMLListItem -Text "Group Policies to delete: ", $GPOEmptyOrUnlinked.Count -FontWeight normal, bold {
+                                        New-HTMLList -Type Unordered {
+                                            New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
+                                            New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
+                                            New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOLinkedButEmpty.Count -FontWeight normal, bold
+                                            New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOLinkedButLinkDisabled.Count -FontWeight normal, bold
+                                        }
+                                    }
+                                } -FontSize 10pt
+                                New-HTMLText -FontSize 10pt -Text 'Usually empty or unlinked Group Policies are safe to delete.'
+                                New-HTMLChart -Title 'Group Policies Summary' {
+                                    New-ChartBarOptions -Type barStacked
+                                    #New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
+                                    New-ChartLegend -Names 'Good', 'Bad' -Color PaleGreen, Salmon
+                                    #New-ChartBar -Name 'Group Policies' -Value $GPONotLinked.Count, $GPOLinked.Count, $GPOEmpty.Count, $GPOTotal
+                                    New-ChartBar -Name 'Linked' -Value $GPOLinked.Count, $GPONotLinked.Count
+                                    New-ChartBar -Name 'Empty' -Value $GPONotEmpty.Count, $GPOEmpty.Count
+                                    New-ChartBar -Name 'Valid' -Value $GPOValid.Count, $GPOEmptyOrUnlinked.Count
+                                } -TitleAlignment center
+                            }
+
+                        }
+                        if ($Type -contains 'GPOConsistency' -or $null -eq $Type) {
+                            if ($Script:GPOZaurrConsistency['Overview']) {
+                                & $Script:GPOZaurrConsistency['Overview']
                             }
                         }
-                    } -FontSize 10pt
-                    New-HTMLText -Text 'All those mentioned Group Policies can be automatically deleted following the steps below the table.' -FontSize 10pt
+                    }
                 }
-                New-HTMLSection -Name 'Group Policies List' {
-                    New-HTMLTable -DataTable $GPOSummary -Filtering {
-                        New-HTMLTableCondition -Name 'Empty' -Value $true -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
-                        New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
-                    } -PagingOptions 10, 20, 30, 40, 50
-                }
-                New-HTMLSection -Name 'Steps to fix - Empty & Unlinked Group Policies' {
-                    New-HTMLContainer {
-                        New-HTMLSpanStyle -FontSize 10pt {
-                            New-HTMLText -Text 'Following steps will guide you how to remove empty or unlinked group policies'
-                            New-HTMLWizard {
-                                & $Script:GPOConfiguration['GPOList']['Wizard']
-                            } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                if ($Type -contains 'GPOOwners' -or $Type -contains 'GPOOrphans' -or $null -eq $Type) {
+                    New-HTMLSection -Invisible {
+                        if ($Type -contains 'GPOOwners' -or $null -eq $Type) {
+                            if ($Script:GpoZaurrOwners['Overview']) {
+                                & $Script:GpoZaurrOwners['Overview']
+                            }
+                        }
+                        if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
+                            New-HTMLPanel {
+                                New-HTMLText -Text 'Following chart presents ', 'Broken / Orphaned Group Policies' -FontSize 10pt -FontWeight normal, bold
+                                New-HTMLList -Type Unordered {
+                                    New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $NotAvailableInAD.Count -FontWeight normal, bold
+                                    New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $NotAvailableOnSysvol.Count -FontWeight normal, bold
+                                    New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $NotAvailablePermissionIssue.Count -FontWeight normal, bold
+                                } -FontSize 10pt
+                                New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
+                                New-HTMLChart {
+                                    New-ChartBarOptions -Type barStacked
+                                    New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'Permissions Issue' -Color Crimson, LightCoral, IndianRed
+                                    New-ChartBar -Name 'Orphans' -Value $NotAvailableInAD.Count, $NotAvailableOnSysvol.Count, $NotAvailablePermissionIssue.Count
+                                } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
+                            }
                         }
                     }
                 }
-            }
-        }
-        if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
-            New-HTMLTab -Name 'Health State' {
-                New-HTMLPanel {
-                    New-HTMLText -TextBlock {
-                        "Following table shows list of all group policies and their status in AD and SYSVOL. Due to different reasons it's "
-                        "possible that "
-                    } -FontSize 10pt
-                    New-HTMLList -Type Unordered {
-                        New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $NotAvailableInAD.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $NotAvailableOnSysvol.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $NotAvailablePermissionIssue.Count -FontWeight normal, bold
-                    } -FontSize 10pt
-                    New-HTMLText -Text "Follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
-                }
-                New-HTMLSection -Name 'Health State of Group Policies' {
-                    New-HTMLTable -DataTable $GPOOrphans -Filtering {
-                        New-HTMLTableCondition -Name 'Status' -Value "Not available in AD" -BackgroundColor Salmon -ComparisonType string
-                        New-HTMLTableCondition -Name 'Status' -Value "Not available on SYSVOL" -BackgroundColor LightCoral -ComparisonType string
-                        New-HTMLTableCondition -Name 'Status' -Value "Permissions issue" -BackgroundColor MediumVioletRed -ComparisonType string -Color White
-                    } -PagingOptions 10, 20, 30, 40, 50
-                }
-                New-HTMLSection -Name 'Steps to fix - Not available on SYSVOL / Active Directory' {
-                    New-HTMLContainer {
-                        New-HTMLSpanStyle -FontSize 10pt {
-                            New-HTMLText -Text 'Following steps will guide you how to fix GPOs which are not available on SYSVOL or AD.'
-                            New-HTMLWizard {
-                                & $Script:GPOConfiguration['GPOOrphans']['Wizard']
-                            } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
-                        }
-                    }
-                }
-            }
-        }
-        if ($Type -contains 'NetLogon' -or $Type -contains 'GPOFiles' -or $null -eq $Type) {
-            New-HTMLTab -Name 'Files (SysVol / NetLogon)' {
                 if ($Type -contains 'NetLogon' -or $null -eq $Type) {
-                    New-HTMLTab -Name 'NetLogon Owners' {
+                    New-HTMLSection -Invisible {
                         New-HTMLPanel {
-                            New-HTMLText -TextBlock {
-                                "Following table shows NetLogon file owners. It's important that NetLogon file owners are set to BUILTIN\Administrators (SID: S-1-5-32-544). "
-                                "Owners have full control over the file object. Current owner of the file may be an Administrator but it doesn't guarentee that he will be in the future. "
-                                "That's why as a best-practice it's recommended to change any non-administrative owners to BUILTIN\Administrators, and even Administrative accounts should be replaced with it. "
-                            } -FontSize 10pt
+                            New-HTMLText -Text 'Following chart presents ', 'NetLogon Summary' -FontSize 10pt -FontWeight normal, bold
                             New-HTMLList -Type Unordered {
                                 & $Script:GPOConfiguration['NetLogon']['List']
                             } -FontSize 10pt
-                            New-HTMLText -Text "Follow the steps below table to get NetLogon Owners into compliant state." -FontSize 10pt
+                            #New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
+                            New-HTMLChart {
+                                New-ChartPie -Name 'Correct Owners' -Value $NetLogonOwnersAdministrators.Count -Color LightGreen
+                                New-ChartPie -Name 'Incorrect Owners' -Value $NetLogonOwnersToFix.Count -Color Crimson
+                            } -Title 'NetLogon Owners' -TitleAlignment center
                         }
-                        New-HTMLSection -Name 'NetLogon Files List' {
-                            New-HTMLTable -DataTable $NetLogonOwners -Filtering {
-                                New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor LightGreen -ComparisonType string
-                                New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor Salmon -ComparisonType string -Operator ne
-                                New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
-                            }
-                        }
-                        New-HTMLSection -Name 'Steps to fix NetLogon Owners ' {
-                            New-HTMLContainer {
-                                New-HTMLSpanStyle -FontSize 10pt {
-                                    New-HTMLText -Text 'Following steps will guide you how to fix NetLogon Owners and make them compliant.'
-                                    New-HTMLWizard {
-                                        & $Script:GPOConfiguration['NetLogon']['Wizard']
-                                    } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
-                                }
-                            }
-                        }
+                        New-HTMLPanel {
 
-                    }
-                    New-HTMLTab -Name 'NetLogon Permissions' {
-                        New-HTMLSection -Name 'NetLogon Files List' {
-                            New-HTMLTable -DataTable $Netlogon -Filtering
                         }
-                    }
-                }
-                if ($Type -contains 'GPOFiles' -or $null -eq $Type) {
-                    New-HTMLTab -Name 'SysVol Files Assesment' {
-                        New-HTMLTable -DataTable $GPOFiles -Filtering
                     }
                 }
             }
-        }
-        if ($Type -contains 'GPOPermissionsRoot' -or $Type -contains 'GPOOwners' -or
-            $Type -contains 'GPOPermissions' -or $Type -contains 'GPOConsistency' -or
-            $null -eq $Type
-        ) {
-            New-HTMLTab -Name 'Permissions' {
-                if ($Type -contains 'GPOPermissionsRoot' -or $null -eq $Type) {
-                    New-HTMLTab -Name 'Root' {
-                        New-HTMLTable -DataTable $GPOPermissionsRoot -Filtering
+
+            if ($Type -contains 'GPOList' -or $null -eq $Type) {
+                New-HTMLTab -Name 'Group Policies Summary' {
+                    New-HTMLPanel {
+                        $newHTMLTextSplat = @{
+                            Text       = @(
+                                'Following table shows a list of group policies.',
+                                'By using following table you can easily find which GPOs can be safely deleted because those are empty or unlinked or linked, but link disabled.'
+                            )
+                            FontSize   = '10pt'
+                            FontWeight = 'normal', 'bold'
+                        }
+                        New-HTMLText @newHTMLTextSplat
+                        New-HTMLList -Type Unordered {
+                            New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
+                            New-HTMLListItem -Text "Group Policies valid: ", $GPOValid.Count -FontWeight normal, bold
+                            New-HTMLListItem -Text "Group Policies to delete: ", $GPOEmptyOrUnlinked.Count -FontWeight normal, bold {
+                                New-HTMLList -Type Unordered {
+                                    New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
+                                    New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
+                                    New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOLinkedButEmpty.Count -FontWeight normal, bold
+                                    New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOLinkedButLinkDisabled.Count -FontWeight normal, bold
+                                }
+                            }
+                        } -FontSize 10pt
+                        New-HTMLText -Text 'All those mentioned Group Policies can be automatically deleted following the steps below the table.' -FontSize 10pt
                     }
-                }
-                if ($Type -contains 'GPOOwners' -or $null -eq $Type) {
-                    New-HTMLTab -Name 'Owners' {
-                        if ($Script:GpoZaurrOwners['Solution']) {
-                            & $Script:GpoZaurrOwners['Solution']
+                    New-HTMLSection -Name 'Group Policies List' {
+                        New-HTMLTable -DataTable $GPOSummary -Filtering {
+                            New-HTMLTableCondition -Name 'Empty' -Value $true -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
+                            New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
+                        } -PagingOptions 10, 20, 30, 40, 50
+                    }
+                    New-HTMLSection -Name 'Steps to fix - Empty & Unlinked Group Policies' {
+                        New-HTMLContainer {
+                            New-HTMLSpanStyle -FontSize 10pt {
+                                New-HTMLText -Text 'Following steps will guide you how to remove empty or unlinked group policies'
+                                New-HTMLWizard {
+                                    & $Script:GPOConfiguration['GPOList']['Wizard']
+                                } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                            }
                         }
                     }
                 }
-                if ($Type -contains 'GPOPermissions' -or $null -eq $Type) {
-                    New-HTMLTab -Name 'Edit & Modify' {
-                        New-HTMLTable -DataTable $GPOPermissions -Filtering
+            }
+            if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
+                New-HTMLTab -Name 'Health State' {
+                    New-HTMLPanel {
+                        New-HTMLText -TextBlock {
+                            "Following table shows list of all group policies and their status in AD and SYSVOL. Due to different reasons it's "
+                            "possible that "
+                        } -FontSize 10pt
+                        New-HTMLList -Type Unordered {
+                            New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $NotAvailableInAD.Count -FontWeight normal, bold
+                            New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $NotAvailableOnSysvol.Count -FontWeight normal, bold
+                            New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $NotAvailablePermissionIssue.Count -FontWeight normal, bold
+                        } -FontSize 10pt
+                        New-HTMLText -Text "Follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
+                    }
+                    New-HTMLSection -Name 'Health State of Group Policies' {
+                        New-HTMLTable -DataTable $GPOOrphans -Filtering {
+                            New-HTMLTableCondition -Name 'Status' -Value "Not available in AD" -BackgroundColor Salmon -ComparisonType string
+                            New-HTMLTableCondition -Name 'Status' -Value "Not available on SYSVOL" -BackgroundColor LightCoral -ComparisonType string
+                            New-HTMLTableCondition -Name 'Status' -Value "Permissions issue" -BackgroundColor MediumVioletRed -ComparisonType string -Color White
+                        } -PagingOptions 10, 20, 30, 40, 50
+                    }
+                    New-HTMLSection -Name 'Steps to fix - Not available on SYSVOL / Active Directory' {
+                        New-HTMLContainer {
+                            New-HTMLSpanStyle -FontSize 10pt {
+                                New-HTMLText -Text 'Following steps will guide you how to fix GPOs which are not available on SYSVOL or AD.'
+                                New-HTMLWizard {
+                                    & $Script:GPOConfiguration['GPOOrphans']['Wizard']
+                                } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                            }
+                        }
                     }
                 }
-                if ($Type -contains 'GPOConsistency' -or $null -eq $Type) {
-                    New-HTMLTab -Name 'Permissions Consistency' {
+            }
+            if ($Type -contains 'NetLogon' -or $Type -contains 'GPOFiles' -or $null -eq $Type) {
+                New-HTMLTab -Name 'Files (SysVol / NetLogon)' {
+                    if ($Type -contains 'NetLogon' -or $null -eq $Type) {
+                        New-HTMLTab -Name 'NetLogon Owners' {
+                            New-HTMLPanel {
+                                New-HTMLText -TextBlock {
+                                    "Following table shows NetLogon file owners. It's important that NetLogon file owners are set to BUILTIN\Administrators (SID: S-1-5-32-544). "
+                                    "Owners have full control over the file object. Current owner of the file may be an Administrator but it doesn't guarentee that he will be in the future. "
+                                    "That's why as a best-practice it's recommended to change any non-administrative owners to BUILTIN\Administrators, and even Administrative accounts should be replaced with it. "
+                                } -FontSize 10pt
+                                New-HTMLList -Type Unordered {
+                                    & $Script:GPOConfiguration['NetLogon']['List']
+                                } -FontSize 10pt
+                                New-HTMLText -Text "Follow the steps below table to get NetLogon Owners into compliant state." -FontSize 10pt
+                            }
+                            New-HTMLSection -Name 'NetLogon Files List' {
+                                New-HTMLTable -DataTable $NetLogonOwners -Filtering {
+                                    New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor LightGreen -ComparisonType string
+                                    New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor Salmon -ComparisonType string -Operator ne
+                                    New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
+                                }
+                            }
+                            New-HTMLSection -Name 'Steps to fix NetLogon Owners ' {
+                                New-HTMLContainer {
+                                    New-HTMLSpanStyle -FontSize 10pt {
+                                        New-HTMLText -Text 'Following steps will guide you how to fix NetLogon Owners and make them compliant.'
+                                        New-HTMLWizard {
+                                            & $Script:GPOConfiguration['NetLogon']['Wizard']
+                                        } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                                    }
+                                }
+                            }
+
+                        }
+                        New-HTMLTab -Name 'NetLogon Permissions' {
+                            New-HTMLSection -Name 'NetLogon Files List' {
+                                New-HTMLTable -DataTable $Netlogon -Filtering
+                            }
+                        }
+                    }
+                    if ($Type -contains 'GPOFiles' -or $null -eq $Type) {
+                        New-HTMLTab -Name 'SysVol Files Assesment' {
+                            New-HTMLTable -DataTable $GPOFiles -Filtering
+                        }
+                    }
+                }
+            }
+            if ($Type -contains 'GPOPermissionsRoot' -or $Type -contains 'GPOOwners' -or
+                $Type -contains 'GPOPermissions' -or $Type -contains 'GPOConsistency' -or
+                $null -eq $Type
+            ) {
+                New-HTMLTab -Name 'Permissions' {
+                    if ($Type -contains 'GPOPermissionsRoot' -or $null -eq $Type) {
+                        New-HTMLTab -Name 'Root' {
+                            New-HTMLTable -DataTable $GPOPermissionsRoot -Filtering
+                        }
+                    }
+                    if ($Type -contains 'GPOOwners' -or $null -eq $Type) {
+                        New-HTMLTab -Name 'Owners' {
+                            if ($Script:GpoZaurrOwners['Solution']) {
+                                & $Script:GpoZaurrOwners['Solution']
+                            }
+                        }
+                    }
+                    if ($Type -contains 'GPOPermissions' -or $null -eq $Type) {
+                        New-HTMLTab -Name 'Edit & Modify' {
+                            New-HTMLTable -DataTable $GPOPermissions -Filtering
+                        }
+                    }
+                    if ($Type -contains 'GPOConsistency' -or $null -eq $Type) {
+                        New-HTMLTab -Name 'Permissions Consistency' {
+                            if ($Script:GPOZaurrConsistency['Solution']) {
+                                & $Script:GPOZaurrConsistency['Solution']
+                            }
+                            <#
                         New-HTMLPanel {
                             New-HTMLText -Text 'Following table presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
                             New-HTMLList -Type Unordered {
@@ -457,18 +492,31 @@
                                 }
                             }
                         }
+                        #>
+                        }
                     }
                 }
             }
-        }
-        if ($Type -contains 'GPOAnalysis' -or $null -eq $Type) {
-            New-HTMLTab -Name 'Analysis' {
-                foreach ($Key in $GPOContent.Keys) {
-                    New-HTMLTab -Name $Key {
-                        New-HTMLTable -DataTable $GPOContent[$Key] -Filtering -Title $Key
+            if ($Type -contains 'GPOAnalysis' -or $null -eq $Type) {
+                New-HTMLTab -Name 'Analysis' {
+                    foreach ($Key in $GPOContent.Keys) {
+                        New-HTMLTab -Name $Key {
+                            New-HTMLTable -DataTable $GPOContent[$Key] -Filtering -Title $Key
+                        }
                     }
                 }
             }
         }
     } -Online -ShowHTML -FilePath $FilePath
+
+
+    Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 }
+
+[scriptblock] $SourcesAutoCompleter = {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+
+    $Script:GPOConfiguration.Keys | Sort-Object | Where-Object { $_ -like "*$wordToComplete*" }
+}
+
+Register-ArgumentCompleter -CommandName Invoke-GPOZaurr -ParameterName Type -ScriptBlock $SourcesAutoCompleter
