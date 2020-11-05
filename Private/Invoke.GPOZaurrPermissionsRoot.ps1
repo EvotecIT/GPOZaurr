@@ -2,7 +2,9 @@
     Name       = 'GPO Permissions Consistency'
     Enabled    = $true
     Data       = $null
-    Execute    = {  }
+    Execute    = {
+        $GPOPermissionsRoot = Get-GPOZaurrPermissionRoot -SkipNames
+     }
     Processing = {
 
     }

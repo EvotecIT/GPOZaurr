@@ -2,7 +2,9 @@
     Name       = 'SYSVOL Legacy ADM Files'
     Enabled    = $false
     Data       = $null
-    Execute    = {  }
+    Execute    = {
+        $ADMLegacyFiles = Get-GPOZaurrLegacyFiles
+     }
     Processing = {
 
     }

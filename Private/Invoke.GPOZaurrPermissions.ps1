@@ -1,8 +1,11 @@
 ﻿$GPOZaurrPermissions = [ordered] @{
-    Name       = 'GPO Permissions Consistency'
+    Name       = 'GPO Permissions'
     Enabled    = $true
     Data       = $null
-    Execute    = {  }
+    Execute    = {
+        $GPOPermissions = Get-GPOZaurrPermission -Type All -IncludePermissionType GpoEditDeleteModifySecurity, GpoEdit, GpoCustom -IncludeOwner
+
+    }
     Processing = {
 
     }

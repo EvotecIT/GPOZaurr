@@ -2,7 +2,38 @@
     Name       = 'NetLogon Permissions'
     Enabled    = $true
     Data       = $null
-    Execute    = {  }
+    Execute    = {
+
+        $NetLogon = Get-GPOZaurrNetLogon
+        $NetLogonOwners = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersAdministrators = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersNotAdministrative = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersAdministrative = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersAdministrativeNotAdministrators = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $NetLogonOwnersToFix = [System.Collections.Generic.List[PSCustomObject]]::new()
+        foreach ($File in $Netlogon) {
+            if ($File.FileSystemRights -eq 'Owner') {
+                $NetLogonOwners.Add($File)
+
+                if ($File.PrincipalType -eq 'WellKnownAdministrative') {
+                    $NetLogonOwnersAdministrative.Add($File)
+                } elseif ($File.PrincipalType -eq 'Administrative') {
+                    $NetLogonOwnersAdministrative.Add($File)
+                } else {
+                    $NetLogonOwnersNotAdministrative.Add($File)
+                }
+
+                if ($File.PrincipalSid -eq 'S-1-5-32-544') {
+                    $NetLogonOwnersAdministrators.Add($File)
+                } elseif ($File.PrincipalType -in 'WellKnownAdministrative', 'Administrative') {
+                    $NetLogonOwnersAdministrativeNotAdministrators.Add($File)
+                    $NetLogonOwnersToFix.Add($File)
+                } else {
+                    $NetLogonOwnersToFix.Add($File)
+                }
+            }
+        }
+     }
     Processing = {
 
     }

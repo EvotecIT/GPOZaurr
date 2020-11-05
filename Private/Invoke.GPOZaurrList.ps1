@@ -1,69 +1,70 @@
 ﻿$GPOZaurrList = [ordered] @{
-    Name       = 'GPO Permissions Consistency'
+    Name       = 'Group Policy Empty & Unlinked'
     Enabled    = $true
     Data       = $null
-    Execute    = {  }
+    Execute    = {
+        Get-GPOZaurr
+    }
     Processing = {
-        $GPOSummary = Get-GPOZaurr
-        $GPONotLinked = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $GPOLinked = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $GPOEmpty = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $GPONotEmpty = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $GPOEmptyAndUnlinked = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $GPOEmptyOrUnlinked = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $GPOLinkedButEmpty = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $GPOValid = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $GPOLinkedButLinkDisabled = [System.Collections.Generic.List[PSCustomObject]]::new()
-        foreach ($GPO in $GPOSummary) {
+        foreach ($GPO in $GPOZaurrList['Data']) {
             if ($GPO.Linked -eq $false -and $GPO.Empty -eq $true) {
                 # Not linked, Empty
-                $GPOEmptyAndUnlinked.Add($GPO)
-                $GPOEmptyOrUnlinked.Add($GPO)
-                $GPONotLinked.Add($GPO)
-                $GPOEmpty.Add($GPO)
+                $GPOZaurrList['Variables']['GPOEmptyAndUnlinked']++
+                $GPOZaurrList['Variables']['GPOEmptyOrUnlinked']++
+                $GPOZaurrList['Variables']['GPONotLinked']++
+                $GPOZaurrList['Variables']['GPOEmpty']++
             } elseif ($GPO.Linked -eq $true -and $GPO.Empty -eq $true) {
                 # Linked, But EMPTY
-                $GPOLinkedButEmpty.Add($GPO)
-                $GPOEmptyOrUnlinked.Add($GPO)
-                $GPOEmpty.Add($GPO)
-                $GPOLinked.Add($GPO)
+                $GPOZaurrList['Variables']['GPOLinkedButEmpty']++
+                $GPOZaurrList['Variables']['GPOEmptyOrUnlinked']++
+                $GPOZaurrList['Variables']['GPOEmpty']++
+                $GPOZaurrList['Variables']['GPOLinked']++
             } elseif ($GPO.Linked -eq $false) {
                 # Not linked, but not EMPTY
-                $GPONotLinked.Add($GPO)
-                $GPOEmptyOrUnlinked.Add($GPO)
-                $GPONotEmpty.Add($GPO)
+                $GPOZaurrList['Variables']['GPONotLinked']++
+                $GPOZaurrList['Variables']['GPOEmptyOrUnlinked']++
+                $GPOZaurrList['Variables']['GPONotEmpty']++
             } elseif ($GPO.Empty -eq $true) {
                 # Linked, But EMPTY
-                $GPOEmpty.Add($GPO)
-                $GPOEmptyOrUnlinked.Add($GPO)
-                $GPOLinked.Add($GPO)
+                $GPOZaurrList['Variables']['GPOEmpty']++
+                $GPOZaurrList['Variables']['GPOEmptyOrUnlinked']++
+                $GPOZaurrList['Variables']['GPOLinked']++
             } else {
                 # Linked, not EMPTY
-                $GPOValid.Add($GPO)
-                $GPOLinked.Add($GPO)
-                $GPONotEmpty.Add($GPO)
+                $GPOZaurrList['Variables']['GPOValid']++
+                $GPOZaurrList['Variables']['GPOLinked']++
+                $GPOZaurrList['Variables']['GPONotEmpty']++
             }
             if ($GPO.LinksDisabledCount -eq $GPO.LinksCount -and $GPO.LinksCount -gt 0) {
-                $GPOLinkedButLinkDisabled.Add($GPO)
+                $GPOZaurrList['Variables']['GPOLinkedButLinkDisabled']++
             }
         }
-        $GPOTotal = $GPOSummary.Count
+        $GPOZaurrList['Variables']['GPOTotal'] = $GPOZaurrList['Data'].Count
     }
-    Variables  = @{
-
+    Variables  = [ordered] @{
+        GPONotLinked             = 0
+        GPOLinked                = 0
+        GPOEmpty                 = 0
+        GPONotEmpty              = 0
+        GPOEmptyAndUnlinked      = 0
+        GPOEmptyOrUnlinked       = 0
+        GPOLinkedButEmpty        = 0
+        GPOValid                 = 0
+        GPOLinkedButLinkDisabled = 0
+        GPOTotal                 = 0
     }
     Overview   = {
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents ', 'Linked / Empty and Unlinked Group Policies' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies valid: ", $GPOValid.Count -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies to delete: ", $GPOEmptyOrUnlinked.Count -FontWeight normal, bold {
+                New-HTMLListItem -Text 'Group Policies total: ', $GPOZaurrList['Variables']['GPOTotal'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Group Policies valid: ", $GPOZaurrList['Variables']['GPOValid'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Group Policies to delete: ", $GPOZaurrList['Variables']['GPOEmptyOrUnlinked'] -FontWeight normal, bold {
                     New-HTMLList -Type Unordered {
-                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOLinkedButEmpty.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOLinkedButLinkDisabled.Count -FontWeight normal, bold
+                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPOZaurrList['Variables']['GPONotLinked'] -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOZaurrList['Variables']['GPOEmpty'] -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOZaurrList['Variables']['GPOLinkedButEmpty'] -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOZaurrList['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
                     }
                 }
             } -FontSize 10pt
@@ -72,40 +73,53 @@
                 New-ChartBarOptions -Type barStacked
                 #New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
                 New-ChartLegend -Names 'Good', 'Bad' -Color PaleGreen, Salmon
-                #New-ChartBar -Name 'Group Policies' -Value $GPONotLinked.Count, $GPOLinked.Count, $GPOEmpty.Count, $GPOTotal
-                New-ChartBar -Name 'Linked' -Value $GPOLinked.Count, $GPONotLinked.Count
-                New-ChartBar -Name 'Empty' -Value $GPONotEmpty.Count, $GPOEmpty.Count
-                New-ChartBar -Name 'Valid' -Value $GPOValid.Count, $GPOEmptyOrUnlinked.Count
+                #New-ChartBar -Name 'Group Policies' -Value $GPOZaurrList['Variables']['GPONotLinked'], $GPOZaurrList['Variables']['GPOLinked'], $GPOZaurrList['Variables']['GPOEmpty'], $GPOZaurrList['Variables']['GPOTotal']
+                New-ChartBar -Name 'Linked' -Value $GPOZaurrList['Variables']['GPOLinked'], $GPOZaurrList['Variables']['GPONotLinked']
+                New-ChartBar -Name 'Empty' -Value $GPOZaurrList['Variables']['GPONotEmpty'], $GPOZaurrList['Variables']['GPOEmpty']
+                New-ChartBar -Name 'Valid' -Value $GPOZaurrList['Variables']['GPOValid'], $GPOZaurrList['Variables']['GPOEmptyOrUnlinked']
             } -TitleAlignment center
         }
     }
     Solution   = {
-        New-HTMLPanel {
-            $newHTMLTextSplat = @{
-                Text       = @(
-                    'Following table shows a list of group policies.',
-                    'By using following table you can easily find which GPOs can be safely deleted because those are empty or unlinked or linked, but link disabled.'
-                )
-                FontSize   = '10pt'
-                FontWeight = 'normal', 'bold'
-            }
-            New-HTMLText @newHTMLTextSplat
-            New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Group Policies total: ', $GPOTotal -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies valid: ", $GPOValid.Count -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies to delete: ", $GPOEmptyOrUnlinked.Count -FontWeight normal, bold {
-                    New-HTMLList -Type Unordered {
-                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPONotLinked.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOEmpty.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOLinkedButEmpty.Count -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOLinkedButLinkDisabled.Count -FontWeight normal, bold
-                    }
+        New-HTMLSection -Invisible {
+            New-HTMLPanel {
+                $newHTMLTextSplat = @{
+                    Text       = @(
+                        'Following table shows a list of group policies.',
+                        'By using following table you can easily find which GPOs can be safely deleted because those are empty or unlinked or linked, but link disabled.'
+                    )
+                    FontSize   = '10pt'
+                    FontWeight = 'normal', 'bold'
                 }
-            } -FontSize 10pt
-            New-HTMLText -Text 'All those mentioned Group Policies can be automatically deleted following the steps below the table.' -FontSize 10pt
+                New-HTMLText @newHTMLTextSplat
+                New-HTMLList -Type Unordered {
+                    New-HTMLListItem -Text 'Group Policies total: ', $GPOZaurrList['Variables']['GPOTotal'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies valid: ", $GPOZaurrList['Variables']['GPOValid'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies to delete: ", $GPOZaurrList['Variables']['GPOEmptyOrUnlinked'] -FontWeight normal, bold {
+                        New-HTMLList -Type Unordered {
+                            New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $GPOZaurrList['Variables']['GPONotLinked'] -FontWeight normal, bold
+                            New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $GPOZaurrList['Variables']['GPOEmpty'] -FontWeight normal, bold
+                            New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $GPOZaurrList['Variables']['GPOLinkedButEmpty'] -FontWeight normal, bold
+                            New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $GPOZaurrList['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
+                        }
+                    }
+                } -FontSize 10pt
+                New-HTMLText -Text 'All those mentioned Group Policies can be automatically deleted following the steps below the table.' -FontSize 10pt
+            }
+            New-HTMLPanel {
+                New-HTMLChart -Title 'Group Policies Empty & Unlinked' {
+                    New-ChartBarOptions -Type barStacked
+                    #New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
+                    New-ChartLegend -Names 'Good', 'Bad' -Color PaleGreen, Salmon
+                    #New-ChartBar -Name 'Group Policies' -Value $GPOZaurrList['Variables']['GPONotLinked'], $GPOZaurrList['Variables']['GPOLinked'], $GPOZaurrList['Variables']['GPOEmpty'], $GPOZaurrList['Variables']['GPOTotal']
+                    New-ChartBar -Name 'Linked' -Value $GPOZaurrList['Variables']['GPOLinked'], $GPOZaurrList['Variables']['GPONotLinked']
+                    New-ChartBar -Name 'Empty' -Value $GPOZaurrList['Variables']['GPONotEmpty'], $GPOZaurrList['Variables']['GPOEmpty']
+                    New-ChartBar -Name 'Valid' -Value $GPOZaurrList['Variables']['GPOValid'], $GPOZaurrList['Variables']['GPOEmptyOrUnlinked']
+                } -TitleAlignment center
+            }
         }
         New-HTMLSection -Name 'Group Policies List' {
-            New-HTMLTable -DataTable $GPOSummary -Filtering {
+            New-HTMLTable -DataTable $GPOZaurrList['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'Empty' -Value $true -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
                 New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
             } -PagingOptions 10, 20, 30, 40, 50

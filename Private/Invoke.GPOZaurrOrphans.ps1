@@ -1,45 +1,72 @@
 ﻿$GPOZaurrOrphans = [ordered] @{
-    Name       = 'GPO Permissions Consistency'
+    Name       = 'Orphaned GPO (SysVol or Active Directory)'
     Enabled    = $true
     Data       = $null
-    Execute    = {  }
+    Execute    = {
+        Get-GPOZaurrBroken
+    }
     Processing = {
-
+        #$NotAvailableInAD = [System.Collections.Generic.List[PSCustomObject]]::new()
+        #$NotAvailableOnSysvol = [System.Collections.Generic.List[PSCustomObject]]::new()
+        #$NotAvailablePermissionIssue = [System.Collections.Generic.List[PSCustomObject]]::new()
+        foreach ($GPO in $GPOZaurrOrphans['Data']) {
+            if ($GPO.Status -eq 'Not available in AD') {
+                #$NotAvailableInAD.Add($NotAvailableInAD)
+                $GPOZaurrOrphans['Variables']['NotAvailableInAD']++
+            } elseif ($GPO.Status -eq 'Not available on SYSVOL') {
+                #$NotAvailableOnSysvol.Add($NotAvailableInAD)
+                $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol']++
+            } elseif ($GPO.Status -eq 'Permissions issue') {
+                #$NotAvailablePermissionIssue.Add($NotAvailableInAD)
+                $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue']++
+            }
+        }
     }
     Variables  = @{
-
+        NotAvailableInAD            = 0
+        NotAvailableOnSysvol        = 0
+        NotAvailablePermissionIssue = 0
     }
     Overview   = {
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents ', 'Broken / Orphaned Group Policies' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $NotAvailableInAD.Count -FontWeight normal, bold
-                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $NotAvailableOnSysvol.Count -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $NotAvailablePermissionIssue.Count -FontWeight normal, bold
+                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $GPOZaurrOrphans['Variables']['NotAvailableInAD'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
             } -FontSize 10pt
             New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
             New-HTMLChart {
                 New-ChartBarOptions -Type barStacked
                 New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'Permissions Issue' -Color Crimson, LightCoral, IndianRed
-                New-ChartBar -Name 'Orphans' -Value $NotAvailableInAD.Count, $NotAvailableOnSysvol.Count, $NotAvailablePermissionIssue.Count
+                New-ChartBar -Name 'Orphans' -Value $GPOZaurrOrphans['Variables']['NotAvailableInAD'], $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol'], $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue']
             } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
         }
     }
     Solution   = {
-        New-HTMLPanel {
-            New-HTMLText -TextBlock {
-                "Following table shows list of all group policies and their status in AD and SYSVOL. Due to different reasons it's "
-                "possible that "
-            } -FontSize 10pt
-            New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $NotAvailableInAD.Count -FontWeight normal, bold
-                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $NotAvailableOnSysvol.Count -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $NotAvailablePermissionIssue.Count -FontWeight normal, bold
-            } -FontSize 10pt
-            New-HTMLText -Text "Follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
+        New-HTMLSection -Invisible {
+            New-HTMLPanel {
+                New-HTMLText -TextBlock {
+                    "Following table shows list of all group policies and their status in AD and SYSVOL. Due to different reasons it's "
+                    "possible that "
+                } -FontSize 10pt
+                New-HTMLList -Type Unordered {
+                    New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $GPOZaurrOrphans['Variables']['NotAvailableInAD'] -FontWeight normal, bold
+                    New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
+                } -FontSize 10pt
+                New-HTMLText -Text "Follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
+            }
+            New-HTMLPanel {
+                New-HTMLChart {
+                    New-ChartBarOptions -Type barStacked
+                    New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'Permissions Issue' -Color Crimson, LightCoral, IndianRed
+                    New-ChartBar -Name 'Orphans' -Value $GPOZaurrOrphans['Variables']['NotAvailableInAD'], $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol'], $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue']
+                } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
+            }
         }
         New-HTMLSection -Name 'Health State of Group Policies' {
-            New-HTMLTable -DataTable $GPOOrphans -Filtering {
+            New-HTMLTable -DataTable $GPOZaurrOrphans['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'Status' -Value "Not available in AD" -BackgroundColor Salmon -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "Not available on SYSVOL" -BackgroundColor LightCoral -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "Permissions issue" -BackgroundColor MediumVioletRed -ComparisonType string -Color White

@@ -54,86 +54,6 @@
         }
     }
 
-    <#
-    # Gather data
-    $TimeLog = Start-TimeLog
-    if ($Type -contains 'GPOOrphans' -or $null -eq $Type) {
-        #Write-Color -Text "[Info] ", "Processing GPOOrphans" -Color Yellow, White
-        Write-Verbose -Message "Invoke-GPOZaurr - Processing GPO Sysvol"
-        $GPOOrphans = Get-GPOZaurrBroken
-
-        $NotAvailableInAD = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $NotAvailableOnSysvol = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $NotAvailablePermissionIssue = [System.Collections.Generic.List[PSCustomObject]]::new()
-        foreach ($_ in $GPOOrphans) {
-            if ($_.Status -eq 'Not available in AD') {
-                $NotAvailableInAD.Add($NotAvailableInAD)
-            } elseif ($_.Status -eq 'Not available on SYSVOL') {
-                $NotAvailableOnSysvol.Add($NotAvailableInAD)
-            } elseif ( $_.Status -eq 'Permissions issue') {
-                $NotAvailablePermissionIssue.Add($NotAvailableInAD)
-            }
-        }
-    }
-    if ($Type -contains 'GPOPermissions' -or $null -eq $Type) {
-        #Write-Color -Text "[Info] ", "Processing GPOPermissions" -Color Yellow, White
-        Write-Verbose -Message "Invoke-GPOZaurr - Processing GPO Permissions"
-        $GPOPermissions = Get-GPOZaurrPermission -Type All -IncludePermissionType GpoEditDeleteModifySecurity, GpoEdit, GpoCustom -IncludeOwner
-    }
-    if ($Type -contains 'GPOPermissionsRoot' -or $null -eq $Type) {
-        Write-Verbose -Message "Invoke-GPOZaurr - Processing GPO Permissions Root"
-        $GPOPermissionsRoot = Get-GPOZaurrPermissionRoot -SkipNames
-    }
-    if ($Type -contains 'NetLogon' -or $null -eq $Type) {
-        $TimeLogSection = Start-TimeLog
-        Write-Verbose "Get-GPOZaurrNetLogon - Processing NETLOGON Share"
-        $NetLogon = Get-GPOZaurrNetLogon
-        $NetLogonOwners = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $NetLogonOwnersAdministrators = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $NetLogonOwnersNotAdministrative = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $NetLogonOwnersAdministrative = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $NetLogonOwnersAdministrativeNotAdministrators = [System.Collections.Generic.List[PSCustomObject]]::new()
-        $NetLogonOwnersToFix = [System.Collections.Generic.List[PSCustomObject]]::new()
-        foreach ($File in $Netlogon) {
-            if ($File.FileSystemRights -eq 'Owner') {
-                $NetLogonOwners.Add($File)
-
-                if ($File.PrincipalType -eq 'WellKnownAdministrative') {
-                    $NetLogonOwnersAdministrative.Add($File)
-                } elseif ($File.PrincipalType -eq 'Administrative') {
-                    $NetLogonOwnersAdministrative.Add($File)
-                } else {
-                    $NetLogonOwnersNotAdministrative.Add($File)
-                }
-
-                if ($File.PrincipalSid -eq 'S-1-5-32-544') {
-                    $NetLogonOwnersAdministrators.Add($File)
-                } elseif ($File.PrincipalType -in 'WellKnownAdministrative', 'Administrative') {
-                    $NetLogonOwnersAdministrativeNotAdministrators.Add($File)
-                    $NetLogonOwnersToFix.Add($File)
-                } else {
-                    $NetLogonOwnersToFix.Add($File)
-                }
-            }
-        }
-        $TimeLogSectionEnd = Stop-TimeLog -Time $TimeLogSection -Option OneLiner
-        Write-Verbose "Get-GPOZaurrNetLogon - Processing NETLOGON Share $TimeLogSectionEnd"
-    }
-    if ($Type -contains 'GPOAnalysis' -or $null -eq $Type) {
-        Write-Verbose "Invoke-GPOZaurr - Processing GPO Analysis"
-        $GPOContent = Invoke-GPOZaurrContent
-    }
-    if ($Type -contains 'GPOFiles') {
-        Write-Verbose "Invoke-GPOZaurr - Processing GPOFiles"
-        $GPOFiles = Get-GPOZaurrFiles
-    }
-    if ($Type -contains 'LegacyADM') {
-        Write-Verbose "Invoke-GPOZaurr - Processing GPOFiles"
-        $ADMLegacyFiles = Get-GPOZaurrLegacyFiles
-    }
-    $TimeEnd = Stop-TimeLog -Time $TimeLog -Option OneLiner
-    Write-Verbose "Invoke-GPOZaurr - Data gathering time $TimeEnd"
-    #>
     # Generate pretty HTML
     Write-Verbose "Invoke-GPOZaurr - Generating HTML"
     New-HTML {
@@ -162,11 +82,17 @@
                 }
             }
         } else {
-
+            foreach ($T in $Script:GPOConfiguration.Keys) {
+                if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+                    New-HTMLTab -Name $T {
+                        if ($Script:GPOConfiguration[$T]['Data']) {
+                            & $Script:GPOConfiguration[$T]['Solution']
+                        }
+                    }
+                }
+            }
         }
     } -Online -ShowHTML -FilePath $FilePath
-
-
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 }
 
