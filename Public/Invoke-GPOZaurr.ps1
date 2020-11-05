@@ -38,6 +38,7 @@
     foreach ($T in $Script:GPOConfiguration.Keys) {
         $Script:GPOConfiguration[$T].Enabled = $false
     }
+    # Lets enable all requested ones
     foreach ($T in $Type) {
         $Script:GPOConfiguration[$T].Enabled = $true
     }
