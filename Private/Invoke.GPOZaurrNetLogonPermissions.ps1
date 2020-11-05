@@ -1,13 +1,11 @@
 ﻿$GPOZaurrNetLogonPermissions = [ordered] @{
-    Name         = 'NetLogon Permissions'
-    Enabled      = $true
-    Data         = $null
-    DataOwner    = [System.Collections.Generic.List[PSCustomObject]]::new()
-    DataNonOwner = [System.Collections.Generic.List[PSCustomObject]]::new()
-    Execute      = {
+    Name       = 'NetLogon Permissions'
+    Enabled    = $true
+    Data       = $null
+    Execute    = {
         Get-GPOZaurrNetLogon
     }
-    Processing   = {
+    Processing = {
         foreach ($File in $GPOZaurrNetLogonPermissions['Data']) {
             if ($File.FileSystemRights -eq 'Owner') {
                 $GPOZaurrNetLogonPermissions['Variables']['NetLogonOwners']++
@@ -26,21 +24,23 @@
                 } else {
                     $GPOZaurrNetLogonPermissions['Variables']['NetLogonOwnersToFix']++
                 }
-                $GPOZaurrNetLogonPermissions['DataOwner'].Add($File)
+                $GPOZaurrNetLogonPermissions['Variables']['Owner'].Add($File)
             } else {
-                $GPOZaurrNetLogonPermissions['DataNonOwner'].Add($File)
+                $GPOZaurrNetLogonPermissions['Variables']['NonOwner'].Add($File)
             }
         }
     }
-    Variables    = @{
+    Variables  = @{
         NetLogonOwners                                = 0
         NetLogonOwnersAdministrators                  = 0
         NetLogonOwnersNotAdministrative               = 0
         NetLogonOwnersAdministrative                  = 0
         NetLogonOwnersAdministrativeNotAdministrators = 0
         NetLogonOwnersToFix                           = 0
+        Owner                                         = [System.Collections.Generic.List[PSCustomObject]]::new()
+        NonOwner                                      = [System.Collections.Generic.List[PSCustomObject]]::new()
     }
-    Overview     = {
+    Overview   = {
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents ', 'NetLogon Summary' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
@@ -63,7 +63,7 @@
 
         }
     }
-    Solution     = {
+    Solution   = {
         New-HTMLTab -Name 'NetLogon Owners' {
             New-HTMLSection -Invisible {
                 New-HTMLPanel {
@@ -92,7 +92,7 @@
                 }
             }
             New-HTMLSection -Name 'NetLogon Files List' {
-                New-HTMLTable -DataTable $GPOZaurrNetLogonPermissions['DataOwner'] -Filtering {
+                New-HTMLTable -DataTable $GPOZaurrNetLogonPermissions['Variables']['Owner'] -Filtering {
                     New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor LightGreen -ComparisonType string
                     New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor Salmon -ComparisonType string -Operator ne
                     New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
@@ -161,7 +161,7 @@
         }
         New-HTMLTab -Name 'NetLogon Permissions' {
             New-HTMLSection -Name 'NetLogon Files List' {
-                New-HTMLTable -DataTable $GPOZaurrNetLogonPermissions['DataNonOwner'] -Filtering
+                New-HTMLTable -DataTable $GPOZaurrNetLogonPermissions['Variables']['NonOwner'] -Filtering
             }
         }
     }

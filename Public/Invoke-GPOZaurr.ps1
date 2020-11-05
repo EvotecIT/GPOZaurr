@@ -24,14 +24,32 @@
     $LatestVersion = $GitHubReleases[0]
     if (-not $LatestVersion.Errors) {
         if ($GPOZaurrVersion.Version -eq $LatestVersion.Version) {
-            $Script:Reporting['Version'] = "GPOZaurr Current/Latest: $($LatestVersion.Version) at $($LatestVersion.PublishDate)"
+            $Script:Reporting['Version'] = "Current/Latest: $($LatestVersion.Version) at $($LatestVersion.PublishDate)"
         } elseif ($GPOZaurrVersion.Version -lt $LatestVersion.Version) {
-            $Script:Reporting['Version'] = "GPOZaurr Current: $($GPOZaurrVersion.Version), Published: $($LatestVersion.Version) at $($LatestVersion.PublishDate). Update?"
+            $Script:Reporting['Version'] = "Current: $($GPOZaurrVersion.Version), Published: $($LatestVersion.Version) at $($LatestVersion.PublishDate). Update?"
         } elseif ($GPOZaurrVersion.Version -gt $LatestVersion.Version) {
-            $Script:Reporting['Version'] = "GPOZaurr Current: $($GPOZaurrVersion.Version), Published: $($LatestVersion.Version) at $($LatestVersion.PublishDate). Lucky you!"
+            $Script:Reporting['Version'] = "Current: $($GPOZaurrVersion.Version), Published: $($LatestVersion.Version) at $($LatestVersion.PublishDate). Lucky you!"
         }
     } else {
         $Script:Reporting['Version'] = "GPOZaurr Current: $($GPOZaurrVersion.Version)"
+    }
+    Write-Color '[i]', "[GPOZaurr] ", 'Version', ' [Informative] ', $Script:Reporting['Version'] -Color Yellow, DarkGray, Yellow, DarkGray, Magenta
+
+    $Supported = [System.Collections.Generic.List[string]]::new()
+    [Array] $NotSupported = foreach ($T in $Type) {
+        if ($T -notin $Script:GPOConfiguration.Keys ) {
+            $T
+        } else {
+            $Supported.Add($T)
+        }
+    }
+    if ($Supported) {
+        Write-Color '[i]', "[GPOZaurr] ", 'Supported types', ' [Informative] ', "Chosen by user: ", ($Supported -join ', ') -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
+    }
+    if ($NotSupported) {
+        Write-Color '[i]', "[GPOZaurr] ", 'Not supported types', ' [Informative] ', "Following types are not supported: ", ($NotSupported -join ', ') -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
+        Write-Color '[i]', "[GPOZaurr] ", 'Not supported types', ' [Informative] ', "Please use one/multiple from the list: ", ($Script:GPOConfiguration.Keys -join ', ') -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
+        return
     }
 
     # Lets disable all current ones

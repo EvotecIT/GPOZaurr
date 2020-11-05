@@ -1,8 +1,8 @@
-﻿$Script:GPOConfiguration = @{
-    GPOConsistency      = $GPOZaurrConsistency
-    GPOOwners           = $GPOZaurrOwners
-    GPOList             = $GPOZaurrList
+﻿$Script:GPOConfiguration = [ordered] @{
     GPOOrphans          = $GPOZaurrOrphans
+    GPOOwners           = $GPOZaurrOwners
+    GPOConsistency      = $GPOZaurrConsistency
+    GPOList             = $GPOZaurrList
     GPOPermissions      = $GPOZaurrPermissions
     GPOPermissionsRoot  = $GPOZaurrPermissionsRoot
     GPOFiles            = $GPOZaurrFiles
