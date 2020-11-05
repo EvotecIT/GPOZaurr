@@ -2,7 +2,9 @@
     GPOOrphans          = $GPOZaurrOrphans
     GPOOwners           = $GPOZaurrOwners
     GPOConsistency      = $GPOZaurrConsistency
+    GPODuplicates       = $GPOZaurrDuplicates
     GPOList             = $GPOZaurrList
+    GPOPassword         = $GPOZaurrPassword
     GPOPermissions      = $GPOZaurrPermissions
     GPOPermissionsRoot  = $GPOZaurrPermissionsRoot
     GPOFiles            = $GPOZaurrFiles
