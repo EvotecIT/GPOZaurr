@@ -3,8 +3,8 @@
     Enabled    = $false
     Data       = $null
     Execute    = {
-        $ADMLegacyFiles = Get-GPOZaurrLegacyFiles
-     }
+        Get-GPOZaurrLegacyFiles
+    }
     Processing = {
 
     }
@@ -15,6 +15,6 @@
 
     }
     Solution   = {
-
+        New-HTMLTable -DataTable $GPOZaurrSysVolLegacyFiles['Data'] -Filtering
     }
 }

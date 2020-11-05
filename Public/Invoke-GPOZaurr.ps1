@@ -4,14 +4,6 @@
     param(
         [string] $FilePath,
         [string[]] $Type
-        <#
-        [ValidateSet(
-            'GPOList', 'GPOOrphans', 'GPOPermissions', 'GPOPermissionsRoot', 'GPOFiles',
-            'GPOConsistency', 'GPOOwners', 'GPOAnalysis',
-            'NetLogon',
-            'LegacyAdm'
-        )][string[]] $Type
-        #>
     )
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
@@ -53,12 +45,14 @@
     }
 
     # Lets disable all current ones
-    foreach ($T in $Script:GPOConfiguration.Keys) {
-        $Script:GPOConfiguration[$T].Enabled = $false
-    }
-    # Lets enable all requested ones
-    foreach ($T in $Type) {
-        $Script:GPOConfiguration[$T].Enabled = $true
+    if ($Type) {
+        foreach ($T in $Script:GPOConfiguration.Keys) {
+            $Script:GPOConfiguration[$T].Enabled = $false
+        }
+        # Lets enable all requested ones
+        foreach ($T in $Type) {
+            $Script:GPOConfiguration[$T].Enabled = $true
+        }
     }
 
     foreach ($T in $Script:GPOConfiguration.Keys) {
@@ -75,7 +69,7 @@
 
     # Generate pretty HTML
     Write-Verbose "Invoke-GPOZaurr - Generating HTML"
-    New-HTML {
+    New-HTML -Author 'Przemysław Kłys' -TitleText 'GPOZaurr Report' {
         New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
         New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
         New-HTMLPanelStyle -BorderRadius 0px
@@ -87,7 +81,7 @@
                     New-HTMLText -Text "Report generated on $(Get-Date)" -Color Blue
                 } -JustifyContent flex-start -Invisible
                 New-HTMLSection {
-                    New-HTMLText -Text $Script:Reporting['Version'] -Color Blue
+                    New-HTMLText -Text "GPOZaurr - $($Script:Reporting['Version'])" -Color Blue
                 } -JustifyContent flex-end -Invisible
             }
         }
@@ -95,18 +89,14 @@
         if ($Type.Count -eq 1) {
             foreach ($T in $Script:GPOConfiguration.Keys) {
                 if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
-                    if ($Script:GPOConfiguration[$T]['Data']) {
-                        & $Script:GPOConfiguration[$T]['Solution']
-                    }
+                    & $Script:GPOConfiguration[$T]['Solution']
                 }
             }
         } else {
             foreach ($T in $Script:GPOConfiguration.Keys) {
                 if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
-                    New-HTMLTab -Name $T {
-                        if ($Script:GPOConfiguration[$T]['Data']) {
-                            & $Script:GPOConfiguration[$T]['Solution']
-                        }
+                    New-HTMLTab -Name $Script:GPOConfiguration[$T]['Name'] {
+                        & $Script:GPOConfiguration[$T]['Solution']
                     }
                 }
             }

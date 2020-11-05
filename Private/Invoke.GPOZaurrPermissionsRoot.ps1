@@ -1,10 +1,10 @@
 ﻿$GPOZaurrPermissionsRoot = [ordered] @{
-    Name       = 'GPO Permissions Consistency'
+    Name       = 'Group Policies Root Permissions'
     Enabled    = $true
     Data       = $null
     Execute    = {
-        $GPOPermissionsRoot = Get-GPOZaurrPermissionRoot -SkipNames
-     }
+        Get-GPOZaurrPermissionRoot -SkipNames
+    }
     Processing = {
 
     }
@@ -15,6 +15,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $GPOPermissionsRoot -Filtering
+        New-HTMLTable -DataTable $GPOZaurrPermissionsRoot['Data'] -Filtering
     }
 }

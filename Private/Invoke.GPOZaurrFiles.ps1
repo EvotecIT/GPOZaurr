@@ -1,10 +1,10 @@
 ﻿$GPOZaurrFiles = [ordered] @{
-    Name       = 'GPO Permissions Consistency'
+    Name       = 'SYSVOL (NetLogon) Files List'
     Enabled    = $true
     Data       = $null
     Execute    = {
-        $GPOFiles = Get-GPOZaurrFiles
-     }
+        Get-GPOZaurrFiles
+    }
     Processing = {
 
     }
@@ -15,6 +15,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $GPOFiles -Filtering
+        New-HTMLTable -DataTable $GPOZaurrFiles['Data'] -Filtering
     }
 }

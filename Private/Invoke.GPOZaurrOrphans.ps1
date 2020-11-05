@@ -1,5 +1,5 @@
 ﻿$GPOZaurrOrphans = [ordered] @{
-    Name       = 'Orphaned GPO (SysVol or Active Directory)'
+    Name       = 'Orphaned Group Policies'
     Enabled    = $true
     Data       = $null
     Execute    = {

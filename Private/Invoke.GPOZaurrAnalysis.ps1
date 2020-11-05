@@ -1,9 +1,9 @@
 ﻿$GPOZaurrAnalysis = [ordered] @{
-    Name       = 'GPO Permissions Consistency'
+    Name       = 'Group Policy Content'
     Enabled    = $true
     Data       = $null
     Execute    = {
-        $GPOContent = Invoke-GPOZaurrContent
+        Invoke-GPOZaurrContent
     }
     Processing = {
 
@@ -15,9 +15,9 @@
 
     }
     Solution   = {
-        foreach ($Key in $GPOContent.Keys) {
+        foreach ($Key in $GPOZaurrAnalysis['Data'].Keys) {
             New-HTMLTab -Name $Key {
-                New-HTMLTable -DataTable $GPOContent[$Key] -Filtering -Title $Key
+                New-HTMLTable -DataTable $GPOZaurrAnalysis['Data'][$Key] -Filtering -Title $Key
             }
         }
     }

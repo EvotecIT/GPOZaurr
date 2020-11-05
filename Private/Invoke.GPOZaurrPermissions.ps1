@@ -1,10 +1,9 @@
 ﻿$GPOZaurrPermissions = [ordered] @{
-    Name       = 'GPO Permissions'
+    Name       = 'Group Policy Permissions'
     Enabled    = $true
     Data       = $null
     Execute    = {
-        $GPOPermissions = Get-GPOZaurrPermission -Type All -IncludePermissionType GpoEditDeleteModifySecurity, GpoEdit, GpoCustom -IncludeOwner
-
+        Get-GPOZaurrPermission -Type All -IncludePermissionType GpoEditDeleteModifySecurity, GpoEdit, GpoCustom #-IncludeOwner
     }
     Processing = {
 
@@ -16,6 +15,6 @@
 
     }
     Solution   = {
-
+        New-HTMLTable -DataTable $GPOZaurrPermissions['Data'] -Filtering
     }
 }
