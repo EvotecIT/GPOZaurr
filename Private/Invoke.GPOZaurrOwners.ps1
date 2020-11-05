@@ -52,34 +52,37 @@
             } -Title 'Group Policy Owners' -TitleAlignment center
         }
     }
+    Summary = {
+        New-HTMLText -FontSize 10pt -TextBlock {
+            "By default GPO creation is usually maintained by Domain Admins or Enterprise Admins. "
+            "When GPO is created by member of Domain Admins or Enterprise Admins group the GPO Owner is set to Domain Admins. "
+            "When GPO is created by member of Group Policy Creator Owners or other group has delegated rights to create a GPO the owner of said GPO is not Domain Admins group but is assigned to relevant user. "
+            "GPO Owners should be Domain Admins or Enterprise Admins to prevent abuse. If that isn't so it means owner is able to fully control GPO and potentially change it's settings in uncontrolled way. "
+            "While at the moment of creation of new GPO it's not a problem, in long term it's possible such person may no longer be admin, yet keep their rights over GPO. "
+        }
+        New-HTMLText -FontSize 10pt -TextBlock {
+            "As you're aware Group Policies are stored in 2 places. In Active Directory (metadata) and SYSVOL (settings). This means that there are 2 places where GPO Owners exists. "
+            "This also means that for multiple reasons AD and SYSVOL can be out of sync when it comes to their permissions which can lead to uncontrolled ability to modify them. "
+            "Ownership in Active Directory and Ownership of SYSVOL for said GPO are required to be the same. "
+        }
+        New-HTMLText -Text "Here's a short summary of ", "Group Policy Owners", ": " -FontSize 10pt -FontWeight normal, bold, normal
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Administrative Owners: ', $GpoZaurrOwners['Variables']['IsAdministrative'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Non-Administrative Owners: ', $GpoZaurrOwners['Variables']['IsNotAdministrative'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Owners consistent in AD and SYSVOL: ", $GpoZaurrOwners['Variables']['IsConsistent'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Owners not-consistent in AD and SYSVOL: ", $GpoZaurrOwners['Variables']['IsNotConsistent'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -FontSize 10pt -Text "This gives us: "
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Group Policies requiring owner change: ', $GpoZaurrOwners['Variables']['WillFix'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies which can't be fixed (no SYSVOL?): ", $GpoZaurrOwners['Variables']['RequiresDiffFix'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies unaffected: ", $GpoZaurrOwners['Variables']['WillNotTouch'] -FontWeight normal, bold
+        } -FontSize 10pt
+    }
     Solution   = {
         New-HTMLSection -Invisible {
             New-HTMLPanel {
-                New-HTMLText -FontSize 10pt -TextBlock {
-                    "By default GPO creation is usually maintained by Domain Admins or Enterprise Admins. "
-                    "When GPO is created by member of Domain Admins or Enterprise Admins group the GPO Owner is set to Domain Admins. "
-                    "When GPO is created by member of Group Policy Creator Owners or other group has delegated rights to create a GPO the owner of said GPO is not Domain Admins group but is assigned to relevant user. "
-                    "GPO Owners should be Domain Admins or Enterprise Admins to prevent abuse. If that isn't so it means owner is able to fully control GPO and potentially change it's settings in uncontrolled way. "
-                    "While at the moment of creation of new GPO it's not a problem, in long term it's possible such person may no longer be admin, yet keep their rights over GPO. "
-                }
-                New-HTMLText -FontSize 10pt -TextBlock {
-                    "As you're aware Group Policies are stored in 2 places. In Active Directory (metadata) and SYSVOL (settings). This means that there are 2 places where GPO Owners exists. "
-                    "This also means that for multiple reasons AD and SYSVOL can be out of sync when it comes to their permissions which can lead to uncontrolled ability to modify them. "
-                    "Ownership in Active Directory and Ownership of SYSVOL for said GPO are required to be the same. "
-                }
-                New-HTMLText -Text "Here's a short summary of ", "Group Policy Owners", ": " -FontSize 10pt -FontWeight normal, bold, normal
-                New-HTMLList -Type Unordered {
-                    New-HTMLListItem -Text 'Administrative Owners: ', $GpoZaurrOwners['Variables']['IsAdministrative'] -FontWeight normal, bold
-                    New-HTMLListItem -Text 'Non-Administrative Owners: ', $GpoZaurrOwners['Variables']['IsNotAdministrative'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Owners consistent in AD and SYSVOL: ", $GpoZaurrOwners['Variables']['IsConsistent'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Owners not-consistent in AD and SYSVOL: ", $GpoZaurrOwners['Variables']['IsNotConsistent'] -FontWeight normal, bold
-                } -FontSize 10pt
-                New-HTMLText -FontSize 10pt -Text "This gives us: "
-                New-HTMLList -Type Unordered {
-                    New-HTMLListItem -Text 'Group Policies requiring owner change: ', $GpoZaurrOwners['Variables']['WillFix'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Group Policies which can't be fixed (no SYSVOL?): ", $GpoZaurrOwners['Variables']['RequiresDiffFix'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Group Policies unaffected: ", $GpoZaurrOwners['Variables']['WillNotTouch'] -FontWeight normal, bold
-                } -FontSize 10pt
+                & $GpoZaurrOwners['Summary']
             }
             New-HTMLPanel {
                 New-HTMLChart {

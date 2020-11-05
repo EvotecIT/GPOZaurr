@@ -4,7 +4,8 @@
     param(
         [string] $FilePath,
         [string[]] $Type,
-        [switch] $PassThru
+        [switch] $PassThru,
+        [switch] $HideHTML
     )
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
@@ -102,7 +103,7 @@
                 }
             }
         }
-    } -Online -ShowHTML -FilePath $FilePath
+    } -Online -ShowHTML:(-not $HideHTML) -FilePath $FilePath
 
     if ($PassThru) {
         $OutputData = Export-GPOZaurr
