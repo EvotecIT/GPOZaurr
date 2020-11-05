@@ -1,6 +1,7 @@
 ﻿$GPOZaurrOrphans = [ordered] @{
     Name       = 'Orphaned Group Policies'
     Enabled    = $true
+    Action     = $null
     Data       = $null
     Execute    = {
         Get-GPOZaurrBroken

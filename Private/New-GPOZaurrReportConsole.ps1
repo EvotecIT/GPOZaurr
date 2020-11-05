@@ -1,4 +1,5 @@
 ﻿function New-GPOZaurrReportConsole {
+    [cmdletBinding()]
     param(
         [System.Collections.IDictionary] $Results
     )

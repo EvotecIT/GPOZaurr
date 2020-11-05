@@ -1,6 +1,7 @@
 ﻿$GPOZaurrOwners = [ordered] @{
     Name       = 'Group Policy Owners'
     Enabled    = $true
+    Action     = $null
     Data       = $null
     Execute    = { Get-GPOZaurrOwner -IncludeSysvol }
     Processing = {

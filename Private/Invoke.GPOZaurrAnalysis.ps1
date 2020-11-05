@@ -1,6 +1,7 @@
 ﻿$GPOZaurrAnalysis = [ordered] @{
     Name       = 'Group Policy Content'
     Enabled    = $true
+    Action     = $null
     Data       = $null
     Execute    = {
         Invoke-GPOZaurrContent

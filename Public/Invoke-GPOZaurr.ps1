@@ -3,7 +3,8 @@
     [cmdletBinding()]
     param(
         [string] $FilePath,
-        [string[]] $Type
+        [string[]] $Type,
+        [switch] $PassThru
     )
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
@@ -102,6 +103,11 @@
             }
         }
     } -Online -ShowHTML -FilePath $FilePath
+
+    if ($PassThru) {
+        $OutputData = Export-GPOZaurr
+        $OutputData
+    }
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 }
 

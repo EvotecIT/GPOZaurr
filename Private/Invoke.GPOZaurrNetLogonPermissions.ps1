@@ -1,6 +1,7 @@
 ﻿$GPOZaurrNetLogonPermissions = [ordered] @{
     Name       = 'NetLogon Permissions'
     Enabled    = $true
+    Action     = $null
     Data       = $null
     Execute    = {
         Get-GPOZaurrNetLogon

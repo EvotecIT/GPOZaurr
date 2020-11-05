@@ -1,6 +1,7 @@
 ﻿$GPOZaurrFiles = [ordered] @{
     Name       = 'SYSVOL (NetLogon) Files List'
     Enabled    = $true
+    Action     = $null
     Data       = $null
     Execute    = {
         Get-GPOZaurrFiles

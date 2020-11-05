@@ -1,6 +1,7 @@
 ﻿$GPOZaurrList = [ordered] @{
     Name       = 'Group Policy Empty & Unlinked'
     Enabled    = $true
+    Action     = $null
     Data       = $null
     Execute    = {
         Get-GPOZaurr

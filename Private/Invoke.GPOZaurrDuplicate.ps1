@@ -1,6 +1,7 @@
 ﻿$GPOZaurrDuplicates = [ordered] @{
     Name       = 'Duplicate (CNF) Group Policies'
     Enabled    = $true
+    Action     = $null
     Data       = $null
     Execute    = {
         Get-GPOZaurrDuplicateObject

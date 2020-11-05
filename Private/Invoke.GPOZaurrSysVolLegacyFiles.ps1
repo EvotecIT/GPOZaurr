@@ -1,6 +1,7 @@
 ﻿$GPOZaurrSysVolLegacyFiles = [ordered] @{
     Name       = 'SYSVOL Legacy ADM Files'
     Enabled    = $false
+    Action     = $null
     Data       = $null
     Execute    = {
         Get-GPOZaurrLegacyFiles

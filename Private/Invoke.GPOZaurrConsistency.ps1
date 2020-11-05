@@ -1,6 +1,7 @@
 ﻿$GPOZaurrConsistency = [ordered] @{
     Name       = 'GPO Permissions Consistency'
     Enabled    = $true
+    Action     = $null
     Data       = $null
     Execute    = { Get-GPOZaurrPermissionConsistency -Type All -VerifyInheritance }
     Processing = {
