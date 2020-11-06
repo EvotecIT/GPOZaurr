@@ -36,7 +36,7 @@
             $GPOZaurrNetLogonPermissions['Action'] = $false
         }
     }
-    Variables  = @{
+    Variables = @{
         NetLogonOwners                                = 0
         NetLogonOwnersAdministrators                  = 0
         NetLogonOwnersNotAdministrative               = 0

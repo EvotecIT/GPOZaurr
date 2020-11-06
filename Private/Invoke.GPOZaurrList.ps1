@@ -42,7 +42,7 @@
         }
         $GPOZaurrList['Variables']['GPOTotal'] = $GPOZaurrList['Data'].Count
     }
-    Variables  = [ordered] @{
+    Variables  = @{
         GPONotLinked             = 0
         GPOLinked                = 0
         GPOEmpty                 = 0

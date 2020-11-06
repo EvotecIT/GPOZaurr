@@ -1,4 +1,4 @@
-﻿$GPOZaurrOwners = [ordered] @{
+﻿$GPOZaurrOwners = [PSCustomObject] @{
     Name       = 'Group Policy Owners'
     Enabled    = $true
     Action     = $null
@@ -24,8 +24,13 @@
                 $GpoZaurrOwners['Variables']['WillNotTouch']++
             }
         }
+        if ($GpoZaurrOwners['Variables']['WillFix'].Count -gt 0) {
+            $GpoZaurrOwners['Action'] = $true
+        } else {
+            $GpoZaurrOwners['Action'] = $false
+        }
     }
-    Variables  = [ordered] @{
+    Variables = @{
         IsAdministrative    = 0
         IsNotAdministrative = 0
         IsConsistent        = 0
@@ -52,7 +57,7 @@
             } -Title 'Group Policy Owners' -TitleAlignment center
         }
     }
-    Summary = {
+    Summary    = {
         New-HTMLText -FontSize 10pt -TextBlock {
             "By default GPO creation is usually maintained by Domain Admins or Enterprise Admins. "
             "When GPO is created by member of Domain Admins or Enterprise Admins group the GPO Owner is set to Domain Admins. "

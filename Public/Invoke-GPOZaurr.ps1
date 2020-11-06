@@ -7,6 +7,7 @@
         [switch] $PassThru,
         [switch] $HideHTML
     )
+    $Script:GPOConfigurationClean = Copy-Dictionary -Dictionary $Script:GPOConfiguration
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
     $Script:Reporting = [ordered] @{}
@@ -70,7 +71,8 @@
     }
 
     # Generate pretty HTML
-    Write-Verbose "Invoke-GPOZaurr - Generating HTML"
+    $TimeLogHTML = Start-TimeLog
+    Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report' -Color Yellow, DarkGray, Yellow
     New-HTML -Author 'Przemysław Kłys' -TitleText 'GPOZaurr Report' {
         New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
         New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
@@ -104,12 +106,14 @@
             }
         }
     } -Online -ShowHTML:(-not $HideHTML) -FilePath $FilePath
-
+    $TimeLogEndHTML = Stop-TimeLog -Time $TimeLogHTML -Option OneLiner
+    Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report', " [Time to execute: $TimeLogEndHTML]" -Color Yellow, DarkGray, Yellow, DarkGray
     if ($PassThru) {
         $OutputData = Export-GPOZaurr
         $OutputData
     }
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
+    $Script:GPOConfiguration = Copy-Dictionary -Dictionary $Script:GPOConfigurationClean
 }
 
 [scriptblock] $SourcesAutoCompleter = {
