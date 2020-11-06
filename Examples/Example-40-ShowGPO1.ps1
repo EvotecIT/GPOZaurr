@@ -1,1 +1,0 @@
-﻿Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurr.html -Verbose -Type NetLogon, GPOOrphans, GPOList, GPOConsistency,GPOOwners
