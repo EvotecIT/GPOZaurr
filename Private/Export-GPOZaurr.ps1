@@ -9,6 +9,7 @@
             $Output[$T] = [ordered]@{
                 Action    = $Script:GPOConfiguration[$T].Action
                 Data      = $Script:GPOConfiguration[$T].Data
+                Name      = $Script:GPOConfiguration[$T].Name
                 Summary   = $Script:GPOConfiguration[$T].Summary
                 Variables = $Script:GPOConfiguration[$T].Variables
             }

@@ -30,6 +30,11 @@
                 $GPOZaurrNetLogonPermissions['Variables']['NonOwner'].Add($File)
             }
         }
+        if ($GPOZaurrNetLogonPermissions['Variables']['NetLogonOwnersToFix'].Count -gt 0) {
+            $GPOZaurrNetLogonPermissions['Action'] = $true
+        } else {
+            $GPOZaurrNetLogonPermissions['Action'] = $false
+        }
     }
     Variables  = @{
         NetLogonOwners                                = 0

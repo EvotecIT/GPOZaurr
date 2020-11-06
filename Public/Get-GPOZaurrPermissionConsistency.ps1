@@ -44,6 +44,7 @@
             $GroupPolicies = Get-GPO @getGPOSplat
             $Count = 0
             $GroupPolicies | ForEach-Object -Process {
+                $GPO = $_
                 $Count++
                 Write-Verbose "Get-GPOZaurrPermissionConsistency - Processing [$($_.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
                 try {
@@ -51,7 +52,7 @@
                     $ErrorMessage = ''
                 } catch {
                     $ErrorMessage = $_.Exception.Message
-                    Write-Warning "Get-GPOZaurrPermissionConsistency - Failed to get consistency: $($_.Exception.Message)."
+                    Write-Warning "Get-GPOZaurrPermissionConsistency - Processing $($GPO.DisplayName) / $($GPO.DomainName) failed to get consistency with error: $($_.Exception.Message)."
                     $IsConsistent = 'Not available'
                 }
                 $SysVolpath = -join ('\\', $Domain, '\sysvol\', $Domain, '\Policies\{', $_.ID.GUID, '}')

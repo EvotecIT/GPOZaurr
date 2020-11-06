@@ -17,6 +17,11 @@
                 $GPOZaurrConsistency['Variables']['InconsistentInside']++
             }
         }
+        if ($GPOZaurrConsistency['Variables']['Inconsistent'].Count -gt 0 -or $GPOZaurrConsistency['Variables']['InconsistentInside'].Count -gt 0 ) {
+            $GPOZaurrConsistency['Action'] = $true
+        } else {
+            $GPOZaurrConsistency['Action'] = $false
+        }
     }
     Variables  = @{
         Consistent         = 0
@@ -43,21 +48,28 @@
             } -Title 'Permissions Consistency' -TitleAlignment center
         }
     }
+    Summary    = {
+        New-HTMLText -FontSize 10pt -TextBlock {
+            "When GPO is created it creates an entry in Active Directory (metadata) and SYSVOL (content). "
+            "Two different places meens two different sets of permissions. Group Policy module is making sure the data in both places is correct. "
+            "However, for different reasons it's not nessecary the case and often permissions go out of sync between AD and SYSVOL. "
+            "This test verifies consistency of policies between AD and SYSVOL in two ways. "
+            "It checks top level permissions for a GPO, and then checks if all files within said GPO are inheriting permissions or have different permissions in place. "
+        }
+        New-HTMLText -Text 'Following list presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Top level permissions consistency: ', $GPOZaurrConsistency['Variables']['Consistent'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Inherited permissions consistency: ', $GPOZaurrConsistency['Variables']['ConsistentInside'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Inconsistent top level permissions: ', $GPOZaurrConsistency['Variables']['Inconsistent'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Inconsistent inherited permissions: ", $GPOZaurrConsistency['Variables']['InconsistentInside'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them. Please notice that if ', `
+            ' Not available ', 'is visible in the table you should first fix related, more pressing issue, before fixing permissions inconsistency.' -FontWeight normal, bold, normal
+    }
     Solution   = {
         New-HTMLSection -Invisible {
             New-HTMLPanel {
-                New-HTMLText -FontSize 10pt -TextBlock {
-                    "When GPO is created it creates an entry in Active Directory (metadata) "
-                }
-                New-HTMLText -Text 'Following table presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
-                New-HTMLList -Type Unordered {
-                    New-HTMLListItem -Text 'Top level permissions consistency: ', $GPOZaurrConsistency['Variables']['Consistent'] -FontWeight normal, bold
-                    New-HTMLListItem -Text 'Inherited permissions consistency: ', $GPOZaurrConsistency['Variables']['ConsistentInside'] -FontWeight normal, bold
-                    New-HTMLListItem -Text 'Inconsistent top level permissions: ', $GPOZaurrConsistency['Variables']['Inconsistent'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Inconsistent inherited permissions: ", $GPOZaurrConsistency['Variables']['InconsistentInside'] -FontWeight normal, bold
-                } -FontSize 10pt
-                New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them. Please notice that if ', `
-                    ' Not available ', 'is visible in the table you should first fix related, more pressing issue, before fixing permissions inconsistency.' -FontWeight normal, bold, normal
+                & $GPOZaurrConsistency['Summary']
             }
             New-HTMLPanel {
                 New-HTMLChart {
