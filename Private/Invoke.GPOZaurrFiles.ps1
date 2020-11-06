@@ -16,6 +16,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $GPOZaurrFiles['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:GPOConfiguration['GPOFiles']['Data'] -Filtering
     }
 }

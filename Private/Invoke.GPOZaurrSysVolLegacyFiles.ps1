@@ -16,6 +16,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $GPOZaurrSysVolLegacyFiles['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:GPOConfiguration['SysVolLegacyFiles']['Data'] -Filtering
     }
 }

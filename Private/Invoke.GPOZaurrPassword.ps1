@@ -9,13 +9,13 @@
     Processing = {
 
     }
-    Variables = @{
+    Variables  = @{
 
     }
     Overview   = {
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $GPOZaurrPassword['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:GPOConfiguration['GPOPassword']['Data'] -Filtering
     }
 }

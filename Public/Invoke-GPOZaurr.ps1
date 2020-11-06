@@ -7,7 +7,6 @@
         [switch] $PassThru,
         [switch] $HideHTML
     )
-    $Script:GPOConfigurationClean = Copy-Dictionary -Dictionary $Script:GPOConfiguration
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
     $Script:Reporting = [ordered] @{}
@@ -113,7 +112,7 @@
         $OutputData
     }
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
-    $Script:GPOConfiguration = Copy-Dictionary -Dictionary $Script:GPOConfigurationClean
+
 }
 
 [scriptblock] $SourcesAutoCompleter = {

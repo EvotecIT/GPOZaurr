@@ -3,9 +3,9 @@
 
     )
     if (-not $Script:GPOConfigurationClean) {
-        #     $Script:GPOConfigurationClean = Copy-Dictionary -Dictionary $Script:GPOConfiguration
+        $Script:GPOConfigurationClean = Copy-Dictionary -Dictionary $Script:GPOConfiguration
     } else {
-        #      $Script:GPOConfiguration = Copy-Dictionary -Dictionary $Script:GPOConfigurationClean
+        $Script:GPOConfiguration = Copy-Dictionary -Dictionary $Script:GPOConfigurationClean
     }
     if (-not $Script:DefaultTypes) {
         $Script:DefaultTypes = foreach ($T in $Script:GPOConfiguration.Keys) {

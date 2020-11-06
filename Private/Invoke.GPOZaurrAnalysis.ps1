@@ -16,9 +16,9 @@
 
     }
     Solution   = {
-        foreach ($Key in $GPOZaurrAnalysis['Data'].Keys) {
+        foreach ($Key in $Script:GPOConfiguration['GPOAnalysis']['Data'].Keys) {
             New-HTMLTab -Name $Key {
-                New-HTMLTable -DataTable $GPOZaurrAnalysis['Data'][$Key] -Filtering -Title $Key
+                New-HTMLTable -DataTable $Script:GPOConfiguration['GPOAnalysis']['Data'][$Key] -Filtering -Title $Key
             }
         }
     }

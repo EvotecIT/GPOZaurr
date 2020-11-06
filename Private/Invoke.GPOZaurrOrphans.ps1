@@ -10,16 +10,16 @@
         #$NotAvailableInAD = [System.Collections.Generic.List[PSCustomObject]]::new()
         #$NotAvailableOnSysvol = [System.Collections.Generic.List[PSCustomObject]]::new()
         #$NotAvailablePermissionIssue = [System.Collections.Generic.List[PSCustomObject]]::new()
-        foreach ($GPO in $GPOZaurrOrphans['Data']) {
+        foreach ($GPO in $Script:GPOConfiguration['GPOOrphans']['Data']) {
             if ($GPO.Status -eq 'Not available in AD') {
                 #$NotAvailableInAD.Add($NotAvailableInAD)
-                $GPOZaurrOrphans['Variables']['NotAvailableInAD']++
+                $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableInAD']++
             } elseif ($GPO.Status -eq 'Not available on SYSVOL') {
                 #$NotAvailableOnSysvol.Add($NotAvailableInAD)
-                $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol']++
+                $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableOnSysvol']++
             } elseif ($GPO.Status -eq 'Permissions issue') {
                 #$NotAvailablePermissionIssue.Add($NotAvailableInAD)
-                $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue']++
+                $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailablePermissionIssue']++
             }
         }
     }
@@ -42,15 +42,15 @@
             }
             New-HTMLText -Text 'Following chart presents ', 'Broken / Orphaned Group Policies' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $GPOZaurrOrphans['Variables']['NotAvailableInAD'] -FontWeight normal, bold
-                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
             } -FontSize 10pt
             New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
             New-HTMLChart {
                 New-ChartBarOptions -Type barStacked
                 New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'Permissions Issue' -Color Crimson, LightCoral, IndianRed
-                New-ChartBar -Name 'Orphans' -Value $GPOZaurrOrphans['Variables']['NotAvailableInAD'], $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol'], $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue']
+                New-ChartBar -Name 'Orphans' -Value $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableInAD'], $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableOnSysvol'], $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailablePermissionIssue']
             } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
         }
     }
@@ -69,26 +69,26 @@
             } -FontSize 10pt
             New-HTMLText -Text 'Following problems were detected:' -FontSize 10pt -FontWeight bold
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $GPOZaurrOrphans['Variables']['NotAvailableInAD'] -FontWeight normal, bold
-                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
             } -FontSize 10pt
             New-HTMLText -Text "Please review output in table and follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
         }
     }
     Solution   = {
         New-HTMLSection -Invisible {
-            & $GPOZaurrOrphans['Summary']
+            & $Script:GPOConfiguration['GPOOrphans']['Summary']
             New-HTMLPanel {
                 New-HTMLChart {
                     New-ChartBarOptions -Type barStacked
                     New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'Permissions Issue' -Color Crimson, LightCoral, IndianRed
-                    New-ChartBar -Name 'Orphans' -Value $GPOZaurrOrphans['Variables']['NotAvailableInAD'], $GPOZaurrOrphans['Variables']['NotAvailableOnSysvol'], $GPOZaurrOrphans['Variables']['NotAvailablePermissionIssue']
+                    New-ChartBar -Name 'Orphans' -Value $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableInAD'], $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailableOnSysvol'], $Script:GPOConfiguration['GPOOrphans']['Variables']['NotAvailablePermissionIssue']
                 } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
             }
         }
         New-HTMLSection -Name 'Health State of Group Policies' {
-            New-HTMLTable -DataTable $GPOZaurrOrphans['Data'] -Filtering {
+            New-HTMLTable -DataTable $Script:GPOConfiguration['GPOOrphans']['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'Status' -Value "Not available in AD" -BackgroundColor Salmon -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "Not available on SYSVOL" -BackgroundColor LightCoral -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "Permissions issue" -BackgroundColor MediumVioletRed -ComparisonType string -Color White

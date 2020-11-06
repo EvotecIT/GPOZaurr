@@ -16,6 +16,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $GPOZaurrPermissions['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:GPOConfiguration['GPOPermissions']['Data'] -Filtering
     }
 }

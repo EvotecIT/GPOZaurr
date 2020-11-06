@@ -16,6 +16,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $GPOZaurrDuplicates['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:GPOConfiguration['GPODuplicates']['Data'] -Filtering
     }
 }
