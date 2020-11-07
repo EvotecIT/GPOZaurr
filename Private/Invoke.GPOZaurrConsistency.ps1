@@ -5,22 +5,22 @@
     Data       = $null
     Execute    = { Get-GPOZaurrPermissionConsistency -Type All -VerifyInheritance }
     Processing = {
-        foreach ($GPO in $Script:GPOConfiguration['GPOConsistency']['Data']) {
+        foreach ($GPO in $Script:Reporting['GPOConsistency']['Data']) {
             if ($GPO.ACLConsistent -eq $true) {
-                $Script:GPOConfiguration['GPOConsistency']['Variables']['Consistent']++
+                $Script:Reporting['GPOConsistency']['Variables']['Consistent']++
             } else {
-                $Script:GPOConfiguration['GPOConsistency']['Variables']['Inconsistent']++
+                $Script:Reporting['GPOConsistency']['Variables']['Inconsistent']++
             }
             if ($GPO.ACLConsistentInside -eq $true) {
-                $Script:GPOConfiguration['GPOConsistency']['Variables']['ConsistentInside']++
+                $Script:Reporting['GPOConsistency']['Variables']['ConsistentInside']++
             } else {
-                $Script:GPOConfiguration['GPOConsistency']['Variables']['InconsistentInside']++
+                $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside']++
             }
         }
-        if ($Script:GPOConfiguration['GPOConsistency']['Variables']['Inconsistent'].Count -gt 0 -or $Script:GPOConfiguration['GPOConsistency']['Variables']['InconsistentInside'].Count -gt 0 ) {
-            $Script:GPOConfiguration['GPOConsistency']['Action'] = $true
+        if ($Script:Reporting['GPOConsistency']['Variables']['Inconsistent'].Count -gt 0 -or $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'].Count -gt 0 ) {
+            $Script:Reporting['GPOConsistency']['Action'] = $true
         } else {
-            $Script:GPOConfiguration['GPOConsistency']['Action'] = $false
+            $Script:Reporting['GPOConsistency']['Action'] = $false
         }
     }
     Variables  = @{
@@ -33,18 +33,18 @@
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Top level permissions consistency: ', $Script:GPOConfiguration['GPOConsistency']['Variables']['Consistent'] -FontWeight normal, bold
-                New-HTMLListItem -Text 'Inherited permissions consistency: ', $Script:GPOConfiguration['GPOConsistency']['Variables']['ConsistentInside'] -FontWeight normal, bold
-                New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Script:GPOConfiguration['GPOConsistency']['Variables']['Inconsistent'] -FontWeight normal, bold
-                New-HTMLListItem -Text "Inconsistent inherited permissions: ", $Script:GPOConfiguration['GPOConsistency']['Variables']['InconsistentInside'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Top level permissions consistency: ', $Script:Reporting['GPOConsistency']['Variables']['Consistent'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Inherited permissions consistency: ', $Script:Reporting['GPOConsistency']['Variables']['ConsistentInside'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Script:Reporting['GPOConsistency']['Variables']['Inconsistent'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Inconsistent inherited permissions: ", $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'] -FontWeight normal, bold
             } -FontSize 10pt
             New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them.'
             New-HTMLChart {
                 New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
                 New-ChartBarOptions -Type barStacked
                 New-ChartLegend -Name 'Consistent', 'Inconsistent'
-                New-ChartBar -Name 'TopLevel' -Value $Script:GPOConfiguration['GPOConsistency']['Variables']['Consistent'], $Script:GPOConfiguration['GPOConsistency']['Variables']['Inconsistent']
-                New-ChartBar -Name 'Inherited' -Value $Script:GPOConfiguration['GPOConsistency']['Variables']['ConsistentInside'], $Script:GPOConfiguration['GPOConsistency']['Variables']['InconsistentInside']
+                New-ChartBar -Name 'TopLevel' -Value $Script:Reporting['GPOConsistency']['Variables']['Consistent'], $Script:Reporting['GPOConsistency']['Variables']['Inconsistent']
+                New-ChartBar -Name 'Inherited' -Value $Script:Reporting['GPOConsistency']['Variables']['ConsistentInside'], $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside']
             } -Title 'Permissions Consistency' -TitleAlignment center
         }
     }
@@ -58,10 +58,10 @@
         }
         New-HTMLText -Text 'Following list presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
         New-HTMLList -Type Unordered {
-            New-HTMLListItem -Text 'Top level permissions consistency: ', $Script:GPOConfiguration['GPOConsistency']['Variables']['Consistent'] -FontWeight normal, bold
-            New-HTMLListItem -Text 'Inherited permissions consistency: ', $Script:GPOConfiguration['GPOConsistency']['Variables']['ConsistentInside'] -FontWeight normal, bold
-            New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Script:GPOConfiguration['GPOConsistency']['Variables']['Inconsistent'] -FontWeight normal, bold
-            New-HTMLListItem -Text "Inconsistent inherited permissions: ", $Script:GPOConfiguration['GPOConsistency']['Variables']['InconsistentInside'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Top level permissions consistency: ', $Script:Reporting['GPOConsistency']['Variables']['Consistent'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Inherited permissions consistency: ', $Script:Reporting['GPOConsistency']['Variables']['ConsistentInside'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Script:Reporting['GPOConsistency']['Variables']['Inconsistent'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Inconsistent inherited permissions: ", $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'] -FontWeight normal, bold
         } -FontSize 10pt
         New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them. Please notice that if ', `
             ' Not available ', 'is visible in the table you should first fix related, more pressing issue, before fixing permissions inconsistency.' -FontWeight normal, bold, normal
@@ -76,13 +76,13 @@
                     New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
                     New-ChartBarOptions -Type barStacked
                     New-ChartLegend -Name 'Consistent', 'Inconsistent'
-                    New-ChartBar -Name 'TopLevel' -Value $Script:GPOConfiguration['GPOConsistency']['Variables']['Consistent'], $Script:GPOConfiguration['GPOConsistency']['Variables']['Inconsistent']
-                    New-ChartBar -Name 'Inherited' -Value $Script:GPOConfiguration['GPOConsistency']['Variables']['ConsistentInside'], $Script:GPOConfiguration['GPOConsistency']['Variables']['InconsistentInside']
+                    New-ChartBar -Name 'TopLevel' -Value $Script:Reporting['GPOConsistency']['Variables']['Consistent'], $Script:Reporting['GPOConsistency']['Variables']['Inconsistent']
+                    New-ChartBar -Name 'Inherited' -Value $Script:Reporting['GPOConsistency']['Variables']['ConsistentInside'], $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside']
                 } -Title 'Permissions Consistency' -TitleAlignment center
             }
         }
         New-HTMLSection -Name 'Group Policy Permissions Consistency' {
-            New-HTMLTable -DataTable $Script:GPOConfiguration['GPOConsistency']['Data'] -Filtering {
+            New-HTMLTable -DataTable $Script:Reporting['GPOConsistency']['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'ACLConsistent' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
                 New-HTMLTableCondition -Name 'ACLConsistentInside' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
                 New-HTMLTableCondition -Name 'ACLConsistent' -Value $true -BackgroundColor PaleGreen -TextTransform capitalize -ComparisonType string

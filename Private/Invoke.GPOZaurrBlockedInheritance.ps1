@@ -16,6 +16,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $Script:GPOConfiguration['GPOBlockedInheritance']['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:Reporting['GPOBlockedInheritance']['Data'] -Filtering
     }
 }

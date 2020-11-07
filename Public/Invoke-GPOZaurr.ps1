@@ -43,12 +43,23 @@
 
     foreach ($T in $Script:GPOConfiguration.Keys) {
         if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+            $Script:Reporting[$T] = [ordered] @{
+                Name      = $Script:GPOConfiguration[$T].Name
+                Action    = $null
+                Data      = $null
+                Errors    = $null
+                Warnings  = $null
+                Time      = $null
+                Variables = Copy-Dictionary -Dictionary $Script:GPOConfiguration[$T]['Variables']
+            }
             $TimeLogGPOList = Start-TimeLog
             Write-Color -Text '[i]', '[Start] ', $($Script:GPOConfiguration[$T]['Name']) -Color Yellow, DarkGray, Yellow
-            $Script:GPOConfiguration[$T]['Data'] = & $Script:GPOConfiguration[$T]['Execute']
-            & $Script:GPOConfiguration[$T]['Processing']
-
+            $Script:Reporting[$T]['Data'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Execute'] -WarningVariable CommandWarnings -ErrorVariable CommandErrors
+            Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Processing']
+            $Script:Reporting[$T]['Warnings'] = $CommandWarnings
+            $Script:Reporting[$T]['Errors'] = $CommandErrors
             $TimeEndGPOList = Stop-TimeLog -Time $TimeLogGPOList -Option OneLiner
+            $Script:Reporting[$T]['Time'] = $TimeEndGPOList
             Write-Color -Text '[i]', '[End  ] ', $($Script:GPOConfiguration[$T]['Name']), " [Time to execute: $TimeEndGPOList]" -Color Yellow, DarkGray, Yellow, DarkGray
         }
     }
@@ -92,8 +103,7 @@
     $TimeLogEndHTML = Stop-TimeLog -Time $TimeLogHTML -Option OneLiner
     Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report', " [Time to execute: $TimeLogEndHTML]" -Color Yellow, DarkGray, Yellow, DarkGray
     if ($PassThru) {
-        $OutputData = Export-GPOZaurr
-        $OutputData
+        $Script:Reporting
     }
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 

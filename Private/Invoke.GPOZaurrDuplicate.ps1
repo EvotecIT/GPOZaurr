@@ -16,6 +16,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $Script:GPOConfiguration['GPODuplicates']['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:Reporting['GPODuplicates']['Data'] -Filtering
     }
 }

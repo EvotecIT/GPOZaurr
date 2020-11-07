@@ -16,6 +16,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $Script:GPOConfiguration['GPOPassword']['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:Reporting['GPOPassword']['Data'] -Filtering
     }
 }

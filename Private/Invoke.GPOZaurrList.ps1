@@ -7,40 +7,40 @@
         Get-GPOZaurr
     }
     Processing = {
-        foreach ($GPO in $Script:GPOConfiguration['GPOList']['Data']) {
+        foreach ($GPO in $Script:Reporting['GPOList']['Data']) {
             if ($GPO.Linked -eq $false -and $GPO.Empty -eq $true) {
                 # Not linked, Empty
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOEmptyAndUnlinked']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOEmptyOrUnlinked']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPONotLinked']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOEmpty']++
+                $Script:Reporting['GPOList']['Variables']['GPOEmptyAndUnlinked']++
+                $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked']++
+                $Script:Reporting['GPOList']['Variables']['GPONotLinked']++
+                $Script:Reporting['GPOList']['Variables']['GPOEmpty']++
             } elseif ($GPO.Linked -eq $true -and $GPO.Empty -eq $true) {
                 # Linked, But EMPTY
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOLinkedButEmpty']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOEmptyOrUnlinked']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOEmpty']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOLinked']++
+                $Script:Reporting['GPOList']['Variables']['GPOLinkedButEmpty']++
+                $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked']++
+                $Script:Reporting['GPOList']['Variables']['GPOEmpty']++
+                $Script:Reporting['GPOList']['Variables']['GPOLinked']++
             } elseif ($GPO.Linked -eq $false) {
                 # Not linked, but not EMPTY
-                $Script:GPOConfiguration['GPOList']['Variables']['GPONotLinked']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOEmptyOrUnlinked']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPONotEmpty']++
+                $Script:Reporting['GPOList']['Variables']['GPONotLinked']++
+                $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked']++
+                $Script:Reporting['GPOList']['Variables']['GPONotEmpty']++
             } elseif ($GPO.Empty -eq $true) {
                 # Linked, But EMPTY
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOEmpty']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOEmptyOrUnlinked']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOLinked']++
+                $Script:Reporting['GPOList']['Variables']['GPOEmpty']++
+                $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked']++
+                $Script:Reporting['GPOList']['Variables']['GPOLinked']++
             } else {
                 # Linked, not EMPTY
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOValid']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOLinked']++
-                $Script:GPOConfiguration['GPOList']['Variables']['GPONotEmpty']++
+                $Script:Reporting['GPOList']['Variables']['GPOValid']++
+                $Script:Reporting['GPOList']['Variables']['GPOLinked']++
+                $Script:Reporting['GPOList']['Variables']['GPONotEmpty']++
             }
             if ($GPO.LinksDisabledCount -eq $GPO.LinksCount -and $GPO.LinksCount -gt 0) {
-                $Script:GPOConfiguration['GPOList']['Variables']['GPOLinkedButLinkDisabled']++
+                $Script:Reporting['GPOList']['Variables']['GPOLinkedButLinkDisabled']++
             }
         }
-        $Script:GPOConfiguration['GPOList']['Variables']['GPOTotal'] = $Script:GPOConfiguration['GPOList']['Data'].Count
+        $Script:Reporting['GPOList']['Variables']['GPOTotal'] = $Script:Reporting['GPOList']['Data'].Count
     }
     Variables  = @{
         GPONotLinked             = 0
@@ -58,14 +58,14 @@
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents ', 'Linked / Empty and Unlinked Group Policies' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Group Policies total: ', $Script:GPOConfiguration['GPOList']['Variables']['GPOTotal'] -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies valid: ", $Script:GPOConfiguration['GPOList']['Variables']['GPOValid'] -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies to delete: ", $Script:GPOConfiguration['GPOList']['Variables']['GPOEmptyOrUnlinked'] -FontWeight normal, bold {
+                New-HTMLListItem -Text 'Group Policies total: ', $Script:Reporting['GPOList']['Variables']['GPOTotal'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Group Policies valid: ", $Script:Reporting['GPOList']['Variables']['GPOValid'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Group Policies to delete: ", $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked'] -FontWeight normal, bold {
                     New-HTMLList -Type Unordered {
-                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $Script:GPOConfiguration['GPOList']['Variables']['GPONotLinked'] -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $Script:GPOConfiguration['GPOList']['Variables']['GPOEmpty'] -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $Script:GPOConfiguration['GPOList']['Variables']['GPOLinkedButEmpty'] -FontWeight normal, bold
-                        New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $Script:GPOConfiguration['GPOList']['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
+                        New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $Script:Reporting['GPOList']['Variables']['GPONotLinked'] -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $Script:Reporting['GPOList']['Variables']['GPOEmpty'] -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButEmpty'] -FontWeight normal, bold
+                        New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
                     }
                 }
             } -FontSize 10pt
@@ -74,10 +74,10 @@
                 New-ChartBarOptions -Type barStacked
                 #New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
                 New-ChartLegend -Names 'Good', 'Bad' -Color PaleGreen, Salmon
-                #New-ChartBar -Name 'Group Policies' -Value $Script:GPOConfiguration['GPOList']['Variables']['GPONotLinked'], $Script:GPOConfiguration['GPOList']['Variables']['GPOLinked'], $Script:GPOConfiguration['GPOList']['Variables']['GPOEmpty'], $Script:GPOConfiguration['GPOList']['Variables']['GPOTotal']
-                New-ChartBar -Name 'Linked' -Value $Script:GPOConfiguration['GPOList']['Variables']['GPOLinked'], $Script:GPOConfiguration['GPOList']['Variables']['GPONotLinked']
-                New-ChartBar -Name 'Empty' -Value $Script:GPOConfiguration['GPOList']['Variables']['GPONotEmpty'], $Script:GPOConfiguration['GPOList']['Variables']['GPOEmpty']
-                New-ChartBar -Name 'Valid' -Value $Script:GPOConfiguration['GPOList']['Variables']['GPOValid'], $Script:GPOConfiguration['GPOList']['Variables']['GPOEmptyOrUnlinked']
+                #New-ChartBar -Name 'Group Policies' -Value $Script:Reporting['GPOList']['Variables']['GPONotLinked'], $Script:Reporting['GPOList']['Variables']['GPOLinked'], $Script:Reporting['GPOList']['Variables']['GPOEmpty'], $Script:Reporting['GPOList']['Variables']['GPOTotal']
+                New-ChartBar -Name 'Linked' -Value $Script:Reporting['GPOList']['Variables']['GPOLinked'], $Script:Reporting['GPOList']['Variables']['GPONotLinked']
+                New-ChartBar -Name 'Empty' -Value $Script:Reporting['GPOList']['Variables']['GPONotEmpty'], $Script:Reporting['GPOList']['Variables']['GPOEmpty']
+                New-ChartBar -Name 'Valid' -Value $Script:Reporting['GPOList']['Variables']['GPOValid'], $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked']
             } -TitleAlignment center
         }
     }
@@ -94,14 +94,14 @@
                 }
                 New-HTMLText @newHTMLTextSplat
                 New-HTMLList -Type Unordered {
-                    New-HTMLListItem -Text 'Group Policies total: ', $Script:GPOConfiguration['GPOList']['Variables']['GPOTotal'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Group Policies valid: ", $Script:GPOConfiguration['GPOList']['Variables']['GPOValid'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Group Policies to delete: ", $Script:GPOConfiguration['GPOList']['Variables']['GPOEmptyOrUnlinked'] -FontWeight normal, bold {
+                    New-HTMLListItem -Text 'Group Policies total: ', $Script:Reporting['GPOList']['Variables']['GPOTotal'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies valid: ", $Script:Reporting['GPOList']['Variables']['GPOValid'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies to delete: ", $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked'] -FontWeight normal, bold {
                         New-HTMLList -Type Unordered {
-                            New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $Script:GPOConfiguration['GPOList']['Variables']['GPONotLinked'] -FontWeight normal, bold
-                            New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $Script:GPOConfiguration['GPOList']['Variables']['GPOEmpty'] -FontWeight normal, bold
-                            New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $Script:GPOConfiguration['GPOList']['Variables']['GPOLinkedButEmpty'] -FontWeight normal, bold
-                            New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $Script:GPOConfiguration['GPOList']['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
+                            New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $Script:Reporting['GPOList']['Variables']['GPONotLinked'] -FontWeight normal, bold
+                            New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $Script:Reporting['GPOList']['Variables']['GPOEmpty'] -FontWeight normal, bold
+                            New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButEmpty'] -FontWeight normal, bold
+                            New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
                         }
                     }
                 } -FontSize 10pt
@@ -112,15 +112,15 @@
                     New-ChartBarOptions -Type barStacked
                     #New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
                     New-ChartLegend -Names 'Good', 'Bad' -Color PaleGreen, Salmon
-                    #New-ChartBar -Name 'Group Policies' -Value $Script:GPOConfiguration['GPOList']['Variables']['GPONotLinked'], $Script:GPOConfiguration['GPOList']['Variables']['GPOLinked'], $Script:GPOConfiguration['GPOList']['Variables']['GPOEmpty'], $Script:GPOConfiguration['GPOList']['Variables']['GPOTotal']
-                    New-ChartBar -Name 'Linked' -Value $Script:GPOConfiguration['GPOList']['Variables']['GPOLinked'], $Script:GPOConfiguration['GPOList']['Variables']['GPONotLinked']
-                    New-ChartBar -Name 'Empty' -Value $Script:GPOConfiguration['GPOList']['Variables']['GPONotEmpty'], $Script:GPOConfiguration['GPOList']['Variables']['GPOEmpty']
-                    New-ChartBar -Name 'Valid' -Value $Script:GPOConfiguration['GPOList']['Variables']['GPOValid'], $Script:GPOConfiguration['GPOList']['Variables']['GPOEmptyOrUnlinked']
+                    #New-ChartBar -Name 'Group Policies' -Value $Script:Reporting['GPOList']['Variables']['GPONotLinked'], $Script:Reporting['GPOList']['Variables']['GPOLinked'], $Script:Reporting['GPOList']['Variables']['GPOEmpty'], $Script:Reporting['GPOList']['Variables']['GPOTotal']
+                    New-ChartBar -Name 'Linked' -Value $Script:Reporting['GPOList']['Variables']['GPOLinked'], $Script:Reporting['GPOList']['Variables']['GPONotLinked']
+                    New-ChartBar -Name 'Empty' -Value $Script:Reporting['GPOList']['Variables']['GPONotEmpty'], $Script:Reporting['GPOList']['Variables']['GPOEmpty']
+                    New-ChartBar -Name 'Valid' -Value $Script:Reporting['GPOList']['Variables']['GPOValid'], $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked']
                 } -TitleAlignment center
             }
         }
         New-HTMLSection -Name 'Group Policies List' {
-            New-HTMLTable -DataTable $Script:GPOConfiguration['GPOList']['Data'] -Filtering {
+            New-HTMLTable -DataTable $Script:Reporting['GPOList']['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'Empty' -Value $true -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
                 New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
             } -PagingOptions 10, 20, 30, 40, 50

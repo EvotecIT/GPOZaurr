@@ -16,6 +16,6 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $Script:GPOConfiguration['GPOPermissions']['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:Reporting['GPOPermissions']['Data'] -Filtering
     }
 }

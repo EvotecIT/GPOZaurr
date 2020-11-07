@@ -7,33 +7,33 @@
         Get-GPOZaurrNetLogon
     }
     Processing = {
-        foreach ($File in $Script:GPOConfiguration['NetLogonPermissions']['Data']) {
+        foreach ($File in $Script:Reporting['NetLogonPermissions']['Data']) {
             if ($File.FileSystemRights -eq 'Owner') {
-                $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwners']++
+                $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwners']++
                 if ($File.PrincipalType -eq 'WellKnownAdministrative') {
-                    $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrative']++
+                    $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrative']++
                 } elseif ($File.PrincipalType -eq 'Administrative') {
-                    $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrative']++
+                    $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrative']++
                 } else {
-                    $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersNotAdministrative']++
+                    $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersNotAdministrative']++
                 }
                 if ($File.PrincipalSid -eq 'S-1-5-32-544') {
-                    $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators']++
+                    $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators']++
                 } elseif ($File.PrincipalType -in 'WellKnownAdministrative', 'Administrative') {
-                    $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrativeNotAdministrators']++
-                    $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersToFix']++
+                    $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrativeNotAdministrators']++
+                    $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix']++
                 } else {
-                    $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersToFix']++
+                    $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix']++
                 }
-                $Script:GPOConfiguration['NetLogonPermissions']['Variables']['Owner'].Add($File)
+                $Script:Reporting['NetLogonPermissions']['Variables']['Owner'].Add($File)
             } else {
-                $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NonOwner'].Add($File)
+                $Script:Reporting['NetLogonPermissions']['Variables']['NonOwner'].Add($File)
             }
         }
-        if ($Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'].Count -gt 0) {
-            $Script:GPOConfiguration['NetLogonPermissions']['Action'] = $true
+        if ($Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'].Count -gt 0) {
+            $Script:Reporting['NetLogonPermissions']['Action'] = $true
         } else {
-            $Script:GPOConfiguration['NetLogonPermissions']['Action'] = $false
+            $Script:Reporting['NetLogonPermissions']['Action'] = $false
         }
     }
     Variables = @{
@@ -50,19 +50,19 @@
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents ', 'NetLogon Summary' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'NetLogon Files in Total: ', $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwners'] -FontWeight normal, bold
-                New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -FontWeight normal, bold
-                New-HTMLListItem -Text "NetLogon Owners requiring change: ", $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -FontWeight normal, bold {
+                New-HTMLListItem -Text 'NetLogon Files in Total: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwners'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -FontWeight normal, bold
+                New-HTMLListItem -Text "NetLogon Owners requiring change: ", $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -FontWeight normal, bold {
                     New-HTMLList -Type Unordered {
-                        New-HTMLListItem -Text 'Not Administrative: ', $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersNotAdministrative'] -FontWeight normal, bold
-                        New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrativeNotAdministrators'] -FontWeight normal, bold
+                        New-HTMLListItem -Text 'Not Administrative: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersNotAdministrative'] -FontWeight normal, bold
+                        New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrativeNotAdministrators'] -FontWeight normal, bold
                     }
                 }
             } -FontSize 10pt
             #New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
             New-HTMLChart {
-                New-ChartPie -Name 'Correct Owners' -Value $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -Color LightGreen
-                New-ChartPie -Name 'Incorrect Owners' -Value $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -Color Crimson
+                New-ChartPie -Name 'Correct Owners' -Value $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -Color LightGreen
+                New-ChartPie -Name 'Incorrect Owners' -Value $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -Color Crimson
             } -Title 'NetLogon Owners' -TitleAlignment center
         }
         New-HTMLPanel {
@@ -79,12 +79,12 @@
                         "That's why as a best-practice it's recommended to change any non-administrative owners to BUILTIN\Administrators, and even Administrative accounts should be replaced with it. "
                     } -FontSize 10pt
                     New-HTMLList -Type Unordered {
-                        New-HTMLListItem -Text 'NetLogon Files in Total: ', $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwners'] -FontWeight normal, bold
-                        New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -FontWeight normal, bold
-                        New-HTMLListItem -Text "NetLogon Owners requiring change: ", $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -FontWeight normal, bold {
+                        New-HTMLListItem -Text 'NetLogon Files in Total: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwners'] -FontWeight normal, bold
+                        New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -FontWeight normal, bold
+                        New-HTMLListItem -Text "NetLogon Owners requiring change: ", $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -FontWeight normal, bold {
                             New-HTMLList -Type Unordered {
-                                New-HTMLListItem -Text 'Not Administrative: ', $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersNotAdministrative'] -FontWeight normal, bold
-                                New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrativeNotAdministrators'] -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Not Administrative: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersNotAdministrative'] -FontWeight normal, bold
+                                New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrativeNotAdministrators'] -FontWeight normal, bold
                             }
                         }
                     } -FontSize 10pt
@@ -92,13 +92,13 @@
                 }
                 New-HTMLPanel {
                     New-HTMLChart {
-                        New-ChartPie -Name 'Correct Owners' -Value $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -Color LightGreen
-                        New-ChartPie -Name 'Incorrect Owners' -Value $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -Color Crimson
+                        New-ChartPie -Name 'Correct Owners' -Value $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -Color LightGreen
+                        New-ChartPie -Name 'Incorrect Owners' -Value $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -Color Crimson
                     } -Title 'NetLogon Owners' -TitleAlignment center
                 }
             }
             New-HTMLSection -Name 'NetLogon Files List' {
-                New-HTMLTable -DataTable $Script:GPOConfiguration['NetLogonPermissions']['Variables']['Owner'] -Filtering {
+                New-HTMLTable -DataTable $Script:Reporting['NetLogonPermissions']['Variables']['Owner'] -Filtering {
                     New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor LightGreen -ComparisonType string
                     New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor Salmon -ComparisonType string -Operator ne
                     New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
@@ -167,7 +167,7 @@
         }
         New-HTMLTab -Name 'NetLogon Permissions' {
             New-HTMLSection -Name 'NetLogon Files List' {
-                New-HTMLTable -DataTable $Script:GPOConfiguration['NetLogonPermissions']['Variables']['NonOwner'] -Filtering
+                New-HTMLTable -DataTable $Script:Reporting['NetLogonPermissions']['Variables']['NonOwner'] -Filtering
             }
         }
     }
