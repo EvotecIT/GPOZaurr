@@ -91,6 +91,15 @@
                 New-HTMLTableCondition -Name 'ACLConsistentInside' -Value 'Not available' -BackgroundColor Crimson -ComparisonType string
             } -PagingOptions 10, 20, 30, 40, 50
         }
+        New-HTMLTable -DataTable $Script:Reporting['GPODuplicates']['Data'] -Filtering
+        if ($Script:Reporting['GPOConsistency']['WarningsAndErrors']) {
+            New-HTMLSection -Name 'Warnings & Errors to Review' {
+                New-HTMLTable -DataTable $Script:Reporting['GPOConsistency']['WarningsAndErrors'] -Filtering {
+                    New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
+                    New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
+                }
+            }
+        }
         New-HTMLSection -Name 'Steps to fix - Permissions Consistency' {
             New-HTMLContainer {
                 New-HTMLSpanStyle -FontSize 10pt {

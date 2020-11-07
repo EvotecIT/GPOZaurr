@@ -130,6 +130,14 @@
                 New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
             } -PagingOptions 10, 20, 30, 40, 50
         }
+        if ($Script:Reporting['GPOList']['WarningsAndErrors']) {
+            New-HTMLSection -Name 'Warnings & Errors to Review' {
+                New-HTMLTable -DataTable $Script:Reporting['GPOList']['WarningsAndErrors'] -Filtering {
+                    New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
+                    New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
+                }
+            }
+        }
         New-HTMLSection -Name 'Steps to fix - Empty & Unlinked Group Policies' {
             New-HTMLContainer {
                 New-HTMLSpanStyle -FontSize 10pt {

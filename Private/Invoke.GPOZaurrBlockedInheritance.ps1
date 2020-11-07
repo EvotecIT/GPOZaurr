@@ -17,5 +17,13 @@
     }
     Solution       = {
         New-HTMLTable -DataTable $Script:Reporting['GPOBlockedInheritance']['Data'] -Filtering
+        if ($Script:Reporting['GPOBlockedInheritance']['WarningsAndErrors']) {
+            New-HTMLSection -Name 'Warnings & Errors to Review' {
+                New-HTMLTable -DataTable $Script:Reporting['GPOBlockedInheritance']['WarningsAndErrors'] -Filtering {
+                    New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
+                    New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
+                }
+            }
+        }
     }
 }

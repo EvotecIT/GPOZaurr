@@ -96,6 +96,14 @@
                 New-HTMLTableCondition -Name 'Status' -Value "Permissions issue" -BackgroundColor MediumVioletRed -ComparisonType string -Color White
             } -PagingOptions 10, 20, 30, 40, 50
         }
+        if ($Script:Reporting['GPOOrphans']['WarningsAndErrors']) {
+            New-HTMLSection -Name 'Warnings & Errors to Review' {
+                New-HTMLTable -DataTable $Script:Reporting['GPOOrphans']['WarningsAndErrors'] -Filtering {
+                    New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
+                    New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
+                }
+            }
+        }
         New-HTMLSection -Name 'Steps to fix - Not available on SYSVOL / Active Directory' {
             New-HTMLContainer {
                 New-HTMLSpanStyle -FontSize 10pt {

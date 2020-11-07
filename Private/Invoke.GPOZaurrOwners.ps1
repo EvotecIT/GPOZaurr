@@ -104,6 +104,14 @@
                 New-HTMLTableCondition -Name 'IsOwnerAdministrative' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
             } -PagingOptions 10, 20, 30, 40, 50
         }
+        if ($Script:Reporting['GPOOwners']['WarningsAndErrors']) {
+            New-HTMLSection -Name 'Warnings & Errors to Review' {
+                New-HTMLTable -DataTable $Script:Reporting['GPOOwners']['WarningsAndErrors'] -Filtering {
+                    New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
+                    New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
+                }
+            }
+        }
         New-HTMLSection -Name 'Steps to fix Group Policy Owners' {
             New-HTMLContainer {
                 New-HTMLSpanStyle -FontSize 10pt {

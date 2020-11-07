@@ -104,6 +104,14 @@
                     New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
                 }
             }
+            if ($Script:Reporting['NetLogonPermissions']['WarningsAndErrors']) {
+                New-HTMLSection -Name 'Warnings & Errors to Review' {
+                    New-HTMLTable -DataTable $Script:Reporting['NetLogonPermissions']['WarningsAndErrors'] -Filtering {
+                        New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
+                        New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
+                    }
+                }
+            }
             New-HTMLSection -Name 'Steps to fix NetLogon Owners ' {
                 New-HTMLContainer {
                     New-HTMLSpanStyle -FontSize 10pt {

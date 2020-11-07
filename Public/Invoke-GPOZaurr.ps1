@@ -13,6 +13,7 @@
     $Script:Reporting['Version'] = Get-GitHubVersion -Cmdlet 'Invoke-GPOZaurr' -RepositoryOwner 'evotecit' -RepositoryName 'GPOZaurr'
     Write-Color '[i]', "[GPOZaurr] ", 'Version', ' [Informative] ', $Script:Reporting['Version'] -Color Yellow, DarkGray, Yellow, DarkGray, Magenta
 
+    # Verify requested types are supported
     $Supported = [System.Collections.Generic.List[string]]::new()
     [Array] $NotSupported = foreach ($T in $Type) {
         if ($T -notin $Script:GPOConfiguration.Keys ) {
@@ -30,7 +31,7 @@
         return
     }
 
-    # Lets disable all current ones
+    # Lets make sure we only enable those types which are requestd by user
     if ($Type) {
         foreach ($T in $Script:GPOConfiguration.Keys) {
             $Script:GPOConfiguration[$T].Enabled = $false
@@ -41,23 +42,39 @@
         }
     }
 
+    # Build data
     foreach ($T in $Script:GPOConfiguration.Keys) {
         if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
             $Script:Reporting[$T] = [ordered] @{
-                Name           = $Script:GPOConfiguration[$T].Name
-                ActionRequired = $null
-                Data           = $null
-                Errors         = $null
-                Warnings       = $null
-                Time           = $null
-                Variables      = Copy-Dictionary -Dictionary $Script:GPOConfiguration[$T]['Variables']
+                Name              = $Script:GPOConfiguration[$T].Name
+                ActionRequired    = $null
+                Data              = $null
+                WarningsAndErrors = $null
+                Time              = $null
+                Variables         = Copy-Dictionary -Dictionary $Script:GPOConfiguration[$T]['Variables']
             }
             $TimeLogGPOList = Start-TimeLog
             Write-Color -Text '[i]', '[Start] ', $($Script:GPOConfiguration[$T]['Name']) -Color Yellow, DarkGray, Yellow
             $Script:Reporting[$T]['Data'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Execute'] -WarningVariable CommandWarnings -ErrorVariable CommandErrors
             Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Processing']
-            $Script:Reporting[$T]['Warnings'] = $CommandWarnings
-            $Script:Reporting[$T]['Errors'] = $CommandErrors
+            $Script:Reporting[$T]['WarningsAndErrors'] = @(
+                foreach ($War in $CommandWarnings) {
+                    [PSCustomObject] @{
+                        Type       = 'Warning'
+                        Comment    = $War
+                        Reason     = ''
+                        TargetName = ''
+                    }
+                }
+                foreach ($Err in $CommandErrors) {
+                    [PSCustomObject] @{
+                        Type       = 'Error'
+                        Comment    = $Err
+                        Reason     = $Err.CategoryInfo.Reason
+                        TargetName = $Err.CategoryInfo.TargetName
+                    }
+                }
+            )
             $TimeEndGPOList = Stop-TimeLog -Time $TimeLogGPOList -Option OneLiner
             $Script:Reporting[$T]['Time'] = $TimeEndGPOList
             Write-Color -Text '[i]', '[End  ] ', $($Script:GPOConfiguration[$T]['Name']), " [Time to execute: $TimeEndGPOList]" -Color Yellow, DarkGray, Yellow, DarkGray
