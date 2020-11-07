@@ -10,23 +10,7 @@
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
     $Script:Reporting = [ordered] @{}
-    # Provide version check for easy use
-    $GPOZaurrVersion = Get-Command -Name 'Invoke-GPOZaurr' -ErrorAction SilentlyContinue
-
-    [Array] $GitHubReleases = (Get-GitHubLatestRelease -Url "https://api.github.com/repos/evotecit/GpoZaurr/releases" -Verbose:$false)
-
-    $LatestVersion = $GitHubReleases[0]
-    if (-not $LatestVersion.Errors) {
-        if ($GPOZaurrVersion.Version -eq $LatestVersion.Version) {
-            $Script:Reporting['Version'] = "Current/Latest: $($LatestVersion.Version) at $($LatestVersion.PublishDate)"
-        } elseif ($GPOZaurrVersion.Version -lt $LatestVersion.Version) {
-            $Script:Reporting['Version'] = "Current: $($GPOZaurrVersion.Version), Published: $($LatestVersion.Version) at $($LatestVersion.PublishDate). Update?"
-        } elseif ($GPOZaurrVersion.Version -gt $LatestVersion.Version) {
-            $Script:Reporting['Version'] = "Current: $($GPOZaurrVersion.Version), Published: $($LatestVersion.Version) at $($LatestVersion.PublishDate). Lucky you!"
-        }
-    } else {
-        $Script:Reporting['Version'] = "GPOZaurr Current: $($GPOZaurrVersion.Version)"
-    }
+    $Script:Reporting['Version'] = Get-GitHubVersion -Cmdlet 'Invoke-GPOZaurr' -RepositoryOwner 'evotecit' -RepositoryName 'GPOZaurr'
     Write-Color '[i]', "[GPOZaurr] ", 'Version', ' [Informative] ', $Script:Reporting['Version'] -Color Yellow, DarkGray, Yellow, DarkGray, Magenta
 
     $Supported = [System.Collections.Generic.List[string]]::new()
