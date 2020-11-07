@@ -57,30 +57,30 @@
         }
     }
     Summary        = {
-        New-HTMLPanel {
-            New-HTMLText -TextBlock {
-                "Group Policies are stored in two places - Active Directory (metadata) and SYSVOL (content)."
-                "Since those are managed in different ways, replicated in different ways it's possible because of different issues they get out of sync."
-            } -FontSize 10pt
-            New-HTMLText -Text "For example:" -FontSize 10pt -FontWeight bold
-            New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'USN Rollback in AD could cause already deleted Group Policies to reapper in Active Directory, yet SYSVOL data would be unavailable'
-                New-HTMLListItem -Text 'Group Policy deletion failing to delete GPO content'
-                New-HTMLListItem -Text 'Permission issue preventing deletion of GPO content'
-                New-HTMLListItem -Text 'Failing DFSR replication between DCs'
-            } -FontSize 10pt
-            New-HTMLText -Text 'Following problems were detected:' -FontSize 10pt -FontWeight bold
-            New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
-                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
-            } -FontSize 10pt
-            New-HTMLText -Text "Please review output in table and follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
-        }
+        New-HTMLText -TextBlock {
+            "Group Policies are stored in two places - Active Directory (metadata) and SYSVOL (content)."
+            "Since those are managed in different ways, replicated in different ways it's possible because of different issues they get out of sync."
+        } -FontSize 10pt
+        New-HTMLText -Text "For example:" -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'USN Rollback in AD could cause already deleted Group Policies to reapper in Active Directory, yet SYSVOL data would be unavailable'
+            New-HTMLListItem -Text 'Group Policy deletion failing to delete GPO content'
+            New-HTMLListItem -Text 'Permission issue preventing deletion of GPO content'
+            New-HTMLListItem -Text 'Failing DFSR replication between DCs'
+        } -FontSize 10pt
+        New-HTMLText -Text 'Following problems were detected:' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -Text "Please review output in table and follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
     }
     Solution       = {
         New-HTMLSection -Invisible {
-            & $Script:GPOConfiguration['GPOOrphans']['Summary']
+            New-HTMLPanel {
+                & $Script:GPOConfiguration['GPOOrphans']['Summary']
+            }
             New-HTMLPanel {
                 New-HTMLChart {
                     New-ChartBarOptions -Type barStacked

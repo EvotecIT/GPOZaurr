@@ -1,6 +1,7 @@
 ﻿function Remove-GPOZaurrDuplicateObject {
     [cmdletBinding(SupportsShouldProcess)]
     param(
+        [int] $LimitProcessing = [int32]::MaxValue,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
@@ -15,9 +16,9 @@
     }
 
     $DuplicateGpoObjects = Get-GPOZaurrDuplicateObject @getGPOZaurrDuplicateObjectSplat
-    foreach ($Duplicate in $DuplicateGpoObjects) {
+    foreach ($Duplicate in $DuplicateGpoObjects | Select-Object -First $LimitProcessing) {
         try {
-            Remove-ADObject -Identity $_.ObjectGUID -Recursive -ErrorAction Stop -Server $Duplicate.DomainName
+            Remove-ADObject -Identity $Duplicate.ObjectGUID -Recursive -ErrorAction Stop -Server $Duplicate.DomainName
         } catch {
             Write-Warning "Remove-GPOZaurrDuplicateObject - Deleting $($Duplicate.ConflictDN) / $($Duplicate.DomainName) via GUID: $($Duplicate.ObjectGUID) failed with error: $($_.Exception.Message)"
         }

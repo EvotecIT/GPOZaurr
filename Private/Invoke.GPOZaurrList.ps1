@@ -1,5 +1,5 @@
 ﻿$GPOZaurrList = [ordered] @{
-    Name       = 'Group Policy Empty & Unlinked'
+    Name       = 'Group Policy Summary'
     Enabled    = $true
     Action     = $null
     Data       = $null
@@ -39,6 +39,30 @@
             if ($GPO.LinksDisabledCount -eq $GPO.LinksCount -and $GPO.LinksCount -gt 0) {
                 $Script:Reporting['GPOList']['Variables']['GPOLinkedButLinkDisabled']++
             }
+
+            if ($GPO.ComputerOptimized -eq $true) {
+                $Script:Reporting['GPOList']['Variables']['ComputerOptimizedYes']++
+            } else {
+                $Script:Reporting['GPOList']['Variables']['ComputerOptimizedNo']++
+            }
+            if ($GPO.ComputerProblem -eq $true) {
+                $Script:Reporting['GPOList']['Variables']['ComputerProblemYes']++
+            } else {
+                $Script:Reporting['GPOList']['Variables']['ComputerProblemNo']++
+            }
+            if ($GPO.UserOptimized -eq $true) {
+                $Script:Reporting['GPOList']['Variables']['UserOptimizedYes']++
+            } else {
+                $Script:Reporting['GPOList']['Variables']['UserOptimizedNo']++
+            }
+            if ($GPO.UserProblem -eq $true) {
+                $Script:Reporting['GPOList']['Variables']['UserProblemYes']++
+            } else {
+                $Script:Reporting['GPOList']['Variables']['UserProblemNo']++
+            }
+            if ($GPO.UserProblem -or $GPO.ComputerProblem) {
+                $Script:Reporting['GPOList']['Variables']['GPOWithProblems']++
+            }
         }
         $Script:Reporting['GPOList']['Variables']['GPOTotal'] = $Script:Reporting['GPOList']['Data'].Count
         if ($Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked'].Count -gt 0) {
@@ -48,6 +72,15 @@
         }
     }
     Variables  = @{
+        GPOWithProblems          = 0
+        ComputerOptimizedYes     = 0
+        ComputerOptimizedNo      = 0
+        ComputerProblemYes       = 0
+        ComputerProblemNo        = 0
+        UserOptimizedYes         = 0
+        UserOptimizedNo          = 0
+        UserProblemYes           = 0
+        UserProblemNo            = 0
         GPONotLinked             = 0
         GPOLinked                = 0
         GPOEmpty                 = 0
@@ -73,7 +106,7 @@
                         New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
                     }
                 }
-            } -FontSize 10pt
+            }
             New-HTMLText -FontSize 10pt -Text 'Usually empty or unlinked Group Policies are safe to delete.'
             New-HTMLChart -Title 'Group Policies Summary' {
                 New-ChartBarOptions -Type barStacked
@@ -86,48 +119,89 @@
             } -TitleAlignment center
         }
     }
+    Summary    = {
+        New-HTMLText -TextBlock {
+            "Over time Administrators add more and more group policies, as business requirements change. "
+            "Due to neglection or thinking it may serve it's purpose later on a lot of Group Policies often have no value at all. "
+            "Either the Group Policy is not linked to anything and just stays unlinked forever, or GPO is linked, but the link (links) are disabled. "
+            "Additionally sometimes new GPO is created without any settings or the settings are removed over time, but GPO stays in place. "
+        } -FontSize 10pt
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Group Policies total: ', $Script:Reporting['GPOList']['Variables']['GPOTotal'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies valid: ", $Script:Reporting['GPOList']['Variables']['GPOValid'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies to delete: ", $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked'] -FontWeight normal, bold {
+                New-HTMLList -Type Unordered {
+                    New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $Script:Reporting['GPOList']['Variables']['GPONotLinked'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $Script:Reporting['GPOList']['Variables']['GPOEmpty'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButEmpty'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
+                }
+            }
+        } -FontSize 10pt
+        New-HTMLText -Text "Additionally, we're reviewing Group Policies that have their section disabled, but contain data. Please review them and make sure this configuration is as expected!" -FontSize 10pt
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Group Policies with problems: ', $Script:Reporting['GPOList']['Variables']['GPOWithProblems'] -FontWeight normal, bold {
+                New-HTMLList -Type Unordered {
+                    New-HTMLListItem -Text 'Group Policies that have content (computer), but are disabled: ', $Script:Reporting['GPOList']['Variables']['ComputerProblemYes'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies that have content (user), but are disabled: ", $Script:Reporting['GPOList']['Variables']['UserProblemYes'] -FontWeight normal, bold
+                }
+            }
+        } -FontSize 10pt
+        New-HTMLText -Text "For best performance it's recommended that if there are no settings of certain kind (Computer or User settings) it's best to disable them. " -FontSize 10pt
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Group Policies with optimization: ' -FontWeight normal, bold {
+                New-HTMLList -Type Unordered {
+                    New-HTMLListItem -Text 'Group Policies that are optimized (computer) ', $Script:Reporting['GPOList']['Variables']['ComputerOptimizedYes'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies that are optimized (user): ", $Script:Reporting['GPOList']['Variables']['UserOptimizedYes'] -FontWeight normal, bold
+                }
+            }
+            New-HTMLListItem -Text 'Group Policies without optimization: ' -FontWeight normal, bold {
+                New-HTMLList -Type Unordered {
+                    New-HTMLListItem -Text 'Group Policies that are not optimized (computer): ', $Script:Reporting['GPOList']['Variables']['ComputerOptimizedNo'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies that are not optimized (user): ", $Script:Reporting['GPOList']['Variables']['UserOptimizedNo'] -FontWeight normal, bold
+                }
+            }
+        } -FontSize 10pt
+        New-HTMLText -TextBlock {
+            'All empty or unlinked Group Policies can be automatically deleted. Please review output in the table and follow steps below table to cleanup Group Policies. '
+            'GPOs that have content, but are disabled require manual intervention. '
+            "If performance is an issue you should consider disabling user or computer sections of GPO when those are not used. "
+        } -FontSize 10pt
+    }
     Solution   = {
         New-HTMLSection -Invisible {
             New-HTMLPanel {
-                $newHTMLTextSplat = @{
-                    Text       = @(
-                        'Following table shows a list of group policies.',
-                        'By using following table you can easily find which GPOs can be safely deleted because those are empty or unlinked or linked, but link disabled.'
-                    )
-                    FontSize   = '10pt'
-                    FontWeight = 'normal', 'bold'
-                }
-                New-HTMLText @newHTMLTextSplat
-                New-HTMLList -Type Unordered {
-                    New-HTMLListItem -Text 'Group Policies total: ', $Script:Reporting['GPOList']['Variables']['GPOTotal'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Group Policies valid: ", $Script:Reporting['GPOList']['Variables']['GPOValid'] -FontWeight normal, bold
-                    New-HTMLListItem -Text "Group Policies to delete: ", $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked'] -FontWeight normal, bold {
-                        New-HTMLList -Type Unordered {
-                            New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $Script:Reporting['GPOList']['Variables']['GPONotLinked'] -FontWeight normal, bold
-                            New-HTMLListItem -Text "Group Policies that are empty (have no settings): ", $Script:Reporting['GPOList']['Variables']['GPOEmpty'] -FontWeight normal, bold
-                            New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButEmpty'] -FontWeight normal, bold
-                            New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
-                        }
-                    }
-                } -FontSize 10pt
-                New-HTMLText -Text 'All those mentioned Group Policies can be automatically deleted following the steps below the table.' -FontSize 10pt
+                & $Script:GPOConfiguration['GPOList']['Summary']
             }
             New-HTMLPanel {
                 New-HTMLChart -Title 'Group Policies Empty & Unlinked' {
                     New-ChartBarOptions -Type barStacked
-                    #New-ChartLegend -Names 'Unlinked', 'Linked', 'Empty', 'Total' -Color Salmon, PaleGreen, PaleVioletRed, PaleTurquoise
-                    New-ChartLegend -Names 'Good', 'Bad' -Color PaleGreen, Salmon
-                    #New-ChartBar -Name 'Group Policies' -Value $Script:Reporting['GPOList']['Variables']['GPONotLinked'], $Script:Reporting['GPOList']['Variables']['GPOLinked'], $Script:Reporting['GPOList']['Variables']['GPOEmpty'], $Script:Reporting['GPOList']['Variables']['GPOTotal']
+                    New-ChartLegend -Names 'Yes', 'No' -Color SpringGreen, Salmon
                     New-ChartBar -Name 'Linked' -Value $Script:Reporting['GPOList']['Variables']['GPOLinked'], $Script:Reporting['GPOList']['Variables']['GPONotLinked']
                     New-ChartBar -Name 'Empty' -Value $Script:Reporting['GPOList']['Variables']['GPONotEmpty'], $Script:Reporting['GPOList']['Variables']['GPOEmpty']
                     New-ChartBar -Name 'Valid' -Value $Script:Reporting['GPOList']['Variables']['GPOValid'], $Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked']
+                    New-ChartBar -Name 'With problem (computers)' -Value $Script:Reporting['GPOList']['Variables']['ComputerProblemNo'], $Script:Reporting['GPOList']['Variables']['ComputerProblemYes']
+                    New-ChartBar -Name 'With problem (users)' -Value $Script:Reporting['GPOList']['Variables']['UserProblemNo'], $Script:Reporting['GPOList']['Variables']['UserProblemYes']
+                    New-ChartBar -Name 'Optimized Computers' -Value $Script:Reporting['GPOList']['Variables']['ComputerOptimizedYes'], $Script:Reporting['GPOList']['Variables']['ComputerOptimizedNo']
+                    New-ChartBar -Name 'Optimized Users' -Value $Script:Reporting['GPOList']['Variables']['UserOptimizedYes'], $Script:Reporting['GPOList']['Variables']['UserOptimizedNo']
                 } -TitleAlignment center
             }
         }
         New-HTMLSection -Name 'Group Policies List' {
             New-HTMLTable -DataTable $Script:Reporting['GPOList']['Data'] -Filtering {
-                New-HTMLTableCondition -Name 'Empty' -Value $true -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
-                New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
+                New-HTMLTableCondition -Name 'Empty' -Value $true -BackgroundColor Salmon -ComparisonType string
+                New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -ComparisonType string
+                New-HTMLTableCondition -Name 'ComputerProblem' -Value $true -BackgroundColor Salmon -ComparisonType string
+                New-HTMLTableCondition -Name 'UserProblem' -Value $true -BackgroundColor Salmon -ComparisonType string
+                New-HTMLTableCondition -Name 'ComputerOptimized' -Value $false -BackgroundColor Salmon -ComparisonType string
+                New-HTMLTableCondition -Name 'UserOptimized' -Value $false -BackgroundColor Salmon -TextTransform capitalize -ComparisonType string
+                # reverse
+                New-HTMLTableCondition -Name 'Empty' -Value $false -BackgroundColor SpringGreen -ComparisonType string
+                New-HTMLTableCondition -Name 'Linked' -Value $true -BackgroundColor SpringGreen -ComparisonType string
+                New-HTMLTableCondition -Name 'ComputerProblem' -Value $false -BackgroundColor SpringGreen -ComparisonType string
+                New-HTMLTableCondition -Name 'UserProblem' -Value $false -BackgroundColor SpringGreen -ComparisonType string
+                New-HTMLTableCondition -Name 'ComputerOptimized' -Value $true -BackgroundColor SpringGreen -ComparisonType string
+                New-HTMLTableCondition -Name 'UserOptimized' -Value $true -BackgroundColor SpringGreen -TextTransform capitalize -ComparisonType string
             } -PagingOptions 10, 20, 30, 40, 50
         }
         if ($Script:Reporting['GPOList']['WarningsAndErrors']) {

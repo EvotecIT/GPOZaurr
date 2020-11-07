@@ -73,7 +73,7 @@
             }
             New-HTMLPanel {
                 New-HTMLChart {
-                    New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
+                    # New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
                     New-ChartBarOptions -Type barStacked
                     New-ChartLegend -Name 'Consistent', 'Inconsistent'
                     New-ChartBar -Name 'TopLevel' -Value $Script:Reporting['GPOConsistency']['Variables']['Consistent'], $Script:Reporting['GPOConsistency']['Variables']['Inconsistent']
@@ -91,7 +91,6 @@
                 New-HTMLTableCondition -Name 'ACLConsistentInside' -Value 'Not available' -BackgroundColor Crimson -ComparisonType string
             } -PagingOptions 10, 20, 30, 40, 50
         }
-        New-HTMLTable -DataTable $Script:Reporting['GPODuplicates']['Data'] -Filtering
         if ($Script:Reporting['GPOConsistency']['WarningsAndErrors']) {
             New-HTMLSection -Name 'Warnings & Errors to Review' {
                 New-HTMLTable -DataTable $Script:Reporting['GPOConsistency']['WarningsAndErrors'] -Filtering {
@@ -160,7 +159,7 @@
                             New-HTMLCodeBlock -Code {
                                 Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrPermissionsInconsistentAfter.html -Verbose -Type GPOConsistency
                             }
-                            New-HTMLText -Text "If everything is health in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
+                            New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                         }
                     } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
                 }
