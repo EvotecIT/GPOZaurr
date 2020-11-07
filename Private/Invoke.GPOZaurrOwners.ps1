@@ -1,10 +1,10 @@
 ﻿$GPOZaurrOwners = [ordered] @{
-    Name       = 'Group Policy Owners'
-    Enabled    = $true
-    Action     = $null
-    Data       = $null
-    Execute    = { Get-GPOZaurrOwner -IncludeSysvol }
-    Processing = {
+    Name           = 'Group Policy Owners'
+    Enabled        = $true
+    ActionRequired = $null
+    Data           = $null
+    Execute        = { Get-GPOZaurrOwner -IncludeSysvol }
+    Processing     = {
         foreach ($GPO in $Script:Reporting['GPOOwners']['Data']) {
             if ($GPO.IsOwnerConsistent) {
                 $Script:Reporting['GPOOwners']['Variables']['IsConsistent']++
@@ -25,12 +25,12 @@
             }
         }
         if ($Script:Reporting['GPOOwners']['Variables']['WillFix'].Count -gt 0) {
-            $Script:Reporting['GPOOwners']['Action'] = $true
+            $Script:Reporting['GPOOwners']['ActionRequired'] = $true
         } else {
-            $Script:Reporting['GPOOwners']['Action'] = $false
+            $Script:Reporting['GPOOwners']['ActionRequired'] = $false
         }
     }
-    Variables  = @{
+    Variables      = @{
         IsAdministrative    = 0
         IsNotAdministrative = 0
         IsConsistent        = 0
@@ -39,7 +39,7 @@
         RequiresDiffFix     = 0
         WillNotTouch        = 0
     }
-    Overview   = {
+    Overview       = {
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents Group Policy owners and whether they are administrative and consistent. By design an owner of Group Policy should be Domain Admins or Enterprise Admins group only to prevent malicious takeover. ', `
                 "It's also important that owner in Active Directory matches owner on SYSVOL (file system)." -FontSize 10pt
@@ -57,7 +57,7 @@
             } -Title 'Group Policy Owners' -TitleAlignment center
         }
     }
-    Summary    = {
+    Summary        = {
         New-HTMLText -FontSize 10pt -TextBlock {
             "By default GPO creation is usually maintained by Domain Admins or Enterprise Admins. "
             "When GPO is created by member of Domain Admins or Enterprise Admins group the GPO Owner is set to Domain Admins. "
@@ -84,7 +84,7 @@
             New-HTMLListItem -Text "Group Policies unaffected: ", $Script:Reporting['GPOOwners']['Variables']['WillNotTouch'] -FontWeight normal, bold
         } -FontSize 10pt
     }
-    Solution   = {
+    Solution       = {
         New-HTMLSection -Invisible {
             New-HTMLPanel {
                 & $Script:GPOConfiguration['GPOOwners']['Summary']

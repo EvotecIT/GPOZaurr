@@ -44,13 +44,13 @@
     foreach ($T in $Script:GPOConfiguration.Keys) {
         if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
             $Script:Reporting[$T] = [ordered] @{
-                Name      = $Script:GPOConfiguration[$T].Name
-                Action    = $null
-                Data      = $null
-                Errors    = $null
-                Warnings  = $null
-                Time      = $null
-                Variables = Copy-Dictionary -Dictionary $Script:GPOConfiguration[$T]['Variables']
+                Name           = $Script:GPOConfiguration[$T].Name
+                ActionRequired = $null
+                Data           = $null
+                Errors         = $null
+                Warnings       = $null
+                Time           = $null
+                Variables      = Copy-Dictionary -Dictionary $Script:GPOConfiguration[$T]['Variables']
             }
             $TimeLogGPOList = Start-TimeLog
             Write-Color -Text '[i]', '[Start] ', $($Script:GPOConfiguration[$T]['Name']) -Color Yellow, DarkGray, Yellow

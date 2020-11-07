@@ -41,6 +41,11 @@
             }
         }
         $Script:Reporting['GPOList']['Variables']['GPOTotal'] = $Script:Reporting['GPOList']['Data'].Count
+        if ($Script:Reporting['GPOList']['Variables']['GPOEmptyOrUnlinked'].Count -gt 0) {
+            $Script:Reporting['GPOList']['ActionRequired'] = $true
+        } else {
+            $Script:Reporting['GPOList']['ActionRequired'] = $false
+        }
     }
     Variables  = @{
         GPONotLinked             = 0

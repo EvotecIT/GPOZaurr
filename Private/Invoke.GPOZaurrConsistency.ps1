@@ -1,10 +1,10 @@
 ﻿$GPOZaurrConsistency = [ordered] @{
-    Name       = 'GPO Permissions Consistency'
-    Enabled    = $true
-    Action     = $null
-    Data       = $null
-    Execute    = { Get-GPOZaurrPermissionConsistency -Type All -VerifyInheritance }
-    Processing = {
+    Name           = 'GPO Permissions Consistency'
+    Enabled        = $true
+    ActionRequired = $null
+    Data           = $null
+    Execute        = { Get-GPOZaurrPermissionConsistency -Type All -VerifyInheritance }
+    Processing     = {
         foreach ($GPO in $Script:Reporting['GPOConsistency']['Data']) {
             if ($GPO.ACLConsistent -eq $true) {
                 $Script:Reporting['GPOConsistency']['Variables']['Consistent']++
@@ -18,18 +18,18 @@
             }
         }
         if ($Script:Reporting['GPOConsistency']['Variables']['Inconsistent'].Count -gt 0 -or $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'].Count -gt 0 ) {
-            $Script:Reporting['GPOConsistency']['Action'] = $true
+            $Script:Reporting['GPOConsistency']['ActionRequired'] = $true
         } else {
-            $Script:Reporting['GPOConsistency']['Action'] = $false
+            $Script:Reporting['GPOConsistency']['ActionRequired'] = $false
         }
     }
-    Variables  = @{
+    Variables      = @{
         Consistent         = 0
         Inconsistent       = 0
         ConsistentInside   = 0
         InconsistentInside = 0
     }
-    Overview   = {
+    Overview       = {
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
@@ -48,7 +48,7 @@
             } -Title 'Permissions Consistency' -TitleAlignment center
         }
     }
-    Summary    = {
+    Summary        = {
         New-HTMLText -FontSize 10pt -TextBlock {
             "When GPO is created it creates an entry in Active Directory (metadata) and SYSVOL (content). "
             "Two different places meens two different sets of permissions. Group Policy module is making sure the data in both places is correct. "
@@ -66,7 +66,7 @@
         New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them. Please notice that if ', `
             ' Not available ', 'is visible in the table you should first fix related, more pressing issue, before fixing permissions inconsistency.' -FontWeight normal, bold, normal
     }
-    Solution   = {
+    Solution       = {
         New-HTMLSection -Invisible {
             New-HTMLPanel {
                 & $Script:GPOConfiguration['GPOConsistency']['Summary']

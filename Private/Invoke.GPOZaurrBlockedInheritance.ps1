@@ -1,21 +1,21 @@
 ﻿$GPOZaurrBlockedInheritance = [ordered] @{
-    Name       = 'Group Policy Blocked Inhertiance'
-    Enabled    = $true
-    Action     = $null
-    Data       = $null
-    Execute    = {
+    Name           = 'Group Policy Blocked Inhertiance'
+    Enabled        = $true
+    ActionRequired = $null
+    Data           = $null
+    Execute        = {
         Get-GPOZaurrInheritance -IncludeBlockedObjects -OnlyBlockedInheritance
     }
-    Processing = {
+    Processing     = {
 
     }
-    Variables  = @{
+    Variables      = @{
 
     }
-    Overview   = {
+    Overview       = {
 
     }
-    Solution   = {
+    Solution       = {
         New-HTMLTable -DataTable $Script:Reporting['GPOBlockedInheritance']['Data'] -Filtering
     }
 }

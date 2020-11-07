@@ -1,28 +1,36 @@
 ﻿$GPOZaurrOrphans = [ordered] @{
-    Name       = 'Orphaned Group Policies'
-    Enabled    = $true
-    Action     = $null
-    Data       = $null
-    Execute    = {
+    Name           = 'Orphaned Group Policies'
+    Enabled        = $true
+    ActionRequired = $null
+    Data           = $null
+    Execute        = {
         Get-GPOZaurrBroken
     }
-    Processing = {
+    Processing     = {
         foreach ($GPO in $Script:Reporting['GPOOrphans']['Data']) {
             if ($GPO.Status -eq 'Not available in AD') {
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD']++
+                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted']++
             } elseif ($GPO.Status -eq 'Not available on SYSVOL') {
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol']++
+                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted']++
             } elseif ($GPO.Status -eq 'Permissions issue') {
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue']++
             }
         }
+        if ($Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted'].Count -gt 0) {
+            $Script:Reporting['GPOOrphans']['ActionRequired'] = $true
+        } else {
+            $Script:Reporting['GPOOrphans']['ActionRequired'] = $false
+        }
     }
-    Variables  = @{
+    Variables      = @{
         NotAvailableInAD            = 0
         NotAvailableOnSysvol        = 0
         NotAvailablePermissionIssue = 0
+        ToBeDeleted                 = 0
     }
-    Overview   = {
+    Overview       = {
         New-HTMLPanel {
             New-HTMLText -TextBlock {
                 "Group Policies are stored in two places - Active Directory (metadata) and SYSVOL (content)."
@@ -48,7 +56,7 @@
             } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
         }
     }
-    Summary    = {
+    Summary        = {
         New-HTMLPanel {
             New-HTMLText -TextBlock {
                 "Group Policies are stored in two places - Active Directory (metadata) and SYSVOL (content)."
@@ -70,7 +78,7 @@
             New-HTMLText -Text "Please review output in table and follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
         }
     }
-    Solution   = {
+    Solution       = {
         New-HTMLSection -Invisible {
             & $Script:GPOConfiguration['GPOOrphans']['Summary']
             New-HTMLPanel {

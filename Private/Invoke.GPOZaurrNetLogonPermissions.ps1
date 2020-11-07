@@ -1,12 +1,12 @@
 ﻿$GPOZaurrNetLogonPermissions = [ordered] @{
-    Name       = 'NetLogon Permissions'
-    Enabled    = $true
-    Action     = $null
-    Data       = $null
-    Execute    = {
+    Name           = 'NetLogon Permissions'
+    Enabled        = $true
+    ActionRequired = $null
+    Data           = $null
+    Execute        = {
         Get-GPOZaurrNetLogon
     }
-    Processing = {
+    Processing     = {
         foreach ($File in $Script:Reporting['NetLogonPermissions']['Data']) {
             if ($File.FileSystemRights -eq 'Owner') {
                 $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwners']++
@@ -31,12 +31,12 @@
             }
         }
         if ($Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'].Count -gt 0) {
-            $Script:Reporting['NetLogonPermissions']['Action'] = $true
+            $Script:Reporting['NetLogonPermissions']['ActionRequired'] = $true
         } else {
-            $Script:Reporting['NetLogonPermissions']['Action'] = $false
+            $Script:Reporting['NetLogonPermissions']['ActionRequired'] = $false
         }
     }
-    Variables = @{
+    Variables      = @{
         NetLogonOwners                                = 0
         NetLogonOwnersAdministrators                  = 0
         NetLogonOwnersNotAdministrative               = 0
@@ -46,7 +46,7 @@
         Owner                                         = [System.Collections.Generic.List[PSCustomObject]]::new()
         NonOwner                                      = [System.Collections.Generic.List[PSCustomObject]]::new()
     }
-    Overview   = {
+    Overview       = {
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents ', 'NetLogon Summary' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
@@ -69,7 +69,7 @@
 
         }
     }
-    Solution   = {
+    Solution       = {
         New-HTMLTab -Name 'NetLogon Owners' {
             New-HTMLSection -Invisible {
                 New-HTMLPanel {
