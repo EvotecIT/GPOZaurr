@@ -47,15 +47,20 @@
                 $GPO = $_
                 $Count++
                 Write-Verbose "Get-GPOZaurrPermissionConsistency - Processing [$($_.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
-                try {
-                    $IsConsistent = $_.IsAclConsistent()
-                    $ErrorMessage = ''
-                } catch {
-                    $ErrorMessage = $_.Exception.Message
-                    Write-Warning "Get-GPOZaurrPermissionConsistency - Processing $($GPO.DisplayName) / $($GPO.DomainName) failed to get consistency with error: $($_.Exception.Message)."
-                    $IsConsistent = 'Not available'
+                $SysVolpath = -join ('\\', $Domain, '\sysvol\', $Domain, '\Policies\{', $GPO.ID.GUID, '}')
+                if (Test-Path -LiteralPath $SysVolpath) {
+                    try {
+                        $IsConsistent = $GPO.IsAclConsistent()
+                        $ErrorMessage = ''
+                    } catch {
+                        $ErrorMessage = $_.Exception.Message
+                        Write-Warning "Get-GPOZaurrPermissionConsistency - Processing $($GPO.DisplayName) / $($GPO.DomainName) failed to get consistency with error: $($_.Exception.Message)."
+                        $IsConsistent = 'Not available'
+                    }
+                } else {
+                    Write-Warning "Get-GPOZaurrPermissionConsistency - Processing $($GPO.DisplayName) / $($GPO.DomainName) failed as path $SysvolPath doesn't exists!"
+                    $IsConsistent = $false
                 }
-                $SysVolpath = -join ('\\', $Domain, '\sysvol\', $Domain, '\Policies\{', $_.ID.GUID, '}')
                 if ($VerifyInheritance) {
                     if ($IsConsistent -eq $true) {
                         $FolderPermissions = Get-WinADSharePermission -Path $SysVolpath -Verbose:$false
