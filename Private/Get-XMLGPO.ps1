@@ -6,7 +6,8 @@
         [switch] $PermissionsOnly,
         [switch] $OwnerOnly,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
-        [string] $Splitter = [System.Environment]::NewLine
+        [string] $Splitter = [System.Environment]::NewLine,
+        [switch] $ReturnObject
     )
     if ($XMLContent.GPO.LinksTo) {
         $LinkSplit = ([Array] $XMLContent.GPO.LinksTo).Where( { $_.Enabled -eq $true }, 'Split')
@@ -215,6 +216,7 @@
                     }
                 }
             }
+            'GPOObject'                         = $GPO
         }
     }
 }
