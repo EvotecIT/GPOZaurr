@@ -49,6 +49,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.74 - 8.11.2020
+  - Improved `Invoke-GPOZaurr` (WIP)
 - 0.0.73 - 7.11.2020
   - Improved `Invoke-GPOZaurr` (WIP)
   - Improved `Get-GPOZaurr`
