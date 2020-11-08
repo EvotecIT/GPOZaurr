@@ -49,6 +49,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.76 - 8.11.2020
+  - Improved `Get-GPOZaurrNetLogon` to better handle errors
 - 0.0.75 - 8.11.2020
   - Improved `Get-GPOZaurrPermissionConsistency` to stop checking consistency if path doesn't exists
 - 0.0.74 - 8.11.2020
