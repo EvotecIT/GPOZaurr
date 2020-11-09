@@ -51,6 +51,7 @@
                 Data              = $null
                 WarningsAndErrors = $null
                 Time              = $null
+                Summary           = $null
                 Variables         = Copy-Dictionary -Dictionary $Script:GPOConfiguration[$T]['Variables']
             }
             $TimeLogGPOList = Start-TimeLog
@@ -75,6 +76,9 @@
                     }
                 }
             )
+            if ($Script:GPOConfiguration[$T]['Summary']) {
+                $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
+            }
             $TimeEndGPOList = Stop-TimeLog -Time $TimeLogGPOList -Option OneLiner
             $Script:Reporting[$T]['Time'] = $TimeEndGPOList
             Write-Color -Text '[i]', '[End  ] ', $($Script:GPOConfiguration[$T]['Name']), " [Time to execute: $TimeEndGPOList]" -Color Yellow, DarkGray, Yellow, DarkGray

@@ -73,9 +73,8 @@
             }
             New-HTMLPanel {
                 New-HTMLChart {
-                    # New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
                     New-ChartBarOptions -Type barStacked
-                    New-ChartLegend -Name 'Consistent', 'Inconsistent'
+                    New-ChartLegend -Name 'Consistent', 'Inconsistent' -Color PaleGreen, Salmon
                     New-ChartBar -Name 'TopLevel' -Value $Script:Reporting['GPOConsistency']['Variables']['Consistent'], $Script:Reporting['GPOConsistency']['Variables']['Inconsistent']
                     New-ChartBar -Name 'Inherited' -Value $Script:Reporting['GPOConsistency']['Variables']['ConsistentInside'], $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside']
                 } -Title 'Permissions Consistency' -TitleAlignment center

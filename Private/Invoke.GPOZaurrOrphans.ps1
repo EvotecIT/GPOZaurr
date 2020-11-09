@@ -35,7 +35,7 @@
             New-HTMLText -TextBlock {
                 "Group Policies are stored in two places - Active Directory (metadata) and SYSVOL (content)."
                 "Since those are managed in different ways, replicated in different ways it's possible because of different issues they get out of sync."
-            }
+            } -LineBreak
             New-HTMLText -Text "For example:"
             New-HTMLList -Type Unordered {
                 New-HTMLListItem -Text 'USN Rollback in AD could cause group policies to reappar in Active Directory, yet SYSVOL data would be unavailable'

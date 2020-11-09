@@ -19,7 +19,15 @@
 
 # GPOZaurr
 
-## To install
+## Table of Contents
+
+- [GPOZaurr](#gpozaurr)
+  - [Table of Contents](#table-of-contents)
+  - [Installing](#installing)
+  - [Updating](#updating)
+  - [Changelog](#changelog)
+
+## Installing
 
 GPOZaurr requires `RSAT` installed to provide results. If you don't have them you can install them as below. Keep in mind it also installs GUI tools so it shouldn't be installed on user workstations.
 
@@ -37,7 +45,7 @@ Install-Module -Name GPOZaurr -AllowClobber -Force
 
 Force and AllowClobber aren't necessary, but they do skip errors in case some appear.
 
-## And to update
+## Updating
 
 ```powershell
 Update-Module -Name GPOZaurr
@@ -49,6 +57,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.77 - 9.11.2020
+  - Improved `Invoke-GPOZaurr` (WIP)
 - 0.0.76 - 8.11.2020
   - Improved `Get-GPOZaurrNetLogon` to better handle errors
 - 0.0.75 - 8.11.2020

@@ -69,26 +69,31 @@
 
         }
     }
+    Summary        = {
+        New-HTMLText -TextBlock {
+            "NetLogon is crucial part of Active Directory. Files stored there are available on each and every computer or server in the company. "
+            "Keeping those files clean and secure is very important task. "
+            "It's important that NetLogon file owners are set to BUILTIN\Administrators (SID: S-1-5-32-544). "
+            "Owners have full control over the file object. Current owner of the file may be an Administrator but it doesn't guarentee that he/she will be in the future. "
+            "That's why as a best-practice it's recommended to change any non-administrative owners to BUILTIN\Administrators, and even Administrative accounts should be replaced with it. "
+        } -FontSize 10pt
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'NetLogon Files in Total: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwners'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -FontWeight normal, bold
+            New-HTMLListItem -Text "NetLogon Owners requiring change: ", $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -FontWeight normal, bold {
+                New-HTMLList -Type Unordered {
+                    New-HTMLListItem -Text 'Not Administrative: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersNotAdministrative'] -FontWeight normal, bold
+                    New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrativeNotAdministrators'] -FontWeight normal, bold
+                }
+            }
+        } -FontSize 10pt
+        New-HTMLText -Text "Follow the steps below table to get NetLogon Owners into compliant state." -FontSize 10pt
+    }
     Solution       = {
         New-HTMLTab -Name 'NetLogon Owners' {
             New-HTMLSection -Invisible {
                 New-HTMLPanel {
-                    New-HTMLText -TextBlock {
-                        "Following table shows NetLogon file owners. It's important that NetLogon file owners are set to BUILTIN\Administrators (SID: S-1-5-32-544). "
-                        "Owners have full control over the file object. Current owner of the file may be an Administrator but it doesn't guarentee that he will be in the future. "
-                        "That's why as a best-practice it's recommended to change any non-administrative owners to BUILTIN\Administrators, and even Administrative accounts should be replaced with it. "
-                    } -FontSize 10pt
-                    New-HTMLList -Type Unordered {
-                        New-HTMLListItem -Text 'NetLogon Files in Total: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwners'] -FontWeight normal, bold
-                        New-HTMLListItem -Text 'NetLogon BUILTIN\Administrators as Owner: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -FontWeight normal, bold
-                        New-HTMLListItem -Text "NetLogon Owners requiring change: ", $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -FontWeight normal, bold {
-                            New-HTMLList -Type Unordered {
-                                New-HTMLListItem -Text 'Not Administrative: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersNotAdministrative'] -FontWeight normal, bold
-                                New-HTMLListItem -Text 'Administrative, but not BUILTIN\Administrators: ', $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrativeNotAdministrators'] -FontWeight normal, bold
-                            }
-                        }
-                    } -FontSize 10pt
-                    New-HTMLText -Text "Follow the steps below table to get NetLogon Owners into compliant state." -FontSize 10pt
+                    & $Script:GPOConfiguration['NetLogonPermissions']['Summary']
                 }
                 New-HTMLPanel {
                     New-HTMLChart {
