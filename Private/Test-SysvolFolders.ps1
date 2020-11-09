@@ -12,6 +12,7 @@
 
     $GPOGUIDS = $GPOs.ID.GUID
     $SysVolPath = "\\$($Server)\SYSVOL\$Domain\Policies"
+    Write-Verbose "Get-GPOZaurrBroken - Processing SYSVOL from \\$($Server)\SYSVOL\$Domain\Policies"
     try {
         $SYSVOL = Get-ChildItem -Path "\\$($Server)\SYSVOL\$Domain\Policies" -Exclude 'PolicyDefinitions' -ErrorAction Stop -Verbose:$false
     } catch {
@@ -46,7 +47,10 @@
         }
     }
     $GPOSummary = @(
+        $Count = 0
         foreach ($GPO in $GPOS) {
+            $Count++
+            Write-Verbose "Get-GPOZaurrBroken - Processing [$($GPO.DomainName)]($Count/$($GPOS.Count)) $($GPO.DisplayName)"
             if ($null -ne $SysvolHash[$GPO.Id.GUID].FullName) {
                 $FullPath = $SysvolHash[$GPO.Id.GUID].FullName
                 try {
@@ -92,6 +96,7 @@
             }
         }
         # Now we need to list thru Sysvol files and fine those that do not exists as GPO and create dummy GPO objects to show orphaned gpos
+        Write-Verbose "Get-GPOZaurrBroken - Processing SYSVOL differences and creating dummy objects"
         foreach ($_ in $Differences.Keys) {
             if ($Differences[$_] -in 'Not available in AD', 'Permissions issue') {
                 $FullPath = $SysvolHash[$_].FullName

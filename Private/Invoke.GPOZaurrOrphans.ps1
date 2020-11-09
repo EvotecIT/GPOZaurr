@@ -96,18 +96,9 @@
                 New-HTMLTableCondition -Name 'Status' -Value "Permissions issue" -BackgroundColor MediumVioletRed -ComparisonType string -Color White
             } -PagingOptions 10, 20, 30, 40, 50
         }
-        if ($Script:Reporting['GPOOrphans']['WarningsAndErrors']) {
-            New-HTMLSection -Name 'Warnings & Errors to Review' {
-                New-HTMLTable -DataTable $Script:Reporting['GPOOrphans']['WarningsAndErrors'] -Filtering {
-                    New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
-                    New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
-                }
-            }
-        }
         New-HTMLSection -Name 'Steps to fix - Not available on SYSVOL / Active Directory' {
             New-HTMLContainer {
                 New-HTMLSpanStyle -FontSize 10pt {
-                    New-HTMLText -Text 'Following steps will guide you how to fix GPOs which are not available on SYSVOL or AD.'
                     New-HTMLWizard {
                         New-HTMLWizardStep -Name 'Prepare environment' {
                             New-HTMLText -Text "To be able to execute actions in automated way please install required modules. Those modules will be installed straight from Microsoft PowerShell Gallery."
@@ -128,48 +119,91 @@
                             }
                             New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
                             New-HTMLCodeBlock -Code {
-                                $GPOOutput = Get-GPOZaurrBroken
+                                $GPOOutput = Get-GPOZaurrBroken -Verbose
                                 $GPOOutput | Format-Table
                             }
                             New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
                         }
-                        New-HTMLWizardStep -Name 'Fix GPOs not available on SYSVOL' {
-                            New-HTMLText -Text "Following command when executed runs cleanup procedure that removes all broken GPOs on SYSVOL side."
-                            New-HTMLText -Text "Make sure when running it for the first time to run it with ", "WhatIf", " parameter as shown below to prevent accidental removal." -FontWeight normal, bold, normal -Color Black, Red, Black
+                        New-HTMLWizardStep -Name 'Fix GPOs not available in AD' {
+                            New-HTMLText -Text @(
+                                "Following command when executed runs cleanup procedure that removes all broken GPOs on SYSVOL side. ",
+                                "Make sure when running it for the first time to run it with ",
+                                "WhatIf ",
+                                "parameter as shown below to prevent accidental removal. ",
+                                'When run it will remove any GPO remains from SYSVOL, that should not be there, as AD metadata is already gone.'
+                                "Please notice I'm using SYSVOL as a type, because the removal will happen on SYSVOL. "
+                            ) -FontWeight normal, normal, bold, normal -Color Black, Black, Red, Black
+                            New-HTMLCodeBlock -Code {
+                                Remove-GPOZaurrBroken -Type SYSVOL -WhatIf -Verbose
+                            }
+                            New-HTMLText -TextBlock {
+                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                            }
+                            New-HTMLCodeBlock -Code {
+                                Remove-GPOZaurrBroken -Type SYSVOL -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor' -Verbose
+                            }
+                            New-HTMLText -TextBlock {
+                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
+                                "Keep in mind that what backup command does is simply copy SYSVOL content to given place. "
+                                "Since there is no GPO metadata in AD there's no real restore process for this step. "
+                                "It's there to make sure if someone kept some data in there and wants to get access to it, he/she can. "
+                            } -LineBreak
+                            New-HTMLText -Text "Once happy with results please follow with command (this will start deletion process): " -LineBreak -FontWeight bold
 
                             New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurrBroken -Type SYSVOL -WhatIf
+                                Remove-GPOZaurrBroken -Type SYSVOL -LimitProcessing 2 -BackupPath $Env:UserProfile\Desktop\GPOSYSVOLBackup -Verbose
                             }
                             New-HTMLText -TextBlock {
-                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. Once happy with results please follow with command: "
+                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                             }
                             New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurrBroken -Type SYSVOL -LimitProcessing 2 -BackupPath $Env:UserProfile\Desktop\GPOSYSVOLBackup
+                                Remove-GPOZaurrBroken -Type SYSVOL -LimitProcessing 2 -BackupPath $Env:UserProfile\Desktop\GPOSYSVOLBackup -IncludeDomains 'YourDomainYouHavePermissionsFor' -Verbose
                             }
                             New-HTMLText -TextBlock {
-                                "This command when executed deletes only first X broken GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur."
-                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly."
+                                "This command when executed deletes only first X broken GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
+                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
+                                "If there's nothing else to be deleted on SYSVOL side, we can skip to next step step. "
                             }
-                            New-HTMLText -Text "If there's nothing else to be deleted on SYSVOL side, we can skip to next step step"
                         }
-                        New-HTMLWizardStep -Name 'Fix GPOs not available on AD' {
-                            New-HTMLText -Text "Following command when executed runs cleanup procedure that removes all broken GPOs on Active Directory side."
-                            New-HTMLText -Text "Make sure when running it for the first time to run it with ", "WhatIf", " parameter as shown below to prevent accidental removal." -FontWeight normal, bold, normal -Color Black, Red, Black
-
+                        New-HTMLWizardStep -Name 'Fix GPOs not available on SYSVOL' {
+                            New-HTMLText -Text @(
+                                "Following command when executed runs cleanup procedure that removes all broken GPOs on Active Directory side."
+                                "Make sure when running it for the first time to run it with ",
+                                "WhatIf",
+                                " parameter as shown below to prevent accidental removal."
+                                'When run it will remove any GPO remains from AD, that should not be there, as SYSVOL content is already gone.'
+                                "Please notice I'm using AD as a type, because the removal will happen on AD side. "
+                            ) -FontWeight normal, normal, bold, normal -Color Black, Black, Red, Black
                             New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurrBroken -Type AD -WhatIf
+                                Remove-GPOZaurrBroken -Type AD -WhatIf -Verbose
                             }
                             New-HTMLText -TextBlock {
-                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. Once happy with results please follow with command: "
+                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                             }
                             New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurrBroken -Type AD -LimitProcessing 2 -BackupPath $Env:UserProfile\Desktop\GPOSYSVOLBackup
+                                Remove-GPOZaurrBroken -Type AD -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor' -Verbose
                             }
                             New-HTMLText -TextBlock {
-                                "This command when executed deletes only first X broken GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur."
-                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly."
+                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
+                                "Keep in mind that there is no backup for this. "
+                                "Since there is no SYSVOL data, and only AD object is there there's no real restore process for this step. "
+                                "Once you delete it, it's gone. "
+                            } -LineBreak
+                            New-HTMLText -Text 'Once happy with results please follow with command (this will start deletion process): ' -LineBreak -FontWeight bold
+                            New-HTMLCodeBlock -Code {
+                                Remove-GPOZaurrBroken -Type AD -LimitProcessing 2 -Verbose
                             }
-                            New-HTMLText -Text "If there's nothing else to be deleted on AD side, we can skip to next step step"
+                            New-HTMLText -TextBlock {
+                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                            }
+                            New-HTMLCodeBlock -Code {
+                                Remove-GPOZaurrBroken -Type AD -LimitProcessing 2 -IncludeDomains 'YourDomainYouHavePermissionsFor' -Verbose
+                            }
+                            New-HTMLText -TextBlock {
+                                "This command when executed deletes only first X broken GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
+                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
+                                "If there's nothing else to be deleted on AD side, we can skip to next step step. "
+                            }
                         }
                         New-HTMLWizardStep -Name 'Verification report' {
                             New-HTMLText -TextBlock {
@@ -181,6 +215,14 @@
                             New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                         }
                     } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                }
+            }
+        }
+        if ($Script:Reporting['GPOOrphans']['WarningsAndErrors']) {
+            New-HTMLSection -Name 'Warnings & Errors to Review' {
+                New-HTMLTable -DataTable $Script:Reporting['GPOOrphans']['WarningsAndErrors'] -Filtering {
+                    New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
+                    New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
                 }
             }
         }

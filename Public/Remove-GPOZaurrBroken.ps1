@@ -21,7 +21,7 @@
     } else {
         $BackupFinalPath = ''
     }
-    Get-GPOZaurrSysvol -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation | Where-Object {
+    Get-GPOZaurrBroken -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation | Where-Object {
         if ($Type -contains 'SYSVOL') {
             if ($_.Status -eq 'Not available in AD') {
                 $_
