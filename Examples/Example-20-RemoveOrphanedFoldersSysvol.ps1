@@ -1,7 +1,10 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
+# Find broken GPOs
+Get-GPOZaurrBroken -Verbose -IncludeDomains 'ad.evotec.pl' | Format-Table
+
 # this allows you to process X amount of orphaned folders/files (good for testing)
-Remove-GPOZaurrOrphaned -Verbose -WhatIf -IncludeDomains 'ad.evotec.xyz' #-LimitProcessing 2
+Remove-GPOZaurrBroken -Verbose -WhatIf -IncludeDomains 'ad.evotec.pl' #-LimitProcessing 2
 
 # this runs for whole SYSVOL and checks things against GPOS
-Remove-GPOZaurrOrphaned -Verbose -IncludeDomains 'ad.evotec.xyz' -BackupPath $Env:UserProfile\Desktop\MyBackup1 -WhatIf
+Remove-GPOZaurrBroken -Verbose -IncludeDomains 'ad.evotec.xyz' -BackupPath $Env:UserProfile\Desktop\MyBackup1 -WhatIf
