@@ -27,13 +27,11 @@
         $LinksDisabledCount = 0
         $LinksTotalCount = 0
     }
-    if ($null -eq $XMLContent.GPO.Computer.ExtensionData -and $null -eq $XMLContent.GPO.User.ExtensionData) {
-        $Empty = $true
-    } else {
-        $Empty = $false
-    }
-
-
+    #if ($null -eq $XMLContent.GPO.Computer.ExtensionData -and $null -eq $XMLContent.GPO.User.ExtensionData) {
+    #    $Empty = $true
+    #} else {
+    #    $Empty = $false
+    #}
     # Find proper values for enabled/disabled user/computer settings
     if ($XMLContent.GPO.Computer.Enabled -eq 'False') {
         $ComputerEnabled = $false
@@ -59,12 +57,55 @@
     $ComputerSettingsAvailable = if ($null -eq $XMLContent.GPO.Computer.ExtensionData) { $false } else { $true }
     $UserSettingsAvailable = if ($null -eq $XMLContent.GPO.User.ExtensionData) { $false } else { $true }
 
+    if ($ComputerSettingsAvailable -eq $false -and $UserSettingsAvailable -eq $false) {
+        $Empty = $true
+    } else {
+        $Empty = $false
+    }
+
+    # $OutputUser = $XMLContent.GPO.User.ExtensionData.Extension | Where-Object { $_.PSObject.Properties.TypeNameOfValue -in 'System.Xml.XmlElement', 'System.Object[]' }
+    # $OutputComputer = $XMLContent.GPO.Computer.ExtensionData.Extension | Where-Object { $_.PSObject.Properties.TypeNameOfValue -in 'System.Xml.XmlElement', 'System.Object[]' }
+
+    $OutputUser = foreach ($ExtensionType in $XMLContent.GPO.User.ExtensionData.Extension) {
+        if ($ExtensionType) {
+            $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
+            try {
+                $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] -and $_.Name -notin @('Blocked') }
+            } catch {
+                Write-Warning "Get-XMLStandard - things went sideways $($_.Exception.Message)"
+                continue
+            }
+        }
+        $KeysToLoop
+    }
+    $OutputComputer = foreach ($ExtensionType in $XMLContent.GPO.Computer.ExtensionData.Extension) {
+        if ($ExtensionType) {
+            $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
+            try {
+                $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] -and $_.Name -notin @('Blocked') }
+            } catch {
+                Write-Warning "Get-XMLStandard - things went sideways $($_.Exception.Message)"
+                continue
+            }
+        }
+        $KeysToLoop
+    }
+
+    $ComputerSettingsAvailableReal = if ($OutputComputer) { $true } else { $false }
+    $UserSettingsAvailableReal = if ($OutputUser) { $true } else { $false }
+
+    if (-not $ComputerSettingsAvailableReal -and -not $UserSettingsAvailableReal) {
+        $EmptyMaybe = $true
+    } else {
+        $EmptyMaybe = $false
+    }
+
     $ComputerProblem = $false
-    if ($ComputerEnabled -eq $true -and $ComputerSettingsAvailable -eq $true) {
+    if ($ComputerEnabled -eq $true -and $ComputerSettingsAvailableReal -eq $true) {
         $ComputerOptimized = $true
-    } elseif ($ComputerEnabled -eq $true -and $ComputerSettingsAvailable -eq $false) {
+    } elseif ($ComputerEnabled -eq $true -and $ComputerSettingsAvailableReal -eq $false) {
         $ComputerOptimized = $false
-    } elseif ($ComputerEnabled -eq $false -and $ComputerSettingsAvailable -eq $false) {
+    } elseif ($ComputerEnabled -eq $false -and $ComputerSettingsAvailableReal -eq $false) {
         $ComputerOptimized = $true
     } else {
         # Enabled $false, but ComputerData is there.
@@ -73,11 +114,11 @@
     }
 
     $UserProblem = $false
-    if ($UserEnabled -eq $true -and $UserSettingsAvailable -eq $true) {
+    if ($UserEnabled -eq $true -and $UserSettingsAvailableReal -eq $true) {
         $UserOptimized = $true
-    } elseif ($UserEnabled -eq $true -and $UserSettingsAvailable -eq $false) {
+    } elseif ($UserEnabled -eq $true -and $UserSettingsAvailableReal -eq $false) {
         $UserOptimized = $false
-    } elseif ($UserEnabled -eq $false -and $UserSettingsAvailable -eq $false) {
+    } elseif ($UserEnabled -eq $false -and $UserSettingsAvailableReal -eq $false) {
         $UserOptimized = $true
     } else {
         # Enabled $false, but UserData is there.
@@ -148,6 +189,7 @@
             'DomainName'                        = $XMLContent.GPO.Identifier.Domain.'#text'
             'GUID'                              = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
             'Empty'                             = $Empty
+            'EmptyMaybe'                        = $EmptyMaybe
             'Linked'                            = $Linked
             'LinksCount'                        = $LinksTotalCount
             'LinksEnabledCount'                 = $LinksEnabledCount
@@ -161,6 +203,10 @@
             'UserProblem'                       = $UserProblem
             'ComputerSettingsAvailable'         = $ComputerSettingsAvailable
             'UserSettingsAvailable'             = $UserSettingsAvailable
+            'ComputerSettingsAvailableReal'     = $ComputerSettingsAvailableReal
+            'UserSettingsAvailableReal'         = $UserSettingsAvailableReal
+            'ComputerSettingsTypes'             = $OutputComputer.Name
+            'UserSettingsTypes'                 = $OutputUser.Name
             'ComputerSettingsStatus'            = if ($XMLContent.GPO.Computer.VersionDirectory -eq 0 -and $XMLContent.GPO.Computer.VersionSysvol -eq 0) { "NeverModified" } else { "Modified" }
             'ComputerSetttingsVersionIdentical' = if ($XMLContent.GPO.Computer.VersionDirectory -eq $XMLContent.GPO.Computer.VersionSysvol) { $true } else { $false }
             'ComputerSettings'                  = $XMLContent.GPO.Computer.ExtensionData.Extension
