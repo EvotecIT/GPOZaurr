@@ -7,15 +7,26 @@
         Get-GPOZaurrBroken
     }
     Processing     = {
+        $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'] = @{}
+        $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'] = @{}
         foreach ($GPO in $Script:Reporting['GPOOrphans']['Data']) {
+            if (-not $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName] = 0
+            }
             if ($GPO.Status -eq 'Not available in AD') {
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD']++
                 $Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted']++
+                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]++
             } elseif ($GPO.Status -eq 'Not available on SYSVOL') {
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol']++
                 $Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted']++
+                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]++
             } elseif ($GPO.Status -eq 'Permissions issue') {
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue']++
+                $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName]++
             }
         }
         if ($Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted'].Count -gt 0) {
@@ -25,12 +36,15 @@
         }
     }
     Variables      = @{
-        NotAvailableInAD            = 0
-        NotAvailableOnSysvol        = 0
-        NotAvailablePermissionIssue = 0
-        ToBeDeleted                 = 0
+        NotAvailableInAD                     = 0
+        NotAvailableOnSysvol                 = 0
+        NotAvailablePermissionIssue          = 0
+        NotAvailablePermissionIssuePerDomain = $null
+        ToBeDeleted                          = 0
+        ToBeDeletedPerDomain                 = $null
     }
     Overview       = {
+        <#
         New-HTMLPanel {
             New-HTMLText -TextBlock {
                 "Group Policies are stored in two places - Active Directory (metadata) and SYSVOL (content)."
@@ -55,12 +69,13 @@
                 New-ChartBar -Name 'Orphans' -Value $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue']
             } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
         }
+        #>
     }
     Summary        = {
         New-HTMLText -TextBlock {
             "Group Policies are stored in two places - Active Directory (metadata) and SYSVOL (content)."
             "Since those are managed in different ways, replicated in different ways it's possible because of different issues they get out of sync."
-        } -FontSize 10pt
+        } -FontSize 10pt -LineBreak
         New-HTMLText -Text "For example:" -FontSize 10pt -FontWeight bold
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'USN Rollback in AD could cause already deleted Group Policies to reapper in Active Directory, yet SYSVOL data would be unavailable'
@@ -73,6 +88,12 @@
             New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
             New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
             New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            }
         } -FontSize 10pt
         New-HTMLText -Text "Please review output in table and follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
     }
