@@ -57,6 +57,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.79 - 10.11.2020
+  - Improved `Invoke-GPOZaurr` - type `GPOOrphans`
 - 0.0.78 - 10.11.2020
   - Improved `Remove-GPOZaurrBroken` more verbose
   - Improved `Get-GPOZaurrBroken` more verbose
