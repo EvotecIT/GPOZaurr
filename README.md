@@ -57,10 +57,12 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.78 -
+- 0.0.78 - 10.11.2020
   - Improved `Remove-GPOZaurrBroken` more verbose
   - Improved `Get-GPOZaurrBroken` more verbose
   - Improved `Invoke-GPOZaurr` - type `GPOOrphans`
+  - Improved `Invoke-GPOZaurr` - type `GPOList` - needs more work
+  - Improved `Get-GPOZaurr` with better detection of Empty Policies (needs testing)
 - 0.0.77 - 9.11.2020
   - Improved `Invoke-GPOZaurr` (WIP)
 - 0.0.76 - 8.11.2020
