@@ -1,5 +1,5 @@
 ﻿function Add-GPOZaurrPermission {
-    [cmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'GPOGUID')]
+    [cmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'GPOName')]
     param(
         [Parameter(ParameterSetName = 'GPOName', Mandatory)][string] $GPOName,
         [Parameter(ParameterSetName = 'GPOGUID', Mandatory)][alias('GUID', 'GPOID')][string] $GPOGuid,
@@ -53,7 +53,6 @@
     }
     $Splat['ExcludeDomains'] = $ExcludeDomains
     $Splat['ExtendedForestInformation'] = $ExtendedForestInformation
-    #$Splat['ExcludePermissionType'] = $ExcludePermissionType
     $Splat['IncludePermissionType'] = $PermissionType
     $Splat['SkipWellKnown'] = $SkipWellKnown.IsPresent
     $Splat['SkipAdministrative'] = $SkipAdministrative.IsPresent
