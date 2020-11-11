@@ -153,6 +153,13 @@
                         if ($Type -eq 'Default') {
                             Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
                             $CountFixed++
+                            if ($PrincipalType -eq 'DistinguishedName') {
+                                $ADIdentity = Get-WinADObject -Identity $Principal
+                                if ($ADIdentity) {
+                                    Write-Verbose "Add-GPOZaurrPermission - Need to convert DN $Principal to SID $($ADIdentity.ObjectSID) to $($GPO.DisplayName) at $($GPO.DomainName)"
+                                    $Principal = $ADIdentity.ObjectSID
+                                }
+                            }
                             if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
                                 try {
                                     Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal)"
