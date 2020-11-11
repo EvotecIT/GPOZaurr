@@ -72,11 +72,11 @@
                 }
             }
             Get-GPO @getGPOSplat | ForEach-Object -Process {
+                $GPOSecurity = $_.GetSecurityInfo()
                 $getPrivPermissionSplat = @{
                     Principal              = $Principal
                     PrincipalType          = $PrincipalType
-                    Accounts               = $Accounts
-                    Type                   = $Type
+                    #Accounts               = $Accounts
                     GPO                    = $_
                     SkipWellKnown          = $SkipWellKnown.IsPresent
                     SkipAdministrative     = $SkipAdministrative.IsPresent
@@ -85,11 +85,15 @@
                     IncludePermissionType  = $IncludePermissionType
                     ExcludePermissionType  = $ExcludePermissionType
                     ADAdministrativeGroups = $ADAdministrativeGroups
+                    SecurityRights         = $GPOSecurity
+                }
+                if ($Type -ne 'Default') {
+                    $getPrivPermissionSplat['Type'] = $Type
                 }
                 [Array] $GPOPermissions = Get-PrivPermission @getPrivPermissionSplat
                 if ($GPOPermissions.Count -gt 0) {
                     foreach ($Permission in $GPOPermissions) {
-                        Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission #-IncludeDomains $GPO.DomainName
+                        Remove-PrivPermission -Principal $Permission.PrincipalSid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission #-IncludeDomains $GPO.DomainName
                     }
                     $Count++
                     if ($Count -eq $LimitProcessing) {

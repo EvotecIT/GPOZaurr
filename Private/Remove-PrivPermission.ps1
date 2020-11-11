@@ -6,16 +6,16 @@
         [PSCustomObject] $GPOPermission,
         [alias('PermissionType')][Microsoft.GroupPolicy.GPPermissionType[]] $IncludePermissionType
     )
-    if ($GPOPermission.Name) {
-        $Text = "Removing SID: $($GPOPermission.Sid), Name: $($GPOPermission.Domain)\$($GPOPermission.Name), SidType: $($GPOPermission.SidType) from domain $($GPOPermission.DomainName)"
+    if ($GPOPermission.PrincipalName) {
+        $Text = "Removing SID: $($GPOPermission.PrincipalSid), Name: $($GPOPermission.PrincipalDomainName)\$($GPOPermission.PrincipalName), SidType: $($GPOPermission.PrincipalSidType) from domain $($GPOPermission.DomainName)"
     } else {
-        $Text = "Removing SID: $($GPOPermission.Sid), Name: EMPTY, SidType: $($GPOPermission.SidType) from domain $($GPOPermission.DomainName)"
+        $Text = "Removing SID: $($GPOPermission.PrincipalSid), Name: EMPTY, SidType: $($GPOPermission.PrincipalSidType) from domain $($GPOPermission.DomainName)"
     }
     if ($PrincipalType -eq 'DistinguishedName') {
         if ($GPOPermission.DistinguishedName -eq $Principal -and $GPOPermission.Permission -eq $IncludePermissionType) {
             if ($PSCmdlet.ShouldProcess($GPOPermission.DisplayName, $Text)) {
                 try {
-                    Write-Verbose "Remove-GPOZaurrPermission - Removing permission $IncludePermissionType for $($Principal) / $($GPOPermission.Name) / Type: $($GPOPermission.PermissionType)"
+                    Write-Verbose "Remove-GPOZaurrPermission - Removing permission $IncludePermissionType for $($Principal) / $($GPOPermission.PrincipalName) / Type: $($GPOPermission.PermissionType)"
                     $GPOPermission.GPOSecurity.Remove($GPOPermission.GPOSecurityPermissionItem)
                     $GPOPermission.GPOObject.SetSecurityInfo($GPOPermission.GPOSecurity)
                 } catch {
@@ -24,10 +24,10 @@
             }
         }
     } elseif ($PrincipalType -eq 'Sid') {
-        if ($GPOPermission.Sid -eq $Principal -and $GPOPermission.Permission -eq $IncludePermissionType) {
+        if ($GPOPermission.PrincipalSid -eq $Principal -and $GPOPermission.Permission -eq $IncludePermissionType) {
             if ($PSCmdlet.ShouldProcess($GPOPermission.DisplayName, $Text)) {
                 try {
-                    Write-Verbose "Remove-GPOZaurrPermission - Removing permission $IncludePermissionType for $($Principal) / $($GPOPermission.Name) / Type: $($GPOPermission.PermissionType)"
+                    Write-Verbose "Remove-GPOZaurrPermission - Removing permission $IncludePermissionType for $($Principal) / $($GPOPermission.PrincipalName) / Type: $($GPOPermission.PermissionType)"
                     $GPOPermission.GPOSecurity.Remove($GPOPermission.GPOSecurityPermissionItem)
                     $GPOPermission.GPOObject.SetSecurityInfo($GPOPermission.GPOSecurity)
                 } catch {
@@ -51,10 +51,10 @@
             }
         }
     } elseif ($PrincipalType -eq 'Name') {
-        if ($GPOPermission.Name -eq $Principal -and $GPOPermission.Permission -eq $IncludePermissionType) {
+        if ($GPOPermission.PrincipalName -eq $Principal -and $GPOPermission.Permission -eq $IncludePermissionType) {
             if ($PSCmdlet.ShouldProcess($GPOPermission.DisplayName, $Text)) {
                 try {
-                    Write-Verbose "Remove-GPOZaurrPermission - Removing permission $IncludePermissionType for $($Principal) / $($GPOPermission.Name) / Type: $($GPOPermission.PermissionType)"
+                    Write-Verbose "Remove-GPOZaurrPermission - Removing permission $IncludePermissionType for $($Principal) / $($GPOPermission.PrincipalName) / Type: $($GPOPermission.PermissionType)"
                     $GPOPermission.GPOSecurity.Remove($GPOPermission.GPOSecurityPermissionItem)
                     $GPOPermission.GPOObject.SetSecurityInfo($GPOPermission.GPOSecurity)
                 } catch {
