@@ -31,7 +31,8 @@
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
-        [switch] $ReturnSecurityWhenNoData # if no data return all data
+        [switch] $ReturnSecurityWhenNoData, # if no data return all data
+        [switch] $ReturnSingleObject # forces return of single object per GPO as one for ForEach-Object processing
     )
     Begin {
         $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Extended
@@ -136,7 +137,11 @@
                             $ReturnObject
                         }
                     } else {
-                        $Output
+                        if ($ReturnSingleObject) {
+                            , $Output
+                        } else {
+                            $Output
+                        }
                     }
                 }
             } catch {

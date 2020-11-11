@@ -63,62 +63,109 @@
         EnterpriseAdmins = $false
     }
     $CountFixed = 0
-    # This should always return results. When no data is found it should return basic information that will allow us to add credentials.
-    Get-GPOZaurrPermission @Splat -ReturnSecurityWhenNoData | ForEach-Object {
-        # When it has GPOSecurityPermissionItem property it means it has permissions, if it doesn't it means we have clean object to process
-        $Skip = $false
-        $GPOPermissions = $_
-        if ($GPOPermissions.GPOSecurityPermissionItem) {
-            # Permission exists, but may be incomplete
-            foreach ($GPOPermission in $GPOPermissions) {
-                if ($Type -eq 'Default') {
-                    # We were looking for specific principal and we got it. nothing to do
-                    # this is for standard users such as przemyslaw.klys / adam.gonzales
-                    $Skip = $true
-                    break
-                } elseif ($Type -eq 'Administrative') {
-                    # We are looking for administrative but we need to make sure we got correct administrative
-                    if ($GPOPermission.Permission -eq $PermissionType) {
-                        $AdministrativeGroup = $ADAdministrativeGroups['BySID'][$GPOPermission.SID]
-                        if ($AdministrativeGroup.SID -like '*-519') {
-                            $AdministrativeExists['EnterpriseAdmins'] = $true
-                        } elseif ($AdministrativeGroup.SID -like '*-512') {
-                            $AdministrativeExists['DomainAdmins'] = $true
+
+    Do {
+        # This should always return results. When no data is found it should return basic information that will allow us to add credentials.
+        Get-GPOZaurrPermission @Splat -ReturnSecurityWhenNoData -ReturnSingleObject | ForEach-Object {
+            # Prepare data to clean
+            $Skip = $false
+            $AdministrativeExists['EnterpriseAdmins'] = $false
+            $AdministrativeExists['DomainAdmins'] = $false
+            $GPOPermissions = $_
+            # Verification Phase
+            # When it has GPOSecurityPermissionItem property it means it has permissions, if it doesn't it means we have clean object to process
+            if ($GPOPermissions.GPOSecurityPermissionItem) {
+                # Permission exists, but may be incomplete
+                foreach ($GPOPermission in $GPOPermissions) {
+                    if ($Type -eq 'Default') {
+                        # We were looking for specific principal and we got it. nothing to do
+                        # this is for standard users such as przemyslaw.klys / adam.gonzales
+                        $Skip = $true
+                        break
+                    } elseif ($Type -eq 'Administrative') {
+                        # We are looking for administrative but we need to make sure we got correct administrative
+                        if ($GPOPermission.Permission -eq $PermissionType) {
+                            $AdministrativeGroup = $ADAdministrativeGroups['BySID'][$GPOPermission.PrincipalSid]
+                            if ($AdministrativeGroup.SID -like '*-519') {
+                                $AdministrativeExists['EnterpriseAdmins'] = $true
+                            } elseif ($AdministrativeGroup.SID -like '*-512') {
+                                $AdministrativeExists['DomainAdmins'] = $true
+                            }
                         }
-                        <#
-                    if ($AdministrativeGroup) {
-                        $DomainAdminsSID = -join ($ForestInformation['DomainsExtended'][$GPOPermission.DomainName].DomainSID, '-512')
-                        $EnterpriseAdminsSID = -join ($ForestInformation['DomainsExtended'][$GPOPermission.DomainName].DomainSID, '-519')
-                        if ($GPOPermission.SID -eq $DomainAdminsSID) {
-                            $AdministrativeExists['DomainAdmins'] = $true
-                        } elseif ($GPOPermission.SID -eq $EnterpriseAdminsSID) {
-                            $AdministrativeExists['EnterpriseAdmins'] = $true
+                        if ($AdministrativeExists['DomainAdmins'] -and $AdministrativeExists['EnterpriseAdmins']) {
+                            $Skip = $true
+                            break
                         }
+                    } elseif ($Type -eq 'WellKnownAdministrative') {
+                        # this is for SYSTEM account
+                        $Skip = $true
+                        break
+                    } elseif ($Type -eq 'AuthenticatedUsers') {
+                        # this is for Authenticated Users
+                        $Skip = $true
+                        break
                     }
-                    #>
-                    }
-                } elseif ($Type -eq 'WellKnownAdministrative') {
-                    # this is for SYSTEM account
-                    $Skip = $true
-                    break
-                } elseif ($Type -eq 'AuthenticatedUsers') {
-                    # this is for Authenticated Users
-                    $Skip = $true
-                    break
                 }
             }
-        }
-        if (-not $Skip) {
-            if (-not $GPOPermissions) {
-                # This is bad - things went wrong
-                Write-Warning "Add-GPOZaurrPermission - Couldn't get permissions for GPO. Things aren't what they should be. Skipping!"
-            } else {
-                $GPO = $GPOPermissions[0]
-                if ($GPOPermissions.GPOSecurityPermissionItem) {
-                    # We asked, we got response, now we need to check if maybe we're missing one of the two administrative groups
-                    if ($Type -eq 'Administrative') {
-                        # this is a case where something was returned. Be it Domain Admins or Enterprise Admins or both. But we still need to check because it may have been Domain Admins from other domain or just one of the two required groups
-                        if ($AdministrativeExists['DomainAdmins'] -eq $false) {
+            if (-not $Skip) {
+                if (-not $GPOPermissions) {
+                    # This is bad - things went wrong
+                    Write-Warning "Add-GPOZaurrPermission - Couldn't get permissions for GPO. Things aren't what they should be. Skipping!"
+                } else {
+                    $GPO = $GPOPermissions[0]
+                    if ($GPOPermissions.GPOSecurityPermissionItem) {
+                        # We asked, we got response, now we need to check if maybe we're missing one of the two administrative groups
+                        if ($Type -eq 'Administrative') {
+                            # this is a case where something was returned. Be it Domain Admins or Enterprise Admins or both. But we still need to check because it may have been Domain Admins from other domain or just one of the two required groups
+                            if ($AdministrativeExists['DomainAdmins'] -eq $false) {
+                                $Principal = $ADAdministrativeGroups[$GPO.DomainName]['DomainAdmins']
+                                Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
+                                $CountFixed++
+                                if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
+                                    try {
+                                        $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
+                                        $GPO.GPOSecurity.Add($AddPermission)
+                                        $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
+                                    } catch {
+                                        Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) with error: $($_.Exception.Message)"
+                                    }
+                                }
+                            }
+                            if ($AdministrativeExists['EnterpriseAdmins'] -eq $false) {
+                                $Principal = $ADAdministrativeGroups[$ForestInformation.Forest.RootDomain]['EnterpriseAdmins']
+                                Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
+                                $CountFixed++
+                                if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
+                                    try {
+                                        $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
+                                        $GPO.GPOSecurity.Add($AddPermission)
+                                        $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
+                                    } catch {
+                                        Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) with error: $($_.Exception.Message)"
+                                    }
+                                }
+                            }
+                        } elseif ($Type -eq 'Default') {
+                            # This shouldn't really happen, as if we got response, and it didn't exists it wouldn't be here
+                            Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType skipped for $($Principal). This shouldn't even happen!"
+                        }
+                    } else {
+                        # We got no response. That means we either asked incorrectly or we need to fix permission. Trying to do so
+                        if ($Type -eq 'Default') {
+                            Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
+                            $CountFixed++
+                            if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
+                                try {
+                                    Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal)"
+                                    $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
+                                    $GPO.GPOSecurity.Add($AddPermission)
+                                    $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
+                                } catch {
+                                    Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) with error: $($_.Exception.Message)"
+                                }
+                            }
+                        } elseif ($Type -eq 'Administrative') {
+                            # this is a case where both Domain Admins/Enterprise Admins were missing
                             $Principal = $ADAdministrativeGroups[$GPO.DomainName]['DomainAdmins']
                             Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
                             $CountFixed++
@@ -131,8 +178,6 @@
                                     Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) with error: $($_.Exception.Message)"
                                 }
                             }
-                        }
-                        if ($AdministrativeExists['EnterpriseAdmins'] -eq $false) {
                             $Principal = $ADAdministrativeGroups[$ForestInformation.Forest.RootDomain]['EnterpriseAdmins']
                             Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
                             $CountFixed++
@@ -145,85 +190,41 @@
                                     Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) with error: $($_.Exception.Message)"
                                 }
                             }
-                        }
-                    } elseif ($Type -eq 'Default') {
-                        # This shouldn't really happen, as if we got response, and it didn't exists it wouldn't be here
-                        Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType skipped for $($Principal). This shouldn't even happen!"
-                    }
-                } else {
-                    # We got no response. That means we either asked incorrectly or we need to fix permission. Trying to do so
-                    if ($Type -eq 'Default') {
-                        Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
-                        $CountFixed++
-                        if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
-                            try {
-                                Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal)"
-                                $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
-                                $GPO.GPOSecurity.Add($AddPermission)
-                                $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
-                            } catch {
-                                Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) with error: $($_.Exception.Message)"
+                        } elseif ($Type -eq 'WellKnownAdministrative') {
+                            $Principal = 'S-1-5-18'
+                            Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
+                            $CountFixed++
+                            if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal (SYSTEM) / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
+                                try {
+                                    $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
+                                    $GPO.GPOSecurity.Add($AddPermission)
+                                    $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
+                                } catch {
+                                    Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) (SYSTEM) with error: $($_.Exception.Message)"
+                                }
                             }
-                        }
-                    } elseif ($Type -eq 'Administrative') {
-                        # this is a case where both Domain Admins/Enterprise Admins were missing
-                        $Principal = $ADAdministrativeGroups[$GPO.DomainName]['DomainAdmins']
-                        Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
-                        $CountFixed++
-                        if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
-                            try {
-                                $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
-                                $GPO.GPOSecurity.Add($AddPermission)
-                                $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
-                            } catch {
-                                Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) with error: $($_.Exception.Message)"
-                            }
-                        }
-                        $Principal = $ADAdministrativeGroups[$ForestInformation.Forest.RootDomain]['EnterpriseAdmins']
-                        Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
-                        $CountFixed++
-                        if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
-                            try {
-                                $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
-                                $GPO.GPOSecurity.Add($AddPermission)
-                                $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
-                            } catch {
-                                Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) with error: $($_.Exception.Message)"
-                            }
-                        }
-                    } elseif ($Type -eq 'WellKnownAdministrative') {
-                        $Principal = 'S-1-5-18'
-                        Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
-                        $CountFixed++
-                        if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal (SYSTEM) / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
-                            try {
-                                $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
-                                $GPO.GPOSecurity.Add($AddPermission)
-                                $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
-                            } catch {
-                                Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) (SYSTEM) with error: $($_.Exception.Message)"
-                            }
-                        }
-                    } elseif ($Type -eq 'AuthenticatedUsers') {
-                        $Principal = 'S-1-5-11'
-                        Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
-                        $CountFixed++
-                        if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal (Authenticated Users) / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
-                            try {
-                                $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
-                                $GPO.GPOSecurity.Add($AddPermission)
-                                $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
-                            } catch {
-                                Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) (Authenticated Users) with error: $($_.Exception.Message)"
+                        } elseif ($Type -eq 'AuthenticatedUsers') {
+                            $Principal = 'S-1-5-11'
+                            Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
+                            $CountFixed++
+                            if ($PSCmdlet.ShouldProcess($GPO.DisplayName, "Adding $Principal (Authenticated Users) / $PermissionType to $($GPO.DisplayName) at $($GPO.DomainName)")) {
+                                try {
+                                    $AddPermission = [Microsoft.GroupPolicy.GPPermission]::new($Principal, $PermissionType, $Inheritable.IsPresent)
+                                    $GPO.GPOSecurity.Add($AddPermission)
+                                    $GPO.GPOObject.SetSecurityInfo($GPO.GPOSecurity)
+                                } catch {
+                                    Write-Warning "Add-GPOZaurrPermission - Adding permission $PermissionType failed for $($Principal) (Authenticated Users) with error: $($_.Exception.Message)"
+                                }
                             }
                         }
                     }
                 }
             }
+            if ($CountFixed -ge $LimitProcessing) {
+                # We want to exit foreach-object, but ForEach-Object doesn't really allow that
+                # that's why there is Do/While which will make sure that breaks doesn't break what it's not supposed to
+                break
+            }
         }
-        if ($CountFixed -ge $LimitProcessing) {
-            # We want to exit foreach-object
-            break
-        }
-    }
+    } while ($false)
 }

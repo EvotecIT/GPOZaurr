@@ -58,8 +58,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 ## Changelog
 
 - 0.0.80
-  - Fixed `Add-GPOZaurrPermission` LimitProcessing to work correctly
-  - Added `Add-GPOZaurrPermission` parameter `All` to process all GPOs
+  - [x] Improves `Add-GPOZaurrPermission`
+    - [x] Fixes LimitProcessing to work correctly
+    - [x] Added `All` to process all GPOs
 - 0.0.79 - 10.11.2020
   - Improved `Invoke-GPOZaurr` - type `GPOOrphans`
 - 0.0.78 - 10.11.2020
