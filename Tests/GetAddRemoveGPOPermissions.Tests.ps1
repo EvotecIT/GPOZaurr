@@ -1,6 +1,7 @@
 ﻿Describe 'GPO Permissions Management - Simple' {
     BeforeAll {
         # just in case some tests failed before and added user stays
+        Import-Module $PSScriptRoot\..\*.psd1 -Force
         Remove-GPOZaurrPermission -GPOName 'TEST | GPOZaurr Permissions Testing' -PermissionType GpoEdit -Principal 'EVOTEC\przemyslaw.klys' -PrincipalType NetbiosName -Verbose
     }
     It 'Get-GPOZaurrPermission - Should return proper data' {
