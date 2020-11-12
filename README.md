@@ -57,6 +57,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.81
+  - [x] Fix for `Set-GPOZaurrOwner` in case of missing permissions
 - 0.0.80 - 12.11.2020
   - [x] Improves `Invoke-GPOZaurr`
     - [x] Type `GPOOrphans` clearer options, updated texts, split per domain

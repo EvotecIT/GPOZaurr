@@ -6,6 +6,7 @@
     GPOList               = $GPOZaurrList
     GPOPassword           = $GPOZaurrPassword
     GPOPermissions        = $GPOZaurrPermissions
+    GPOPermissionsRead    = $GPOZaurrPermissionsRead
     GPOPermissionsRoot    = $GPOZaurrPermissionsRoot
     GPOFiles              = $GPOZaurrFiles
     GPOBlockedInheritance = $GPOZaurrBlockedInheritance
