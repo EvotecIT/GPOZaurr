@@ -76,7 +76,8 @@
 
         [Parameter(ParameterSetName = 'Type')]
         [Parameter(ParameterSetName = 'Named')]
-        [int] $LimitProcessing = [int32]::MaxValue
+        [int] $LimitProcessing = [int32]::MaxValue,
+        [switch] $Force
     )
     Begin {
         #Write-Verbose "Set-GPOZaurrOwner - Getting ADAdministrativeGroups"
@@ -114,45 +115,50 @@
                     $AdministrativeGroupSysvol = $null
                 }
             }
-            if ($Type -eq 'NotAdministrative') {
-                if (-not $AdministrativeGroup -or (-not $AdministrativeGroupSysvol -and -not $SkipSysvol)) {
-                    $_
-                } else {
-                    if ($AdministrativeGroup -ne $AdministrativeGroupSysvol) {
-                        Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). Fixing required."
-                        $_
-                    }
-                }
-            } elseif ($Type -eq 'Unknown') {
-                if (-not $_.Owner -or (-not $_.SysvolOwner -and -not $SkipSysvol)) {
-                    $_
-                }
-            } elseif ($Type -eq 'NotMatching') {
-                if ($SkipSysvol) {
-                    Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). SysVol scanning is disabled. Skipping."
-                } else {
-                    if ($AdministrativeGroup -ne $AdministrativeGroupSysvol) {
-                        #Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). Fixing required."
-                        $_
-                    }
-                }
+            if ($Force) {
+                Write-Verbose "Set-GPOZaurrOwner - Force was used to push new owner to $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner)."
+                $_
             } else {
-                # we run with no type, that means we need to either set it to principal or to Administrative
-                if ($_.Owner) {
-                    # we check if Principal is not set
-                    $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($_.Owner)"]
-                    if (-not $SkipSysvol -and $_.SysvolOwner) {
-                        $AdministrativeGroupSysvol = $ADAdministrativeGroups['ByNetBIOS']["$($_.SysvolOwner)"]
-                        if (-not $AdministrativeGroup -or -not $AdministrativeGroupSysvol) {
+                if ($Type -eq 'NotAdministrative') {
+                    if (-not $AdministrativeGroup -or (-not $AdministrativeGroupSysvol -and -not $SkipSysvol)) {
+                        $_
+                    } else {
+                        if ($AdministrativeGroup -ne $AdministrativeGroupSysvol) {
+                            Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). Fixing required."
                             $_
+                        }
+                    }
+                } elseif ($Type -eq 'Unknown') {
+                    if (-not $_.Owner -or (-not $_.SysvolOwner -and -not $SkipSysvol)) {
+                        $_
+                    }
+                } elseif ($Type -eq 'NotMatching') {
+                    if ($SkipSysvol) {
+                        Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). SysVol scanning is disabled. Skipping."
+                    } else {
+                        if ($AdministrativeGroup -ne $AdministrativeGroupSysvol) {
+                            #Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). Fixing required."
+                            $_
+                        }
+                    }
+                } else {
+                    # we run with no type, that means we need to either set it to principal or to Administrative
+                    if ($_.Owner) {
+                        # we check if Principal is not set
+                        $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($_.Owner)"]
+                        if (-not $SkipSysvol -and $_.SysvolOwner) {
+                            $AdministrativeGroupSysvol = $ADAdministrativeGroups['ByNetBIOS']["$($_.SysvolOwner)"]
+                            if (-not $AdministrativeGroup -or -not $AdministrativeGroupSysvol) {
+                                $_
+                            }
+                        } else {
+                            if (-not $AdministrativeGroup) {
+                                $_
+                            }
                         }
                     } else {
-                        if (-not $AdministrativeGroup) {
-                            $_
-                        }
+                        $_
                     }
-                } else {
-                    $_
                 }
             }
         } | Select-Object -First $LimitProcessing | ForEach-Object -Process {
