@@ -1,8 +1,7 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 # Backup GPOs
-$BackupPath = "$Env:UserProfile\Desktop\GPO"
-$GPOSummary = Backup-GPOZaurr -BackupPath $BackupPath -Verbose -Type All #-BackupDated #-LimitProcessing 1
+$GPOSummary = Backup-GPOZaurr -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -Type All -IncludeDomains 'ad.evotec.pl' #-BackupDated #-LimitProcessing 1
 $GPOSummary | Format-Table -AutoSize
 
 ## Confirm GPOs are backed up properly

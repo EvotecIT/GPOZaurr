@@ -9,7 +9,7 @@ $GPOs | Format-Table DisplayName, Owner, OwnerSID, OwnerType
 Set-GPOZaurrOwner -GPOName 'ALL | Enable RDP' -WhatIf
 
 # If principal is given it is set (of course if it exits). Otherwise warning is returned.
-Set-GPOZaurrOwner -GPOName 'ALL | Enable RDP' -Principal 'przemyslaw.klys' #-WhatIf
+Set-GPOZaurrOwner -GPOName 'ALL | Enable RDP' -Principal 'przemyslaw.klys' -WhatIf
 
 $GPOs = Get-GPOZaurr #-GPOName 'New Group Policy Object'
 $GPOs | Format-Table DisplayName, Owner, OwnerSID, OwnerType

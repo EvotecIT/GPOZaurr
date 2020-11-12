@@ -145,6 +145,22 @@
                             }
                             New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
                         }
+                        New-HTMLWizardStep -Name 'Make a backup (optional)' {
+                            New-HTMLText -TextBlock {
+                                "The process fixing broken GPOs will delete AD or SYSVOL content depending on type of a problem. "
+                                "While it's always useful to have a backup, this backup won't actually backup those broken group policies"
+                                " for a simple reason that those are not backupable. You can't back up GPO if there is no SYSVOL content"
+                                " and you can't backup GPO if there's only SYSVOL content. "
+                                "However, since the script does make changes to GPOs it's advised to have a backup anyways! "
+                            }
+                            New-HTMLCodeBlock -Code {
+                                $GPOSummary = Backup-GPOZaurr -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -Type All
+                                $GPOSummary | Format-Table # only if you want to display output of backup
+                            }
+                            New-HTMLText -TextBlock {
+                                "Above command when executed will make a backup to Desktop, create GPO folder and within it it will put all those GPOs. "
+                            }
+                        }
                         New-HTMLWizardStep -Name 'Fix GPOs not available in AD' {
                             New-HTMLText -Text @(
                                 "Following command when executed runs cleanup procedure that removes all broken GPOs on SYSVOL side. ",

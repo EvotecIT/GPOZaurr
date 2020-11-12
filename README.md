@@ -58,10 +58,15 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 ## Changelog
 
 - 0.0.80
+  - [x] Improves `Invoke-GPOZaurr`
+    - [x] Type `GPOOrphans` clearer options, updated texts, split per domain
+    - [x] Type `GPOOwners` clearer options, updated texts, split per domain
   - [x] Improves `Add-GPOZaurrPermission`
     - [x] Fixes LimitProcessing to work correctly
     - [x] Added `All` to process all GPOs
   - [x] Fixes `Remove-GPOZaurrPermission`
+  - [x] Improves `Set-GPOZaurrOwner`
+    - [x] Added `Force` to force `GPO Owner` to any principal (normally only Domain Admins)
 - 0.0.79 - 10.11.2020
   - Improved `Invoke-GPOZaurr` - type `GPOOrphans`
 - 0.0.78 - 10.11.2020

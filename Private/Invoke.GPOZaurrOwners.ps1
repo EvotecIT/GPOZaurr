@@ -5,7 +5,18 @@
     Data           = $null
     Execute        = { Get-GPOZaurrOwner -IncludeSysvol }
     Processing     = {
+        # Create Per Domain Variables
+        $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFixPerDomain'] = @{}
+        $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'] = @{}
         foreach ($GPO in $Script:Reporting['GPOOwners']['Data']) {
+            # Create Per Domain Variables
+            if (-not $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFixPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFixPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'][$GPO.DomainName] = 0
+            }
+            # Checks
             if ($GPO.IsOwnerConsistent) {
                 $Script:Reporting['GPOOwners']['Variables']['IsConsistent']++
             } else {
@@ -18,8 +29,10 @@
             }
             if (($GPO.IsOwnerAdministrative -eq $false -or $GPO.IsOwnerConsistent -eq $false) -and $GPO.SysvolExists -eq $true) {
                 $Script:Reporting['GPOOwners']['Variables']['WillFix']++
+                $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'][$GPO.DomainName]++
             } elseif ($GPO.SysvolExists -eq $false) {
                 $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFix']++
+                $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFixPerDomain'][$GPO.DomainName]++
             } else {
                 $Script:Reporting['GPOOwners']['Variables']['WillNotTouch']++
             }
@@ -31,15 +44,18 @@
         }
     }
     Variables      = @{
-        IsAdministrative    = 0
-        IsNotAdministrative = 0
-        IsConsistent        = 0
-        IsNotConsistent     = 0
-        WillFix             = 0
-        RequiresDiffFix     = 0
-        WillNotTouch        = 0
+        IsAdministrative         = 0
+        IsNotAdministrative      = 0
+        IsConsistent             = 0
+        IsNotConsistent          = 0
+        WillFix                  = 0
+        RequiresDiffFix          = 0
+        WillNotTouch             = 0
+        RequiresDiffFixPerDomain = $null
+        WillFixPerDomain         = $null
     }
     Overview       = {
+        <#
         New-HTMLPanel {
             New-HTMLText -Text 'Following chart presents Group Policy owners and whether they are administrative and consistent. By design an owner of Group Policy should be Domain Admins or Enterprise Admins group only to prevent malicious takeover. ', `
                 "It's also important that owner in Active Directory matches owner on SYSVOL (file system)." -FontSize 10pt
@@ -56,6 +72,7 @@
                 New-ChartBar -Name 'Is consistent' -Value $Script:Reporting['GPOOwners']['Variables']['IsConsistent'], $Script:Reporting['GPOOwners']['Variables']['IsNotConsistent']
             } -Title 'Group Policy Owners' -TitleAlignment center
         }
+        #>
     }
     Summary        = {
         New-HTMLText -FontSize 10pt -TextBlock {
@@ -77,11 +94,23 @@
             New-HTMLListItem -Text "Owners consistent in AD and SYSVOL: ", $Script:Reporting['GPOOwners']['Variables']['IsConsistent'] -FontWeight normal, bold
             New-HTMLListItem -Text "Owners not-consistent in AD and SYSVOL: ", $Script:Reporting['GPOOwners']['Variables']['IsNotConsistent'] -FontWeight normal, bold
         } -FontSize 10pt
-        New-HTMLText -FontSize 10pt -Text "This gives us: "
+        New-HTMLText -FontSize 10pt -Text "Following will need to happen: " -FontWeight bold
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Group Policies requiring owner change: ', $Script:Reporting['GPOOwners']['Variables']['WillFix'] -FontWeight normal, bold
             New-HTMLListItem -Text "Group Policies which can't be fixed (no SYSVOL?): ", $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFix'] -FontWeight normal, bold
             New-HTMLListItem -Text "Group Policies unaffected: ", $Script:Reporting['GPOOwners']['Variables']['WillNotTouch'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            }
+        } -FontSize 10pt
+        New-HTMLText -Text 'Following domains require fixing using, ', 'different methods:' -FontSize 10pt -FontWeight bold, bold -Color Black, RedRobin -TextDecoration none, underline
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFixPerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFixPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            }
         } -FontSize 10pt
     }
     Solution       = {
@@ -141,18 +170,43 @@
                             }
                             New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
                         }
+                        New-HTMLWizardStep -Name 'Make a backup (optional)' {
+                            New-HTMLText -TextBlock {
+                                "The process of fixing GPO Owner does NOT touch GPO content. It simply changes owners on AD and SYSVOL at the same time. "
+                                "However, it's always good to have a backup before executing changes that may impact Active Directory. "
+                            }
+                            New-HTMLCodeBlock -Code {
+                                $GPOSummary = Backup-GPOZaurr -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -Type All
+                                $GPOSummary | Format-Table # only if you want to display output of backup
+                            }
+                            New-HTMLText -TextBlock {
+                                "Above command when executed will make a backup to Desktop, create GPO folder and within it it will put all those GPOs. "
+                            }
+                        }
                         New-HTMLWizardStep -Name 'Set GPO Owners to Administrative (Domain Admins)' {
                             New-HTMLText -Text "Following command will find any GPO which doesn't have proper GPO Owner (be it due to inconsistency or not being Domain Admin) and will enforce new GPO Owner. "
                             New-HTMLText -Text "Make sure when running it for the first time to run it with ", "WhatIf", " parameter as shown below to prevent accidental removal." -FontWeight normal, bold, normal -Color Black, Red, Black
-
                             New-HTMLCodeBlock -Code {
                                 Set-GPOZaurrOwner -Type All -Verbose -WhatIf
                             }
                             New-HTMLText -TextBlock {
-                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be changed matches expected data. Once happy with results please follow with command: "
+                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                             }
                             New-HTMLCodeBlock -Code {
+                                Set-GPOZaurrOwner -Type All -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                            }
+                            New-HTMLText -TextBlock {
+                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be changed matches expected data."
+                            } -LineBreak
+                            New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
+                            New-HTMLCodeBlock -Code {
                                 Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2
+                            }
+                            New-HTMLText -TextBlock {
+                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                            }
+                            New-HTMLCodeBlock -Code {
+                                Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2 -IncludeDomains 'YourDomainYouHavePermissionsFor'
                             }
                             New-HTMLText -TextBlock {
                                 "This command when executed sets new owner only on first X non-compliant GPO Owners for AD/SYSVOL. Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur."
