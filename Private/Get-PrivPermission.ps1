@@ -166,7 +166,7 @@
             #>
 
             # I don't trust the returned data, some stuff like 'alias' shows up for groups. To unify it with everything else... using my own function
-            $PermissionAccount = Get-WinADObject -Identity $GPOPermission.Trustee.Sid.Value -AddType -Cache
+            $PermissionAccount = Get-WinADObject -Identity $GPOPermission.Trustee.Sid.Value -AddType -Cache -Verbose:$false
             if ($PermissionAccount) {
                 $UserNameDomain = $PermissionAccount.DomainName
                 $UserName = $PermissionAccount.Name
@@ -214,7 +214,7 @@
         if ($IncludeOwner) {
             if ($GPO.Owner) {
                 # I don't trust the returned data, some stuff like 'alias' shows up for groups. To unify it with everything else... using my own function
-                $OwnerAccount = Get-WinADObject -Identity $GPO.Owner -AddType -Cache
+                $OwnerAccount = Get-WinADObject -Identity $GPO.Owner -AddType -Cache -Verbose:$false
                 if ($OwnerAccount) {
                     $UserNameDomain = $OwnerAccount.DomainName
                     $UserName = $OwnerAccount.Name
