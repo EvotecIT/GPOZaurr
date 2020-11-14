@@ -37,7 +37,7 @@
                 $Script:Reporting['GPOOwners']['Variables']['WillNotTouch']++
             }
         }
-        if ($Script:Reporting['GPOOwners']['Variables']['WillFix'].Count -gt 0) {
+        if ($Script:Reporting['GPOOwners']['Variables']['WillFix'] -gt 0) {
             $Script:Reporting['GPOOwners']['ActionRequired'] = $true
         } else {
             $Script:Reporting['GPOOwners']['ActionRequired'] = $false

@@ -29,7 +29,7 @@
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName]++
             }
         }
-        if ($Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted'].Count -gt 0) {
+        if ($Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted'] -gt 0) {
             $Script:Reporting['GPOOrphans']['ActionRequired'] = $true
         } else {
             $Script:Reporting['GPOOrphans']['ActionRequired'] = $false

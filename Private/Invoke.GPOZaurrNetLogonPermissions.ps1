@@ -30,7 +30,7 @@
                 $Script:Reporting['NetLogonPermissions']['Variables']['NonOwner'].Add($File)
             }
         }
-        if ($Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'].Count -gt 0) {
+        if ($Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -gt 0) {
             $Script:Reporting['NetLogonPermissions']['ActionRequired'] = $true
         } else {
             $Script:Reporting['NetLogonPermissions']['ActionRequired'] = $false

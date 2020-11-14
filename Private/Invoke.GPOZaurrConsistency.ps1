@@ -17,7 +17,7 @@
                 $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside']++
             }
         }
-        if ($Script:Reporting['GPOConsistency']['Variables']['Inconsistent'].Count -gt 0 -or $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'].Count -gt 0 ) {
+        if ($Script:Reporting['GPOConsistency']['Variables']['Inconsistent'] -gt 0 -or $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'] -gt 0 ) {
             $Script:Reporting['GPOConsistency']['ActionRequired'] = $true
         } else {
             $Script:Reporting['GPOConsistency']['ActionRequired'] = $false
