@@ -19,7 +19,7 @@
     Doesn't display GPOs that have no SYSVOL content (orphaned GPOs)
 
     .PARAMETER Forest
-    Target different Forest
+    Target different Forest, by default current forest is used
 
     .PARAMETER ExcludeDomains
     Exclude domain from search, by default whole forest is scanned
