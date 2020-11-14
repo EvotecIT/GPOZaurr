@@ -4,13 +4,37 @@
     Action     = $null
     Data       = $null
     Execute    = {
-        Get-GPOZaurrPermission -Type AuthenticatedUsers -ReturnSecurityWhenNoData
+        [ordered] @{
+            Permissions = Get-GPOZaurrPermission -Type AuthenticatedUsers -ReturnSecurityWhenNoData
+            Issues      = Get-GPOZaurrPermissionIssue
+        }
     }
     Processing = {
+        # This is a workaround - we need to use it since we have 0 permissions
+
         # Create Per Domain Variables
         $Script:Reporting['GPOPermissionsRead']['Variables']['WillFixPerDomain'] = @{}
         $Script:Reporting['GPOPermissionsRead']['Variables']['WillNotTouchPerDomain'] = @{}
-        foreach ($GPO in $Script:Reporting['GPOPermissionsRead']['Data']) {
+        $Script:Reporting['GPOPermissionsRead']['Variables']['ReadPerDomain'] = @{}
+        $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotReadPerDomain'] = @{}
+
+        foreach ($GPO in $Script:Reporting['GPOPermissionsRead']['Data'].Issues) {
+            # Create Per Domain Variables
+            if (-not $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotReadPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotReadPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOPermissionsRead']['Variables']['ReadPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOPermissionsRead']['Variables']['ReadPerDomain'][$GPO.DomainName] = 0
+            }
+            if ($GPO.PermissionIssue) {
+                $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotRead']++
+                $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotReadPerDomain'][$GPO.DomainName]++
+            } else {
+                $Script:Reporting['GPOPermissionsRead']['Variables']['Read']++
+                $Script:Reporting['GPOPermissionsRead']['Variables']['ReadPerDomain'][$GPO.DomainName]++
+            }
+        }
+        foreach ($GPO in $Script:Reporting['GPOPermissionsRead']['Data'].Permissions) {
             # Create Per Domain Variables
             if (-not $Script:Reporting['GPOPermissionsRead']['Variables']['WillFixPerDomain'][$GPO.DomainName]) {
                 $Script:Reporting['GPOPermissionsRead']['Variables']['WillFixPerDomain'][$GPO.DomainName] = 0
@@ -27,17 +51,24 @@
                 $Script:Reporting['GPOPermissionsRead']['Variables']['WillFixPerDomain'][$GPO.DomainName]++
             }
         }
-        if ($Script:Reporting['GPOPermissionsRead']['Variables']['WillFix'].Count -gt 0) {
+        if ($Script:Reporting['GPOPermissionsRead']['Variables']['WillFix'] -gt 0 -or $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotRead'] -gt 0) {
             $Script:Reporting['GPOPermissionsRead']['ActionRequired'] = $true
         } else {
             $Script:Reporting['GPOPermissionsRead']['ActionRequired'] = $false
         }
+        # Summary from 2 reports
+        $Script:Reporting['GPOPermissionsRead']['Variables']['TotalToFix'] = $Script:Reporting['GPOPermissionsRead']['Variables']['WillFix'] + $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotRead']
     }
     Variables  = @{
         WillFix               = 0
         WillNotTouch          = 0
         WillFixPerDomain      = $null
-        WillNotTouchPerDomain = $ull
+        WillNotTouchPerDomain = $null
+        CouldNotRead          = 0
+        CouldNotReadPerDomain = $null
+        Read                  = 0
+        ReadPerDomain         = $null
+        TotalToFix            = 0
     }
     Overview   = {
 
@@ -46,12 +77,22 @@
         New-HTMLText -FontSize 10pt -TextBlock {
             "When GPO is created one of the permissions that are required for proper functioning of Group Policies is NT AUTHORITY\Authenticated Users. "
             "Some Administrators don't follow best practices and trying to remove GpoApply permission, remove also GpoRead permission from a GPO which can have consequences. "
-        }
-        New-HTMLText -Text "On June 14th, 2016 Microsoft released [HotFix](https://support.microsoft.com/en-gb/help/3159398/ms16-072-description-of-the-security-update-for-group-policy-june-14-2) that requires Authenticated Users to be present on all Group Policies to function properly" -FontSize 10pt
+        } -LineBreak
+        New-HTMLText -Text "On June 14th, 2016 Microsoft released [HotFix](https://support.microsoft.com/en-gb/help/3159398/ms16-072-description-of-the-security-update-for-group-policy-june-14-2) that requires Authenticated Users to be present on all Group Policies to function properly: " -FontSize 10pt
         New-HTMLText -TextBlock {
-            "MS16-072 changes the security context with which user group policies are retrieved. This by-design behavior change protects customers’ computers from a security vulnerability. Before MS16-072 is installed, user group policies were retrieved by using the user’s security context. After MS16-072 is installed, user group policies are retrieved by using the computer's security context."
-        } -FontStyle italic -FontSize 10pt
-        New-HTMLText -FontSize 10pt -Text "Following will need to happen: " -FontWeight bold
+            "MS16-072 changes the security context with which user group policies are retrieved. "
+            "This by-design behavior change protects customers’ computers from a security vulnerability. "
+            "Before MS16-072 is installed, user group policies were retrieved by using the user’s security context. "
+            "After MS16-072 is installed, user group policies are retrieved by using the computer's security context."
+        } -FontStyle italic -FontSize 10pt -FontWeight bold -LineBreak
+        New-HTMLText -FontSize 10pt -Text @(
+            "There are two parts to this assesment. Reading all Group Policies Permissions that account ",
+            $($Env:USERNAME.ToUpper()),
+            " has permissions to read and provide detailed assesment about permissions. ",
+            "Second assesment checks for permissions that this account is not able to read at all, and therefore it has no visibility about permissions set on it. "
+            "We just were able to detect the problem, but hopefully higher level account (Domain Admin) should be able to provide full assesment. "
+        ) -FontWeight normal, bold, normal
+        New-HTMLText -FontSize 10pt -Text "First assesment results: " -FontWeight bold
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Group Policies requiring Authenticated Users with GpoRead permission: ', $Script:Reporting['GPOPermissionsRead']['Variables']['WillFix'] -FontWeight normal, bold
             New-HTMLListItem -Text "Group Policies which don't require changes: ", $Script:Reporting['GPOPermissionsRead']['Variables']['WillNotTouch'] -FontWeight normal, bold
@@ -62,6 +103,18 @@
                 New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOPermissionsRead']['Variables']['WillFixPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
             }
         } -FontSize 10pt
+        New-HTMLText -FontSize 10pt -Text "Secondary assesment results: " -FontWeight bold
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text "Group Policies couldn't read at all: ", $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotRead'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies with permissions allowing read: ", $Script:Reporting['GPOPermissionsRead']['Variables']['Read'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -Text @(
+            "That means we need to fix permissions on: "
+            $($Script:Reporting['GPOPermissionsRead']['Variables']['TotalToFix'])
+            " out of "
+            $($Script:Reporting['GPOPermissionsRead']['Data'].Issues).Count
+            " Group Policies. "
+        ) -FontSize 10pt -FontWeight bold, bold, normal, bold, normal -Color Black, FreeSpeechRed, Black, Black -LineBreak -TextDecoration none, underline, underline, underline, none
     }
     Solution   = {
         New-HTMLSection -Invisible {
@@ -72,14 +125,20 @@
                 New-HTMLChart {
                     New-ChartBarOptions -Type barStacked
                     New-ChartLegend -Name 'Yes', 'No' -Color LightGreen, Salmon
-                    New-ChartBar -Name 'Authenticated Users' -Value $Script:Reporting['GPOPermissionsRead']['Variables']['WillNotTouch'], $Script:Reporting['GPOPermissionsRead']['Variables']['WillFix']
+                    New-ChartBar -Name 'Authenticated Users Available' -Value $Script:Reporting['GPOPermissionsRead']['Variables']['WillNotTouch'], $Script:Reporting['GPOPermissionsRead']['Variables']['WillFix']
+                    New-ChartBar -Name 'Accessible Group Policies' -Value $Script:Reporting['GPOPermissionsRead']['Variables']['Read'], $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotRead']
                 } -Title 'Group Policy Permissions' -TitleAlignment center
             }
         }
-        New-HTMLSection -Name 'Group Policy Authenticated Users' {
-            New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsRead']['Data'] -Filtering {
+        New-HTMLSection -Name 'Group Policy Authenticated Users Analysis' {
+            New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsRead']['Data'].Permissions -Filtering {
                 New-HTMLTableCondition -Name 'Permission' -Value '' -BackgroundColor Salmon -ComparisonType string -Row
-            } -PagingOptions 10, 20, 30, 40, 50
+            } -PagingOptions 7, 15, 30, 45, 60
+        }
+        New-HTMLSection -Name 'Group Policy Issues Assesment' {
+            New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsRead']['Data'].Issues -Filtering {
+                New-HTMLTableCondition -Name 'PermissionIssue' -Value $true -BackgroundColor Salmon -ComparisonType string -Row
+            } -PagingOptions 7, 15, 30, 45, 60 -DefaultSortColumn PermissionIssue -DefaultSortOrder Descending
         }
         New-HTMLSection -Name 'Steps to fix Group Policy Authenticated Users' {
             New-HTMLContainer {
