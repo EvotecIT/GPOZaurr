@@ -7,16 +7,16 @@
     Tries to find CPassword in Group Policies or given path and translate it to readable value
 
     .PARAMETER Forest
-    Specify forest name. By default current forest is used
+    Target different Forest, by default current forest is used
 
     .PARAMETER ExcludeDomains
-    Exclude Domain or Domains
+    Exclude domain from search, by default whole forest is scanned
 
     .PARAMETER IncludeDomains
-    Include only certain Domain or Domains
+    Include only specific domains, by default whole forest is scanned
 
     .PARAMETER ExtendedForestInformation
-    Ability to provide extended forest information in advanced scenarios
+    Ability to provide Forest Information from another command to speed up processing
 
     .PARAMETER GPOPath
     Path where Group Policy content is located or where backup is located

@@ -18,7 +18,7 @@
     GUID of GPO. By default all GPOs are targetted
 
     .PARAMETER Forest
-    Target different Forest
+    Target different Forest, by default current forest is used
 
     .PARAMETER ExcludeDomains
     Exclude domain from search, by default whole forest is scanned
