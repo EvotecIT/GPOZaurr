@@ -57,8 +57,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.82 -
+- 0.0.82 - 14.11.2020
   - [x] Added `Get-GPOZaurrPermissionIssue` to detect permission issue with no rights
+  - [x] Improves `Invoke-GPOZaurr` (WIP)
+    - [x] Type `GPOPermissionsRead` improved detection of problems with low permissions
 - 0.0.81 - 12.11.2020
   - [x] Fix for `Set-GPOZaurrOwner` in case of missing permissions to not throw errors
   - [x] Improves `Invoke-GPOZaurr` (WIP)
