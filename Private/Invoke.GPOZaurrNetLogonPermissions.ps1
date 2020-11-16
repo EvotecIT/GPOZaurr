@@ -109,14 +109,6 @@
                     New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
                 }
             }
-            if ($Script:Reporting['NetLogonPermissions']['WarningsAndErrors']) {
-                New-HTMLSection -Name 'Warnings & Errors to Review' {
-                    New-HTMLTable -DataTable $Script:Reporting['NetLogonPermissions']['WarningsAndErrors'] -Filtering {
-                        New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
-                        New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
-                    }
-                }
-            }
             New-HTMLSection -Name 'Steps to fix NetLogon Owners ' {
                 New-HTMLContainer {
                     New-HTMLSpanStyle -FontSize 10pt {
@@ -141,7 +133,7 @@
                                 }
                                 New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
                                 New-HTMLCodeBlock -Code {
-                                    $NetLogonOutput = Get-GPOZaurrNetLogon -Verbose
+                                    $NetLogonOutput = Get-GPOZaurrNetLogon -OwnerOnly -Verbose
                                     $NetLogonOutput | Format-Table
                                 }
                                 New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
@@ -177,10 +169,48 @@
                     }
                 }
             }
+            if ($Script:Reporting['NetLogonPermissions']['WarningsAndErrors']) {
+                New-HTMLSection -Name 'Warnings & Errors to Review' {
+                    New-HTMLTable -DataTable $Script:Reporting['NetLogonPermissions']['WarningsAndErrors'] -Filtering {
+                        New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
+                        New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
+                    }
+                }
+            }
         }
         New-HTMLTab -Name 'NetLogon Permissions' {
+            New-HTMLSection -Invisible {
+                New-HTMLPanel {
+                    #& $Script:GPOConfiguration['NetLogonPermissions']['Summary']
+                }
+                New-HTMLPanel {
+                    #New-HTMLChart {
+                    #    New-ChartPie -Name 'Correct Owners' -Value $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersAdministrators'] -Color LightGreen
+                    #    New-ChartPie -Name 'Incorrect Owners' -Value $Script:Reporting['NetLogonPermissions']['Variables']['NetLogonOwnersToFix'] -Color Crimson
+                    #} -Title 'NetLogon Owners' -TitleAlignment center
+                }
+            }
+            # New-HTMLSection -Name 'NetLogon Files List' {
+            #     New-HTMLTable -DataTable $Script:Reporting['NetLogonPermissions']['Variables']['Owner'] -Filtering {
+            #         New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor LightGreen -ComparisonType string
+            #         New-HTMLTableCondition -Name 'PrincipalSid' -Value "S-1-5-32-544" -BackgroundColor Salmon -ComparisonType string -Operator ne
+            #         New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
+            #     }
+            # }
             New-HTMLSection -Name 'NetLogon Files List' {
-                New-HTMLTable -DataTable $Script:Reporting['NetLogonPermissions']['Variables']['NonOwner'] -Filtering
+                New-HTMLTable -DataTable $Script:Reporting['NetLogonPermissions']['Variables']['NonOwner'] -Filtering {
+                    New-HTMLTableCondition -Name 'PrincipalType' -Value "Unknown" -BackgroundColor Salmon -ComparisonType string -Operator eq -Row
+                    New-HTMLTableCondition -Name 'PrincipalType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq -Row
+                    New-HTMLTableCondition -Name 'Status' -Value "Review Required" -BackgroundColor PaleGoldenrod -ComparisonType string -Operator eq -Row
+                }
+            }
+            if ($Script:Reporting['NetLogonPermissions']['WarningsAndErrors']) {
+                New-HTMLSection -Name 'Warnings & Errors to Review' {
+                    New-HTMLTable -DataTable $Script:Reporting['NetLogonPermissions']['WarningsAndErrors'] -Filtering {
+                        New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
+                        New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
+                    }
+                }
             }
         }
     }

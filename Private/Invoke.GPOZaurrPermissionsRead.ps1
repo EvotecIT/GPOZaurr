@@ -17,6 +17,7 @@
         $Script:Reporting['GPOPermissionsRead']['Variables']['WillNotTouchPerDomain'] = @{}
         $Script:Reporting['GPOPermissionsRead']['Variables']['ReadPerDomain'] = @{}
         $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotReadPerDomain'] = @{}
+        $Script:Reporting['GPOPermissionsRead']['Variables']['TotalPerDomain'] = @{}
 
         foreach ($GPO in $Script:Reporting['GPOPermissionsRead']['Data'].Issues) {
             # Create Per Domain Variables
@@ -26,6 +27,9 @@
             if (-not $Script:Reporting['GPOPermissionsRead']['Variables']['ReadPerDomain'][$GPO.DomainName]) {
                 $Script:Reporting['GPOPermissionsRead']['Variables']['ReadPerDomain'][$GPO.DomainName] = 0
             }
+            if (-not $Script:Reporting['GPOPermissionsRead']['Variables']['TotalPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOPermissionsRead']['Variables']['TotalPerDomain'][$GPO.DomainName] = 0
+            }
             if ($GPO.PermissionIssue) {
                 $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotRead']++
                 $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotReadPerDomain'][$GPO.DomainName]++
@@ -33,6 +37,7 @@
                 $Script:Reporting['GPOPermissionsRead']['Variables']['Read']++
                 $Script:Reporting['GPOPermissionsRead']['Variables']['ReadPerDomain'][$GPO.DomainName]++
             }
+            $Script:Reporting['GPOPermissionsRead']['Variables']['TotalPerDomain'][$GPO.DomainName]++
         }
         foreach ($GPO in $Script:Reporting['GPOPermissionsRead']['Data'].Permissions) {
             # Create Per Domain Variables
@@ -69,6 +74,7 @@
         Read                  = 0
         ReadPerDomain         = $null
         TotalToFix            = 0
+        TotalPerDomain        = $null
     }
     Overview   = {
 
@@ -107,6 +113,18 @@
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text "Group Policies couldn't read at all: ", $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotRead'] -FontWeight normal, bold
             New-HTMLListItem -Text "Group Policies with permissions allowing read: ", $Script:Reporting['GPOPermissionsRead']['Variables']['Read'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -Text 'With split per domain (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotReadPerDomain'].Keys) {
+                New-HTMLListItem -Text @(
+                    "$Domain requires ",
+                    $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotReadPerDomain'][$Domain],
+                    " changes out of ",
+                    $Script:Reporting['GPOPermissionsRead']['Variables']['TotalPerDomain'][$Domain],
+                    "."
+                ) -FontWeight normal, bold, normal
+            }
         } -FontSize 10pt
         New-HTMLText -Text @(
             "That means we need to fix permissions on: "

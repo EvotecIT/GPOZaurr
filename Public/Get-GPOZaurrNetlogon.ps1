@@ -30,8 +30,14 @@
             }
             if (-not $OwnerOnly) {
                 if (-not $SkipOwner) {
+                    if ($IdentityOwner.SID -eq "S-1-5-32-544") {
+                        $Status = 'OK'
+                    } else {
+                        $Status = 'Replace Owner Required'
+                    }
                     [PSCustomObject] @{
                         FullName          = $File.FullName
+                        Status            = $Status
                         Extension         = $File.Extension
                         CreationTime      = $File.CreationTime
                         LastAccessTime    = $File.LastAccessTime
@@ -44,14 +50,25 @@
                         FileSystemRights  = 'Owner'  # : FullControl
                         IsInherited       = $false
                         FullNameOnSysVol  = $File.FullName.Replace($Path, $PathOnSysvol)
-                        #Owner             = $ACL.Owner
                     }
                 }
-                $FilePermission = Get-FilePermissions -Path $_.FullName -ACLS $ACL -Verbose:$false
+                $FilePermission = Get-FilePermissions -Path $File.FullName -ACLS $ACL -Verbose:$false
                 foreach ($Perm in $FilePermission) {
                     $Identity = Convert-Identity -Identity $Perm.Principal -Verbose:$false
+                    $Status = $null
+                    if ($Perm.FileSystemRights -eq [System.Security.AccessControl.FileSystemRights]::FullControl) {
+                        if ($Identity.Type -eq 'WellKnownAdministrative') {
+                            $Status = 'OK'
+                        } else {
+                            $Status = 'Review Required'
+                        }
+                    }
+                    if ($Identity.Type -eq 'Unknown') {
+                        $Status = 'Removal Required'
+                    }
                     [PSCustomObject] @{
                         FullName          = $File.FullName
+                        Status            = $Status
                         Extension         = $File.Extension
                         CreationTime      = $File.CreationTime
                         LastAccessTime    = $File.LastAccessTime
@@ -65,6 +82,7 @@
                         IsInherited       = $Perm.IsInherited       # : True
                         FullNameOnSysVol  = $File.FullName.Replace($Path, $PathOnSysvol)
                     }
+
                 }
             } else {
                 [PSCustomObject] @{

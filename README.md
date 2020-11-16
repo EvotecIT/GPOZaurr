@@ -57,6 +57,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.84
+  - [x] Improves `Invoke-GPOZaurr` (WIP)
+    - [x] Type `NetLogonPermissions`
+  - [x] Fix for `Get-GPOZaurrNetLogon`
 - 0.0.83 - 14.11.2020
   - [x] Improves `Invoke-GPOZaurr` (WIP)
     - [x] Fix for wrong ActionRequired count
