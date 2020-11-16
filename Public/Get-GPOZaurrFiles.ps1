@@ -129,6 +129,9 @@
                     } elseif ($_.Extension -eq '.adm') {
                         $SuggestedAction = 'Consider deleting'
                         $SuggestedActionComment = 'Most likely legacy ADM files'
+                    } elseif ($_.Name -eq 'Thumbs.db') {
+                        $SuggestedAction = 'Consider deleting'
+                        $SuggestedActionComment = 'Most likely database files to store image thumbnails on Windows systems.'
                     }
                     if (-not $SuggestedAction) {
                         $FullPathAdmFiles = [System.IO.Path]::Combine($GPO.Path, 'Adm\admfiles.ini')
@@ -215,6 +218,12 @@
                             $SuggestedActionComment = "FileName contains backup related names ($Name)"
                             break
                         }
+                    }
+                }
+                if (-not $SuggestedAction) {
+                    if ($_.Name -eq 'Thumbs.db') {
+                        $SuggestedAction = 'Consider deleting'
+                        $SuggestedActionComment = 'Most likely database files to store image thumbnails on Windows systems.'
                     }
                 }
                 if (-not $SuggestedAction) {

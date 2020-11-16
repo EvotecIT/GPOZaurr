@@ -11,6 +11,7 @@
     GPOFiles              = $GPOZaurrFiles
     GPOBlockedInheritance = $GPOZaurrBlockedInheritance
     GPOAnalysis           = $GPOZaurrAnalysis
+    NetLogonOwners        = $GPOZaurrNetLogonOwners
     NetLogonPermissions   = $GPOZaurrNetLogonPermissions
     SysVolLegacyFiles     = $GPOZaurrSysVolLegacyFiles
 }

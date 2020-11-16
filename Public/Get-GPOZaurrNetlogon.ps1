@@ -23,70 +23,100 @@
             } catch {
                 Write-Warning "Get-GPOZaurrNetLogon - ACL reading failed for $($File.FullName) with error $($_.Exception.Message) ($($_.CategoryInfo.Reason))"
             }
-            if ($ACL.Owner) {
-                $IdentityOwner = Convert-Identity -Identity $ACL.Owner -Verbose:$false
-            } else {
-                $IdentityOwner = [PSCustomObject] @{ SID = ''; Type = 'Uknown' }
-            }
+            #if ($ACL.Owner) {
+            $IdentityOwner = Convert-Identity -Identity $ACL.Owner -Verbose:$false
+            $IdentityOwnerAdvanced = Get-WinADObject -Identity $ACL.Owner -Cache -Verbose:$false
+            #} else {
+            #    $IdentityOwner = [PSCustomObject] @{ SID = ''; Type = 'Unknown' }
+            #    $IdentityOwnerAdvanced = [PSCustomObject] @{ ObjectClass = '' }
+            #}
             if (-not $OwnerOnly) {
                 if (-not $SkipOwner) {
                     if ($IdentityOwner.SID -eq "S-1-5-32-544") {
                         $Status = 'OK'
                     } else {
-                        $Status = 'Replace Owner Required'
+                        $Status = 'Replace owner required'
                     }
                     [PSCustomObject] @{
-                        FullName          = $File.FullName
-                        Status            = $Status
-                        Extension         = $File.Extension
-                        CreationTime      = $File.CreationTime
-                        LastAccessTime    = $File.LastAccessTime
-                        LastWriteTime     = $File.LastWriteTime
-                        Attributes        = $File.Attributes
-                        AccessControlType = 'Allow' # : Allow
-                        Principal         = $IdentityOwner.Name         # : BUILTIN\Administrators
-                        PrincipalSid      = $IdentityOwner.SID
-                        PrincipalType     = $IdentityOwner.Type
-                        FileSystemRights  = 'Owner'  # : FullControl
-                        IsInherited       = $false
-                        FullNameOnSysVol  = $File.FullName.Replace($Path, $PathOnSysvol)
+                        FullName             = $File.FullName
+                        Status               = $Status
+                        DomainName           = $Domain
+                        Extension            = $File.Extension
+                        CreationTime         = $File.CreationTime
+                        LastAccessTime       = $File.LastAccessTime
+                        LastWriteTime        = $File.LastWriteTime
+                        Attributes           = $File.Attributes
+                        AccessControlType    = 'Allow' # : Allow
+                        Principal            = $IdentityOwner.Name         # : BUILTIN\Administrators
+                        PrincipalSid         = $IdentityOwner.SID
+                        PrincipalType        = $IdentityOwner.Type
+                        PrincipalObjectClass = $IdentityOwnerAdvanced.ObjectClass
+                        FileSystemRights     = 'Owner'  # : FullControl
+                        IsInherited          = $false
+                        FullNameOnSysVol     = $File.FullName.Replace($Path, $PathOnSysvol)
                     }
                 }
                 $FilePermission = Get-FilePermissions -Path $File.FullName -ACLS $ACL -Verbose:$false
                 foreach ($Perm in $FilePermission) {
                     $Identity = Convert-Identity -Identity $Perm.Principal -Verbose:$false
-                    $Status = $null
+                    $AdvancedIdentity = Get-WinADObject -Identity $Perm.Principal -Cache -Verbose:$false
+                    $Status = 'Not assesed'
                     if ($Perm.FileSystemRights -eq [System.Security.AccessControl.FileSystemRights]::FullControl) {
                         if ($Identity.Type -eq 'WellKnownAdministrative') {
                             $Status = 'OK'
                         } else {
-                            $Status = 'Review Required'
+                            if ($AdvancedIdentity.ObjectClass -in 'user', 'computer') {
+                                $Status = 'Removal permission required'
+                            } else {
+                                $Status = 'Review permission required'
+                            }
+                        }
+                    } elseif ($Perm.FileSystemRights -like "*Modify*") {
+                        if ($AdvancedIdentity.ObjectClass -in 'user', 'computer') {
+                            $Status = 'Removal permission required'
+                        } else {
+                            $Status = 'Review permission required'
+                        }
+                    } elseif ($Perm.FileSystemRights -like "*Write*") {
+                        if ($AdvancedIdentity.ObjectClass -in 'user', 'computer') {
+                            $Status = 'Removal permission required'
+                        } else {
+                            $Status = 'Review permission required'
                         }
                     }
                     if ($Identity.Type -eq 'Unknown') {
-                        $Status = 'Removal Required'
+                        $Status = 'Removal permission required'
                     }
                     [PSCustomObject] @{
-                        FullName          = $File.FullName
-                        Status            = $Status
-                        Extension         = $File.Extension
-                        CreationTime      = $File.CreationTime
-                        LastAccessTime    = $File.LastAccessTime
-                        LastWriteTime     = $File.LastWriteTime
-                        Attributes        = $File.Attributes
-                        AccessControlType = $Perm.AccessControlType # : Allow
-                        Principal         = $Identity.Name         # : BUILTIN\Administrators
-                        PrincipalSid      = $Identity.SID
-                        PrincipalType     = $Identity.Type
-                        FileSystemRights  = $Perm.FileSystemRights  # : FullControl
-                        IsInherited       = $Perm.IsInherited       # : True
-                        FullNameOnSysVol  = $File.FullName.Replace($Path, $PathOnSysvol)
+                        FullName             = $File.FullName
+                        Status               = $Status
+                        DomainName           = $Domain
+                        Extension            = $File.Extension
+                        CreationTime         = $File.CreationTime
+                        LastAccessTime       = $File.LastAccessTime
+                        LastWriteTime        = $File.LastWriteTime
+                        Attributes           = $File.Attributes
+                        AccessControlType    = $Perm.AccessControlType # : Allow
+                        Principal            = $Identity.Name         # : BUILTIN\Administrators
+                        PrincipalSid         = $Identity.SID
+                        PrincipalType        = $Identity.Type
+                        PrincipalObjectClass = $AdvancedIdentity.ObjectClass
+                        FileSystemRights     = $Perm.FileSystemRights  # : FullControl
+                        IsInherited          = $Perm.IsInherited       # : True
+                        FullNameOnSysVol     = $File.FullName.Replace($Path, $PathOnSysvol)
                     }
 
                 }
             } else {
+                if ($IdentityOwner.SID -eq "S-1-5-32-544") {
+                    $Status = 'OK'
+                } else {
+                    $Status = 'Replace owner required'
+                }
                 [PSCustomObject] @{
                     FullName         = $File.FullName
+                    Status           = $Status
+                    DomainName       = $Domain
                     Extension        = $File.Extension
                     CreationTime     = $File.CreationTime
                     LastAccessTime   = $File.LastAccessTime
