@@ -23,7 +23,7 @@
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
-        [int] $LimitProcessing
+        [int] $LimitProcessing = [int32]::MaxValue
     )
     $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Extended
     if (-not $ADAdministrativeGroups) {

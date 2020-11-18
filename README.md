@@ -57,6 +57,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.88 - 18.11.2020
+  - [x] Fix for `Add-GPOZaurrPermission`
 - 0.0.87 - 18.11.2020
   - [x] Improve error handling `Remove-GPOZaurrBroken`
 - 0.0.86 - 18.11.2020
