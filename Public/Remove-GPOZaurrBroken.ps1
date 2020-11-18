@@ -35,7 +35,7 @@
     } | Select-Object | Select-Object -First $LimitProcessing | ForEach-Object {
         $GPO = $_
         if ($GPO.Status -eq 'Not available in AD') {
-            Write-Verbose "Remove-GPOZaurrBroken - Processing $($GPO.Path)"
+            Write-Verbose "Remove-GPOZaurrBroken - Processing [AD] $($GPO.Path)"
             if ($BackupFinalPath) {
                 Try {
                     Write-Verbose "Remove-GPOZaurrBroken - Backing up $($GPO.Path)"
@@ -55,6 +55,7 @@
                 }
             }
         } elseif ($GPO.Status -eq 'Not available on SYSVOL') {
+            Write-Verbose "Remove-GPOZaurrBroken - Processing [SYSVOL] $($GPO.DistinguishedName)"
             try {
                 $ExistingObject = Get-ADObject -Identity $GPO.DistinguishedName -Server $GPO.DomainName -ErrorAction Stop
             } catch {

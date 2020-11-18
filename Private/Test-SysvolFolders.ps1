@@ -96,7 +96,7 @@
             }
         }
         # Now we need to list thru Sysvol files and fine those that do not exists as GPO and create dummy GPO objects to show orphaned gpos
-        Write-Verbose "Get-GPOZaurrBroken - Processing SYSVOL differences and creating dummy objects"
+        Write-Verbose "Get-GPOZaurrBroken - Processing SYSVOL differences"
         foreach ($_ in $Differences.Keys) {
             if ($Differences[$_] -in 'Not available in AD', 'Permissions issue') {
                 $FullPath = $SysvolHash[$_].FullName
