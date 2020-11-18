@@ -33,42 +33,43 @@
             }
         }
     } | Select-Object | Select-Object -First $LimitProcessing | ForEach-Object {
-        if ($_.Status -eq 'Not available in AD') {
-            Write-Verbose "Remove-GPOZaurrBroken - Processing $($_.Path)"
+        $GPO = $_
+        if ($GPO.Status -eq 'Not available in AD') {
+            Write-Verbose "Remove-GPOZaurrBroken - Processing $($GPO.Path)"
             if ($BackupFinalPath) {
                 Try {
-                    Write-Verbose "Remove-GPOZaurrBroken - Backing up $($_.Path)"
-                    Copy-Item -LiteralPath $_.Path -Recurse -Destination $BackupFinalPath -ErrorAction Stop
+                    Write-Verbose "Remove-GPOZaurrBroken - Backing up $($GPO.Path)"
+                    Copy-Item -LiteralPath $GPO.Path -Recurse -Destination $BackupFinalPath -ErrorAction Stop
                     $BackupWorked = $true
                 } catch {
-                    Write-Warning "Remove-GPOZaurrBroken - Error backing up error: $($_.Exception.Message)"
+                    Write-Warning "Remove-GPOZaurrBroken - Error backing up $($GPO.Path) error: $($_.Exception.Message)"
                     $BackupWorked = $false
                 }
             }
             if ($BackupWorked -or $BackupFinalPath -eq '') {
-                Write-Verbose "Remove-GPOZaurrBroken - Deleting $($_.Path)"
+                Write-Verbose "Remove-GPOZaurrBroken - Deleting $($GPO.Path)"
                 try {
-                    Remove-Item -Recurse -Force -LiteralPath $_.Path
+                    Remove-Item -Recurse -Force -LiteralPath $GPO.Path -ErrorAction Stop
                 } catch {
-                    Write-Warning "Remove-GPOZaurrBroken - Failed to remove file $($_.Path): $($_.Exception.Message)."
+                    Write-Warning "Remove-GPOZaurrBroken - Failed to remove file $($GPO.Path): $($_.Exception.Message)."
                 }
             }
-        } elseif ($_.Status -eq 'Not available on SYSVOL') {
+        } elseif ($GPO.Status -eq 'Not available on SYSVOL') {
             try {
-                $ExistingObject = Get-ADObject -Identity $_.DistinguishedName -Server $_.DomainName -ErrorAction Stop
+                $ExistingObject = Get-ADObject -Identity $GPO.DistinguishedName -Server $GPO.DomainName -ErrorAction Stop
             } catch {
-                Write-Warning "Remove-GPOZaurrBroken - Error getting $($_.DistinguishedName) from AD error: $($_.Exception.Message)"
+                Write-Warning "Remove-GPOZaurrBroken - Error getting $($GPO.DistinguishedName) from AD error: $($_.Exception.Message)"
                 $ExistingObject = $null
             }
             if ($ExistingObject -and $ExistingObject.ObjectClass -eq 'groupPolicyContainer') {
-                Write-Verbose "Remove-GPOZaurrBroken - Removing DN: $($_.DistinguishedName) / ObjectClass: $($ExistingObject.ObjectClass)"
+                Write-Verbose "Remove-GPOZaurrBroken - Removing DN: $($GPO.DistinguishedName) / ObjectClass: $($ExistingObject.ObjectClass)"
                 try {
-                    Remove-ADObject -Server $_.DomainName -Identity $_.DistinguishedName -Recursive -Confirm:$false
+                    Remove-ADObject -Server $GPO.DomainName -Identity $GPO.DistinguishedName -Recursive -Confirm:$false -ErrorAction Stop
                 } catch {
-                    Write-Warning "Remove-GPOZaurrBroken - Failed to remove $($_.DistinguishedName) from AD error: $($_.Exception.Message)"
+                    Write-Warning "Remove-GPOZaurrBroken - Failed to remove $($GPO.DistinguishedName) from AD error: $($_.Exception.Message)"
                 }
             } else {
-                Write-Warning "Remove-GPOZaurrBroken - DistinguishedName $($_.DistinguishedName) not found or ObjectClass is not groupPolicyContainer ($($ExistingObject.ObjectClass))"
+                Write-Warning "Remove-GPOZaurrBroken - DistinguishedName $($GPO.DistinguishedName) not found or ObjectClass is not groupPolicyContainer ($($ExistingObject.ObjectClass))"
             }
         }
     }
