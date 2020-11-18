@@ -5,7 +5,11 @@
         [string] $FilePath,
         [string[]] $Type,
         [switch] $PassThru,
-        [switch] $HideHTML
+        [switch] $HideHTML,
+
+        [alias('ForestName')][string] $Forest,
+        [string[]] $ExcludeDomains,
+        [alias('Domain', 'Domains')][string[]] $IncludeDomains
     )
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
@@ -30,6 +34,12 @@
         Write-Color '[i]', "[GPOZaurr] ", 'Not supported types', ' [Informative] ', "Please use one/multiple from the list: ", ($Script:GPOConfiguration.Keys -join ', ') -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
         return
     }
+    $DisplayForest = if ($Forest) { $Forest } else { 'Not defined. Using current one' }
+    $DisplayIncludedDomains = if ($IncludeDomains) { $IncludeDomains -join "," } else { 'Not defined. Using all domains of forest' }
+    $DisplayExcludedDomains = if ($ExcludeDomains) { $ExcludeDomains -join ',' } else { 'No exclusions provided' }
+    Write-Color '[i]', "[GPOZaurr] ", 'Domain Information', ' [Informative] ', "Forest: ", $DisplayForest -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
+    Write-Color '[i]', "[GPOZaurr] ", 'Domain Information', ' [Informative] ', "Included Domains: ", $DisplayIncludedDomains -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
+    Write-Color '[i]', "[GPOZaurr] ", 'Domain Information', ' [Informative] ', "Excluded Domains: ", $DisplayExcludedDomains -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
 
     # Lets make sure we only enable those types which are requestd by user
     if ($Type) {
@@ -56,7 +66,7 @@
             }
             $TimeLogGPOList = Start-TimeLog
             Write-Color -Text '[i]', '[Start] ', $($Script:GPOConfiguration[$T]['Name']) -Color Yellow, DarkGray, Yellow
-            $Script:Reporting[$T]['Data'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Execute'] -WarningVariable CommandWarnings -ErrorVariable CommandErrors
+            $Script:Reporting[$T]['Data'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Execute'] -WarningVariable CommandWarnings -ErrorVariable CommandErrors -ArgumentList $Forest, $ExcludeDomains, $IncludeDomains
             Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Processing']
             $Script:Reporting[$T]['WarningsAndErrors'] = @(
                 foreach ($War in $CommandWarnings) {

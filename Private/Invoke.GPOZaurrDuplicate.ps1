@@ -4,7 +4,7 @@
     Action     = $null
     Data       = $null
     Execute    = {
-        Get-GPOZaurrDuplicateObject
+        Get-GPOZaurrDuplicateObject -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing = {
         $Script:Reporting['GPODuplicates']['Variables']['RequireDeletion'] = $Script:Reporting['GPODuplicates']['Data'].Count

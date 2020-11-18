@@ -4,7 +4,7 @@
     Action     = $null
     Data       = $null
     Execute    = {
-        Get-GPOZaurr
+        Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing = {
         foreach ($GPO in $Script:Reporting['GPOList']['Data']) {

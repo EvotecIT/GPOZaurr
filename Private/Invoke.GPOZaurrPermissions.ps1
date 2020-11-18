@@ -4,7 +4,7 @@
     Action     = $null
     Data       = $null
     Execute    = {
-        Get-GPOZaurrPermission -Type All -IncludePermissionType GpoEditDeleteModifySecurity, GpoEdit, GpoCustom #-IncludeOwner
+        Get-GPOZaurrPermission -Type All -IncludePermissionType GpoEditDeleteModifySecurity, GpoEdit, GpoCustom -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing = {
 

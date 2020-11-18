@@ -5,7 +5,7 @@
     Data       = $null
     Execute    = {
         [ordered] @{
-            Permissions = Get-GPOZaurrPermission -Type AuthenticatedUsers -ReturnSecurityWhenNoData
+            Permissions = Get-GPOZaurrPermission -Type AuthenticatedUsers -ReturnSecurityWhenNoData -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
             Issues      = Get-GPOZaurrPermissionIssue
         }
     }

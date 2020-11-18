@@ -4,7 +4,7 @@
     Action     = $null
     Data       = $null
     Execute    = {
-        Get-GPOZaurrPermissionRoot -SkipNames
+        Get-GPOZaurrPermissionRoot -SkipNames -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing = {
 

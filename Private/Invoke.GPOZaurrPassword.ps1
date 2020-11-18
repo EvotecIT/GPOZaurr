@@ -4,7 +4,7 @@
     Action     = $null
     Data       = $null
     Execute    = {
-        Get-GPOZaurrPassword
+        Get-GPOZaurrPassword -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing = {
 

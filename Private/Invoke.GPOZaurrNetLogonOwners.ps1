@@ -4,7 +4,7 @@
     ActionRequired = $null
     Data           = $null
     Execute        = {
-        Get-GPOZaurrNetLogon -OwnerOnly
+        Get-GPOZaurrNetLogon -OwnerOnly -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing     = {
         foreach ($File in $Script:Reporting['NetLogonOwners']['Data']) {

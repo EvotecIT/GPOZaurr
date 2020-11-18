@@ -4,7 +4,7 @@
     ActionRequired = $null
     Data           = $null
     Execute        = {
-        Invoke-GPOZaurrContent
+        Invoke-GPOZaurrContent -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing     = {
 

@@ -3,7 +3,9 @@
     Enabled        = $true
     ActionRequired = $null
     Data           = $null
-    Execute        = { Get-GPOZaurrOwner -IncludeSysvol }
+    Execute        = {
+        Get-GPOZaurrOwner -IncludeSysvol -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+    }
     Processing     = {
         # Create Per Domain Variables
         $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFixPerDomain'] = @{}

@@ -4,7 +4,7 @@
     ActionRequired = $null
     Data           = $null
     Execute        = {
-        Get-GPOZaurrNetLogon -SkipOwner
+        Get-GPOZaurrNetLogon -SkipOwner -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing     = {
         $Script:Reporting['NetLogonPermissions']['Variables']['PermissionWriteReviewPerDomain'] = @{}

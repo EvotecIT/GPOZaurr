@@ -4,7 +4,7 @@
     ActionRequired = $null
     Data           = $null
     Execute        = {
-        Get-GPOZaurrBroken
+        Get-GPOZaurrBroken -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing     = {
         $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'] = @{}

@@ -4,7 +4,7 @@
     ActionRequired = $null
     Data           = $null
     Execute        = {
-        Get-GPOZaurrInheritance -IncludeBlockedObjects -OnlyBlockedInheritance
+        Get-GPOZaurrInheritance -IncludeBlockedObjects -OnlyBlockedInheritance -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing     = {
 

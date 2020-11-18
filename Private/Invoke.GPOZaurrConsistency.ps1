@@ -3,7 +3,9 @@
     Enabled        = $true
     ActionRequired = $null
     Data           = $null
-    Execute        = { Get-GPOZaurrPermissionConsistency -Type All -VerifyInheritance }
+    Execute        = {
+        Get-GPOZaurrPermissionConsistency -Type All -VerifyInheritance -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+    }
     Processing     = {
         foreach ($GPO in $Script:Reporting['GPOConsistency']['Data']) {
             if ($GPO.ACLConsistent -eq $true) {
