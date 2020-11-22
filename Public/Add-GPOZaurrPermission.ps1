@@ -57,19 +57,20 @@
     $Splat['SkipWellKnown'] = $SkipWellKnown.IsPresent
     $Splat['SkipAdministrative'] = $SkipAdministrative.IsPresent
 
-    $AdministrativeExists = @{
-        DomainAdmins     = $false
-        EnterpriseAdmins = $false
-    }
     $CountFixed = 0
 
     Do {
         # This should always return results. When no data is found it should return basic information that will allow us to add credentials.
         Get-GPOZaurrPermission @Splat -ReturnSecurityWhenNoData -ReturnSingleObject | ForEach-Object {
+            $GPOPermissions = $_
+            $PermissionsAnalysis = Get-PermissionsAnalysis -GPOPermissions $GPOPermissions -ADAdministrativeGroups $ADAdministrativeGroups -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Type $Type -PermissionType $PermissionType
+            <#
             # Prepare data to clean
             $Skip = $false
-            $AdministrativeExists['EnterpriseAdmins'] = $false
-            $AdministrativeExists['DomainAdmins'] = $false
+            $AdministrativeExists = @{
+                DomainAdmins     = $false
+                EnterpriseAdmins = $false
+            }
             $GPOPermissions = $_
             # Verification Phase
             # When it has GPOSecurityPermissionItem property it means it has permissions, if it doesn't it means we have clean object to process
@@ -106,7 +107,8 @@
                     }
                 }
             }
-            if (-not $Skip) {
+            #>
+            if (-not $PermissionsAnalysis['Skip']) {
                 if (-not $GPOPermissions) {
                     # This is bad - things went wrong
                     Write-Warning "Add-GPOZaurrPermission - Couldn't get permissions for GPO. Things aren't what they should be. Skipping!"
@@ -116,7 +118,7 @@
                         # We asked, we got response, now we need to check if maybe we're missing one of the two administrative groups
                         if ($Type -eq 'Administrative') {
                             # this is a case where something was returned. Be it Domain Admins or Enterprise Admins or both. But we still need to check because it may have been Domain Admins from other domain or just one of the two required groups
-                            if ($AdministrativeExists['DomainAdmins'] -eq $false) {
+                            if ($PermissionsAnalysis['DomainAdmins'] -eq $false) {
                                 $Principal = $ADAdministrativeGroups[$GPO.DomainName]['DomainAdmins']
                                 Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
                                 $CountFixed++
@@ -130,7 +132,7 @@
                                     }
                                 }
                             }
-                            if ($AdministrativeExists['EnterpriseAdmins'] -eq $false) {
+                            if ($PermissionsAnalysis['EnterpriseAdmins'] -eq $false) {
                                 $Principal = $ADAdministrativeGroups[$ForestInformation.Forest.RootDomain]['EnterpriseAdmins']
                                 Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
                                 $CountFixed++
