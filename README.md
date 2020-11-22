@@ -61,6 +61,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
   - [x] Improves `Invoke-GPOZaurr` (WIP)
     - [x] Improves Type `GPODuplicates`
       - [ ] Fix for chart color to be RED
+  - [x] Improves `Remove-GPOZaurrDuplicateObject` - removed `Confirm` requirement
+  - [x] Improves `Get-GPOZaurrNetLogon` with more verbose
+  - [x] Improves `Repair-GPOZaurrNetLogonOwner` with more verbose and fix for `LimitProcessing`
 - 0.0.89 - 22.11.2020
   - [x] Small update `Add-GPOZaurrPermission`
   - [x] Improves `Invoke-GPOZaurr` (WIP)
