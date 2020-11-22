@@ -40,7 +40,7 @@
             }
             New-HTMLPanel {
                 New-HTMLChart {
-                    New-ChartLegend -Names 'Bad' -Color PaleGreen, Salmon
+                    New-ChartLegend -Names 'Bad' -Color Salmon
                     New-ChartBar -Name 'Duplicate (CNF) object' -Value $Script:Reporting['GPODuplicates']['Data'].Count
                 } -Title 'Duplicate (CNF) Objects' -TitleAlignment center
             }
@@ -61,7 +61,6 @@
         New-HTMLSection -Name 'Steps to fix - Remove duplicate (CNF) objects' {
             New-HTMLContainer {
                 New-HTMLSpanStyle -FontSize 10pt {
-                    New-HTMLText -Text 'Following steps will guide you how to remove duplicate objects'
                     New-HTMLWizard {
                         New-HTMLWizardStep -Name 'Prepare environment' {
                             New-HTMLText -Text "To be able to execute actions in automated way please install required modules. Those modules will be installed straight from Microsoft PowerShell Gallery."

@@ -57,6 +57,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.90 - 22.11.2020
+  - [x] Improves `Invoke-GPOZaurr` (WIP)
+    - [x] Improves Type `GPODuplicates`
+      - [ ] Fix for chart color to be RED
 - 0.0.89 - 22.11.2020
   - [x] Small update `Add-GPOZaurrPermission`
   - [x] Improves `Invoke-GPOZaurr` (WIP)
