@@ -53,6 +53,7 @@
         New-HTMLText -FontSize 10pt -TextBlock {
             "When GPO is created by default it gets Domain Admins and Enterprise Admins with Edit/Delete/Modify Security permissions. "
             "For some reason, some Administrators remove those permissions or modify them when they shouldn't touch those at all. "
+            "Since having Edit/Delete/Modify Security permissions doesn't affect GPOApply permissions there's no reason to remove Domain Admins or Enterprise Admins from permissions, or limit their rights. "
         } -LineBreak
         New-HTMLText -FontSize 10pt -Text "Assesment results: " -FontWeight bold
         New-HTMLList -Type Unordered {
