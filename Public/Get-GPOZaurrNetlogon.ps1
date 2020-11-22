@@ -13,11 +13,14 @@
     $FilesAll = foreach ($Domain in $ForestInformation.Domains) {
         $Path = -join ("\\", $Domain, '\Netlogon')
         $PathOnSysvol = -join ("\\", $Domain, "\SYSVOL\", $Domain, "\Scripts")
-        $Files = Get-ChildItem -LiteralPath $Path -Recurse -Force -ErrorVariable Err -ErrorAction SilentlyContinue
+        [Array] $Files = Get-ChildItem -LiteralPath $Path -Recurse -Force -ErrorVariable Err -ErrorAction SilentlyContinue
         foreach ($e in $err) {
             Write-Warning "Get-GPOZaurrNetLogon - Listing file failed with error $($e.Exception.Message) ($($e.CategoryInfo.Reason))"
         }
+        $Count = 0
         foreach ($File in $Files) {
+            $Count++
+            Write-Verbose "GPOZaurrNetLogon - Processing [$($Domain)]($Count/$($Files.Count)) $($File.FullName)"
             try {
                 $ACL = Get-Acl -Path $File.FullName -ErrorAction Stop
             } catch {
