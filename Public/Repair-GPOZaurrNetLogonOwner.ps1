@@ -17,18 +17,18 @@
     $Principal = $Identity.Name
 
     $getGPOZaurrNetLogonSplat = @{
-        OwnerOnly = $true
-        Forest = $Forest
-        IncludeDomains = $IncludeDomains
-        ExcludeDomains = $ExcludeDomains
+        OwnerOnly                 = $true
+        Forest                    = $Forest
+        IncludeDomains            = $IncludeDomains
+        ExcludeDomains            = $ExcludeDomains
         ExtendedForestInformation = $ExtendedForestInformation
     }
 
-    Get-GPOZaurrNetLogon @getGPOZaurrNetLogonSplat | Select-Object -First $LimitProcessing | Where-Object {
+    Get-GPOZaurrNetLogon @getGPOZaurrNetLogonSplat -Verbose | Where-Object {
         if ($_.OwnerSid -ne 'S-1-5-32-544') {
             $_
         }
-    } | ForEach-Object {
+    } | Select-Object -First $LimitProcessing | ForEach-Object {
         if ($PSCmdlet.ShouldProcess($_.FullName, "Setting NetLogon Owner to $($Principal)")) {
             Set-FileOwner -JustPath -Path $_.FullName -Owner $Principal -Verbose:$true -WhatIf:$WhatIfPreference
         }
