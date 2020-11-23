@@ -60,8 +60,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 - 0.0.90 - 23.11.2020
   - [x] Improves `Invoke-GPOZaurr` (WIP)
     - [x] Improves Type `GPODuplicates`
-      - [ ] Fix for chart color to be RED
-    - [ ] Add Type `GPOPermissionsUnknown`
+      - [x] Fix for chart color to be RED
+    - [x] Add Type `GPOPermissionsUnknown`
+    - [x] Improves logic for Data with 0/1 element
   - [x] Improves `Remove-GPOZaurrDuplicateObject` - removed `Confirm` requirement
   - [x] Improves `Get-GPOZaurrNetLogon` with more verbose
   - [x] Improves `Repair-GPOZaurrNetLogonOwner` with more verbose and fix for `LimitProcessing`
