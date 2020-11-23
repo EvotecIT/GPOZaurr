@@ -66,7 +66,14 @@
             }
             $TimeLogGPOList = Start-TimeLog
             Write-Color -Text '[i]', '[Start] ', $($Script:GPOConfiguration[$T]['Name']) -Color Yellow, DarkGray, Yellow
-            $Script:Reporting[$T]['Data'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Execute'] -WarningVariable CommandWarnings -ErrorVariable CommandErrors -ArgumentList $Forest, $ExcludeDomains, $IncludeDomains
+            $OutputCommand = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Execute'] -WarningVariable CommandWarnings -ErrorVariable CommandErrors -ArgumentList $Forest, $ExcludeDomains, $IncludeDomains
+            if ($OutputCommand -is [System.Collections.IDictionary]) {
+                # in some cases the return will be wrapped in Hashtable/orderedDictionary and we need to handle this without an array
+                $Script:Reporting[$T]['Data'] = $OutputCommand
+            } else {
+                # since sometimes it can be 0 or 1 objects being returned we force it being an array
+                $Script:Reporting[$T]['Data'] = [Array] $OutputCommand
+            }
             Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Processing']
             $Script:Reporting[$T]['WarningsAndErrors'] = @(
                 foreach ($War in $CommandWarnings) {
