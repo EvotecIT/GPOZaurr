@@ -50,12 +50,10 @@
             }
         } -FontSize 10pt
         New-HTMLText -Text @(
-            "That means we need to fix permissions on: "
+            "That means we need to remove "
             $($Script:Reporting['GPOPermissionsUnknown']['Variables'].WillFix)
-            " out of "
-            ($Script:Reporting['GPOPermissionsUnknown']['Data']).Count
-            " Group Policies. "
-        ) -FontSize 10pt -FontWeight bold, bold, normal, bold, normal -Color Black, FreeSpeechRed, Black, Black -LineBreak -TextDecoration none, underline, underline, underline, none
+            " unknown permissions from Group Policies. "
+        ) -FontSize 10pt -FontWeight normal, bold, normal -Color Black, FreeSpeechRed, Black -LineBreak -TextDecoration none, underline, none
     }
     Solution   = {
         New-HTMLSection -Invisible {
