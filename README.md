@@ -57,6 +57,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.91 - 24.11.2020
+  - [x] Improves `Invoke-GPOZaurr` (WIP)
+    - [x] Improve Type `GPOPermissionsUnknown`
 - 0.0.90 - 23.11.2020
   - [x] Improves `Invoke-GPOZaurr` (WIP)
     - [x] Improves Type `GPODuplicates`
