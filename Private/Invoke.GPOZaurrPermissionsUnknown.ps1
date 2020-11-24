@@ -116,7 +116,7 @@
                                 "Above command when executed will make a backup to Desktop, create GPO folder and within it it will put all those GPOs. "
                             }
                         }
-                        New-HTMLWizardStep -Name 'Add Administrative Groups proper permissions GPO' {
+                        New-HTMLWizardStep -Name 'Remove Unknown Permissions' {
                             New-HTMLText -Text @(
                                 "Following command will find any GPO which has an unknown SID and will remove it. ",
                                 "This change doesn't change any other permissions. ",
