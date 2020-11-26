@@ -117,7 +117,8 @@
         $PolicyContent.Rsop
     } else {
         $Output = [ordered] @{
-            ResultantSetPolicy = $ResultantSetPolicy
+            ComputerInformation = Get-Computer -ComputerName $ComputerName
+            ResultantSetPolicy  = $ResultantSetPolicy
         }
         if ($PolicyContent.Rsop.ComputerResults) {
             $Output.ComputerResults = ConvertFrom-XMLRSOP -Content $PolicyContent.Rsop -ResultantSetPolicy $ResultantSetPolicy -ResultsType 'ComputerResults' -Splitter $Splitter
