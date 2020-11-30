@@ -93,9 +93,9 @@
                     }
                 }
             )
-            if ($Script:GPOConfiguration[$T]['Summary']) {
-                $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
-            }
+            #if ($Script:GPOConfiguration[$T]['Summary']) {
+            #    $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
+            #}
             $TimeEndGPOList = Stop-TimeLog -Time $TimeLogGPOList -Option OneLiner
             $Script:Reporting[$T]['Time'] = $TimeEndGPOList
             Write-Color -Text '[i]', '[End  ] ', $($Script:GPOConfiguration[$T]['Name']), " [Time to execute: $TimeEndGPOList]" -Color Yellow, DarkGray, Yellow, DarkGray
@@ -125,12 +125,18 @@
         if ($Type.Count -eq 1) {
             foreach ($T in $Script:GPOConfiguration.Keys) {
                 if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+                    if ($Script:GPOConfiguration[$T]['Summary']) {
+                        $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
+                    }
                     & $Script:GPOConfiguration[$T]['Solution']
                 }
             }
         } else {
             foreach ($T in $Script:GPOConfiguration.Keys) {
                 if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+                    if ($Script:GPOConfiguration[$T]['Summary']) {
+                        $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
+                    }
                     New-HTMLTab -Name $Script:GPOConfiguration[$T]['Name'] {
                         & $Script:GPOConfiguration[$T]['Solution']
                     }
