@@ -6,6 +6,11 @@ function New-GPOZaurrReportHTML {
         [switch] $Offline,
         [switch] $Open
     )
+
+
+
+
+
     $PSDefaultParameterValues = @{
         "New-HTMLTable:WarningAction" = 'SilentlyContinue'
     }
@@ -17,14 +22,47 @@ function New-GPOZaurrReportHTML {
     #$LoggingMode = $($Support.ResultantSetPolicy.LoggingMode)
     New-HTML -TitleText "Group Policy Report - $ComputerName" {
         #New-HTMLTabOptions -SlimTabs -Transition -LinearGradient -SelectorColor Akaroa
+        New-HTMLTableOption -DataStore JavaScript -BoolAsString
         New-HTMLTabOptions -SlimTabs `
             -BorderBottomStyleActive solid -BorderBottomColorActive LightSkyBlue -BackgroundColorActive none `
             -TextColorActive Black -Align left -BorderRadius 0px -RemoveShadow -TextColor Grey -TextTransform capitalize
         New-HTMLTab -Name 'Information' {
-            New-HTMLTable -DataTable $Support.ResultantSetPolicy -HideFooter
+            New-HTMLTable -DataTable $Support.ResultantSetPolicy -HideFooter -Transpose
+
+            New-HTMLSection {
+                New-HTMLSection {
+                    New-HTMLTable -DataTable $Support.ComputerInformation.Time -Filtering -Transpose {
+                        New-TableHeader -Names 'Name', 'Value' -Title 'Time Information'
+                    }
+                    New-HTMLTable -DataTable $Support.ComputerInformation.BIOS -Filtering -Transpose
+                }
+                New-HTMLContainer {
+                    New-HTMLSection {
+                        New-HTMLTable -DataTable $Support.ComputerInformation.CPU -Filtering
+                    }
+                    New-HTMLSection {
+                        New-HTMLTable -DataTable $Support.ComputerInformation.RAM -Filtering
+                    }
+                }
+
+            }
+            New-HTMLSection {
+                New-HTMLTable -DataTable $Support.ComputerInformation.OperatingSystem -Filtering
+                New-HTMLTable -DataTable $Support.ComputerInformation.System -Filtering
+            }
+            New-HTMLSection {
+                New-HTMLTable -DataTable $Support.ComputerInformation.Disk -Filtering
+                New-HTMLTable -DataTable $Support.ComputerInformation.DiskLogical -Filtering
+            }
+            New-HTMLSection {
+                New-HTMLTable -DataTable $Support.ComputerInformation.Services -Filtering
+            }
+            New-HTMLSection {
+
+            }
         }
         foreach ($Key in $Support.Keys) {
-            if ($Key -eq 'ResultantSetPolicy') {
+            if ($Key -in 'ResultantSetPolicy', 'ComputerInformation') {
                 continue
             }
             New-HTMLTab -Name $Key {
@@ -32,7 +70,7 @@ function New-GPOZaurrReportHTML {
                     New-HTMLSection -Invisible {
                         New-HTMLSection -HeaderText 'Summary' {
                             New-HTMLTable -DataTable $Support.$Key.Summary -Filtering -PagingOptions @(7, 14 )
-                            New-HTMLTable -DataTable $Support.$Key.SummaryDetails -Filtering -PagingOptions @(7, 14)
+                            New-HTMLTable -DataTable $Support.$Key.SummaryDetails -Filtering -PagingOptions @(7, 14) -Transpose
                         }
                         New-HTMLSection -HeaderText 'Part of Security Groups' {
                             New-HTMLTable -DataTable $Support.$Key.SecurityGroups -Filtering -PagingOptions @(7, 14)
@@ -55,11 +93,34 @@ function New-GPOZaurrReportHTML {
                         }
                         #>
                         New-HTMLSection -HeaderText 'ExtensionStatus' {
-                            New-HTMLTable -DataTable $Support.$Key.ExtensionStatus -Filtering
+                            New-HTMLPanel {
+                                New-HTMLTable -DataTable $Support.$Key.ExtensionStatus -Filtering
+                            }
+                            New-HTMLPanel {
+                                New-HTMLChart -Title 'Extension TimeLine' -TitleAlignment center {
+                                    foreach ($Extension in $Support.$Key.ExtensionStatus) {
+                                        New-ChartTimeLine -DateFrom ([DateTime] $Extension.BeginTime) -DateTo ([DateTime] $Extension.EndTime) -Name $Extension.Name
+                                    }
+                                }
+                            }
                         }
                     }
                     New-HTMLSection -HeaderText 'Group Policies' {
-                        New-HTMLTable -DataTable $Support.$Key.GroupPolicies -Filtering
+                        New-HTMLTable -DataTable $Support.$Key.GroupPolicies -Filtering {
+                            # Global color applied
+                            New-TableCondition -Name 'Status' -Value 'Applied' -BackgroundColor BrightGreen -Row
+                            New-TableCondition -Name 'Status' -Value 'Denied' -BackgroundColor Salmon -Row
+
+                            # One by one colors
+                            New-TableCondition -Name 'IsValid' -Value $true -BackgroundColor BrightGreen
+                            New-TableCondition -Name 'IsValid' -Value $false -BackgroundColor Salmon
+
+                            New-TableCondition -Name 'FilterAllowed' -Value $true -BackgroundColor BrightGreen
+                            New-TableCondition -Name 'FilterAllowed' -Value $false -BackgroundColor Salmon
+
+                            New-TableCondition -Name 'AccessAllowed' -Value $true -BackgroundColor BrightGreen
+                            New-TableCondition -Name 'AccessAllowed' -Value $false -BackgroundColor Salmon
+                        }
                     }
                     New-HTMLSection -HeaderText 'Group Policies Links' {
                         New-HTMLTable -DataTable $Support.$Key.GroupPoliciesLinks -Filtering
