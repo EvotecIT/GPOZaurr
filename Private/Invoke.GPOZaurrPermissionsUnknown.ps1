@@ -149,9 +149,9 @@
                             }
                             New-HTMLText -TextBlock {
                                 "This command when executed removes only first X unknwon permissions from Group Policies. "
-                                "Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur."
+                                "Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur. "
                                 "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. "
-                                "In case of any issues please review and action accordingly."
+                                "In case of any issues please review and action accordingly. "
                             }
                         }
                         New-HTMLWizardStep -Name 'Verification report' {

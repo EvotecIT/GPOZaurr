@@ -234,7 +234,7 @@
                             }
                             New-HTMLText -TextBlock {
                                 "This command when executed adds Authenticated Users (GpoRead permission) only on first X non-compliant Group Policies. "
-                                "Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur."
+                                "Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur. "
                                 "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. "
                                 "In case of any issues please review and action accordingly."
                             }
