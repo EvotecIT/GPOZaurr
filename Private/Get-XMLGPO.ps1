@@ -27,30 +27,35 @@
         $LinksDisabledCount = 0
         $LinksTotalCount = 0
     }
-    #if ($null -eq $XMLContent.GPO.Computer.ExtensionData -and $null -eq $XMLContent.GPO.User.ExtensionData) {
-    #    $Empty = $true
-    #} else {
-    #    $Empty = $false
-    #}
     # Find proper values for enabled/disabled user/computer settings
     if ($XMLContent.GPO.Computer.Enabled -eq 'False') {
         $ComputerEnabled = $false
     } elseif ($XMLContent.GPO.Computer.Enabled -eq 'True') {
         $ComputerEnabled = $true
+    } else {
+        Write-Warning "Get-XMLGPO - Computer enabled not set to true or false. Weird."
+        $ComputerEnabled = $null
     }
     if ($XMLContent.GPO.User.Enabled -eq 'False') {
         $UserEnabled = $false
     } elseif ($XMLContent.GPO.User.Enabled -eq 'True') {
         $UserEnabled = $true
+    } else {
+        Write-Warning "Get-XMLGPO - User enabled not set to true or false. Weird."
+        $UserEnabled = $null
     }
     # Translate Enabled to same as GPO GUI
     if ($UserEnabled -eq $True -and $ComputerEnabled -eq $true) {
+        $EnabledBool = $true
         $Enabled = 'Enabled'
     } elseif ($UserEnabled -eq $false -and $ComputerEnabled -eq $false) {
+        $EnabledBool = $false
         $Enabled = 'All settings disabled'
     } elseif ($UserEnabled -eq $true -and $ComputerEnabled -eq $false) {
+        $EnabledBool = $True
         $Enabled = 'Computer configuration settings disabled'
     } elseif ($UserEnabled -eq $false -and $ComputerEnabled -eq $true) {
+        $EnabledBool = $True
         $Enabled = 'User configuration settings disabled'
     }
 
@@ -58,9 +63,9 @@
     $UserSettingsAvailable = if ($null -eq $XMLContent.GPO.User.ExtensionData) { $false } else { $true }
 
     if ($ComputerSettingsAvailable -eq $false -and $UserSettingsAvailable -eq $false) {
-        $Empty = $true
+        $NoSettings = $true
     } else {
-        $Empty = $false
+        $NoSettings = $false
     }
 
     # $OutputUser = $XMLContent.GPO.User.ExtensionData.Extension | Where-Object { $_.PSObject.Properties.TypeNameOfValue -in 'System.Xml.XmlElement', 'System.Object[]' }
@@ -72,7 +77,7 @@
             try {
                 $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] -and $_.Name -notin @('Blocked') }
             } catch {
-                Write-Warning "Get-XMLStandard - things went sideways $($_.Exception.Message)"
+                Write-Warning "Get-XMLGPO - things went sideways $($_.Exception.Message)"
                 continue
             }
         }
@@ -84,7 +89,7 @@
             try {
                 $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] -and $_.Name -notin @('Blocked') }
             } catch {
-                Write-Warning "Get-XMLStandard - things went sideways $($_.Exception.Message)"
+                Write-Warning "Get-XMLGPO - things went sideways $($_.Exception.Message)"
                 continue
             }
         }
@@ -95,9 +100,9 @@
     $UserSettingsAvailableReal = if ($OutputUser) { $true } else { $false }
 
     if (-not $ComputerSettingsAvailableReal -and -not $UserSettingsAvailableReal) {
-        $EmptyMaybe = $true
+        $Empty = $true
     } else {
-        $EmptyMaybe = $false
+        $Empty = $false
     }
 
     $ComputerProblem = $false
@@ -126,8 +131,19 @@
         $UserProblem = $true
     }
 
+    if ($UserProblem -or $ComputerProblem) {
+        $Problem = $true
+    } else {
+        $Problem = $false
+    }
+    if ($UserOptimized -and $ComputerOptimized) {
+        $Optimized = $true
+    } else {
+        $Optimized = $false
+    }
+
     if (-not $PermissionsOnly) {
-        if ($XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text') {
+        if ($ADAdministrativeGroups -and $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text') {
             $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text')"]
             $WellKnown = ConvertFrom-SID -SID $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text' -OnlyWellKnown
             if ($AdministrativeGroup) {
@@ -137,8 +153,10 @@
             } else {
                 $OwnerType = 'NotAdministrative'
             }
-        } else {
+        } elseif ($ADAdministrativeGroups) {
             $OwnerType = 'Unknown'
+        } else {
+            $OwnerType = 'Unable to asses (local files?)'
         }
     }
     if ($PermissionsOnly) {
@@ -189,32 +207,35 @@
             'DomainName'                        = $XMLContent.GPO.Identifier.Domain.'#text'
             'GUID'                              = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
             'Empty'                             = $Empty
-            'EmptyMaybe'                        = $EmptyMaybe
             'Linked'                            = $Linked
+            'Enabled'                           = $EnabledBool
+            'Optimized'                         = $Optimized
+            'Problem'                           = $Problem
+            'ComputerPolicies'                  = $XMLContent.GPO.Computer.ExtensionData.Name -join ", "
+            'UserPolicies'                      = $XMLContent.GPO.User.ExtensionData.Name -join ", "
             'LinksCount'                        = $LinksTotalCount
             'LinksEnabledCount'                 = $LinksEnabledCount
             'LinksDisabledCount'                = $LinksDisabledCount
-            'Enabled'                           = $Enabled
-            'ComputerEnabled'                   = $ComputerEnabled
-            'ComputerOptimized'                 = $ComputerOptimized
+            'EnabledDetails'                    = $Enabled
             'ComputerProblem'                   = $ComputerProblem
-            'UserEnabled'                       = $UserEnabled
-            'UserOptimized'                     = $UserOptimized
+            'ComputerOptimized'                 = $ComputerOptimized
             'UserProblem'                       = $UserProblem
+            'UserOptimized'                     = $UserOptimized
             'ComputerSettingsAvailable'         = $ComputerSettingsAvailable
             'UserSettingsAvailable'             = $UserSettingsAvailable
             'ComputerSettingsAvailableReal'     = $ComputerSettingsAvailableReal
             'UserSettingsAvailableReal'         = $UserSettingsAvailableReal
             'ComputerSettingsTypes'             = $OutputComputer.Name
             'UserSettingsTypes'                 = $OutputUser.Name
+            'ComputerEnabled'                   = $ComputerEnabled
+            'UserEnabled'                       = $UserEnabled
             'ComputerSettingsStatus'            = if ($XMLContent.GPO.Computer.VersionDirectory -eq 0 -and $XMLContent.GPO.Computer.VersionSysvol -eq 0) { "NeverModified" } else { "Modified" }
             'ComputerSetttingsVersionIdentical' = if ($XMLContent.GPO.Computer.VersionDirectory -eq $XMLContent.GPO.Computer.VersionSysvol) { $true } else { $false }
             'ComputerSettings'                  = $XMLContent.GPO.Computer.ExtensionData.Extension
             'UserSettingsStatus'                = if ($XMLContent.GPO.User.VersionDirectory -eq 0 -and $XMLContent.GPO.User.VersionSysvol -eq 0) { "NeverModified" } else { "Modified" }
             'UserSettingsVersionIdentical'      = if ($XMLContent.GPO.User.VersionDirectory -eq $XMLContent.GPO.User.VersionSysvol) { $true } else { $false }
             'UserSettings'                      = $XMLContent.GPO.User.ExtensionData.Extension
-            'ComputerPolicies'                  = $XMLContent.GPO.Computer.ExtensionData.Name -join ", "
-            'UserPolicies'                      = $XMLContent.GPO.User.ExtensionData.Name -join ", "
+            'NoSettings'                        = $NoSettings
             'CreationTime'                      = [DateTime] $XMLContent.GPO.CreatedTime
             'ModificationTime'                  = [DateTime] $XMLContent.GPO.ModifiedTime
             'ReadTime'                          = [DateTime] $XMLContent.GPO.ReadTime
