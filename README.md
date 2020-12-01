@@ -58,7 +58,12 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 ## Changelog
 
 - 0.0.92
-  - [x] Improve `Invoke-GPOZaurrSupport`
+  - [x] Improved `Invoke-GPOZaurrSupport`
+  - [x] Improved `Invoke-GPOZaurr`
+    - [x] Type `GPOList` improved with more data, more problems and clearer information
+  - [x] Improved `Remove-GPOZaurr`
+    - [x] Added ability do remove disabed GPO
+  - [x] Improved `Get-GPOZaurr` detecting more issues, delivering more data
 - 0.0.91 - 24.11.2020
   - [x] Improves `Invoke-GPOZaurr` (WIP)
     - [x] Improve Type `GPOPermissionsUnknown`
