@@ -57,7 +57,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.92
+- 0.0.92 - 01.12.2020
   - [x] Improved `Invoke-GPOZaurrSupport`
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOList` improved with more data, more problems and clearer information
