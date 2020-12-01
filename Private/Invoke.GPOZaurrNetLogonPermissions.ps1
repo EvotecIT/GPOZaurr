@@ -257,8 +257,8 @@
                                 Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrNetLogonBefore.html -Verbose -Type NetLogonPermissions
                             }
                             New-HTMLText -TextBlock {
-                                "When executed it will take a while to generate all data and provide you with new report depending on size of environment."
-                                "Once confirmed that data is still showing issues and requires fixing please proceed with next step."
+                                "When executed it will take a while to generate all data and provide you with new report depending on size of environment. "
+                                "Once confirmed that data is still showing issues and requires fixing please proceed with next step. "
                             }
                             New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
                             New-HTMLCodeBlock -Code {

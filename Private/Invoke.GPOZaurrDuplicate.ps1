@@ -76,8 +76,8 @@
                                 Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrDuplicateObjectsBefore.html -Verbose -Type GPODuplicates
                             }
                             New-HTMLText -Text {
-                                "When executed it will take a while to generate all data and provide you with new report depending on size of environment."
-                                "Once confirmed that data is still showing issues and requires fixing please proceed with next step."
+                                "When executed it will take a while to generate all data and provide you with new report depending on size of environment. "
+                                "Once confirmed that data is still showing issues and requires fixing please proceed with next step. "
                             }
                             New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
                             New-HTMLCodeBlock -Code {
@@ -100,8 +100,8 @@
                                 Remove-GPOZaurrDuplicateObject -Verbose -LimitProcessing 2
                             }
                             New-HTMLText -TextBlock {
-                                "This command when executed removes only first X duplicate objects. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur."
-                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly."
+                                "This command when executed removes only first X duplicate objects. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
+                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
                             }
                         }
                         New-HTMLWizardStep -Name 'Verification report' {
