@@ -1,7 +1,7 @@
 ﻿function Remove-GPOZaurr {
     [cmdletBinding(SupportsShouldProcess)]
     param(
-        [parameter(Mandatory)][validateset('Empty', 'Unlinked')][string[]] $Type,
+        [parameter(Mandatory)][validateset('Empty', 'Unlinked', 'Disabled')][string[]] $Type,
         [int] $LimitProcessing,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
@@ -28,58 +28,45 @@
     }
     Process {
         Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOPath $GPOPath | ForEach-Object {
+            $DeleteRequired = $false
             if ($Type -contains 'Empty') {
-                if ($_.ComputerSettingsAvailable -eq $false -and $_.UserSettingsAvailable -eq $false) {
-                    if ($BackupRequired) {
-                        try {
-                            Write-Verbose "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName)"
-                            $BackupInfo = Backup-GPO -Guid $_.Guid -Domain $_.DomainName -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
-                            $BackupInfo
-                            $BackupOK = $true
-                        } catch {
-                            Write-Warning "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
-                            $BackupOK = $false
-                        }
-                    }
-                    if (($BackupRequired -and $BackupOK) -or (-not $BackupRequired)) {
-                        try {
-                            Write-Verbose "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName)"
-                            Remove-GPO -Domain $_.DomainName -Guid $_.Guid -ErrorAction Stop #-Server $QueryServer
-                        } catch {
-                            Write-Warning "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
-                        }
-                    }
-                    $Count++
-                    if ($LimitProcessing -eq $Count) {
-                        break
-                    }
+                if ($_.Empty -eq $true) {
+                    $DeleteRequired = $true
                 }
             }
             if ($Type -contains 'Unlinked') {
                 if ($_.Linked -eq $false) {
-                    if ($BackupRequired) {
-                        try {
-                            Write-Verbose "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName)"
-                            $BackupInfo = Backup-GPO -Guid $_.Guid -Domain $_.DomainName -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
-                            $BackupInfo
-                            $BackupOK = $true
-                        } catch {
-                            Write-Warning "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
-                            $BackupOK = $false
-                        }
+                    $DeleteRequired = $true
+                }
+            }
+            if ($Type -contains 'Disabled') {
+                if ($_.Enabled -eq $false) {
+                    $DeleteRequired = $true
+                }
+            }
+            if ($DeleteRequired) {
+                if ($BackupRequired) {
+                    try {
+                        Write-Verbose "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName)"
+                        $BackupInfo = Backup-GPO -Guid $_.Guid -Domain $_.DomainName -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
+                        $BackupInfo
+                        $BackupOK = $true
+                    } catch {
+                        Write-Warning "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
+                        $BackupOK = $false
                     }
-                    if (($BackupRequired -and $BackupOK) -or (-not $BackupRequired)) {
-                        try {
-                            Write-Verbose "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName)"
-                            Remove-GPO -Domain $_.DomainName -Guid $_.Guid -ErrorAction Stop #-Server $QueryServer
-                        } catch {
-                            Write-Warning "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
-                        }
+                }
+                if (($BackupRequired -and $BackupOK) -or (-not $BackupRequired)) {
+                    try {
+                        Write-Verbose "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName)"
+                        Remove-GPO -Domain $_.DomainName -Guid $_.Guid -ErrorAction Stop #-Server $QueryServer
+                    } catch {
+                        Write-Warning "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
                     }
-                    $Count++
-                    if ($LimitProcessing -eq $Count) {
-                        break
-                    }
+                }
+                $Count++
+                if ($LimitProcessing -eq $Count) {
+                    break
                 }
             }
         }
