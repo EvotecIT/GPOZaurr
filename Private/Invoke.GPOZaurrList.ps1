@@ -195,9 +195,9 @@
                     New-ChartBar -Name 'Enabled' -Value $Script:Reporting['GPOList']['Variables']['GPOEnabled'], $Script:Reporting['GPOList']['Variables']['GPODisabled']
                     New-ChartBar -Name 'Valid' -Value $Script:Reporting['GPOList']['Variables']['GPOValid'], $Script:Reporting['GPOList']['Variables']['GPONotValid']
                     New-ChartBar -Name 'Optimized (for speed)' -Value $Script:Reporting['GPOList']['Variables']['GPOOptimized'], $Script:Reporting['GPOList']['Variables']['GPONotOptimized']
-                    New-ChartBar -Name 'With problem' -Value $Script:Reporting['GPOList']['Variables']['GPOProblem'], $Script:Reporting['GPOList']['Variables']['GPONoProblem']
-                    New-ChartBar -Name 'With problem (computers)' -Value $Script:Reporting['GPOList']['Variables']['ComputerProblemNo'], $Script:Reporting['GPOList']['Variables']['ComputerProblemYes']
-                    New-ChartBar -Name 'With problem (users)' -Value $Script:Reporting['GPOList']['Variables']['UserProblemNo'], $Script:Reporting['GPOList']['Variables']['UserProblemYes']
+                    New-ChartBar -Name 'No problem' -Value $Script:Reporting['GPOList']['Variables']['GPONoProblem'], $Script:Reporting['GPOList']['Variables']['GPOProblem']
+                    New-ChartBar -Name 'No problem (computers)' -Value $Script:Reporting['GPOList']['Variables']['ComputerProblemNo'], $Script:Reporting['GPOList']['Variables']['ComputerProblemYes']
+                    New-ChartBar -Name 'No problem (users)' -Value $Script:Reporting['GPOList']['Variables']['UserProblemNo'], $Script:Reporting['GPOList']['Variables']['UserProblemYes']
                     New-ChartBar -Name 'Optimized Computers' -Value $Script:Reporting['GPOList']['Variables']['ComputerOptimizedYes'], $Script:Reporting['GPOList']['Variables']['ComputerOptimizedNo']
                     New-ChartBar -Name 'Optimized Users' -Value $Script:Reporting['GPOList']['Variables']['UserOptimizedYes'], $Script:Reporting['GPOList']['Variables']['UserOptimizedNo']
                 } -TitleAlignment center
