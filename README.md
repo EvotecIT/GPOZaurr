@@ -57,9 +57,12 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.93 - 02.12.2020
+- 0.0.93 - 03.12.2020
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOList` reverted charts colors for entries to match colors
+    - [ ] Added `Skip-GroupPolicy` to use within `Invoke-GPOZaurr`
+  - [x] Improved `Invoke-GPOZaurr` with basic support for Exclusions
+  - [x] Improved `Get-GPOZaurr` with basic support for Exclusions
 - 0.0.92 - 01.12.2020
   - [x] Improved `Invoke-GPOZaurrSupport`
   - [x] Improved `Invoke-GPOZaurr`
