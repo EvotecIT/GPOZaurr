@@ -57,6 +57,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.94
+  - [x] Fix for too big int - [#4](https://github.com/EvotecIT/GPOZaurr/issues/4) - tnx neztach
 - 0.0.93 - 03.12.2020
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOList` reverted charts colors for entries to match colors
