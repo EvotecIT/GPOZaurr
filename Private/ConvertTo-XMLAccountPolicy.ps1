@@ -42,7 +42,7 @@
                 if ($GPOEntry.SettingBoolean) {
                     $Settings[$($GPOEntry.Name)] = if ($GPOEntry.SettingBoolean -eq 'true') { 'Enabled' } elseif ($GPOEntry.SettingBoolean -eq 'false') { 'Disabled' } else { 'Not set' };
                 } elseif ($GPOEntry.SettingNumber) {
-                    $Settings[$($GPOEntry.Name)] = [int] $GPOEntry.SettingNumber
+                    $Settings[$($GPOEntry.Name)] = [int64] $GPOEntry.SettingNumber
                 }
             }
             [PSCustomObject] $Settings
@@ -84,7 +84,7 @@
             if ($GPOEntry.SettingBoolean) {
                 $CreateGPO[$($GPOEntry.Name)] = if ($GPOEntry.SettingBoolean -eq 'true') { 'Enabled' } elseif ($GPOEntry.SettingBoolean -eq 'false') { 'Disabled' } else { 'Not set' };
             } elseif ($GPOEntry.SettingNumber) {
-                $CreateGPO[$($GPOEntry.Name)] = [int] $GPOEntry.SettingNumber
+                $CreateGPO[$($GPOEntry.Name)] = [int64] $GPOEntry.SettingNumber
             }
         }
         $CreateGPO['Linked'] = $GPO.Linked
