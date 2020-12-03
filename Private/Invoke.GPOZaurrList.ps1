@@ -154,8 +154,8 @@
         ) -FontSize 10pt -FontWeight normal, bold, normal, bold, normal, bold, normal, normal, normal, normal
 
         New-HTMLText -LineBreak
-        <#
-        New-HTMLText -Text "Additionally, we're reviewing Group Policies that have their section disabled, but contain data. Please review them and make sure this configuration is as expected!" -FontSize 10pt
+
+        New-HTMLText -Text "Additionally, we're reviewing Group Policies that have their section disabled, but contain data." -FontSize 10pt
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Group Policies with problems: ', $Script:Reporting['GPOList']['Variables']['GPOWithProblems'] -FontWeight normal, bold {
                 New-HTMLList -Type Unordered {
@@ -164,7 +164,15 @@
                 }
             }
         } -FontSize 10pt
-        New-HTMLText -Text "For best performance it's recommended that if there are no settings of certain kind (Computer or User settings) it's best to disable them. " -FontSize 10pt
+        New-HTMLText -Text @(
+            "Such policies require manual review from whoever owns them. "
+            "It could be a mistake tha section was disabled while containing data or that content is no longer needed in which case it should be deleted. "
+            "This can't be auto-handled and is INFORMATIONAL only. "
+        ) -FontSize 10pt
+
+        New-HTMLText -LineBreak
+
+        New-HTMLText -Text "Moreover, for best performance it's recommended that if there are no settings of certain kind (Computer or User settings) it's best to disable whole section. " -FontSize 10pt
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Group Policies with optimization: ' -FontWeight normal, bold {
                 New-HTMLList -Type Unordered {
@@ -179,7 +187,11 @@
                 }
             }
         } -FontSize 10pt
-        #>
+        New-HTMLText -Text @(
+            "This means "
+            $Script:Reporting['GPOList']['Variables']['GPONotOptimized']
+            " could be optimized for performance reasons. "
+        ) -FontSize 10pt -FontWeight normal, bold, normal
     }
     Solution   = {
         New-HTMLSection -Invisible {

@@ -7,7 +7,8 @@
         [switch] $OwnerOnly,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
         [string] $Splitter = [System.Environment]::NewLine,
-        [switch] $ReturnObject
+        [switch] $ReturnObject,
+        [System.Collections.IDictionary] $ExcludeGroupPolicies
     )
     if ($XMLContent.GPO.LinksTo) {
         $LinkSplit = ([Array] $XMLContent.GPO.LinksTo).Where( { $_.Enabled -eq $true }, 'Split')
@@ -159,6 +160,14 @@
             $OwnerType = 'Unable to asses (local files?)'
         }
     }
+    # Mark GPO as excluded
+    $Exclude = $false
+    if ($ExcludeGroupPolicies) {
+        $PolicyWithDomain = -join ($XMLContent.GPO.Identifier.Domain.'#text', $XMLContent.GPO.Name)
+        if ($ExcludeGroupPolicies[$XMLContent.GPO.Name] -or $ExcludeGroupPolicies[$PolicyWithDomain]) {
+            $Exclude = $true
+        }
+    }
     if ($PermissionsOnly) {
         [PsCustomObject] @{
             'DisplayName'          = $XMLContent.GPO.Name
@@ -211,6 +220,7 @@
             'Enabled'                           = $EnabledBool
             'Optimized'                         = $Optimized
             'Problem'                           = $Problem
+            'Exclude'                           = $Exclude
             'ComputerPolicies'                  = $XMLContent.GPO.Computer.ExtensionData.Name -join ", "
             'UserPolicies'                      = $XMLContent.GPO.User.ExtensionData.Name -join ", "
             'LinksCount'                        = $LinksTotalCount

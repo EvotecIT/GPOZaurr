@@ -10,6 +10,8 @@
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [string[]] $GPOPath,
 
+        [Array] $ExcludeGroupPolicies,
+
         [switch] $PermissionsOnly,
         [switch] $OwnerOnly,
         [switch] $Limited,
@@ -23,6 +25,22 @@
         }
         if (-not $GPOPath) {
             $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        }
+        $ExcludeGPO = [ordered] @{}
+        if ($ExcludeGroupPolicies) {
+            foreach ($GroupPolicy in $ExcludeGroupPolicies) {
+                if ($GroupPolicy -is [string]) {
+                    $ExcludeGPO[$GroupPolicy] = $true
+                } elseif ($GroupPolicy -is [System.Collections.IDictionary] -and $GroupPolicy.Name -and $GroupPolicy.DomainName) {
+                    $PolicyName = -join ($GroupPolicy.DomainName, $GroupPolicy.Name)
+                    $ExcludeGPO[$PolicyName] = $true
+                } elseif ($GroupPolicy -is [System.Collections.IDictionary] -and $GroupPolicy.Name) {
+                    $ExcludeGPO[$GroupPolicy.Name] = $true
+                } else {
+                    Write-Warning "Get-GPOZaurr - Exclusion takes only Group Policy Name as string, or as hashtable with domain name @{ Name = 'Group Policy Name'; DomainName = 'Domain' }."
+                    continue
+                }
+            }
         }
     }
     Process {
@@ -43,7 +61,7 @@
                                 Write-Warning "Get-GPOZaurr - Failed to get GPOReport: $($_.Exception.Message). Skipping."
                                 continue
                             }
-                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent
+                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO
                         } else {
                             $_
                         }
@@ -61,7 +79,7 @@
                                 Write-Warning "Get-GPOZaurr - Failed to get GPOReport: $($_.Exception.Message). Skipping."
                                 continue
                             }
-                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent
+                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO
                         } else {
                             $_
                         }
@@ -79,7 +97,7 @@
                                 Write-Warning "Get-GPOZaurr - Failed to get GPOReport: $($_.Exception.Message). Skipping."
                                 continue
                             }
-                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent
+                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO
                         } else {
                             $_
                         }
@@ -92,7 +110,7 @@
                 Get-ChildItem -LiteralPath $Path -Recurse -Filter *.xml | ForEach-Object {
                     $XMLContent = [XML]::new()
                     $XMLContent.Load($_.FullName)
-                    Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -PermissionsOnly:$PermissionsOnly.IsPresent
+                    Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -PermissionsOnly:$PermissionsOnly.IsPresent -ExcludeGroupPolicies $ExcludeGPO
                 }
                 Write-Verbose "Get-GPOZaurr - Finished GPO content from XML files"
             }
