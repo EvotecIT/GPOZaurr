@@ -4,7 +4,12 @@
     Action     = $null
     Data       = $null
     Execute    = {
-        Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+        if ($Script:Reporting['GPOList']['ExclusionsCode']) {
+            Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExcludeGroupPolicies $Script:Reporting['GPOList']['ExclusionsCode']
+
+        } else {
+            Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+        }
     }
     Processing = {
         foreach ($GPO in $Script:Reporting['GPOList']['Data']) {
@@ -248,6 +253,13 @@
                 } -PagingOptions 10, 20, 30, 40, 50
             }
         }
+        if ($Script:Reporting['GPOList']['Exclusions']) {
+            New-HTMLSection -Name 'Group Policies Exclusions' {
+                New-HTMLTable -DataTable $Script:Reporting['GPOList']['Exclusions'] -Filtering {
+
+                }
+            }
+        }
         New-HTMLSection -Name 'Steps to fix - Empty & Unlinked & Disabled Group Policies' {
             New-HTMLContainer {
                 New-HTMLSpanStyle -FontSize 10pt {
@@ -304,27 +316,67 @@
                                 "Make sure to use BackupPath which will make sure that for each GPO that is about to be deleted a backup is made to folder on a desktop."
                                 "You can skip parameters related to backup if you did backup all GPOs prior to running remove command. "
                             ) -FontWeight normal, bold, normal, bold, normal, bold, normal, normal -Color Black, Red, Black, Red, Black
-                            New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
+                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
+                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
+                                $Code = @"
+Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
+    $ExclusionsCode
+}
+"@
+                                New-HTMLCodeBlock -Code $Code
+                            } else {
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
+                                }
                             }
                             New-HTMLText -TextBlock {
                                 "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                             }
-                            New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
+                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
+                                $Code = @"
+Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
+    $ExclusionsCode
+}
+"@
+                                New-HTMLCodeBlock -Code $Code
+                            } else {
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
                             }
                             New-HTMLText -TextBlock {
                                 "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
                             } -LineBreak
                             New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
-                            New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
+                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
+                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
+                                $Code = @"
+Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
+    $ExclusionsCode
+}
+"@
+                                New-HTMLCodeBlock -Code $Code
+                            } else {
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
+                                }
                             }
                             New-HTMLText -TextBlock {
                                 "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                             }
-                            New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
+                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
+                                $Code = @"
+Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
+    $ExclusionsCode
+}
+"@
+                                New-HTMLCodeBlock -Code $Code
+                            } else {
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
                             }
                             New-HTMLText -TextBlock {
                                 "This command when executed deletes only first X empty or unlinked GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur."
@@ -346,27 +398,67 @@
                             New-HTMLText -TextBlock {
                                 ""
                             }
-                            New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
+                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
+                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
+                                $Code = @"
+Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
+    $ExclusionsCode
+}
+"@
+                                New-HTMLCodeBlock -Code $Code
+                            } else {
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
+                                }
                             }
                             New-HTMLText -TextBlock {
                                 "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                             }
-                            New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
+                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
+                                $Code = @"
+Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor' {
+    $ExclusionsCode
+}
+"@
+                                New-HTMLCodeBlock -Code $Code
+                            } else {
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
                             }
                             New-HTMLText -TextBlock {
                                 "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
                             } -LineBreak
                             New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
-                            New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
+                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
+                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
+                                $Code = @"
+Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose {
+    $ExclusionsCode
+}
+"@
+                                New-HTMLCodeBlock -Code $Code
+                            } else {
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
+                                }
                             }
                             New-HTMLText -TextBlock {
                                 "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                             }
-                            New-HTMLCodeBlock -Code {
-                                Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
+                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
+                                $Code = @"
+Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor' {
+    $ExclusionsCode
+}
+"@
+                                New-HTMLCodeBlock -Code $Code
+                            } else {
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
                             }
                             New-HTMLText -TextBlock {
                                 "This command when executed deletes only first X disabled GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
