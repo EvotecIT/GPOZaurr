@@ -62,7 +62,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOList` - added ability for Exclusions
     - [x] All other types, small improvements
-    - [x] Added HideSteps, HideErrors, HideWarnings
+    - [x] Added HideSteps, ShowError, ShowWarning -> Disabled Warnings/Errors by default as they tend to show too much information
   - [x] Improved `Remove-GPOZaurr` - added Exclusions
 - 0.0.93 - 03.12.2020
   - [x] Improved `Invoke-GPOZaurr`
