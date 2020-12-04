@@ -1,6 +1,7 @@
 ﻿function Get-GPOZaurr {
     [cmdletBinding()]
     param(
+        [scriptblock] $ExcludeGroupPolicies,
         [string] $GPOName,
         [alias('GUID', 'GPOID')][string] $GPOGuid,
 
@@ -9,8 +10,6 @@
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [string[]] $GPOPath,
-
-        [Array] $ExcludeGroupPolicies,
 
         [switch] $PermissionsOnly,
         [switch] $OwnerOnly,
@@ -28,13 +27,14 @@
         }
         $ExcludeGPO = [ordered] @{}
         if ($ExcludeGroupPolicies) {
-            foreach ($GroupPolicy in $ExcludeGroupPolicies) {
+            $ExExecution = Invoke-Command -ScriptBlock $ExcludeGroupPolicies
+            foreach ($GroupPolicy in $ExExecution) {
                 if ($GroupPolicy -is [string]) {
                     $ExcludeGPO[$GroupPolicy] = $true
-                } elseif ($GroupPolicy -is [System.Collections.IDictionary] -and $GroupPolicy.Name -and $GroupPolicy.DomainName) {
+                } elseif ($GroupPolicy.Name -and $GroupPolicy.DomainName) {
                     $PolicyName = -join ($GroupPolicy.DomainName, $GroupPolicy.Name)
                     $ExcludeGPO[$PolicyName] = $true
-                } elseif ($GroupPolicy -is [System.Collections.IDictionary] -and $GroupPolicy.Name) {
+                } elseif ($GroupPolicy.Name) {
                     $ExcludeGPO[$GroupPolicy.Name] = $true
                 } else {
                     Write-Warning "Get-GPOZaurr - Exclusion takes only Group Policy Name as string, or as hashtable with domain name @{ Name = 'Group Policy Name'; DomainName = 'Domain' }."

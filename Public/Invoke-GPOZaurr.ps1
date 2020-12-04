@@ -2,12 +2,14 @@
     [alias('Show-GPOZaurr', 'Show-GPO')]
     [cmdletBinding()]
     param(
-        [scriptblock] $Extension,
+        [scriptblock] $Exclusions,
         [string] $FilePath,
         [string[]] $Type,
         [switch] $PassThru,
         [switch] $HideHTML,
-
+        [switch] $HideSteps,
+        [switch] $HideErrors,
+        [switch] $HideWarnings,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains
@@ -16,6 +18,11 @@
 
     $Script:Reporting = [ordered] @{}
     $Script:Reporting['Version'] = Get-GitHubVersion -Cmdlet 'Invoke-GPOZaurr' -RepositoryOwner 'evotecit' -RepositoryName 'GPOZaurr'
+    $Script:Reporting['Settings'] = @{
+        HideErrors   = $HideErrors.IsPresent
+        HideWarnings = $HideWarnings.IsPresent
+        HideSteps    = $HideSteps.IsPresent
+    }
     Write-Color '[i]', "[GPOZaurr] ", 'Version', ' [Informative] ', $Script:Reporting['Version'] -Color Yellow, DarkGray, Yellow, DarkGray, Magenta
 
     # Verify requested types are supported
@@ -43,6 +50,7 @@
     Write-Color '[i]', "[GPOZaurr] ", 'Domain Information', ' [Informative] ', "Excluded Domains: ", $DisplayExcludedDomains -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
 
     # Exclusions support, converts ScriptBlock into list of GPOs
+    <#
     $Exclusions = [ordered]@{}
     if ($Extension) {
         $Exclusions['All'] = [System.Collections.Generic.List[PSCustomObject]]::new()
@@ -60,6 +68,7 @@
             }
         }
     }
+    #>
 
     # Lets make sure we only enable those types which are requestd by user
     if ($Type) {
@@ -86,7 +95,8 @@
                 Variables         = Copy-Dictionary -Dictionary $Script:GPOConfiguration[$T]['Variables']
             }
             if ($Exclusions) {
-                $Script:Reporting[$T]['Exclusions'] = $Extension
+                $Script:Reporting[$T]['ExclusionsCode'] = $Exclusions
+                $Script:Reporting[$T]['Exclusions'] = & $Exclusions
             }
 
             $TimeLogGPOList = Start-TimeLog
@@ -101,20 +111,24 @@
             }
             Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Processing']
             $Script:Reporting[$T]['WarningsAndErrors'] = @(
-                foreach ($War in $CommandWarnings) {
-                    [PSCustomObject] @{
-                        Type       = 'Warning'
-                        Comment    = $War
-                        Reason     = ''
-                        TargetName = ''
+                if (-not $HideWarnings) {
+                    foreach ($War in $CommandWarnings) {
+                        [PSCustomObject] @{
+                            Type       = 'Warning'
+                            Comment    = $War
+                            Reason     = ''
+                            TargetName = ''
+                        }
                     }
                 }
-                foreach ($Err in $CommandErrors) {
-                    [PSCustomObject] @{
-                        Type       = 'Error'
-                        Comment    = $Err
-                        Reason     = $Err.CategoryInfo.Reason
-                        TargetName = $Err.CategoryInfo.TargetName
+                if (-not $HideErrors) {
+                    foreach ($Err in $CommandErrors) {
+                        [PSCustomObject] @{
+                            Type       = 'Error'
+                            Comment    = $Err
+                            Reason     = $Err.CategoryInfo.Reason
+                            TargetName = $Err.CategoryInfo.TargetName
+                        }
                     }
                 }
             )

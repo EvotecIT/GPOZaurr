@@ -5,10 +5,16 @@
         [string] $Name,
         [string] $DomaiName
     )
-    @{
-        Type       = 'Exclusion'
-        ReportType = $Type
-        Name       = $Name
-        DomainName = $DomaiName
+    if ($Type) {
+        [PSCustomObject] @{
+            Type       = $Type
+            Name       = $Name
+            DomainName = $DomaiName
+        }
+    } else {
+        [PSCustomObject] @{
+            Name       = $Name
+            DomainName = $DomaiName
+        }
     }
 }
