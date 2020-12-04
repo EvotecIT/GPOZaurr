@@ -28,7 +28,16 @@
         $Count = 0
     }
     Process {
-        Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOPath $GPOPath -ExcludeGroupPolicies $ExcludeGroupPolicies | ForEach-Object {
+        $getGPOZaurrSplat = @{
+            Forest                    = $Forest
+            IncludeDomains            = $IncludeDomains
+            ExcludeDomains            = $ExcludeDomains
+            ExtendedForestInformation = $ExtendedForestInformation
+            GPOPath                   = $GPOPath
+            ExcludeGroupPolicies      = $ExcludeGroupPolicies
+        }
+
+        Get-GPOZaurr @getGPOZaurrSplat | ForEach-Object {
             $DeleteRequired = $false
 
             if ($Type -contains 'Empty') {
