@@ -57,7 +57,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.94
+- 0.0.95 - 04.12.2020
   - [x] Fix for too big int - [#4](https://github.com/EvotecIT/GPOZaurr/issues/4) - tnx neztach
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOList` - added ability for Exclusions
