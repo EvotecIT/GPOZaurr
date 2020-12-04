@@ -63,6 +63,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
     - [x] Type `GPOList` - added ability for Exclusions
     - [x] All other types, small improvements
     - [x] Added HideSteps, HideErrors, HideWarnings
+  - [x] Improved `Remove-GPOZaurr` - added Exclusions
 - 0.0.93 - 03.12.2020
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOList` reverted charts colors for entries to match colors
