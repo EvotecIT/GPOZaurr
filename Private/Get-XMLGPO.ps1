@@ -60,6 +60,7 @@
         $Enabled = 'User configuration settings disabled'
     }
 
+    # This is kind of old way of doing things, but it's superseded by other way below
     $ComputerSettingsAvailable = if ($null -eq $XMLContent.GPO.Computer.ExtensionData) { $false } else { $true }
     $UserSettingsAvailable = if ($null -eq $XMLContent.GPO.User.ExtensionData) { $false } else { $true }
 
@@ -97,21 +98,21 @@
         $KeysToLoop
     }
 
-    $ComputerSettingsAvailableReal = if ($OutputComputer) { $true } else { $false }
-    $UserSettingsAvailableReal = if ($OutputUser) { $true } else { $false }
+    $ComputerSettingsAvailable = if ($OutputComputer) { $true } else { $false }
+    $UserSettingsAvailable = if ($OutputUser) { $true } else { $false }
 
-    if (-not $ComputerSettingsAvailableReal -and -not $UserSettingsAvailableReal) {
+    if (-not $ComputerSettingsAvailable -and -not $UserSettingsAvailable) {
         $Empty = $true
     } else {
         $Empty = $false
     }
 
     $ComputerProblem = $false
-    if ($ComputerEnabled -eq $true -and $ComputerSettingsAvailableReal -eq $true) {
+    if ($ComputerEnabled -eq $true -and $ComputerSettingsAvailable -eq $true) {
         $ComputerOptimized = $true
-    } elseif ($ComputerEnabled -eq $true -and $ComputerSettingsAvailableReal -eq $false) {
+    } elseif ($ComputerEnabled -eq $true -and $ComputerSettingsAvailable -eq $false) {
         $ComputerOptimized = $false
-    } elseif ($ComputerEnabled -eq $false -and $ComputerSettingsAvailableReal -eq $false) {
+    } elseif ($ComputerEnabled -eq $false -and $ComputerSettingsAvailable -eq $false) {
         $ComputerOptimized = $true
     } else {
         # Enabled $false, but ComputerData is there.
@@ -120,11 +121,11 @@
     }
 
     $UserProblem = $false
-    if ($UserEnabled -eq $true -and $UserSettingsAvailableReal -eq $true) {
+    if ($UserEnabled -eq $true -and $UserSettingsAvailable -eq $true) {
         $UserOptimized = $true
-    } elseif ($UserEnabled -eq $true -and $UserSettingsAvailableReal -eq $false) {
+    } elseif ($UserEnabled -eq $true -and $UserSettingsAvailable -eq $false) {
         $UserOptimized = $false
-    } elseif ($UserEnabled -eq $false -and $UserSettingsAvailableReal -eq $false) {
+    } elseif ($UserEnabled -eq $false -and $UserSettingsAvailable -eq $false) {
         $UserOptimized = $true
     } else {
         # Enabled $false, but UserData is there.
@@ -233,8 +234,8 @@
             'UserOptimized'                     = $UserOptimized
             'ComputerSettingsAvailable'         = $ComputerSettingsAvailable
             'UserSettingsAvailable'             = $UserSettingsAvailable
-            'ComputerSettingsAvailableReal'     = $ComputerSettingsAvailableReal
-            'UserSettingsAvailableReal'         = $UserSettingsAvailableReal
+            #'ComputerSettingsAvailableReal'         = $ComputerSettingsAvailableReal
+            #'UserSettingsAvailableReal'             = $UserSettingsAvailableReal
             'ComputerSettingsTypes'             = $OutputComputer.Name
             'UserSettingsTypes'                 = $OutputUser.Name
             'ComputerEnabled'                   = $ComputerEnabled
