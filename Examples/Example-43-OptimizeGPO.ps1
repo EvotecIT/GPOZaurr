@@ -1,3 +1,3 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-Optimize-GPOZaurr -WhatIf -Verbose -LimitProcessing 2
+Optimize-GPOZaurr -All -WhatIf -Verbose -LimitProcessing 2
