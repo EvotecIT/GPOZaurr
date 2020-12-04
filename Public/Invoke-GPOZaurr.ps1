@@ -2,9 +2,9 @@
     [alias('Show-GPOZaurr', 'Show-GPO')]
     [cmdletBinding()]
     param(
-        [scriptblock] $Exclusions,
+        [Parameter(Position = 1)][scriptblock] $ExcludeGroupPolicies,
         [string] $FilePath,
-        [string[]] $Type,
+        [Parameter(Position = 0)][string[]] $Type,
         [switch] $PassThru,
         [switch] $HideHTML,
         [switch] $HideSteps,
@@ -95,8 +95,8 @@
                 Variables         = Copy-Dictionary -Dictionary $Script:GPOConfiguration[$T]['Variables']
             }
             if ($Exclusions) {
-                $Script:Reporting[$T]['ExclusionsCode'] = $Exclusions
-                $Script:Reporting[$T]['Exclusions'] = & $Exclusions
+                $Script:Reporting[$T]['ExclusionsCode'] = $ExcludeGroupPolicies
+                $Script:Reporting[$T]['Exclusions'] = & $ExcludeGroupPolicies
             }
 
             $TimeLogGPOList = Start-TimeLog

@@ -1,7 +1,8 @@
 ﻿function Remove-GPOZaurr {
     [cmdletBinding(SupportsShouldProcess)]
     param(
-        [parameter(Mandatory)][validateset('Empty', 'Unlinked', 'Disabled')][string[]] $Type,
+        [Parameter(Position = 1)][scriptblock] $ExcludeGroupPolicies,
+        [parameter(Position = 0, Mandatory)][validateset('Empty', 'Unlinked', 'Disabled')][string[]] $Type,
         [int] $LimitProcessing,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
@@ -27,8 +28,9 @@
         $Count = 0
     }
     Process {
-        Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOPath $GPOPath | ForEach-Object {
+        Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOPath $GPOPath -ExcludeGroupPolicies $ExcludeGroupPolicies | ForEach-Object {
             $DeleteRequired = $false
+
             if ($Type -contains 'Empty') {
                 if ($_.Empty -eq $true) {
                     $DeleteRequired = $true
@@ -44,7 +46,9 @@
                     $DeleteRequired = $true
                 }
             }
-            if ($DeleteRequired) {
+            if ($_.Exclude -eq $true) {
+                Write-Verbose "Remove-GPOZaurr - Excluded GPO $($_.DisplayName) from $($_.DomainName). Skipping!"
+            } elseif ($DeleteRequired) {
                 if ($BackupRequired) {
                     try {
                         Write-Verbose "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName)"
