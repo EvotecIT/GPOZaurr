@@ -8,8 +8,8 @@
         [switch] $PassThru,
         [switch] $HideHTML,
         [switch] $HideSteps,
-        [switch] $HideErrors,
-        [switch] $HideWarnings,
+        [switch] $ShowError,
+        [switch] $ShowWarning,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains
@@ -19,9 +19,9 @@
     $Script:Reporting = [ordered] @{}
     $Script:Reporting['Version'] = Get-GitHubVersion -Cmdlet 'Invoke-GPOZaurr' -RepositoryOwner 'evotecit' -RepositoryName 'GPOZaurr'
     $Script:Reporting['Settings'] = @{
-        HideErrors   = $HideErrors.IsPresent
-        HideWarnings = $HideWarnings.IsPresent
-        HideSteps    = $HideSteps.IsPresent
+        ShowError   = $ShowError.IsPresent
+        ShowWarning = $ShowWarning.IsPresent
+        HideSteps   = $HideSteps.IsPresent
     }
     Write-Color '[i]', "[GPOZaurr] ", 'Version', ' [Informative] ', $Script:Reporting['Version'] -Color Yellow, DarkGray, Yellow, DarkGray, Magenta
 
@@ -111,7 +111,7 @@
             }
             Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Processing']
             $Script:Reporting[$T]['WarningsAndErrors'] = @(
-                if (-not $HideWarnings) {
+                if ($ShowWarning) {
                     foreach ($War in $CommandWarnings) {
                         [PSCustomObject] @{
                             Type       = 'Warning'
@@ -121,7 +121,7 @@
                         }
                     }
                 }
-                if (-not $HideErrors) {
+                if ($ShowError) {
                     foreach ($Err in $CommandErrors) {
                         [PSCustomObject] @{
                             Type       = 'Error'
