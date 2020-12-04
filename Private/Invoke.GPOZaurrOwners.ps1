@@ -135,88 +135,90 @@
                 New-HTMLTableCondition -Name 'IsOwnerAdministrative' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
             } -PagingOptions 10, 20, 30, 40, 50
         }
-        New-HTMLSection -Name 'Steps to fix Group Policy Owners' {
-            New-HTMLContainer {
-                New-HTMLSpanStyle -FontSize 10pt {
-                    #New-HTMLText -Text 'Following steps will guide you how to fix group policy owners'
-                    New-HTMLWizard {
-                        New-HTMLWizardStep -Name 'Prepare environment' {
-                            New-HTMLText -Text "To be able to execute actions in automated way please install required modules. Those modules will be installed straight from Microsoft PowerShell Gallery."
-                            New-HTMLCodeBlock -Code {
-                                Install-Module GPOZaurr -Force
-                                Import-Module GPOZaurr -Force
-                            } -Style powershell
-                            New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
-                        }
-                        New-HTMLWizardStep -Name 'Prepare report' {
-                            New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with fixing Group Policy Owners. To generate new report please use:"
-                            New-HTMLCodeBlock -Code {
-                                Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOOwnersBefore.html -Verbose -Type GPOOwners
+        if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
+            New-HTMLSection -Name 'Steps to fix Group Policy Owners' {
+                New-HTMLContainer {
+                    New-HTMLSpanStyle -FontSize 10pt {
+                        #New-HTMLText -Text 'Following steps will guide you how to fix group policy owners'
+                        New-HTMLWizard {
+                            New-HTMLWizardStep -Name 'Prepare environment' {
+                                New-HTMLText -Text "To be able to execute actions in automated way please install required modules. Those modules will be installed straight from Microsoft PowerShell Gallery."
+                                New-HTMLCodeBlock -Code {
+                                    Install-Module GPOZaurr -Force
+                                    Import-Module GPOZaurr -Force
+                                } -Style powershell
+                                New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
                             }
-                            New-HTMLText -TextBlock {
-                                "When executed it will take a while to generate all data and provide you with new report depending on size of environment."
-                                "Once confirmed that data is still showing issues and requires fixing please proceed with next step."
+                            New-HTMLWizardStep -Name 'Prepare report' {
+                                New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with fixing Group Policy Owners. To generate new report please use:"
+                                New-HTMLCodeBlock -Code {
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOOwnersBefore.html -Verbose -Type GPOOwners
+                                }
+                                New-HTMLText -TextBlock {
+                                    "When executed it will take a while to generate all data and provide you with new report depending on size of environment."
+                                    "Once confirmed that data is still showing issues and requires fixing please proceed with next step."
+                                }
+                                New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
+                                New-HTMLCodeBlock -Code {
+                                    $OwnersGPO = Get-GPOZaurrOwner -IncludeSysvol -Verbose
+                                    $OwnersGPO | Format-Table
+                                }
+                                New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
                             }
-                            New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
-                            New-HTMLCodeBlock -Code {
-                                $OwnersGPO = Get-GPOZaurrOwner -IncludeSysvol -Verbose
-                                $OwnersGPO | Format-Table
+                            New-HTMLWizardStep -Name 'Make a backup (optional)' {
+                                New-HTMLText -TextBlock {
+                                    "The process of fixing GPO Owner does NOT touch GPO content. It simply changes owners on AD and SYSVOL at the same time. "
+                                    "However, it's always good to have a backup before executing changes that may impact Active Directory. "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    $GPOSummary = Backup-GPOZaurr -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -Type All
+                                    $GPOSummary | Format-Table # only if you want to display output of backup
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Above command when executed will make a backup to Desktop, create GPO folder and within it it will put all those GPOs. "
+                                }
                             }
-                            New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
-                        }
-                        New-HTMLWizardStep -Name 'Make a backup (optional)' {
-                            New-HTMLText -TextBlock {
-                                "The process of fixing GPO Owner does NOT touch GPO content. It simply changes owners on AD and SYSVOL at the same time. "
-                                "However, it's always good to have a backup before executing changes that may impact Active Directory. "
+                            New-HTMLWizardStep -Name 'Set GPO Owners to Administrative (Domain Admins)' {
+                                New-HTMLText -Text "Following command will find any GPO which doesn't have proper GPO Owner (be it due to inconsistency or not being Domain Admin) and will enforce new GPO Owner. "
+                                New-HTMLText -Text "Make sure when running it for the first time to run it with ", "WhatIf", " parameter as shown below to prevent accidental removal." -FontWeight normal, bold, normal -Color Black, Red, Black
+                                New-HTMLCodeBlock -Code {
+                                    Set-GPOZaurrOwner -Type All -Verbose -WhatIf
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Set-GPOZaurrOwner -Type All -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be changed matches expected data."
+                                } -LineBreak
+                                New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2 -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed sets new owner only on first X non-compliant GPO Owners for AD/SYSVOL. Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur. "
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
+                                }
                             }
-                            New-HTMLCodeBlock -Code {
-                                $GPOSummary = Backup-GPOZaurr -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -Type All
-                                $GPOSummary | Format-Table # only if you want to display output of backup
+                            New-HTMLWizardStep -Name 'Verification report' {
+                                New-HTMLText -TextBlock {
+                                    "Once cleanup task was executed properly, we need to verify that report now shows no problems."
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOOwnersAfter.html -Verbose -Type GPOOwners
+                                }
+                                New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                             }
-                            New-HTMLText -TextBlock {
-                                "Above command when executed will make a backup to Desktop, create GPO folder and within it it will put all those GPOs. "
-                            }
-                        }
-                        New-HTMLWizardStep -Name 'Set GPO Owners to Administrative (Domain Admins)' {
-                            New-HTMLText -Text "Following command will find any GPO which doesn't have proper GPO Owner (be it due to inconsistency or not being Domain Admin) and will enforce new GPO Owner. "
-                            New-HTMLText -Text "Make sure when running it for the first time to run it with ", "WhatIf", " parameter as shown below to prevent accidental removal." -FontWeight normal, bold, normal -Color Black, Red, Black
-                            New-HTMLCodeBlock -Code {
-                                Set-GPOZaurrOwner -Type All -Verbose -WhatIf
-                            }
-                            New-HTMLText -TextBlock {
-                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
-                            }
-                            New-HTMLCodeBlock -Code {
-                                Set-GPOZaurrOwner -Type All -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
-                            }
-                            New-HTMLText -TextBlock {
-                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be changed matches expected data."
-                            } -LineBreak
-                            New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
-                            New-HTMLCodeBlock -Code {
-                                Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2
-                            }
-                            New-HTMLText -TextBlock {
-                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
-                            }
-                            New-HTMLCodeBlock -Code {
-                                Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2 -IncludeDomains 'YourDomainYouHavePermissionsFor'
-                            }
-                            New-HTMLText -TextBlock {
-                                "This command when executed sets new owner only on first X non-compliant GPO Owners for AD/SYSVOL. Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur. "
-                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
-                            }
-                        }
-                        New-HTMLWizardStep -Name 'Verification report' {
-                            New-HTMLText -TextBlock {
-                                "Once cleanup task was executed properly, we need to verify that report now shows no problems."
-                            }
-                            New-HTMLCodeBlock -Code {
-                                Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOOwnersAfter.html -Verbose -Type GPOOwners
-                            }
-                            New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
-                        }
-                    } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                        } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                    }
                 }
             }
         }

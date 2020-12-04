@@ -231,6 +231,8 @@
                     New-HTMLListItem -FontWeight bold, normal -Text "Problem", " - means GPO has one or more section (user or computer) that is disabled, yet there is content in it. "
                 } -FontSize 10pt
                 New-HTMLTable -DataTable $Script:Reporting['GPOList']['Data'] -Filtering {
+                    New-HTMLTableCondition -Name 'Exclude' -Value $true -BackgroundColor DeepSkyBlue -ComparisonType string -Row
+
                     New-HTMLTableCondition -Name 'Empty' -Value $true -BackgroundColor Salmon -ComparisonType string
                     New-HTMLTableCondition -Name 'Linked' -Value $false -BackgroundColor Salmon -ComparisonType string
                     New-HTMLTableCondition -Name 'Enabled' -Value $false -BackgroundColor Salmon -ComparisonType string
@@ -253,235 +255,187 @@
                 } -PagingOptions 10, 20, 30, 40, 50
             }
         }
-        if ($Script:Reporting['GPOList']['Exclusions']) {
-            New-HTMLSection -Name 'Group Policies Exclusions' {
-                New-HTMLTable -DataTable $Script:Reporting['GPOList']['Exclusions'] -Filtering {
-
-                }
-            }
-        }
-        New-HTMLSection -Name 'Steps to fix - Empty & Unlinked & Disabled Group Policies' {
-            New-HTMLContainer {
-                New-HTMLSpanStyle -FontSize 10pt {
-                    New-HTMLText -Text 'Following steps will guide you how to remove empty or unlinked group policies'
-                    New-HTMLWizard {
-                        New-HTMLWizardStep -Name 'Prepare environment' {
-                            New-HTMLText -Text "To be able to execute actions in automated way please install required modules. Those modules will be installed straight from Microsoft PowerShell Gallery."
-                            New-HTMLCodeBlock -Code {
-                                Install-Module GPOZaurr -Force
-                                Import-Module GPOZaurr -Force
-                            } -Style powershell
-                            New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
-                        }
-                        New-HTMLWizardStep -Name 'Prepare report' {
-                            New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with removal. To generate new report please use:"
-                            New-HTMLCodeBlock -Code {
-                                Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrEmptyUnlinked.html -Verbose -Type GPOList
+        if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
+            New-HTMLSection -Name 'Steps to fix - Empty & Unlinked & Disabled Group Policies' {
+                New-HTMLContainer {
+                    New-HTMLSpanStyle -FontSize 10pt {
+                        New-HTMLText -Text 'Following steps will guide you how to remove empty or unlinked group policies'
+                        New-HTMLWizard {
+                            New-HTMLWizardStep -Name 'Prepare environment' {
+                                New-HTMLText -Text "To be able to execute actions in automated way please install required modules. Those modules will be installed straight from Microsoft PowerShell Gallery."
+                                New-HTMLCodeBlock -Code {
+                                    Install-Module GPOZaurr -Force
+                                    Import-Module GPOZaurr -Force
+                                } -Style powershell
+                                New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
                             }
-                            New-HTMLText -TextBlock {
-                                "When executed it will take a while to generate all data and provide you with new report depending on size of environment."
-                                "Once confirmed that data is still showing issues and requires fixing please proceed with next step."
+                            New-HTMLWizardStep -Name 'Prepare report' {
+                                New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with removal. To generate new report please use:"
+                                New-HTMLCodeBlock -Code {
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrEmptyUnlinked.html -Verbose -Type GPOList
+                                }
+                                New-HTMLText -TextBlock {
+                                    "When executed it will take a while to generate all data and provide you with new report depending on size of environment."
+                                    "Once confirmed that data is still showing issues and requires fixing please proceed with next step."
+                                }
+                                New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
+                                New-HTMLCodeBlock -Code {
+                                    $GPOOutput = Get-GPOZaurr
+                                    $GPOOutput | Format-Table
+                                }
+                                New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
                             }
-                            New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
-                            New-HTMLCodeBlock -Code {
-                                $GPOOutput = Get-GPOZaurr
-                                $GPOOutput | Format-Table
+                            New-HTMLWizardStep -Name 'Make a backup' {
+                                New-HTMLText -TextBlock {
+                                    "The process of deleting Group Policies is final. Once GPO is removed - it's gone. "
+                                    "To make sure you can recover deleted GPO please make sure to back them up. "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    $GPOSummary = Backup-GPOZaurr -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -Type All
+                                    $GPOSummary | Format-Table # only if you want to display output of backup
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Above command when executed will make a backup to Desktop, create GPO folder and within it it will put all those GPOs. "
+                                    "Keep in mind that Remove-GPOZaurr command also has a backup feature built-in. "
+                                    "It's possible to skip this backup and use the backup provided as part of Remove-GPOZaurr command. "
+                                }
                             }
-                            New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
-                        }
-                        New-HTMLWizardStep -Name 'Make a backup' {
-                            New-HTMLText -TextBlock {
-                                "The process of deleting Group Policies is final. Once GPO is removed - it's gone. "
-                                "To make sure you can recover deleted GPO please make sure to back them up. "
+                            New-HTMLWizardStep -Name 'Excluding Group Policies' {
+                                New-HTMLText -Text @(
+                                    "Remove-GPOZaurr",
+                                    " cmdlet that you will use in next steps is pretty advanced in what it can do. It can remove one or multiple types of problems at the same time. "
+                                    "That means you can pick just EMPTY, just UNLINKED or just DISABLED but also a mix of them if you want. "
+                                    "It also provides a way to exclude some GPOs from being removed even though they match condition. "
+                                    "You would do so using following approach "
+                                ) -FontSize 10pt -FontWeight bold, normal
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Empty, Unlinked, Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor' {
+                                        Skip-GroupPolicy -Name 'TEST | Drive Mapping'
+                                        Skip-GroupPolicy -Name 'Default Domain Policy'
+                                        Skip-GroupPolicy -Name 'Default Domain Controllers Policy' -DomaiName 'JustOneDomain'
+                                    }
+                                }
+                                New-HTMLText -Text @(
+                                    "Code above when executed will scan YourDomainYouHavePermissionsFor, find all empty, unlinked, disabled group policies, backup any GPO just before it's to be deleted to `$Env:UserProfile\Desktop\GPO. "
+                                    "If it's not able to make a backup it will terminate. Additionally it will skip all 3 group policies that have been shown above. "
+                                    "You can one or multiple group policies to be skipped. "
+                                    "Now go ahead and find what's there"
+                                )
                             }
-                            New-HTMLCodeBlock -Code {
-                                $GPOSummary = Backup-GPOZaurr -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -Type All
-                                $GPOSummary | Format-Table # only if you want to display output of backup
-                            }
-                            New-HTMLText -TextBlock {
-                                "Above command when executed will make a backup to Desktop, create GPO folder and within it it will put all those GPOs. "
-                                "Keep in mind that Remove-GPOZaurr command also has a backup feature built-in. "
-                                "It's possible to skip this backup and use the backup provided as part of Remove-GPOZaurr command. "
-                            }
-                        }
-                        New-HTMLWizardStep -Name 'Remove GPOs that are EMPTY or UNLINKED' {
-                            New-HTMLText -Text @(
-                                "Following command when executed removes every ",
-                                "EMPTY"
-                                " or "
-                                "NOT LINKED"
-                                " Group Policy. Make sure when running it for the first time to run it with ",
-                                "WhatIf",
-                                " parameter as shown below to prevent accidental removal.",
-                                "Make sure to use BackupPath which will make sure that for each GPO that is about to be deleted a backup is made to folder on a desktop."
-                                "You can skip parameters related to backup if you did backup all GPOs prior to running remove command. "
-                            ) -FontWeight normal, bold, normal, bold, normal, bold, normal, normal -Color Black, Red, Black, Red, Black
-                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
-                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
-                                $Code = @"
-Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
-    $ExclusionsCode
-}
-"@
-                                New-HTMLCodeBlock -Code $Code
-                            } else {
+                            New-HTMLWizardStep -Name 'Remove GPOs that are EMPTY or UNLINKED' {
+                                New-HTMLText -Text @(
+                                    "Following command when executed removes every ",
+                                    "EMPTY"
+                                    " or "
+                                    "NOT LINKED"
+                                    " Group Policy. Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental removal.",
+                                    "Make sure to use BackupPath which will make sure that for each GPO that is about to be deleted a backup is made to folder on a desktop."
+                                    "You can skip parameters related to backup if you did backup all GPOs prior to running remove command. "
+                                ) -FontWeight normal, bold, normal, bold, normal, bold, normal, normal -Color Black, Red, Black, Red, Black
                                 New-HTMLCodeBlock -Code {
                                     Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
                                 }
-                            }
-                            New-HTMLText -TextBlock {
-                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
-                            }
-                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
-                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
-                                $Code = @"
-Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
-    $ExclusionsCode
-}
-"@
-                                New-HTMLCodeBlock -Code $Code
-                            } else {
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
                                 New-HTMLCodeBlock -Code {
                                     Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
                                 }
-                            }
-                            New-HTMLText -TextBlock {
-                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
-                            } -LineBreak
-                            New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
-                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
-                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
-                                $Code = @"
-Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
-    $ExclusionsCode
-}
-"@
-                                New-HTMLCodeBlock -Code $Code
-                            } else {
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
+                                } -LineBreak
+                                New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
                                 New-HTMLCodeBlock -Code {
                                     Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
                                 }
-                            }
-                            New-HTMLText -TextBlock {
-                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
-                            }
-                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
-                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
-                                $Code = @"
-Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
-    $ExclusionsCode
-}
-"@
-                                New-HTMLCodeBlock -Code $Code
-                            } else {
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
                                 New-HTMLCodeBlock -Code {
                                     Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
                                 }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed deletes only first X empty or unlinked GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur."
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly."
+                                    "Please make sure to check if backup is made as well before going all in."
+                                }
+                                New-HTMLText -Text "If there's nothing else to be deleted on SYSVOL side, we can skip to next step step"
                             }
-                            New-HTMLText -TextBlock {
-                                "This command when executed deletes only first X empty or unlinked GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur."
-                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly."
-                                "Please make sure to check if backup is made as well before going all in."
-                            }
-                            New-HTMLText -Text "If there's nothing else to be deleted on SYSVOL side, we can skip to next step step"
-                        }
-                        New-HTMLWizardStep -Name 'Remove GPOs that are DISABLED' {
-                            New-HTMLText -Text @(
-                                "Following command when executed removes every ",
-                                "DISABLED"
-                                " Group Policy. Make sure when running it for the first time to run it with ",
-                                "WhatIf",
-                                " parameter as shown below to prevent accidental removal.",
-                                "Make sure to use BackupPath which will make sure that for each GPO that is about to be deleted a backup is made to folder on a desktop."
-                                "You can skip parameters related to backup if you did backup all GPOs prior to running remove command. "
-                            ) -FontWeight normal, bold, normal, bold, normal, bold, normal, normal -Color Black, Red, Black, Red, Black
-                            New-HTMLText -TextBlock {
-                                ""
-                            }
-                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
-                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
-                                $Code = @"
-Remove-GPOZaurr -Type Disabled -BackupPath "`$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf {
-    $ExclusionsCode
-}
-"@
-                                New-HTMLCodeBlock -Code $Code
-                            } else {
+                            New-HTMLWizardStep -Name 'Remove GPOs that are DISABLED' {
+                                New-HTMLText -Text @(
+                                    "Following command when executed removes every ",
+                                    "DISABLED"
+                                    " Group Policy. Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental removal.",
+                                    "Make sure to use BackupPath which will make sure that for each GPO that is about to be deleted a backup is made to folder on a desktop."
+                                    "You can skip parameters related to backup if you did backup all GPOs prior to running remove command. "
+                                ) -FontWeight normal, bold, normal, bold, normal, bold, normal, normal -Color Black, Red, Black, Red, Black
+                                New-HTMLText -TextBlock {
+                                    ""
+                                }
                                 New-HTMLCodeBlock -Code {
                                     Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
                                 }
-                            }
-                            New-HTMLText -TextBlock {
-                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
-                            }
-                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
-                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
-                                $Code = @"
-Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor' {
-    $ExclusionsCode
-}
-"@
-                                New-HTMLCodeBlock -Code $Code
-                            } else {
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
                                 New-HTMLCodeBlock -Code {
                                     Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
                                 }
-                            }
-                            New-HTMLText -TextBlock {
-                                "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
-                            } -LineBreak
-                            New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
-                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
-                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
-                                $Code = @"
-Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose {
-    $ExclusionsCode
-}
-"@
-                                New-HTMLCodeBlock -Code $Code
-                            } else {
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
+                                } -LineBreak
+                                New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
                                 New-HTMLCodeBlock -Code {
                                     Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
                                 }
-                            }
-                            New-HTMLText -TextBlock {
-                                "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
-                            }
-                            if ($Script:Reporting['GPOList']['ExclusionsCode']) {
-                                $ExclusionsCode = $Script:Reporting['GPOList']['ExclusionsCode'].ToString()
-                                $Code = @"
-Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor' {
-    $ExclusionsCode
-}
-"@
-                                New-HTMLCodeBlock -Code $Code
-                            } else {
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
                                 New-HTMLCodeBlock -Code {
                                     Remove-GPOZaurr -Type Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
                                 }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed deletes only first X disabled GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
+                                    "Please make sure to check if backup is made as well before going all in."
+                                }
+                                New-HTMLText -Text "If there's nothing else to be deleted, we can skip to next step step."
                             }
-                            New-HTMLText -TextBlock {
-                                "This command when executed deletes only first X disabled GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
-                                "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
-                                "Please make sure to check if backup is made as well before going all in."
+                            New-HTMLWizardStep -Name 'Verification report' {
+                                New-HTMLText -TextBlock {
+                                    "Once cleanup task was executed properly, we need to verify that report now shows no problems."
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrEmptyUnlinkedAfter.html -Verbose -Type GPOList
+                                }
+                                New-HTMLText -Text "If there are no more empty or unlinked GPOs in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                             }
-                            New-HTMLText -Text "If there's nothing else to be deleted, we can skip to next step step."
+                        } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                    }
+                }
+            }
+            if ($Script:Reporting['GPOList']['Exclusions']) {
+                New-HTMLSection -Invisible {
+                    New-HTMLSection -Name 'Group Policies Exclusions' {
+                        New-HTMLTable -DataTable $Script:Reporting['GPOList']['Exclusions'] -Filtering {
+
                         }
-                        New-HTMLWizardStep -Name 'Verification report' {
-                            New-HTMLText -TextBlock {
-                                "Once cleanup task was executed properly, we need to verify that report now shows no problems."
-                            }
-                            New-HTMLCodeBlock -Code {
-                                Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrEmptyUnlinkedAfter.html -Verbose -Type GPOList
-                            }
-                            New-HTMLText -Text "If there are no more empty or unlinked GPOs in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
+                    }
+                    New-HTMLSection -Name 'Group Policies Exclusions Code' {
+                        New-HTMLContainer {
+                            New-HTMLText -Text 'Please make sure to use following exclusions when executing removal' -FontSize 10pt
+                            New-HTMLCodeBlock -Code $Script:Reporting['GPOList']['ExclusionsCode']
                         }
-                    } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                    }
                 }
             }
         }
         if ($Script:Reporting['GPOList']['WarningsAndErrors']) {
-            New-HTMLSection -Name 'Warnings & Errors to Review' {
+            New-HTMLSection -Name 'Errors to Review' {
                 New-HTMLTable -DataTable $Script:Reporting['GPOList']['WarningsAndErrors'] -Filtering {
                     New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
                     New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row

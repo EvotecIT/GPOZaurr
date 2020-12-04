@@ -239,50 +239,52 @@
                 New-HTMLTableCondition -Name 'Status' -Value "OK" -BackgroundColor LightGreen -ComparisonType string -Operator eq
             }
         }
-        New-HTMLSection -Name 'Steps to fix NetLogon Permissions ' {
-            New-HTMLContainer {
-                New-HTMLSpanStyle -FontSize 10pt {
-                    New-HTMLWizard {
-                        New-HTMLWizardStep -Name 'Prepare environment' {
-                            New-HTMLText -Text "To be able to execute actions in automated way please install required modules. Those modules will be installed straight from Microsoft PowerShell Gallery."
-                            New-HTMLCodeBlock -Code {
-                                Install-Module GPOZaurr -Force
-                                Import-Module GPOZaurr -Force
-                            } -Style powershell
-                            New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
-                        }
-                        New-HTMLWizardStep -Name 'Prepare report' {
-                            New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with removal. To generate new report please use:"
-                            New-HTMLCodeBlock -Code {
-                                Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrNetLogonBefore.html -Verbose -Type NetLogonPermissions
+        if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
+            New-HTMLSection -Name 'Steps to fix NetLogon Permissions ' {
+                New-HTMLContainer {
+                    New-HTMLSpanStyle -FontSize 10pt {
+                        New-HTMLWizard {
+                            New-HTMLWizardStep -Name 'Prepare environment' {
+                                New-HTMLText -Text "To be able to execute actions in automated way please install required modules. Those modules will be installed straight from Microsoft PowerShell Gallery."
+                                New-HTMLCodeBlock -Code {
+                                    Install-Module GPOZaurr -Force
+                                    Import-Module GPOZaurr -Force
+                                } -Style powershell
+                                New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
                             }
-                            New-HTMLText -TextBlock {
-                                "When executed it will take a while to generate all data and provide you with new report depending on size of environment. "
-                                "Once confirmed that data is still showing issues and requires fixing please proceed with next step. "
+                            New-HTMLWizardStep -Name 'Prepare report' {
+                                New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with removal. To generate new report please use:"
+                                New-HTMLCodeBlock -Code {
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrNetLogonBefore.html -Verbose -Type NetLogonPermissions
+                                }
+                                New-HTMLText -TextBlock {
+                                    "When executed it will take a while to generate all data and provide you with new report depending on size of environment. "
+                                    "Once confirmed that data is still showing issues and requires fixing please proceed with next step. "
+                                }
+                                New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
+                                New-HTMLCodeBlock -Code {
+                                    $NetLogonOutput = Get-GPOZaurrNetLogon -SkipOwner -Verbose
+                                    $NetLogonOutput | Format-Table
+                                }
+                                New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
                             }
-                            New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
-                            New-HTMLCodeBlock -Code {
-                                $NetLogonOutput = Get-GPOZaurrNetLogon -SkipOwner -Verbose
-                                $NetLogonOutput | Format-Table
+                            New-HTMLWizardStep -Name 'Remove permissions manually for non-compliant users/groups' {
+                                New-HTMLText -Text @(
+                                    "In case of NETLOGON permissions it's impossible to tell what in a given moment for given domain should be automatically removed except for the very obvious ",
+                                    "unknown ", 'permissions. Domain Admins have to make their assesment on and remove permissions from users or groups that '
+                                ) -FontWeight normal, bold, normal
                             }
-                            New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
-                        }
-                        New-HTMLWizardStep -Name 'Remove permissions manually for non-compliant users/groups' {
-                            New-HTMLText -Text @(
-                                "In case of NETLOGON permissions it's impossible to tell what in a given moment for given domain should be automatically removed except for the very obvious ",
-                                "unknown ", 'permissions. Domain Admins have to make their assesment on and remove permissions from users or groups that '
-                            ) -FontWeight normal, bold, normal
-                        }
-                        New-HTMLWizardStep -Name 'Verification report' {
-                            New-HTMLText -TextBlock {
-                                "Once cleanup task was executed properly, we need to verify that report now shows no problems."
+                            New-HTMLWizardStep -Name 'Verification report' {
+                                New-HTMLText -TextBlock {
+                                    "Once cleanup task was executed properly, we need to verify that report now shows no problems."
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrNetLogonAfter.html -Verbose -Type NetLogonPermissions
+                                }
+                                New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                             }
-                            New-HTMLCodeBlock -Code {
-                                Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrNetLogonAfter.html -Verbose -Type NetLogonPermissions
-                            }
-                            New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
-                        }
-                    } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                        } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                    }
                 }
             }
         }
