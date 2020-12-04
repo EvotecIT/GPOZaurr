@@ -28,7 +28,10 @@
     Provide Extended Forest Information
 
     .EXAMPLE
-    An example
+    Set-GPOZaurrStatus -Name 'TEST | Empty GPO - AD.EVOTEC.PL CrossDomain GPO' -Status AllSettingsEnabled -Verbose
+
+    .EXAMPLE
+    Set-GPOZaurrStatus -Name 'TEST | Empty GPO - AD.EVOTEC.PL CrossDomain GPO' -DomainName ad.evotec.pl -Status AllSettingsEnabled -Verbose
 
     .NOTES
     General notes
@@ -41,7 +44,7 @@
 
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
-        [alias('Domain', 'Domains')][string[]] $IncludeDomains,
+        [alias('Domain', 'Domains', 'DomainName')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {
