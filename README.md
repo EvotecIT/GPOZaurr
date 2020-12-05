@@ -58,6 +58,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 ## Changelog
 
 - 0.0.96
+  - [x] Improved `Invoke-GPOZaurr`
+    - [x] Type `GPOList` - added more data, added Optimization Step
   - [x] Added `Set-GPOZaurrStatus`
   - [x] Added `Optimize-GPOZaurr`
 - 0.0.95 - 04.12.2020
