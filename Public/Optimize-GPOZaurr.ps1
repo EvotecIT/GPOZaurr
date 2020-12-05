@@ -105,17 +105,6 @@
                     Write-Warning "Optimize-GPOZaurr - GPO ($($GPO.DisplayName)) / $($GPO.DomainName)) is not optimized, but GPO is marked as one with problem. Skipping."
                 }
             }
-            <#
-        if ($GPO.UserSettingsAvailable -eq $false -and $GPO.ComputerSettingsAvailable -eq $false) {
-            if ($GPO.Enabled -ne 'All setttings disabled') {
-                # $GPO
-            }
-        } elseif ($GPO.UserSettingsAvailable -eq $false) {
-
-        } elseif ($GPO.ComputerSettingsAvailable -eq $false) {
-
-        }
-        #>
         }
     }
 }

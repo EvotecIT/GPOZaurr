@@ -405,6 +405,42 @@
                                 }
                                 New-HTMLText -Text "If there's nothing else to be deleted, we can skip to next step step."
                             }
+                            New-HTMLWizardStep -Name 'Optimize GPOs (optional)' {
+                                New-HTMLText -Text @(
+                                    "Following command when executed disables user or computer section when there's no content for given type. ",
+                                    "This makes sure that when GPO is processed for application it's empty section is ignored. Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental disabling of sections."
+                                ) -FontWeight normal, normal, bold, normal -Color Black, Black, Red, Black
+                                New-HTMLCodeBlock -Code {
+                                    Optimize-GPOZaurr -All -WhatIf -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Optimize-GPOZaurr -All -WhatIf -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be optimized matches expected data. "
+                                } -LineBreak
+                                New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    Optimize-GPOZaurr -All -LimitProcessing 2 -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Optimize-GPOZaurr -All -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed optimizes only first X not optimized GPOs. Use LimitProcessing parameter to prevent mass changes and increase the counter when no errors occur. "
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
+                                    "Please make sure to check if backup is made as well before going all in."
+                                }
+                                New-HTMLText -Text "If there's nothing else to be optimized, we can skip to next step step."
+                            }
                             New-HTMLWizardStep -Name 'Verification report' {
                                 New-HTMLText -TextBlock {
                                     "Once cleanup task was executed properly, we need to verify that report now shows no problems."
@@ -412,7 +448,7 @@
                                 New-HTMLCodeBlock -Code {
                                     Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrEmptyUnlinkedAfter.html -Verbose -Type GPOList
                                 }
-                                New-HTMLText -Text "If there are no more empty or unlinked GPOs in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
+                                New-HTMLText -Text "If there are no more problems to solve, GPOs to optimize in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                             }
                         } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
                     }
