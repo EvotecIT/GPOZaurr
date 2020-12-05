@@ -12,11 +12,39 @@
         }
     }
     Processing = {
+        # Create Per Domain Variables
+        $Script:Reporting['GPOList']['Variables']['GPONotValidPerDomain'] = @{}
+        $Script:Reporting['GPOList']['Variables']['GPOValidPerDomain'] = @{}
+        $Script:Reporting['GPOList']['Variables']['GPONotOptimizedPerDomain'] = @{}
+        $Script:Reporting['GPOList']['Variables']['GPOOptimizedPerDomain'] = @{}
+        $Script:Reporting['GPOList']['Variables']['GPOProblemPerDomain'] = @{}
+        $Script:Reporting['GPOList']['Variables']['GPONoProblemPerDomain'] = @{}
         foreach ($GPO in $Script:Reporting['GPOList']['Data']) {
+            # Create Per Domain Variables
+            if (-not $Script:Reporting['GPOList']['Variables']['GPONotValidPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOList']['Variables']['GPONotValidPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOList']['Variables']['GPOValidPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOList']['Variables']['GPOValidPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOList']['Variables']['GPONotOptimizedPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOList']['Variables']['GPONotOptimizedPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOList']['Variables']['GPOOptimizedPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOList']['Variables']['GPOOptimizedPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOList']['Variables']['GPOProblemPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOList']['Variables']['GPOProblemPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOList']['Variables']['GPONoProblemPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOList']['Variables']['GPONoProblemPerDomain'][$GPO.DomainName] = 0
+            }
             if ($GPO.Enabled -eq $false -or $GPO.Empty -eq $true -or $GPO.Linked -eq $false) {
                 $Script:Reporting['GPOList']['Variables']['GPONotValid']++
+                $Script:Reporting['GPOList']['Variables']['GPONotValidPerDomain'][$GPO.DomainName]++
             } else {
                 $Script:Reporting['GPOList']['Variables']['GPOValid']++
+                $Script:Reporting['GPOList']['Variables']['GPOValidPerDomain'][$GPO.DomainName]++
             }
             if ($GPO.Linked -eq $false -and $GPO.Empty -eq $true) {
                 # Not linked, Empty
@@ -78,13 +106,17 @@
             }
             if ($GPO.Problem -eq $true) {
                 $Script:Reporting['GPOList']['Variables']['GPOProblem']++
+                $Script:Reporting['GPOList']['Variables']['GPOProblemPerDomain'][$GPO.DomainName]++
             } else {
                 $Script:Reporting['GPOList']['Variables']['GPONoProblem']++
+                $Script:Reporting['GPOList']['Variables']['GPONoProblemPerDomain'][$GPO.DomainName]++
             }
             if ($GPO.Optimized -eq $true) {
                 $Script:Reporting['GPOList']['Variables']['GPOOptimized']++
+                $Script:Reporting['GPOList']['Variables']['GPOOptimizedPerDomain'][$GPO.DomainName]++
             } else {
                 $Script:Reporting['GPOList']['Variables']['GPONotOptimized']++
+                $Script:Reporting['GPOList']['Variables']['GPONotOptimizedPerDomain'][$GPO.DomainName]++
             }
         }
         $Script:Reporting['GPOList']['Variables']['GPOTotal'] = $Script:Reporting['GPOList']['Data'].Count
@@ -95,6 +127,12 @@
         }
     }
     Variables  = @{
+        GPONotValidPerDomain     = $null
+        GPOValidPerDomain        = $null
+        GPONotOptimizedPerDomain = $null
+        GPOOptimizedPerDomain    = $null
+        GPOProblemPerDomain      = $null
+        GPONoProblemPerDomain    = $null
         GPOWithProblems          = 0
         ComputerOptimizedYes     = 0
         ComputerOptimizedNo      = 0
@@ -145,7 +183,15 @@
                 }
             }
         } -FontSize 10pt
+
+        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOList']['Variables']['GPONotValidPerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOList']['Variables']['GPONotValidPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            }
+        } -FontSize 10pt
         New-HTMLText -Text "Keep in mind that each GPO can match multiple conditions such as being empty and unlinked and disabled at the same time. We're only deleting GPO once." -FontSize 10pt
+
         New-HTMLText -Text @(
             'All ',
             'empty',
@@ -175,6 +221,13 @@
             "This can't be auto-handled and is INFORMATIONAL only. "
         ) -FontSize 10pt
 
+        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOList']['Variables']['GPOProblemPerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOList']['Variables']['GPOProblemPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            }
+        } -FontSize 10pt
+
         New-HTMLText -LineBreak
 
         New-HTMLText -Text "Moreover, for best performance it's recommended that if there are no settings of certain kind (Computer or User settings) it's best to disable whole section. " -FontSize 10pt
@@ -197,6 +250,13 @@
             $Script:Reporting['GPOList']['Variables']['GPONotOptimized']
             " could be optimized for performance reasons. "
         ) -FontSize 10pt -FontWeight normal, bold, normal
+
+        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOList']['Variables']['GPONotOptimizedPerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOList']['Variables']['GPONotOptimizedPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            }
+        } -FontSize 10pt
     }
     Solution   = {
         New-HTMLSection -Invisible {
