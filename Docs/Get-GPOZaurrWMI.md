@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-GPOZaurrWMI
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Get Group Policy WMI filter
 
 ## SYNTAX
 
@@ -19,21 +19,24 @@ Get-GPOZaurrWMI [[-Guid] <Guid[]>] [[-Name] <String[]>] [[-Forest] <String>] [[-
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Get Group Policy WMI filter
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+Get-GPOZaurrWMI -AsHashtable
 ```
 
-{{ Add example description here }}
+### EXAMPLE 2
+```
+Get-GPOZaurrWMI | Format-Table
+```
 
 ## PARAMETERS
 
 ### -Guid
-{{ Fill Guid Description }}
+Search for specific filter using GUID
 
 ```yaml
 Type: Guid[]
@@ -48,7 +51,7 @@ Accept wildcard characters: False
 ```
 
 ### -Name
-{{ Fill Name Description }}
+Search for specific filter using Name
 
 ```yaml
 Type: String[]
@@ -63,7 +66,7 @@ Accept wildcard characters: False
 ```
 
 ### -Forest
-{{ Fill Forest Description }}
+Target different Forest, by default current forest is used
 
 ```yaml
 Type: String
@@ -78,7 +81,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+Exclude domain from search, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -93,7 +96,7 @@ Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+Include only specific domains, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -108,7 +111,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
+Ability to provide Forest Information from another command to speed up processing
 
 ```yaml
 Type: IDictionary
@@ -142,11 +145,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

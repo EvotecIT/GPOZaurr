@@ -34,7 +34,7 @@ Optimize-GPOZaurr [[-ExcludeGroupPolicies] <ScriptBlock>] [-All] [-LimitProcessi
 ```
 
 ## DESCRIPTION
-Long description
+Enables or disables user/computer section of group policy based on it's content.
 
 ## EXAMPLES
 

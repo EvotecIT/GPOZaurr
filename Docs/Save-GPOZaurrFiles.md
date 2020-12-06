@@ -1,6 +1,6 @@
 ---
 external help file: GPOZaurr-help.xml
-Module Name: GPoZaurr
+Module Name: GPOZaurr
 online version:
 schema: 2.0.0
 ---

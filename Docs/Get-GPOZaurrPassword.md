@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-GPOZaurrPassword
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Tries to find CPassword in Group Policies or given path and translate it to readable value
 
 ## SYNTAX
 
@@ -18,21 +18,24 @@ Get-GPOZaurrPassword [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-Incl
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Tries to find CPassword in Group Policies or given path and translate it to readable value
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+Get-GPOZaurrPassword -GPOPath 'C:\Users\przemyslaw.klys\Desktop\GPOExport_2020.10.12'
 ```
 
-{{ Add example description here }}
+### EXAMPLE 2
+```
+Get-GPOZaurrPassword
+```
 
 ## PARAMETERS
 
 ### -Forest
-{{ Fill Forest Description }}
+Target different Forest, by default current forest is used
 
 ```yaml
 Type: String
@@ -47,7 +50,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+Exclude domain from search, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -62,7 +65,7 @@ Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+Include only specific domains, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -77,7 +80,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
+Ability to provide Forest Information from another command to speed up processing
 
 ```yaml
 Type: IDictionary
@@ -92,7 +95,7 @@ Accept wildcard characters: False
 ```
 
 ### -GPOPath
-{{ Fill GPOPath Description }}
+Path where Group Policy content is located or where backup is located
 
 ```yaml
 Type: String[]
@@ -111,11 +114,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

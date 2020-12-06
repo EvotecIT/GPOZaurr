@@ -8,7 +8,7 @@ schema: 2.0.0
 # Set-GPOZaurrOwner
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Sets GPO Owner to Domain Admins or other choosen account
 
 ## SYNTAX
 
@@ -27,21 +27,25 @@ Set-GPOZaurrOwner [-GPOName <String>] [-GPOGuid <String>] [-Forest <String>] [-E
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Sets GPO Owner to Domain Admins or other choosen account.
+GPO Owner is set in AD and SYSVOL unless specified otherwise.
+If account doesn't require change, no change is done.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
 ```
-
-{{ Add example description here }}
+Set-GPOZaurrOwner -Type All -Verbose -WhatIf -LimitProcessing 2
+```
 
 ## PARAMETERS
 
 ### -Type
-{{ Fill Type Description }}
+Unknown - finds unknown Owners and sets them to Administrative (Domain Admins) or chosen principal
+NotMatching - find administrative groups only and if sysvol and gpo doesn't match - replace with chosen principal or Domain Admins if not specified
+NotAdministrative - combination of Unknown/NotMatching and NotAdministrative - replace with chosen principal or Domain Admins if not specified
+All - if Owner is known it checks if it's Administrative, if it sn't it fixes that.
+If owner is unknown it fixes it
 
 ```yaml
 Type: String
@@ -56,7 +60,8 @@ Accept wildcard characters: False
 ```
 
 ### -GPOName
-{{ Fill GPOName Description }}
+Name of GPO.
+By default all GPOs are targetted
 
 ```yaml
 Type: String
@@ -71,7 +76,8 @@ Accept wildcard characters: False
 ```
 
 ### -GPOGuid
-{{ Fill GPOGuid Description }}
+GUID of GPO.
+By default all GPOs are targetted
 
 ```yaml
 Type: String
@@ -86,7 +92,7 @@ Accept wildcard characters: False
 ```
 
 ### -Forest
-{{ Fill Forest Description }}
+Target different Forest, by default current forest is used
 
 ```yaml
 Type: String
@@ -101,7 +107,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+Exclude domain from search, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -116,7 +122,7 @@ Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+Include only specific domains, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -131,7 +137,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
+Ability to provide Forest Information from another command to speed up processing
 
 ```yaml
 Type: IDictionary
@@ -146,7 +152,7 @@ Accept wildcard characters: False
 ```
 
 ### -Principal
-{{ Fill Principal Description }}
+Parameter description
 
 ```yaml
 Type: String
@@ -161,7 +167,8 @@ Accept wildcard characters: False
 ```
 
 ### -SkipSysvol
-Set GPO Owner only in Active Directory. By default GPO Owner is being set in both places
+Set GPO Owner only in Active Directory.
+By default GPO Owner is being set in both places
 
 ```yaml
 Type: SwitchParameter
@@ -176,7 +183,8 @@ Accept wildcard characters: False
 ```
 
 ### -LimitProcessing
-{{ Fill LimitProcessing Description }}
+Allows to specify maximum number of items that will be fixed in a single run.
+It doesn't affect amount of GPOs processed
 
 ```yaml
 Type: Int32
@@ -185,7 +193,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 2147483647
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -241,11 +249,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS
