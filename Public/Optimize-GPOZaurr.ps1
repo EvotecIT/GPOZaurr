@@ -4,7 +4,7 @@
     Enables or disables user/computer section of group policy based on it's content.
 
     .DESCRIPTION
-    Long description
+    Enables or disables user/computer section of group policy based on it's content.
 
     .PARAMETER ExcludeGroupPolicies
     Provide a list of group policies to skip using Skip-GroupPolicy cmdlet
