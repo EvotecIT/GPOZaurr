@@ -8,7 +8,8 @@
         [System.Collections.IDictionary] $ADAdministrativeGroups,
         [string] $Splitter = [System.Environment]::NewLine,
         [switch] $ReturnObject,
-        [System.Collections.IDictionary] $ExcludeGroupPolicies
+        [System.Collections.IDictionary] $ExcludeGroupPolicies,
+        [string[]] $Type
     )
     if ($XMLContent.GPO.LinksTo) {
         $LinkSplit = ([Array] $XMLContent.GPO.LinksTo).Where( { $_.Enabled -eq $true }, 'Split')
@@ -170,7 +171,7 @@
         }
     }
     if ($PermissionsOnly) {
-        [PsCustomObject] @{
+        $GPOOutput = [PsCustomObject] @{
             'DisplayName'          = $XMLContent.GPO.Name
             'DomainName'           = $XMLContent.GPO.Identifier.Domain.'#text'
             'GUID'                 = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
@@ -201,7 +202,7 @@
             }
         }
     } elseif ($OwnerOnly) {
-        [PsCustomObject] @{
+        $GPOOutput = [PsCustomObject] @{
             'DisplayName'          = $XMLContent.GPO.Name
             'DomainName'           = $XMLContent.GPO.Identifier.Domain.'#text'
             'GUID'                 = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
@@ -212,7 +213,7 @@
             'GPODistinguishedName' = $GPO.Path
         }
     } else {
-        [PsCustomObject] @{
+        $GPOOutput = [PsCustomObject] @{
             'DisplayName'                       = $XMLContent.GPO.Name
             'DomainName'                        = $XMLContent.GPO.Identifier.Domain.'#text'
             'GUID'                              = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
@@ -295,6 +296,29 @@
                 }
             }
             'GPOObject'                         = $GPO
+        }
+    }
+    if ($PermissionsOnly -or $OwnerOnly) {
+        $GPOOutput
+    } else {
+        if (-not $Type -or $Type -contains 'All') {
+            $GPOOutput
+        } else {
+            if ($Type -contains 'Empty') {
+                if ($GPOOutput.Empty -eq $true) {
+                    $GPOOutput
+                }
+            }
+            if ($Type -contains 'Unlinked') {
+                if ($GPOOutput.Linked -eq $false) {
+                    $GPOOutput
+                }
+            }
+            if ($Type -contains 'Disabled') {
+                if ($GPOOutput.Enabled -eq $false) {
+                    $GPOOutput
+                }
+            }
         }
     }
 }
