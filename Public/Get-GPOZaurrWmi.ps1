@@ -1,4 +1,41 @@
 ﻿function Get-GPOZaurrWMI {
+    <#
+    .SYNOPSIS
+    Get Group Policy WMI filter
+
+    .DESCRIPTION
+    Get Group Policy WMI filter
+
+    .PARAMETER Guid
+    Search for specific filter using GUID
+
+    .PARAMETER Name
+    Search for specific filter using Name
+
+    .PARAMETER Forest
+    Target different Forest, by default current forest is used
+
+    .PARAMETER ExcludeDomains
+    Exclude domain from search, by default whole forest is scanned
+
+    .PARAMETER IncludeDomains
+    Include only specific domains, by default whole forest is scanned
+
+    .PARAMETER ExtendedForestInformation
+    Ability to provide Forest Information from another command to speed up processing
+
+    .PARAMETER AsHashtable
+    Return output as hashtable
+
+    .EXAMPLE
+    Get-GPOZaurrWMI -AsHashtable
+
+    .EXAMPLE
+    Get-GPOZaurrWMI | Format-Table
+
+    .NOTES
+    General notes
+    #>
     [cmdletBinding()]
     Param(
         [Guid[]] $Guid,
