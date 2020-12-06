@@ -195,7 +195,7 @@
                 } elseif ($Rule.Action -eq 'Remove') {
                     $GPOPermissions = Get-GPOZaurrPermission -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName -IncludePermissionType $Rule.IncludePermissionType -ExcludePermissionType $Rule.ExcludePermissionType -Type $Rule.Type -IncludeGPOObject -PermitType $Rule.PermitType -Principal $Rule.Principal -PrincipalType $Rule.PrincipalType -ExcludePrincipal $Rule.ExcludePrincipal -ExcludePrincipalType $Rule.ExcludePrincipalType -ADAdministrativeGroups $ADAdministrativeGroups
                     foreach ($Permission in $GPOPermissions) {
-                        Remove-PrivPermission -Principal $Permission.Sid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission
+                        Remove-PrivPermission -Principal $Permission.PrincipalSid -PrincipalType Sid -GPOPermission $Permission -IncludePermissionType $Permission.Permission
                     }
                 } elseif ($Rule.Action -eq 'Add') {
                     # Initially we were askng for same domain as user requested, but in fact we need to apply GPODomain as it can be linked to different domain

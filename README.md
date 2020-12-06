@@ -62,6 +62,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
     - [x] Type `GPOList` - added more data, added Optimization Step
   - [x] Added `Set-GPOZaurrStatus`
   - [x] Added `Optimize-GPOZaurr`
+  - [x] Fixed `Invoke-GPOZaurrPermission` which would not remove permission due to internal changes earlier on
 - 0.0.95 - 04.12.2020
   - [x] Fix for too big int - [#4](https://github.com/EvotecIT/GPOZaurr/issues/4) - tnx neztach
   - [x] Improved `Invoke-GPOZaurr`
