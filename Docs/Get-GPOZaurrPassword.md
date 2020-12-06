@@ -1,6 +1,6 @@
 ---
 external help file: GPOZaurr-help.xml
-Module Name: GPoZaurr
+Module Name: GPOZaurr
 online version:
 schema: 2.0.0
 ---
@@ -31,36 +31,6 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
-
-```yaml
-Type: IDictionary
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -Forest
 {{ Fill Forest Description }}
 
@@ -70,14 +40,14 @@ Parameter Sets: (All)
 Aliases: ForestName
 
 Required: False
-Position: 0
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -GPOPath
-{{ Fill GPOPath Description }}
+### -ExcludeDomains
+{{ Fill ExcludeDomains Description }}
 
 ```yaml
 Type: String[]
@@ -85,7 +55,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 4
+Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -100,7 +70,37 @@ Parameter Sets: (All)
 Aliases: Domain, Domains
 
 Required: False
-Position: 2
+Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExtendedForestInformation
+{{ Fill ExtendedForestInformation Description }}
+
+```yaml
+Type: IDictionary
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 4
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GPOPath
+{{ Fill GPOPath Description }}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 5
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

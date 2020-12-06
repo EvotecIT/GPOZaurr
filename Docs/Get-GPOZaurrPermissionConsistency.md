@@ -5,17 +5,32 @@ online version:
 schema: 2.0.0
 ---
 
-# New-GPOZaurrWMI
+# Get-GPOZaurrPermissionConsistency
 
 ## SYNOPSIS
 {{ Fill in the Synopsis }}
 
 ## SYNTAX
 
+### Type (Default)
 ```
-New-GPOZaurrWMI [-Name] <String> [[-Description] <String>] [[-Namespace] <String>] [-Query] <String>
- [-SkipQueryCheck] [-Force] [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>]
- [[-ExtendedForestInformation] <IDictionary>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-GPOZaurrPermissionConsistency [-Type <String[]>] [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-IncludeGPOObject]
+ [-VerifyInheritance] [<CommonParameters>]
+```
+
+### GPOName
+```
+Get-GPOZaurrPermissionConsistency [-GPOName <String>] [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-IncludeGPOObject]
+ [-VerifyInheritance] [<CommonParameters>]
+```
+
+### GPOGUID
+```
+Get-GPOZaurrPermissionConsistency [-GPOGuid <String>] [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-IncludeGPOObject]
+ [-VerifyInheritance] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -32,36 +47,6 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -Confirm
-Prompts you for confirmation before running the cmdlet.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: cf
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Description
-{{ Fill Description Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ExcludeDomains
 {{ Fill ExcludeDomains Description }}
 
@@ -71,7 +56,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 5
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -82,21 +67,6 @@ Accept wildcard characters: False
 
 ```yaml
 Type: IDictionary
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 7
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Force
-{{ Fill Force Description }}
-
-```yaml
-Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:
 
@@ -116,7 +86,37 @@ Parameter Sets: (All)
 Aliases: ForestName
 
 Required: False
-Position: 4
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GPOGuid
+{{ Fill GPOGuid Description }}
+
+```yaml
+Type: String
+Parameter Sets: GPOGUID
+Aliases: GUID, GPOID
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GPOName
+{{ Fill GPOName Description }}
+
+```yaml
+Type: String
+Parameter Sets: GPOName
+Aliases:
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -131,59 +131,14 @@ Parameter Sets: (All)
 Aliases: Domain, Domains
 
 Required: False
-Position: 6
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Name
-{{ Fill Name Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 0
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Namespace
-{{ Fill Namespace Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Query
-{{ Fill Query Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SkipQueryCheck
-{{ Fill SkipQueryCheck Description }}
+### -IncludeGPOObject
+{{ Fill IncludeGPOObject Description }}
 
 ```yaml
 Type: SwitchParameter
@@ -197,14 +152,29 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
+### -Type
+{{ Fill Type Description }}
+
+```yaml
+Type: String[]
+Parameter Sets: Type
+Aliases:
+Accepted values: Consistent, Inconsistent, All
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -VerifyInheritance
+{{ Fill VerifyInheritance Description }}
 
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases: wi
+Aliases:
 
 Required: False
 Position: Named

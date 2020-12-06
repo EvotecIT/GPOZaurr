@@ -5,51 +5,65 @@ online version:
 schema: 2.0.0
 ---
 
-# Set-GPOZaurrOwner
+# Optimize-GPOZaurr
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Enables or disables user/computer section of group policy based on it's content.
 
 ## SYNTAX
 
-### Type (Default)
+### GPOName (Default)
 ```
-Set-GPOZaurrOwner -Type <String> [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
- [-ExtendedForestInformation <IDictionary>] [-Principal <String>] [-SkipSysvol] [-LimitProcessing <Int32>]
- [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
+Optimize-GPOZaurr [[-ExcludeGroupPolicies] <ScriptBlock>] -GPOName <String> [-LimitProcessing <Int32>]
+ [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
+ [-ExtendedForestInformation <IDictionary>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
-### Named
+### GPOGUID
 ```
-Set-GPOZaurrOwner [-GPOName <String>] [-GPOGuid <String>] [-Forest <String>] [-ExcludeDomains <String[]>]
- [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-Principal <String>] [-SkipSysvol]
- [-LimitProcessing <Int32>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
+Optimize-GPOZaurr [[-ExcludeGroupPolicies] <ScriptBlock>] -GPOGuid <String> [-LimitProcessing <Int32>]
+ [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
+ [-ExtendedForestInformation <IDictionary>] [-WhatIf] [-Confirm] [<CommonParameters>]
+```
+
+### All
+```
+Optimize-GPOZaurr [[-ExcludeGroupPolicies] <ScriptBlock>] [-All] [-LimitProcessing <Int32>] [-Forest <String>]
+ [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Long description
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+Optimize-GPOZaurr -All -WhatIf -Verbose -LimitProcessing 2
 ```
 
-{{ Add example description here }}
+### EXAMPLE 2
+```
+Optimize-GPOZaurr -All -WhatIf -Verbose -LimitProcessing 2 {
+```
+
+Skip-GroupPolicy -Name 'TEST | Drive Mapping 1'
+    Skip-GroupPolicy -Name 'TEST | Drive Mapping 2'
+}
 
 ## PARAMETERS
 
-### -Type
-{{ Fill Type Description }}
+### -ExcludeGroupPolicies
+Provide a list of group policies to skip using Skip-GroupPolicy cmdlet
 
 ```yaml
-Type: String
-Parameter Sets: Type
+Type: ScriptBlock
+Parameter Sets: (All)
 Aliases:
 
-Required: True
-Position: Named
+Required: False
+Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -60,10 +74,10 @@ Accept wildcard characters: False
 
 ```yaml
 Type: String
-Parameter Sets: Named
-Aliases:
+Parameter Sets: GPOName
+Aliases: Name, DisplayName
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -75,18 +89,49 @@ Accept wildcard characters: False
 
 ```yaml
 Type: String
-Parameter Sets: Named
+Parameter Sets: GPOGUID
 Aliases: GUID, GPOID
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -All
+{{ Fill All Description }}
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: All
+Aliases:
+
+Required: True
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -LimitProcessing
+Allows to specify maximum number of items that will be fixed in a single run.
+It doesn't affect amount of GPOs processed
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Forest
-{{ Fill Forest Description }}
+Target different Forest, by default current forest is used
 
 ```yaml
 Type: String
@@ -101,7 +146,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+Exclude domain from search, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -116,7 +161,7 @@ Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+Include only specific domains, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -131,7 +176,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
+Ability to provide Forest Information from another command to speed up processing
 
 ```yaml
 Type: IDictionary
@@ -141,66 +186,6 @@ Aliases:
 Required: False
 Position: Named
 Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Principal
-{{ Fill Principal Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SkipSysvol
-Set GPO Owner only in Active Directory. By default GPO Owner is being set in both places
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -LimitProcessing
-{{ Fill LimitProcessing Description }}
-
-```yaml
-Type: Int32
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Force
-{{ Fill Force Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -241,11 +226,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

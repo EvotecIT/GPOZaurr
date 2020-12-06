@@ -5,48 +5,51 @@ online version:
 schema: 2.0.0
 ---
 
-# Set-GPOZaurrOwner
+# Set-GPOZaurrStatus
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Enables or disables user/computer section of Group Policy.
 
 ## SYNTAX
 
-### Type (Default)
+### GPOName (Default)
 ```
-Set-GPOZaurrOwner -Type <String> [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
- [-ExtendedForestInformation <IDictionary>] [-Principal <String>] [-SkipSysvol] [-LimitProcessing <Int32>]
- [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
+Set-GPOZaurrStatus -GPOName <String> -Status <GpoStatus> [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
-### Named
+### GPOGUID
 ```
-Set-GPOZaurrOwner [-GPOName <String>] [-GPOGuid <String>] [-Forest <String>] [-ExcludeDomains <String[]>]
- [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-Principal <String>] [-SkipSysvol]
- [-LimitProcessing <Int32>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
+Set-GPOZaurrStatus -GPOGuid <String> -Status <GpoStatus> [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Enables or disables user/computer section of Group Policy.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+Set-GPOZaurrStatus -Name 'TEST | Empty GPO - AD.EVOTEC.PL CrossDomain GPO' -Status AllSettingsEnabled -Verbose
 ```
 
-{{ Add example description here }}
+### EXAMPLE 2
+```
+Set-GPOZaurrStatus -Name 'TEST | Empty GPO - AD.EVOTEC.PL CrossDomain GPO' -DomainName ad.evotec.pl -Status AllSettingsEnabled -Verbose
+```
 
 ## PARAMETERS
 
-### -Type
-{{ Fill Type Description }}
+### -GPOName
+Provide Group Policy Name
 
 ```yaml
 Type: String
-Parameter Sets: Type
-Aliases:
+Parameter Sets: GPOName
+Aliases: Name, DisplayName
 
 Required: True
 Position: Named
@@ -55,30 +58,31 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -GPOName
-{{ Fill GPOName Description }}
+### -GPOGuid
+Provide Group Policy GUID
 
 ```yaml
 Type: String
-Parameter Sets: Named
-Aliases:
+Parameter Sets: GPOGUID
+Aliases: GUID, GPOID
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -GPOGuid
-{{ Fill GPOGuid Description }}
+### -Status
+Choose a status for provided Group Policy
 
 ```yaml
-Type: String
-Parameter Sets: Named
-Aliases: GUID, GPOID
+Type: GpoStatus
+Parameter Sets: (All)
+Aliases:
+Accepted values: AllSettingsDisabled, UserSettingsDisabled, ComputerSettingsDisabled, AllSettingsEnabled
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -86,7 +90,7 @@ Accept wildcard characters: False
 ```
 
 ### -Forest
-{{ Fill Forest Description }}
+Choose forest to target.
 
 ```yaml
 Type: String
@@ -101,7 +105,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+Exclude domains from trying to find Group Policy Name or GUID
 
 ```yaml
 Type: String[]
@@ -116,12 +120,12 @@ Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+Include domain (one or more) to find Group Policy Name or GUID
 
 ```yaml
 Type: String[]
 Parameter Sets: (All)
-Aliases: Domain, Domains
+Aliases: Domain, Domains, DomainName
 
 Required: False
 Position: Named
@@ -131,7 +135,7 @@ Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
+Provide Extended Forest Information
 
 ```yaml
 Type: IDictionary
@@ -141,66 +145,6 @@ Aliases:
 Required: False
 Position: Named
 Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Principal
-{{ Fill Principal Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SkipSysvol
-Set GPO Owner only in Active Directory. By default GPO Owner is being set in both places
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -LimitProcessing
-{{ Fill LimitProcessing Description }}
-
-```yaml
-Type: Int32
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Force
-{{ Fill Force Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -241,11 +185,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

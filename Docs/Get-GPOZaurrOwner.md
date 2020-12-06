@@ -5,55 +5,58 @@ online version:
 schema: 2.0.0
 ---
 
-# Remove-GPOZaurr
+# Get-GPOZaurrOwner
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Gets owners of GPOs from Active Directory and SYSVOL
 
 ## SYNTAX
 
+### Default (Default)
 ```
-Remove-GPOZaurr [[-ExcludeGroupPolicies] <ScriptBlock>] [-Type] <String[]> [-LimitProcessing <Int32>]
- [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
- [-ExtendedForestInformation <IDictionary>] [-GPOPath <String[]>] [-BackupPath <String>] [-BackupDated]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-GPOZaurrOwner [-IncludeSysvol] [-SkipBroken] [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
+ [-ADAdministrativeGroups <IDictionary>] [<CommonParameters>]
+```
+
+### GPOName
+```
+Get-GPOZaurrOwner [-GPOName <String>] [-IncludeSysvol] [-SkipBroken] [-Forest <String>]
+ [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
+ [-ADAdministrativeGroups <IDictionary>] [<CommonParameters>]
+```
+
+### GPOGUID
+```
+Get-GPOZaurrOwner [-GPOGuid <String>] [-IncludeSysvol] [-SkipBroken] [-Forest <String>]
+ [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
+ [-ADAdministrativeGroups <IDictionary>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Gets owners of GPOs from Active Directory and SYSVOL
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+Get-GPOZaurrOwner -Verbose -IncludeSysvol
 ```
 
-{{ Add example description here }}
+### EXAMPLE 2
+```
+Get-GPOZaurrOwner -Verbose -IncludeSysvol -SkipBroken
+```
 
 ## PARAMETERS
 
-### -BackupDated
-{{ Fill BackupDated Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -BackupPath
-{{ Fill BackupPath Description }}
+### -GPOName
+Name of GPO.
+By default all GPOs are returned
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: GPOName
 Aliases:
 
 Required: False
@@ -63,68 +66,54 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Confirm
-Prompts you for confirmation before running the cmdlet.
+### -GPOGuid
+GUID of GPO.
+By default all GPOs are returned
+
+```yaml
+Type: String
+Parameter Sets: GPOGUID
+Aliases: GUID, GPOID
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -IncludeSysvol
+Includes Owner from SYSVOL as well
 
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases: cf
+Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+### -SkipBroken
+Doesn't display GPOs that have no SYSVOL content (orphaned GPOs)
 
 ```yaml
-Type: String[]
+Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:
 
 Required: False
 Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExcludeGroupPolicies
-{{ Fill ExcludeGroupPolicies Description }}
-
-```yaml
-Type: ScriptBlock
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
-
-```yaml
-Type: IDictionary
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -Forest
-{{ Fill Forest Description }}
+Target different Forest, by default current forest is used
 
 ```yaml
 Type: String
@@ -138,8 +127,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -GPOPath
-{{ Fill GPOPath Description }}
+### -ExcludeDomains
+Exclude domain from search, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -154,7 +143,7 @@ Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+Include only specific domains, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -168,11 +157,11 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -LimitProcessing
-{{ Fill LimitProcessing Description }}
+### -ExtendedForestInformation
+Ability to provide Forest Information from another command to speed up processing
 
 ```yaml
-Type: Int32
+Type: IDictionary
 Parameter Sets: (All)
 Aliases:
 
@@ -183,30 +172,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Type
-{{ Fill Type Description }}
+### -ADAdministrativeGroups
+Ability to provide AD Administrative Groups from another command to speed up processing
 
 ```yaml
-Type: String[]
+Type: IDictionary
 Parameter Sets: (All)
 Aliases:
-Accepted values: Empty, Unlinked, Disabled
-
-Required: True
-Position: 0
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: wi
 
 Required: False
 Position: Named
@@ -220,11 +192,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

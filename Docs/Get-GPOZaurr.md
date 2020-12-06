@@ -1,6 +1,6 @@
 ---
 external help file: GPOZaurr-help.xml
-Module Name: GPoZaurr
+Module Name: GPOZaurr
 online version:
 schema: 2.0.0
 ---
@@ -13,9 +13,10 @@ schema: 2.0.0
 ## SYNTAX
 
 ```
-Get-GPOZaurr [[-GPOName] <String>] [[-GPOGuid] <String>] [[-Forest] <String>] [[-ExcludeDomains] <String[]>]
- [[-IncludeDomains] <String[]>] [[-ExtendedForestInformation] <IDictionary>] [[-GPOPath] <String[]>]
- [-PermissionsOnly] [-OwnerOnly] [-Limited] [<CommonParameters>]
+Get-GPOZaurr [[-ExcludeGroupPolicies] <ScriptBlock>] [[-GPOName] <String>] [[-GPOGuid] <String>]
+ [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>]
+ [[-ExtendedForestInformation] <IDictionary>] [[-GPOPath] <String[]>] [-PermissionsOnly] [-OwnerOnly]
+ [-Limited] [-ReturnObject] [[-ADAdministrativeGroups] <IDictionary>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -32,6 +33,21 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
+### -ADAdministrativeGroups
+{{ Fill ADAdministrativeGroups Description }}
+
+```yaml
+Type: IDictionary
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 8
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -ExcludeDomains
 {{ Fill ExcludeDomains Description }}
 
@@ -41,7 +57,22 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 3
+Position: 4
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExcludeGroupPolicies
+{{ Fill ExcludeGroupPolicies Description }}
+
+```yaml
+Type: ScriptBlock
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 0
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -56,7 +87,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 5
+Position: 6
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -71,7 +102,7 @@ Parameter Sets: (All)
 Aliases: ForestName
 
 Required: False
-Position: 2
+Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -86,7 +117,7 @@ Parameter Sets: (All)
 Aliases: GUID, GPOID
 
 Required: False
-Position: 1
+Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -101,7 +132,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 0
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -116,7 +147,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 6
+Position: 7
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -131,7 +162,7 @@ Parameter Sets: (All)
 Aliases: Domain, Domains
 
 Required: False
-Position: 4
+Position: 5
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -169,6 +200,21 @@ Accept wildcard characters: False
 
 ### -PermissionsOnly
 {{ Fill PermissionsOnly Description }}
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ReturnObject
+{{ Fill ReturnObject Description }}
 
 ```yaml
 Type: SwitchParameter

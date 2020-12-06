@@ -5,7 +5,7 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-GPOZaurrWMI
+# Add-GPOPermission
 
 ## SYNOPSIS
 {{ Fill in the Synopsis }}
@@ -13,9 +13,8 @@ schema: 2.0.0
 ## SYNTAX
 
 ```
-Get-GPOZaurrWMI [[-Guid] <Guid[]>] [[-Name] <String[]>] [[-Forest] <String>] [[-ExcludeDomains] <String[]>]
- [[-IncludeDomains] <String[]>] [[-ExtendedForestInformation] <IDictionary>] [-AsHashtable]
- [<CommonParameters>]
+Add-GPOPermission [[-Type] <String>] [[-IncludePermissionType] <GPPermissionType>] [[-Principal] <String>]
+ [[-PrincipalType] <String>] [[-PermitType] <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -32,13 +31,14 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -Guid
-{{ Fill Guid Description }}
+### -IncludePermissionType
+{{ Fill IncludePermissionType Description }}
 
 ```yaml
-Type: Guid[]
+Type: GPPermissionType
 Parameter Sets: (All)
 Aliases:
+Accepted values: None, GpoApply, GpoRead, GpoEdit, GpoEditDeleteModifySecurity, GpoCustom, WmiFilterEdit, WmiFilterFullControl, WmiFilterCustom, StarterGpoRead, StarterGpoEdit, StarterGpoFullControl, StarterGpoCustom, SomCreateWmiFilter, SomWmiFilterFullControl, SomCreateGpo, SomCreateStarterGpo, SomLogging, SomPlanning, SomLink
 
 Required: False
 Position: 1
@@ -47,43 +47,14 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Name
-{{ Fill Name Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Forest
-{{ Fill Forest Description }}
+### -PermitType
+{{ Fill PermitType Description }}
 
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases: ForestName
-
-Required: False
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
 Aliases:
+Accepted values: Allow, Deny
 
 Required: False
 Position: 4
@@ -92,47 +63,49 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+### -Principal
+{{ Fill Principal Description }}
 
 ```yaml
-Type: String[]
+Type: String
 Parameter Sets: (All)
-Aliases: Domain, Domains
+Aliases: Trustee
 
 Required: False
-Position: 5
+Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
+### -PrincipalType
+{{ Fill PrincipalType Description }}
 
 ```yaml
-Type: IDictionary
+Type: String
 Parameter Sets: (All)
-Aliases:
+Aliases: TrusteeType
+Accepted values: DistinguishedName, Name, Sid
 
 Required: False
-Position: 6
+Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -AsHashtable
-Return output as hashtable
+### -Type
+{{ Fill Type Description }}
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
 Aliases:
+Accepted values: WellKnownAdministrative, Administrative, AuthenticatedUsers, Default
 
 Required: False
-Position: Named
-Default value: False
+Position: 0
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

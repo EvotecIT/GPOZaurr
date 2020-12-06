@@ -5,17 +5,29 @@ online version:
 schema: 2.0.0
 ---
 
-# New-GPOZaurrWMI
+# Get-GPOZaurrNetLogon
 
 ## SYNOPSIS
 {{ Fill in the Synopsis }}
 
 ## SYNTAX
 
+### Default (Default)
 ```
-New-GPOZaurrWMI [-Name] <String> [[-Description] <String>] [[-Namespace] <String>] [-Query] <String>
- [-SkipQueryCheck] [-Force] [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>]
- [[-ExtendedForestInformation] <IDictionary>] [-WhatIf] [-Confirm] [<CommonParameters>]
+Get-GPOZaurrNetLogon [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
+ [-ExtendedForestInformation <IDictionary>] [<CommonParameters>]
+```
+
+### OwnerOnly
+```
+Get-GPOZaurrNetLogon [-OwnerOnly] [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
+ [-ExtendedForestInformation <IDictionary>] [<CommonParameters>]
+```
+
+### SkipOwner
+```
+Get-GPOZaurrNetLogon [-SkipOwner] [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
+ [-ExtendedForestInformation <IDictionary>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -32,36 +44,6 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -Confirm
-Prompts you for confirmation before running the cmdlet.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: cf
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Description
-{{ Fill Description Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ExcludeDomains
 {{ Fill ExcludeDomains Description }}
 
@@ -71,7 +53,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 5
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -82,21 +64,6 @@ Accept wildcard characters: False
 
 ```yaml
 Type: IDictionary
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 7
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Force
-{{ Fill Force Description }}
-
-```yaml
-Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:
 
@@ -116,7 +83,7 @@ Parameter Sets: (All)
 Aliases: ForestName
 
 Required: False
-Position: 4
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -131,63 +98,18 @@ Parameter Sets: (All)
 Aliases: Domain, Domains
 
 Required: False
-Position: 6
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Name
-{{ Fill Name Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 0
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Namespace
-{{ Fill Namespace Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Query
-{{ Fill Query Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: True
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SkipQueryCheck
-{{ Fill SkipQueryCheck Description }}
+### -OwnerOnly
+{{ Fill OwnerOnly Description }}
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: OwnerOnly
 Aliases:
 
 Required: False
@@ -197,14 +119,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -WhatIf
-Shows what would happen if the cmdlet runs.
-The cmdlet is not run.
+### -SkipOwner
+{{ Fill SkipOwner Description }}
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
-Aliases: wi
+Parameter Sets: SkipOwner
+Aliases:
 
 Required: False
 Position: Named

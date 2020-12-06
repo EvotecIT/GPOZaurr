@@ -5,40 +5,39 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-GPOZaurrWMI
+# Get-GPOZaurrPermissionIssue
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Detects Group Policy missing Authenticated Users permission while not having higher permissions.
 
 ## SYNTAX
 
 ```
-Get-GPOZaurrWMI [[-Guid] <Guid[]>] [[-Name] <String[]>] [[-Forest] <String>] [[-ExcludeDomains] <String[]>]
- [[-IncludeDomains] <String[]>] [[-ExtendedForestInformation] <IDictionary>] [-AsHashtable]
- [<CommonParameters>]
+Get-GPOZaurrPermissionIssue [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>]
+ [[-ExtendedForestInformation] <IDictionary>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Detects Group Policy missing Authenticated Users permission while not having higher permissions.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+$Issues = Get-GPOZaurrPermissionIssue
 ```
 
-{{ Add example description here }}
+$Issues | Format-Table
 
 ## PARAMETERS
 
-### -Guid
-{{ Fill Guid Description }}
+### -Forest
+Target different Forest, by default current forest is used
 
 ```yaml
-Type: Guid[]
+Type: String
 Parameter Sets: (All)
-Aliases:
+Aliases: ForestName
 
 Required: False
 Position: 1
@@ -47,8 +46,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Name
-{{ Fill Name Description }}
+### -ExcludeDomains
+Exclude domain from search, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -62,13 +61,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Forest
-{{ Fill Forest Description }}
+### -IncludeDomains
+Include only specific domains, by default whole forest is scanned
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases: ForestName
+Aliases: Domain, Domains
 
 Required: False
 Position: 3
@@ -77,11 +76,11 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+### -ExtendedForestInformation
+Ability to provide Forest Information from another command to speed up processing
 
 ```yaml
-Type: String[]
+Type: IDictionary
 Parameter Sets: (All)
 Aliases:
 
@@ -92,61 +91,14 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -IncludeDomains
-{{ Fill IncludeDomains Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases: Domain, Domains
-
-Required: False
-Position: 5
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
-
-```yaml
-Type: IDictionary
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 6
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -AsHashtable
-Return output as hashtable
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

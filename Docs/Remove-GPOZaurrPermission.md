@@ -5,41 +5,38 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-GPOZaurrPermission
+# Remove-GPOZaurrPermission
 
 ## SYNOPSIS
 {{ Fill in the Synopsis }}
 
 ## SYNTAX
 
-### GPO (Default)
+### Global (Default)
 ```
-Get-GPOZaurrPermission [-Principal <String[]>] [-PrincipalType <String>] [-Type <String[]>] [-SkipWellKnown]
- [-SkipAdministrative] [-IncludeOwner] [-IncludePermissionType <GPPermissionType[]>]
- [-ExcludePermissionType <GPPermissionType[]>] [-PermitType <String>] [-ExcludePrincipal <String[]>]
- [-ExcludePrincipalType <String>] [-IncludeGPOObject] [-Forest <String>] [-ExcludeDomains <String[]>]
- [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
- [-ADAdministrativeGroups <IDictionary>] [-ReturnSecurityWhenNoData] [-ReturnSingleObject] [<CommonParameters>]
+Remove-GPOZaurrPermission [-Principal <String[]>] [-PrincipalType <String>] [-Type <String[]>]
+ [-IncludePermissionType <GPPermissionType[]>] [-ExcludePermissionType <GPPermissionType[]>] [-SkipWellKnown]
+ [-SkipAdministrative] [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
+ [-ExtendedForestInformation <IDictionary>] [-LimitProcessing <Int32>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ### GPOName
 ```
-Get-GPOZaurrPermission [-GPOName <String>] [-Principal <String[]>] [-PrincipalType <String>] [-Type <String[]>]
- [-SkipWellKnown] [-SkipAdministrative] [-IncludeOwner] [-IncludePermissionType <GPPermissionType[]>]
- [-ExcludePermissionType <GPPermissionType[]>] [-PermitType <String>] [-ExcludePrincipal <String[]>]
- [-ExcludePrincipalType <String>] [-IncludeGPOObject] [-Forest <String>] [-ExcludeDomains <String[]>]
- [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
- [-ADAdministrativeGroups <IDictionary>] [-ReturnSecurityWhenNoData] [-ReturnSingleObject] [<CommonParameters>]
+Remove-GPOZaurrPermission -GPOName <String> [-Principal <String[]>] [-PrincipalType <String>]
+ [-Type <String[]>] [-IncludePermissionType <GPPermissionType[]>] [-ExcludePermissionType <GPPermissionType[]>]
+ [-SkipWellKnown] [-SkipAdministrative] [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-LimitProcessing <Int32>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ### GPOGUID
 ```
-Get-GPOZaurrPermission [-GPOGuid <String>] [-Principal <String[]>] [-PrincipalType <String>] [-Type <String[]>]
- [-SkipWellKnown] [-SkipAdministrative] [-IncludeOwner] [-IncludePermissionType <GPPermissionType[]>]
- [-ExcludePermissionType <GPPermissionType[]>] [-PermitType <String>] [-ExcludePrincipal <String[]>]
- [-ExcludePrincipalType <String>] [-IncludeGPOObject] [-Forest <String>] [-ExcludeDomains <String[]>]
- [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
- [-ADAdministrativeGroups <IDictionary>] [-ReturnSecurityWhenNoData] [-ReturnSingleObject] [<CommonParameters>]
+Remove-GPOZaurrPermission -GPOGuid <String> [-Principal <String[]>] [-PrincipalType <String>]
+ [-Type <String[]>] [-IncludePermissionType <GPPermissionType[]>] [-ExcludePermissionType <GPPermissionType[]>]
+ [-SkipWellKnown] [-SkipAdministrative] [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-LimitProcessing <Int32>] [-WhatIf]
+ [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -56,13 +53,13 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -ADAdministrativeGroups
-{{ Fill ADAdministrativeGroups Description }}
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
 
 ```yaml
-Type: IDictionary
+Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: cf
 
 Required: False
 Position: Named
@@ -94,37 +91,6 @@ Type: GPPermissionType[]
 Parameter Sets: (All)
 Aliases:
 Accepted values: None, GpoApply, GpoRead, GpoEdit, GpoEditDeleteModifySecurity, GpoCustom, WmiFilterEdit, WmiFilterFullControl, WmiFilterCustom, StarterGpoRead, StarterGpoEdit, StarterGpoFullControl, StarterGpoCustom, SomCreateWmiFilter, SomWmiFilterFullControl, SomCreateGpo, SomCreateStarterGpo, SomLogging, SomPlanning, SomLink
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExcludePrincipal
-{{ Fill ExcludePrincipal Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExcludePrincipalType
-{{ Fill ExcludePrincipalType Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-Accepted values: DistinguishedName, Name, Sid
 
 Required: False
 Position: Named
@@ -171,7 +137,7 @@ Type: String
 Parameter Sets: GPOGUID
 Aliases: GUID, GPOID
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -186,7 +152,7 @@ Type: String
 Parameter Sets: GPOName
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -208,43 +174,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -IncludeGPOObject
-{{ Fill IncludeGPOObject Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -IncludeOwner
-{{ Fill IncludeOwner Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -IncludePermissionType
 {{ Fill IncludePermissionType Description }}
 
 ```yaml
 Type: GPPermissionType[]
 Parameter Sets: (All)
-Aliases:
+Aliases: PermissionType
 Accepted values: None, GpoApply, GpoRead, GpoEdit, GpoEditDeleteModifySecurity, GpoCustom, WmiFilterEdit, WmiFilterFullControl, WmiFilterCustom, StarterGpoRead, StarterGpoEdit, StarterGpoFullControl, StarterGpoCustom, SomCreateWmiFilter, SomWmiFilterFullControl, SomCreateGpo, SomCreateStarterGpo, SomLogging, SomPlanning, SomLink
 
 Required: False
@@ -254,14 +190,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -PermitType
-{{ Fill PermitType Description }}
+### -LimitProcessing
+{{ Fill LimitProcessing Description }}
 
 ```yaml
-Type: String
+Type: Int32
 Parameter Sets: (All)
 Aliases:
-Accepted values: Allow, Deny, All
 
 Required: False
 Position: Named
@@ -293,36 +228,6 @@ Type: String
 Parameter Sets: (All)
 Aliases:
 Accepted values: DistinguishedName, Name, NetbiosName, Sid
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ReturnSecurityWhenNoData
-{{ Fill ReturnSecurityWhenNoData Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ReturnSingleObject
-{{ Fill ReturnSingleObject Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
 
 Required: False
 Position: Named
@@ -368,7 +273,23 @@ Accept wildcard characters: False
 Type: String[]
 Parameter Sets: (All)
 Aliases:
-Accepted values: AuthenticatedUsers, DomainComputers, Unknown, WellKnownAdministrative, NotWellKnown, NotWellKnownAdministrative, NotAdministrative, Administrative, All
+Accepted values: Unknown, NotAdministrative, Default
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -WhatIf
+Shows what would happen if the cmdlet runs.
+The cmdlet is not run.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
 
 Required: False
 Position: Named
