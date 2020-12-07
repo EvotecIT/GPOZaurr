@@ -2,7 +2,7 @@
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Position = 1)][scriptblock] $ExcludeGroupPolicies,
-        [parameter(Position = 0, Mandatory)][validateset('Empty', 'Unlinked', 'Disabled')][string[]] $Type,
+        [parameter(Position = 0, Mandatory)][validateset('Empty', 'Unlinked', 'Disabled', 'NoApplyPermission')][string[]] $Type,
         [int] $LimitProcessing,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
@@ -52,6 +52,11 @@
             }
             if ($Type -contains 'Disabled') {
                 if ($_.Enabled -eq $false) {
+                    $DeleteRequired = $true
+                }
+            }
+            if ($Type -contains 'NoApplyPermission') {
+                if ($_.ApplyPermission -eq $false) {
                     $DeleteRequired = $true
                 }
             }

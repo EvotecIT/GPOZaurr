@@ -19,6 +19,8 @@
         $Script:Reporting['GPOList']['Variables']['GPOOptimizedPerDomain'] = @{}
         $Script:Reporting['GPOList']['Variables']['GPOProblemPerDomain'] = @{}
         $Script:Reporting['GPOList']['Variables']['GPONoProblemPerDomain'] = @{}
+        $Script:Reporting['GPOList']['Variables']['GPOApplyPermissionYesPerDomain'] = @{}
+        $Script:Reporting['GPOList']['Variables']['GPOApplypermissionNoPerDomain'] = @{}
         foreach ($GPO in $Script:Reporting['GPOList']['Data']) {
             # Create Per Domain Variables
             if (-not $Script:Reporting['GPOList']['Variables']['GPONotValidPerDomain'][$GPO.DomainName]) {
@@ -39,7 +41,13 @@
             if (-not $Script:Reporting['GPOList']['Variables']['GPONoProblemPerDomain'][$GPO.DomainName]) {
                 $Script:Reporting['GPOList']['Variables']['GPONoProblemPerDomain'][$GPO.DomainName] = 0
             }
-            if ($GPO.Enabled -eq $false -or $GPO.Empty -eq $true -or $GPO.Linked -eq $false) {
+            if (-not $Script:Reporting['GPOList']['Variables']['GPOApplyPermissionYesPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOList']['Variables']['GPOApplyPermissionYesPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOList']['Variables']['GPOApplypermissionNoPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOList']['Variables']['GPOApplypermissionNoPerDomain'][$GPO.DomainName] = 0
+            }
+            if ($GPO.Enabled -eq $false -or $GPO.Empty -eq $true -or $GPO.Linked -eq $false -or $GPO.ApplyPermission -eq $false) {
                 $Script:Reporting['GPOList']['Variables']['GPONotValid']++
                 $Script:Reporting['GPOList']['Variables']['GPONotValidPerDomain'][$GPO.DomainName]++
             } else {
@@ -77,6 +85,11 @@
                 $Script:Reporting['GPOList']['Variables']['GPOEnabled']++
             } else {
                 $Script:Reporting['GPOList']['Variables']['GPODisabled']++
+            }
+            if ($GPO.ApplyPermission -eq $true) {
+                $Script:Reporting['GPOList']['Variables']['ApplyPermissionYes']++
+            } else {
+                $Script:Reporting['GPOList']['Variables']['ApplyPermissionNo']++
             }
             if ($GPO.LinksDisabledCount -eq $GPO.LinksCount -and $GPO.LinksCount -gt 0) {
                 $Script:Reporting['GPOList']['Variables']['GPOLinkedButLinkDisabled']++
@@ -127,38 +140,42 @@
         }
     }
     Variables  = @{
-        GPONotValidPerDomain     = $null
-        GPOValidPerDomain        = $null
-        GPONotOptimizedPerDomain = $null
-        GPOOptimizedPerDomain    = $null
-        GPOProblemPerDomain      = $null
-        GPONoProblemPerDomain    = $null
-        GPOWithProblems          = 0
-        ComputerOptimizedYes     = 0
-        ComputerOptimizedNo      = 0
-        ComputerProblemYes       = 0
-        ComputerProblemNo        = 0
-        UserOptimizedYes         = 0
-        UserOptimizedNo          = 0
-        UserProblemYes           = 0
-        UserProblemNo            = 0
-        GPOOptimized             = 0
-        GPONotOptimized          = 0
-        GPOProblem               = 0
-        GPONoProblem             = 0
-        GPONotLinked             = 0
-        GPOLinked                = 0
-        GPOEmpty                 = 0
-        GPONotEmpty              = 0
-        GPOEmptyAndUnlinked      = 0
-        GPOEmptyOrUnlinked       = 0
-        GPOLinkedButEmpty        = 0
-        GPOEnabled               = 0
-        GPODisabled              = 0
-        GPOValid                 = 0
-        GPONotValid              = 0
-        GPOLinkedButLinkDisabled = 0
-        GPOTotal                 = 0
+        GPONotValidPerDomain           = $null
+        GPOValidPerDomain              = $null
+        GPONotOptimizedPerDomain       = $null
+        GPOOptimizedPerDomain          = $null
+        GPOProblemPerDomain            = $null
+        GPONoProblemPerDomain          = $null
+        GPOApplyPermissionYesPerDomain = $null
+        GPOApplyPermissionNoPerDomain  = $null
+        GPOWithProblems                = 0
+        ComputerOptimizedYes           = 0
+        ComputerOptimizedNo            = 0
+        ComputerProblemYes             = 0
+        ComputerProblemNo              = 0
+        UserOptimizedYes               = 0
+        UserOptimizedNo                = 0
+        UserProblemYes                 = 0
+        UserProblemNo                  = 0
+        GPOOptimized                   = 0
+        GPONotOptimized                = 0
+        GPOProblem                     = 0
+        GPONoProblem                   = 0
+        GPONotLinked                   = 0
+        GPOLinked                      = 0
+        GPOEmpty                       = 0
+        GPONotEmpty                    = 0
+        GPOEmptyAndUnlinked            = 0
+        GPOEmptyOrUnlinked             = 0
+        GPOLinkedButEmpty              = 0
+        GPOEnabled                     = 0
+        GPODisabled                    = 0
+        GPOValid                       = 0
+        GPONotValid                    = 0
+        GPOLinkedButLinkDisabled       = 0
+        GPOTotal                       = 0
+        ApplyPermissionYes             = 0
+        ApplyPermissionNo              = 0
     }
     Overview   = {
 
@@ -167,7 +184,8 @@
         New-HTMLText -TextBlock {
             "Over time Administrators add more and more group policies, as business requirements change. "
             "Due to neglection or thinking it may serve it's purpose later on a lot of Group Policies often have no value at all. "
-            "Either the Group Policy is not linked to anything and just stays unlinked forever, or GPO is linked, but the link (links) are disabled. "
+            "Either the Group Policy is not linked to anything and just stays unlinked forever, or GPO is linked, but the link (links) are disabled or GPO is totally disabled. "
+            "Then there are Group Policies that are targetting certain group or person and that group is removed leaving Group Policy doing nothing. "
             "Additionally sometimes new GPO is created without any settings or the settings are removed over time, but GPO stays in place. "
         } -FontSize 10pt
         New-HTMLList -Type Unordered {
@@ -180,6 +198,7 @@
                     New-HTMLListItem -Text "Group Policies that are linked, but empty: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButEmpty'] -FontWeight normal, bold
                     New-HTMLListItem -Text "Group Policies that are linked, but link disabled: ", $Script:Reporting['GPOList']['Variables']['GPOLinkedButLinkDisabled'] -FontWeight normal, bold
                     New-HTMLListItem -Text "Group Policies that are disabled (both user/computer sections): ", $Script:Reporting['GPOList']['Variables']['GPODisabled'] -FontWeight normal, bold
+                    New-HTMLListItem -Text "Group Policies that have no Apply Permission: ", $Script:Reporting['GPOList']['Variables']['ApplyPermissionNo'] -FontWeight normal, bold
                 }
             }
         } -FontSize 10pt
@@ -270,6 +289,7 @@
                     New-ChartBar -Name 'Linked' -Value $Script:Reporting['GPOList']['Variables']['GPOLinked'], $Script:Reporting['GPOList']['Variables']['GPONotLinked']
                     New-ChartBar -Name 'Not Empty' -Value $Script:Reporting['GPOList']['Variables']['GPONotEmpty'], $Script:Reporting['GPOList']['Variables']['GPOEmpty']
                     New-ChartBar -Name 'Enabled' -Value $Script:Reporting['GPOList']['Variables']['GPOEnabled'], $Script:Reporting['GPOList']['Variables']['GPODisabled']
+                    New-ChartBar -Name 'Apply Permission' -Value $Script:Reporting['GPOList']['Variables']['ApplyPermissionYes'], $Script:Reporting['GPOList']['Variables']['ApplyPermissionNo']
                     New-ChartBar -Name 'Valid' -Value $Script:Reporting['GPOList']['Variables']['GPOValid'], $Script:Reporting['GPOList']['Variables']['GPONotValid']
                     New-ChartBar -Name 'Optimized (for speed)' -Value $Script:Reporting['GPOList']['Variables']['GPOOptimized'], $Script:Reporting['GPOList']['Variables']['GPONotOptimized']
                     New-ChartBar -Name 'No problem' -Value $Script:Reporting['GPOList']['Variables']['GPONoProblem'], $Script:Reporting['GPOList']['Variables']['GPOProblem']
@@ -289,6 +309,7 @@
                     New-HTMLListItem -FontWeight bold, normal -Text "Enabled", " - means GPO has at least one section enabled. If enabled is set to false that means both sections are disabled, and therefore GPO is not active. "
                     New-HTMLListItem -FontWeight bold, normal -Text "Optimized", " - means GPO section that is not in use is disabled. If section (user or computer) is enabled and there is no content, it's not optimized. "
                     New-HTMLListItem -FontWeight bold, normal -Text "Problem", " - means GPO has one or more section (user or computer) that is disabled, yet there is content in it. "
+                    New-HTMLListItem -FontWeight bold, normal -Text "ApplyPermission", " - means GPO has no Apply Permission. This means there's no user/computer/group it's applicable to. "
                 } -FontSize 10pt
                 New-HTMLTable -DataTable $Script:Reporting['GPOList']['Data'] -Filtering {
                     New-HTMLTableCondition -Name 'Exclude' -Value $true -BackgroundColor DeepSkyBlue -ComparisonType string -Row
@@ -298,6 +319,7 @@
                     New-HTMLTableCondition -Name 'Enabled' -Value $false -BackgroundColor Salmon -ComparisonType string
                     New-HTMLTableCondition -Name 'Optimized' -Value $false -BackgroundColor Salmon -ComparisonType string
                     New-HTMLTableCondition -Name 'Problem' -Value $true -BackgroundColor Salmon -ComparisonType string
+                    New-HTMLTableCondition -Name 'ApplyPermission' -Value $false -BackgroundColor Salmon -ComparisonType string
                     New-HTMLTableCondition -Name 'ComputerProblem' -Value $true -BackgroundColor Salmon -ComparisonType string
                     New-HTMLTableCondition -Name 'UserProblem' -Value $true -BackgroundColor Salmon -ComparisonType string
                     New-HTMLTableCondition -Name 'ComputerOptimized' -Value $false -BackgroundColor Salmon -ComparisonType string
@@ -308,6 +330,7 @@
                     New-HTMLTableCondition -Name 'Enabled' -Value $true -BackgroundColor SpringGreen -ComparisonType string
                     New-HTMLTableCondition -Name 'Optimized' -Value $true -BackgroundColor SpringGreen -ComparisonType string
                     New-HTMLTableCondition -Name 'Problem' -Value $false -BackgroundColor SpringGreen -ComparisonType string
+                    New-HTMLTableCondition -Name 'ApplyPermission' -Value $true -BackgroundColor SpringGreen -ComparisonType string
                     New-HTMLTableCondition -Name 'ComputerProblem' -Value $false -BackgroundColor SpringGreen -ComparisonType string
                     New-HTMLTableCondition -Name 'UserProblem' -Value $false -BackgroundColor SpringGreen -ComparisonType string
                     New-HTMLTableCondition -Name 'ComputerOptimized' -Value $true -BackgroundColor SpringGreen -ComparisonType string
@@ -382,11 +405,48 @@
                                     "Now go ahead and find what's there"
                                 )
                             }
-                            New-HTMLWizardStep -Name 'Remove GPOs that are EMPTY or UNLINKED' {
+                            New-HTMLWizardStep -Name 'Remove GPOs that are EMPTY' {
                                 New-HTMLText -Text @(
                                     "Following command when executed removes every ",
                                     "EMPTY"
-                                    " or "
+                                    " Group Policy. Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental removal.",
+                                    "Make sure to use BackupPath which will make sure that for each GPO that is about to be deleted a backup is made to folder on a desktop."
+                                    "You can skip parameters related to backup if you did backup all GPOs prior to running remove command. "
+                                ) -FontWeight normal, bold, normal, bold, normal, bold, normal, normal -Color Black, Red, Black, Red, Black
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Empty -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Empty -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
+                                } -LineBreak
+                                New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Empty -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type Empty -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed deletes only first X empty GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur."
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly."
+                                    "Please make sure to check if backup is made as well before going all in."
+                                }
+                                New-HTMLText -Text "If there's nothing else to be deleted, we can skip to next step step"
+                            }
+                            New-HTMLWizardStep -Name 'Remove GPOs that are UNLINKED' {
+                                New-HTMLText -Text @(
+                                    "Following command when executed removes every ",
                                     "NOT LINKED"
                                     " Group Policy. Make sure when running it for the first time to run it with ",
                                     "WhatIf",
@@ -395,33 +455,33 @@
                                     "You can skip parameters related to backup if you did backup all GPOs prior to running remove command. "
                                 ) -FontWeight normal, bold, normal, bold, normal, bold, normal, normal -Color Black, Red, Black, Red, Black
                                 New-HTMLCodeBlock -Code {
-                                    Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
+                                    Remove-GPOZaurr -Type Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
                                 }
                                 New-HTMLText -TextBlock {
                                     "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                                 }
                                 New-HTMLCodeBlock -Code {
-                                    Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                    Remove-GPOZaurr -Type Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
                                 }
                                 New-HTMLText -TextBlock {
                                     "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
                                 } -LineBreak
                                 New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
                                 New-HTMLCodeBlock -Code {
-                                    Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
+                                    Remove-GPOZaurr -Type Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
                                 }
                                 New-HTMLText -TextBlock {
                                     "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                                 }
                                 New-HTMLCodeBlock -Code {
-                                    Remove-GPOZaurr -Type Empty, Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                    Remove-GPOZaurr -Type Unlinked -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
                                 }
                                 New-HTMLText -TextBlock {
-                                    "This command when executed deletes only first X empty or unlinked GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur."
+                                    "This command when executed deletes only first X unlinked GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur."
                                     "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly."
                                     "Please make sure to check if backup is made as well before going all in."
                                 }
-                                New-HTMLText -Text "If there's nothing else to be deleted on SYSVOL side, we can skip to next step step"
+                                New-HTMLText -Text "If there's nothing else to be deleted, we can skip to next step step"
                             }
                             New-HTMLWizardStep -Name 'Remove GPOs that are DISABLED' {
                                 New-HTMLText -Text @(
@@ -460,6 +520,48 @@
                                 }
                                 New-HTMLText -TextBlock {
                                     "This command when executed deletes only first X disabled GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
+                                    "Please make sure to check if backup is made as well before going all in."
+                                }
+                                New-HTMLText -Text "If there's nothing else to be deleted, we can skip to next step step."
+                            }
+                            New-HTMLWizardStep -Name 'Remove GPOs that do not APPLY' {
+                                New-HTMLText -Text @(
+                                    "Following command when executed removes every ",
+                                    "NoApplyPermission"
+                                    " Group Policy. Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental removal.",
+                                    "Make sure to use BackupPath which will make sure that for each GPO that is about to be deleted a backup is made to folder on a desktop."
+                                    "You can skip parameters related to backup if you did backup all GPOs prior to running remove command. "
+                                ) -FontWeight normal, bold, normal, bold, normal, bold, normal, normal -Color Black, Red, Black, Red, Black
+                                New-HTMLText -TextBlock {
+                                    ""
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type NoApplyPermission -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type NoApplyPermission -BackupPath "$Env:UserProfile\Desktop\GPO" -Verbose -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
+                                } -LineBreak
+                                New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type NoApplyPermission -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurr -Type NoApplyPermission -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed deletes only first X NoApplyPermission GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
                                     "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
                                     "Please make sure to check if backup is made as well before going all in."
                                 }

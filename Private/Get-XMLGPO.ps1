@@ -222,6 +222,7 @@
             'Enabled'                           = $EnabledBool
             'Optimized'                         = $Optimized
             'Problem'                           = $Problem
+            'ApplyPermission'                   = $null
             'Exclude'                           = $Exclude
             'ComputerPolicies'                  = $XMLContent.GPO.Computer.ExtensionData.Name -join ", "
             'UserPolicies'                      = $XMLContent.GPO.User.ExtensionData.Name -join ", "
@@ -297,6 +298,15 @@
             }
             'GPOObject'                         = $GPO
         }
+        if ($GPOOutput.ACL) {
+            $GPOOutput.ApplyPermission = $false
+            foreach ($Permission in $GPOOutput.ACL) {
+                if ($Permission.Permissions -eq 'Apply Group Policy') {
+                    $GPOOutput.ApplyPermission = $true
+                }
+            }
+        }
+
     }
     if ($PermissionsOnly -or $OwnerOnly) {
         $GPOOutput
@@ -316,6 +326,11 @@
             }
             if ($Type -contains 'Disabled') {
                 if ($GPOOutput.Enabled -eq $false) {
+                    $GPOOutput
+                }
+            }
+            if ($Type -contains 'NoApplyPermission') {
+                if ($GPOOutput.ApplyPermission -eq $false) {
                     $GPOOutput
                 }
             }

@@ -5,7 +5,7 @@
         [string] $GPOName,
         [alias('GUID', 'GPOID')][string] $GPOGuid,
 
-        [validateset('Empty', 'Unlinked', 'Disabled', 'All')][string[]] $Type,
+        [validateset('Empty', 'Unlinked', 'Disabled', 'NoApplyPermission', 'All')][string[]] $Type,
 
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
