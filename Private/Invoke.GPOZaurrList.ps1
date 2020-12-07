@@ -373,7 +373,7 @@
                                         Skip-GroupPolicy -Name 'TEST | Drive Mapping'
                                         Skip-GroupPolicy -Name 'Default Domain Policy'
                                         Skip-GroupPolicy -Name 'Default Domain Controllers Policy' -DomaiName 'JustOneDomain'
-                                    }
+                                    } -WhatIf
                                 }
                                 New-HTMLText -Text @(
                                     "Code above when executed will scan YourDomainYouHavePermissionsFor, find all empty, unlinked, disabled group policies, backup any GPO just before it's to be deleted to `$Env:UserProfile\Desktop\GPO. "
