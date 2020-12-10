@@ -142,7 +142,7 @@
             New-HTMLPanel {
                 New-HTMLChart {
                     New-ChartBarOptions -Type barStacked
-                    New-ChartLegend -Name 'Yes', 'No' -Color LightGreen, Salmon
+                    New-ChartLegend -Name 'Yes', 'No' -Color SpringGreen, Salmon
                     New-ChartBar -Name 'Authenticated Users Available' -Value $Script:Reporting['GPOPermissionsRead']['Variables']['WillNotTouch'], $Script:Reporting['GPOPermissionsRead']['Variables']['WillFix']
                     New-ChartBar -Name 'Accessible Group Policies' -Value $Script:Reporting['GPOPermissionsRead']['Variables']['Read'], $Script:Reporting['GPOPermissionsRead']['Variables']['CouldNotRead']
                 } -Title 'Group Policy Permissions' -TitleAlignment center

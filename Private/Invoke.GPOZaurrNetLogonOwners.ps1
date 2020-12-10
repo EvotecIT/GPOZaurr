@@ -123,8 +123,8 @@
             }
             New-HTMLPanel {
                 New-HTMLChart {
-                    New-ChartPie -Name 'Correct Owners' -Value $Script:Reporting['NetLogonOwners']['Variables']['NetLogonOwnersAdministrators'] -Color LightGreen
-                    New-ChartPie -Name 'Incorrect Owners' -Value $Script:Reporting['NetLogonOwners']['Variables']['NetLogonOwnersToFix'] -Color Crimson
+                    New-ChartPie -Name 'Correct Owners' -Value $Script:Reporting['NetLogonOwners']['Variables']['NetLogonOwnersAdministrators'] -Color SpringGreen
+                    New-ChartPie -Name 'Incorrect Owners' -Value $Script:Reporting['NetLogonOwners']['Variables']['NetLogonOwnersToFix'] -Color Salmon
                 } -Title 'NetLogon Owners' -TitleAlignment center
             }
         }
