@@ -54,58 +54,41 @@
                 $QueryServer = $ForestInformation.QueryServers[$Domain]['HostName'][0]
                 $Count = 0
                 if ($GPOName) {
-                    $GroupPolicies = Get-GPO -Name $GPOName -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue
-                    $GroupPolicies | ForEach-Object {
-                        $Count++
-                        #Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
-                        Write-Verbose "Get-GPOZaurr - Processing [$($_.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
-                        if (-not $Limited) {
-                            try {
-                                $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
-                            } catch {
-                                Write-Warning "Get-GPOZaurr - Failed to get GPOReport: $($_.Exception.Message). Skipping."
-                                continue
-                            }
-                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO -Type $Type
-                        } else {
-                            $_
-                        }
+                    $getGPOSplat = @{
+                        Name        = $GPOName
+                        Domain      = $Domain
+                        Server      = $QueryServer
+                        ErrorAction = 'SilentlyContinue'
                     }
                 } elseif ($GPOGuid) {
-                    $GroupPolicies = Get-GPO -Guid $GPOGuid -Domain $Domain -Server $QueryServer -ErrorAction SilentlyContinue
-                    $GroupPolicies | ForEach-Object {
-                        $Count++
-                        #Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
-                        Write-Verbose "Get-GPOZaurr - Processing [$($_.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
-                        if (-not $Limited) {
-                            try {
-                                $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
-                            } catch {
-                                Write-Warning "Get-GPOZaurr - Failed to get GPOReport: $($_.Exception.Message). Skipping."
-                                continue
-                            }
-                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO -Type $Type
-                        } else {
-                            $_
-                        }
+                    $getGPOSplat = @{
+                        Guid        = $GPOGuid
+                        Domain      = $Domain
+                        Server      = $QueryServer
+                        ErrorAction = 'SilentlyContinue'
                     }
                 } else {
-                    $GroupPolicies = Get-GPO -All -Server $QueryServer -Domain $Domain -ErrorAction SilentlyContinue
-                    $GroupPolicies | ForEach-Object {
-                        $Count++
-                        #Write-Verbose "Get-GPOZaurr - Getting GPO $($_.DisplayName) / ID: $($_.ID) from $Domain"
-                        Write-Verbose "Get-GPOZaurr - Processing [$($_.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
-                        if (-not $Limited) {
-                            try {
-                                $XMLContent = Get-GPOReport -ID $_.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
-                            } catch {
-                                Write-Warning "Get-GPOZaurr - Failed to get GPOReport: $($_.Exception.Message). Skipping."
-                                continue
-                            }
-                            Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $_ -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO -Type $Type
-                        } else {
-                            $_
+                    $getGPOSplat = @{
+                        All         = $true
+                        Server      = $QueryServer
+                        Domain      = $Domain
+                        ErrorAction = 'SilentlyContinue'
+                    }
+                }
+                $GroupPolicies = Get-GPO @getGPOSplat
+                foreach ($GPO in $GroupPolicies) {
+                    $Count++
+                    Write-Verbose "Get-GPOZaurr - Processing [$($GPO.DomainName)]($Count/$($GroupPolicies.Count)) $($_.DisplayName)"
+                    if (-not $Limited) {
+                        try {
+                            $XMLContent = Get-GPOReport -ID $GPO.ID -ReportType XML -Server $ForestInformation.QueryServers[$Domain].HostName[0] -Domain $Domain -ErrorAction Stop
+                        } catch {
+                            Write-Warning "Get-GPOZaurr - Failed to get [$($GPO.DomainName)]($Count/$($GroupPolicies.Count)) $($GPO.DisplayName) GPOReport: $($_.Exception.Message). Skipping."
+                            continue
                         }
+                        Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $GPO -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO -Type $Type
+                    } else {
+                        $GPO
                     }
                 }
             }
