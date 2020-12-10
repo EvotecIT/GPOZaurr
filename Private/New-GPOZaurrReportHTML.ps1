@@ -23,42 +23,41 @@ function New-GPOZaurrReportHTML {
     New-HTML -TitleText "Group Policy Report - $ComputerName" {
         #New-HTMLTabOptions -SlimTabs -Transition -LinearGradient -SelectorColor Akaroa
         New-HTMLTableOption -DataStore JavaScript -BoolAsString
+        New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
+        New-HTMLPanelStyle -BorderRadius 0px
         New-HTMLTabOptions -SlimTabs `
             -BorderBottomStyleActive solid -BorderBottomColorActive LightSkyBlue -BackgroundColorActive none `
             -TextColorActive Black -Align left -BorderRadius 0px -RemoveShadow -TextColor Grey -TextTransform capitalize
         New-HTMLTab -Name 'Information' {
-            New-HTMLTable -DataTable $Support.ResultantSetPolicy -HideFooter -Transpose
-
             New-HTMLSection {
-                New-HTMLSection {
+                #New-HTMLTable -DataTable $Support.ResultantSetPolicy -HideFooter -Transpose
+                New-HTMLSection -HeaderText 'General Information' {
                     New-HTMLTable -DataTable $Support.ComputerInformation.Time -Filtering -Transpose {
                         New-TableHeader -Names 'Name', 'Value' -Title 'Time Information'
                     }
-                    New-HTMLTable -DataTable $Support.ComputerInformation.BIOS -Filtering -Transpose
+                    New-HTMLTable -DataTable $Support.ComputerInformation.BIOS -Filtering -Transpose {
+                        New-TableHeader -Names 'Name', 'Value' -Title 'BIOS Information'
+                    }
                 }
                 New-HTMLContainer {
-                    New-HTMLSection {
+                    New-HTMLSection -HeaderText 'CPU Information' {
                         New-HTMLTable -DataTable $Support.ComputerInformation.CPU -Filtering
                     }
-                    New-HTMLSection {
+                    New-HTMLSection -HeaderText 'RAM Information' {
                         New-HTMLTable -DataTable $Support.ComputerInformation.RAM -Filtering
                     }
                 }
-
             }
-            New-HTMLSection {
+            New-HTMLSection -HeaderText 'Operating System Information' {
                 New-HTMLTable -DataTable $Support.ComputerInformation.OperatingSystem -Filtering
                 New-HTMLTable -DataTable $Support.ComputerInformation.System -Filtering
             }
-            New-HTMLSection {
+            New-HTMLSection -HeaderText 'Disk Information' {
                 New-HTMLTable -DataTable $Support.ComputerInformation.Disk -Filtering
                 New-HTMLTable -DataTable $Support.ComputerInformation.DiskLogical -Filtering
             }
-            New-HTMLSection {
+            New-HTMLSection -HeaderText 'Services Information' {
                 New-HTMLTable -DataTable $Support.ComputerInformation.Services -Filtering
-            }
-            New-HTMLSection {
-
             }
         }
         foreach ($Key in $Support.Keys) {
@@ -81,9 +80,9 @@ function New-GPOZaurrReportHTML {
                         New-HTMLTable -DataTable $Support.$Key.SummaryDownload -HideFooter
                     }
                     #>
-                    New-HTMLSection -HeaderText 'Resultant Set Policy' {
-                        New-HTMLTable -DataTable $Support.$Key.ResultantSetPolicy -HideFooter
-                    }
+                    #New-HTMLSection -HeaderText 'Resultant Set Policy' {
+                    #    New-HTMLTable -DataTable $Support.$Key.ResultantSetPolicy -HideFooter
+                    #}
                 }
                 New-HTMLTab -Name 'Group Policies' {
                     New-HTMLSection -Invisible {

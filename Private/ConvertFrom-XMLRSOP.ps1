@@ -3,14 +3,14 @@
     param(
         [System.Xml.XmlElement]$Content,
         [string] $ResultsType,
-        [Microsoft.GroupPolicy.GPRsop] $ResultantSetPolicy,
+       # [Microsoft.GroupPolicy.GPRsop] $ResultantSetPolicy,
         [string] $Splitter = [System.Environment]::NewLine
     )
     $GPOPrimary = [ordered] @{
         Summary              = $null
         SummaryDetails       = [System.Collections.Generic.List[PSCustomObject]]::new()
         SummaryDownload      = $null
-        ResultantSetPolicy   = $ResultantSetPolicy
+        #ResultantSetPolicy   = $ResultantSetPolicy
 
         GroupPolicies        = $null
         GroupPoliciesLinks   = $null

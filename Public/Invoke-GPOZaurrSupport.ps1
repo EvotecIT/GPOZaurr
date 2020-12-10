@@ -7,8 +7,8 @@
         [string] $Path,
         [string] $Splitter = [System.Environment]::NewLine,
         [switch] $PreventShow,
-        [switch] $Offline,
-        [switch] $ForceGPResult
+        [switch] $Offline #,
+        # [switch] $ForceGPResult
     )
     # if user didn't choose anything, lets run as currently logged in user locally
     if (-not $UserName -and -not $ComputerName) {
@@ -54,39 +54,43 @@
     if ($UserName) {
         $SplatPolicy['User'] = $UserName
     }
-    if ($Command -and -not $ForceGPResult) {
-        try {
-            #Write-Verbose "Request-GPOZaurr - ComputerName: $($SplatPolicy['Computer']) UserName: $($SplatPolicy['User'])"
-            $ResultantSetPolicy = Get-GPResultantSetOfPolicy @SplatPolicy -ErrorAction Stop
-        } catch {
-            if ($_.Exception.Message -eq 'Exception from HRESULT: 0x80041003') {
-                Write-Warning "Request-GPOZaurr - Are you running as admin? $($_.Exception.Message)"
-                return
-            } else {
-                $ErrorMessage = $($_.Exception.Message).Replace([Environment]::NewLine, ' ')
-                Write-Warning "Request-GPOZaurr - Error: $ErrorMessage"
-                return
-            }
+
+    $SplatPolicy['TempXmlPath'] = [io.path]::GetTempFileName().Replace('.tmp', ".xml")
+    # Originally planned to use Get-GPResultantSetOfPolicy but it only works with administrative rights
+    # if ($Command -and -not $ForceGPResult) {
+    #     try {
+    #         Write-Verbose "Invoke-GPOZaurrSupport - ComputerName: $($SplatPolicy['Computer']), UserName: $($SplatPolicy['User']), ReportType: $($SplatPolicy['ReportType']), Path: $($SplatPolicy['Path'])"
+    #         $ResultantSetPolicy = Get-GPResultantSetOfPolicy @SplatPolicy -ErrorAction Stop
+    #     } catch {
+    #         if ($_.Exception.Message -eq 'Exception from HRESULT: 0x80041003') {
+    #             Write-Warning "Invoke-GPOZaurrSupport - Are you running as admin? $($_.Exception.Message)"
+    #             return
+    #         } else {
+    #             $ErrorMessage = $($_.Exception.Message).Replace([Environment]::NewLine, ' ')
+    #             Write-Warning "Invoke-GPOZaurrSupport - Error: $ErrorMessage"
+    #             return
+    #         }
+    #     }
+    # } else {
+    $Arguments = @(
+        if ($SplatPolicy['Computer']) {
+            "/S $ComputerName"
         }
-    } else {
-        $Arguments = @(
-            if ($SplatPolicy['Computer']) {
-                "/S $ComputerName"
-            }
-            if ($SplatPolicy['User']) {
-                "/USER $($SplatPolicy['User'])"
-            }
-            if ($SplatPolicy['ReportType'] -eq 'HTML') {
-                '/H'
-            } elseif ($SplatPolicy['ReportType'] -eq 'XML') {
-                '/X'
-            }
+        if ($SplatPolicy['User']) {
+            "/USER $($SplatPolicy['User'])"
+        }
+        if ($SplatPolicy['ReportType'] -eq 'HTML') {
+            '/H'
             $SplatPolicy['Path']
-            "/F"
-        )
-        Write-Verbose "Invoke-GPOZaurrSupport - GPResult Arguments: $Arguments"
-        Start-Process -NoNewWindow -FilePath 'gpresult' -ArgumentList $Arguments -Wait
-    }
+        } elseif ($SplatPolicy['ReportType'] -eq 'XML') {
+            '/X'
+            $SplatPolicy['TempXmlPath']
+        }
+        "/F"
+    )
+    Write-Verbose "Invoke-GPOZaurrSupport - GPResult Arguments: $Arguments"
+    Start-Process -NoNewWindow -FilePath 'gpresult' -ArgumentList $Arguments -Wait
+    #}
     if ($Type -eq 'NativeHTML') {
         if (-not $PreventShow) {
             Write-Verbose "Invoke-GPOZaurrSupport - Opening up file $($SplatPolicy['Path'])"
@@ -95,39 +99,58 @@
         return
     }
     # Loads created XML by resultant Output
-    if ($SplatPolicy.Path -and (Test-Path -LiteralPath $SplatPolicy.Path)) {
-        [xml] $PolicyContent = Get-Content -LiteralPath $SplatPolicy.Path
+    if ($SplatPolicy.TempXmlPath -and (Test-Path -LiteralPath $SplatPolicy.TempXmlPath)) {
+        [xml] $PolicyContent = Get-Content -LiteralPath $SplatPolicy.TempXmlPath
         if ($PolicyContent) {
             # lets remove temporary XML file
-            Remove-Item -LiteralPath $SplatPolicy.Path
+            Remove-Item -LiteralPath $SplatPolicy.TempXmlPath
         } else {
-            Write-Warning "Request-GPOZaurr - Couldn't load XML file from drive $($SplatPolicy.Path). Terminating."
+            Write-Warning "Invoke-GPOZaurrSupport - Couldn't load XML file from drive $($SplatPolicy.TempXmlPath). Terminating."
             return
         }
     } else {
-        Write-Warning "Request-GPOZaurr - Couldn't find XML file on drive $($SplatPolicy.Path). Terminating."
+        Write-Warning "Invoke-GPOZaurrSupport - Couldn't find XML file on drive $($SplatPolicy.TempXmlPath). Terminating."
         return
     }
     if ($ComputerName) {
         if (-not $PolicyContent.Rsop.'ComputerResults'.EventsDetails) {
-            Write-Warning "Request-GPOZaurr - Windows Events for Group Policy are missing. Amount of data will be limited. Firewall issue?"
+            Write-Warning "Invoke-GPOZaurrSupport - Windows Events for Group Policy are missing. Amount of data will be limited. Firewall issue?"
         }
     }
+    if (-not $ComputerName) {
+        # Ok, user haven't given computername, and we're not admin, so RSOP won't be there, but we will use $ComputerName further down to get additional data, even without administrative rights
+        # Also for display purposes
+        $ComputerName = $Env:COMPUTERNAME
+    }
+
     if ($Type -eq 'XML') {
         $PolicyContent.Rsop
     } else {
+        if ($VerbosePreference -ne 'SilentlyContinue') {
+            $Verbose = $true
+        } else {
+            $Verbose = $false
+        }
         $Output = [ordered] @{
-            ComputerInformation = Get-Computer -ComputerName $ComputerName
-            ResultantSetPolicy  = $ResultantSetPolicy
+            ComputerInformation = Get-Computer -ComputerName $ComputerName -Verbose:$Verbose
+            #ResultantSetPolicy  = $ResultantSetPolicy
+
+            <# ResultantSetPolicy  = $ResultantSetPolicy
+            RunspaceId      : 5a4931ea-915e-42d3-80d8-6a86b16eb271
+            RsopMode        : Logging
+            Namespace       : \\EVOSPEED\Root\Rsop\NS103F4892_39E9_42B8_B0FF_E438EC0796B5
+            LoggingComputer : EVOSPEED
+            LoggingUser     : EVOTEC\przemyslaw.klys
+            LoggingMode     : UserAndComputer
+            #>
         }
         if ($PolicyContent.Rsop.ComputerResults) {
-            $Output.ComputerResults = ConvertFrom-XMLRSOP -Content $PolicyContent.Rsop -ResultantSetPolicy $ResultantSetPolicy -ResultsType 'ComputerResults' -Splitter $Splitter
+            $Output.ComputerResults = ConvertFrom-XMLRSOP -Content $PolicyContent.Rsop -ResultsType 'ComputerResults' -Splitter $Splitter
         }
         if ($PolicyContent.Rsop.UserResults) {
-            $Output.UserResults = ConvertFrom-XMLRSOP -Content $PolicyContent.Rsop -ResultantSetPolicy $ResultantSetPolicy -ResultsType 'UserResults' -Splitter $Splitter
+            $Output.UserResults = ConvertFrom-XMLRSOP -Content $PolicyContent.Rsop -ResultsType 'UserResults' -Splitter $Splitter
         }
-
-        New-GPOZaurrReportConsole -Results $Output
+        New-GPOZaurrReportConsole -Results $Output -ComputerName $ComputerName
         if ($Type -contains 'Object') {
             $Output
         } elseif ($Type -contains 'HTML') {
