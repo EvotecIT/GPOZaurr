@@ -217,6 +217,7 @@
             'DisplayName'                       = $XMLContent.GPO.Name
             'DomainName'                        = $XMLContent.GPO.Identifier.Domain.'#text'
             'GUID'                              = $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}'
+            'Days'                              = (New-TimeSpan -Start ([DateTime] $XMLContent.GPO.ModifiedTime) -End (Get-Date)).Days
             'Empty'                             = $Empty
             'Linked'                            = $Linked
             'Enabled'                           = $EnabledBool
