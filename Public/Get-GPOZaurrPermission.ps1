@@ -44,25 +44,6 @@
                 Write-Warning "Get-GPOZaurrPermission - Using SkipAdministrative or SkipWellKnown while looking for Unknown doesn't make sense as only Unknown will be displayed."
             }
         }
-        <#
-        if ($ResolveAccounts) {
-            $Accounts = @{ }
-            foreach ($Domain in $ForestInformation.Domains) {
-                $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
-                $DomainInformation = Get-ADDomain -Server $QueryServer
-                $Users = Get-ADUser -Filter * -Server $QueryServer -Properties PasswordLastSet, LastLogonDate, UserPrincipalName
-                foreach ($User in $Users) {
-                    $U = -join ($DomainInformation.NetBIOSName, '\', $User.SamAccountName)
-                    $Accounts[$U] = $User
-                }
-                $Groups = Get-ADGroup -Filter * -Server $QueryServer
-                foreach ($Group in $Groups) {
-                    $G = -join ($DomainInformation.NetBIOSName, '\', $Group.SamAccountName)
-                    $Accounts[$G] = $Group
-                }
-            }
-        }
-        #>
     }
     Process {
         foreach ($Domain in $ForestInformation.Domains) {
