@@ -14,7 +14,10 @@
     if (-not $ADAdministrativeGroups) {
         $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     }
-    $AdministrativeExists = @{
+    $AdministrativeExists = [ordered] @{
+        DisplayName      = $GPOPermissions[0].DisplayName
+        DomainName       = $GPOPermissions[0].DomainName
+        GUID             = $GPOPermissions[0].GUID
         Skip             = $false
         DomainAdmins     = $false
         EnterpriseAdmins = $false
@@ -55,5 +58,5 @@
             }
         }
     }
-    $AdministrativeExists
+    [PSCustomObject] $AdministrativeExists
 }
