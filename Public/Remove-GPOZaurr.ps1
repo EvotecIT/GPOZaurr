@@ -10,7 +10,8 @@
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [string[]] $GPOPath,
         [string] $BackupPath,
-        [switch] $BackupDated
+        [switch] $BackupDated,
+        [int] $RequireDays
     )
     Begin {
         if ($BackupPath) {
@@ -60,13 +61,19 @@
                     $DeleteRequired = $true
                 }
             }
+            if ($RequireDays) {
+                if ($RequireDays -ge $_.Days) {
+                    # GPO was modified recently and we don't want to touch it yet, maybe edit is in progress
+                    $DeleteRequired = $false
+                }
+            }
             if ($_.Exclude -eq $true) {
                 Write-Verbose "Remove-GPOZaurr - Excluded GPO $($_.DisplayName) from $($_.DomainName). Skipping!"
             } elseif ($DeleteRequired) {
                 if ($BackupRequired) {
                     try {
                         Write-Verbose "Remove-GPOZaurr - Backing up GPO $($_.DisplayName) from $($_.DomainName)"
-                        $BackupInfo = Backup-GPO -Guid $_.Guid -Domain $_.DomainName -Path $BackupFinalPath -ErrorAction Stop #-Server $QueryServer
+                        $BackupInfo = Backup-GPO -Guid $_.Guid -Domain $_.DomainName -Path $BackupFinalPath -ErrorAction Stop
                         $BackupInfo
                         $BackupOK = $true
                     } catch {
@@ -77,7 +84,7 @@
                 if (($BackupRequired -and $BackupOK) -or (-not $BackupRequired)) {
                     try {
                         Write-Verbose "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName)"
-                        Remove-GPO -Domain $_.DomainName -Guid $_.Guid -ErrorAction Stop #-Server $QueryServer
+                        Remove-GPO -Domain $_.DomainName -Guid $_.Guid -ErrorAction Stop
                     } catch {
                         Write-Warning "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
                     }
