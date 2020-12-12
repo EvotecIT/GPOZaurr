@@ -1,4 +1,4 @@
-function ConvertFrom-CSExtension {
+﻿function ConvertFrom-CSExtension {
     [cmdletBinding()]
     param(
         [string[]] $CSE,

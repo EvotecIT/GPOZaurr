@@ -1,4 +1,4 @@
-function ConvertTo-XMLLocalGroups {
+﻿function ConvertTo-XMLLocalGroups {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

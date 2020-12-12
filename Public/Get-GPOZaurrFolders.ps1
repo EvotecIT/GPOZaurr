@@ -1,4 +1,4 @@
-function Get-GPOZaurrFolders {
+﻿function Get-GPOZaurrFolders {
     [cmdletBinding()]
     param(
         [ValidateSet('All', 'Netlogon', 'Sysvol')][string[]] $Type = 'All',

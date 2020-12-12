@@ -1,4 +1,4 @@
-function Remove-GPOZaurrFolders {
+﻿function Remove-GPOZaurrFolders {
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [string] $BackupPath,

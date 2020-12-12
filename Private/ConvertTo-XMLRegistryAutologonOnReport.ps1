@@ -1,4 +1,4 @@
-function ConvertTo-XMLRegistryAutologonOnReport {
+﻿function ConvertTo-XMLRegistryAutologonOnReport {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO

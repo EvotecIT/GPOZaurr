@@ -1,4 +1,4 @@
-function ConvertTo-XMLGenericSecuritySettings {
+﻿function ConvertTo-XMLGenericSecuritySettings {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

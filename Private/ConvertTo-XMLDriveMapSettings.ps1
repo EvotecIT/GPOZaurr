@@ -1,4 +1,4 @@
-function ConvertTo-XMLDriveMapSettings {
+﻿function ConvertTo-XMLDriveMapSettings {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

@@ -1,4 +1,4 @@
-function Clear-GPOZaurrSysvolDFSR {
+﻿function Clear-GPOZaurrSysvolDFSR {
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [alias('ForestName')][string] $Forest,

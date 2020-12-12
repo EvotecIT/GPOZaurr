@@ -1,4 +1,4 @@
-function ConvertTo-XMLPrinterInternal {
+﻿function ConvertTo-XMLPrinterInternal {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

@@ -1,4 +1,4 @@
-function ConvertTo-XMLTaskScheduler {
+﻿function ConvertTo-XMLTaskScheduler {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

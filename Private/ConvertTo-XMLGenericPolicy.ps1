@@ -1,4 +1,4 @@
-function ConvertTo-XMLGenericPolicy {
+﻿function ConvertTo-XMLGenericPolicy {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

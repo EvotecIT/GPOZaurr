@@ -1,4 +1,4 @@
-function Find-CSExtension {
+﻿function Find-CSExtension {
     [cmdletBinding()]
     param(
         [string[]] $CSE,

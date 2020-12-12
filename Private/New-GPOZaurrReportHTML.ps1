@@ -1,4 +1,4 @@
-function New-GPOZaurrReportHTML {
+﻿function New-GPOZaurrReportHTML {
     [cmdletBinding()]
     param(
         [System.Collections.IDictionary] $Support,

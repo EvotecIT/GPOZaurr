@@ -1,4 +1,4 @@
-function Get-GPOZaurrFilesPolicyDefinition {
+﻿function Get-GPOZaurrFilesPolicyDefinition {
     [alias('Get-GPOZaurrFilesPolicyDefinitions')]
     [cmdletbinding()]
     param(

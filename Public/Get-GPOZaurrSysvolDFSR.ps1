@@ -1,4 +1,4 @@
-function Get-GPOZaurrSysvolDFSR {
+﻿function Get-GPOZaurrSysvolDFSR {
     [cmdletBinding()]
     param(
         [alias('ForestName')][string] $Forest,

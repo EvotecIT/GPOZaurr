@@ -1,4 +1,4 @@
-function Get-GPOCategories {
+﻿function Get-GPOCategories {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

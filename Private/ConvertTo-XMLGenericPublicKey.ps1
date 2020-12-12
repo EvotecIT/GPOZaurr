@@ -1,4 +1,4 @@
-function ConvertTo-XMLGenericPublicKey {
+﻿function ConvertTo-XMLGenericPublicKey {
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,
