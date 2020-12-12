@@ -1,7 +1,7 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-Invoke-GPOZaurrSupport -ComputerName 'ad1.ad.evotec.xyz' -UserName 'EVOTEC\przemyslaw.klys' -Type NativeHTML -ForceGPResult -Verbose
-
+#Invoke-GPOZaurrSupport -ComputerName 'ad1.ad.evotec.xyz' -UserName 'EVOTEC\przemyslaw.klys' -Type HTML -Verbose -Path $PSScriptRoot\Reports\GPOSupport.html
+Invoke-GPOZaurrSupport -Type HTML -Verbose -Path $PSScriptRoot\Reports\GPOSupport.html -ComputerName ad1.ad.evotec.xyz
 return
 #$Support1 = Invoke-GPOZaurrSupport -ComputerName 'AD1' -UserName 'przemyslaw.klys' -Type Object
 #$Support = Invoke-GPOZaurrSupport -ComputerName 'AD1' -UserName 'EVOTEC\Administrator' -Type Object
