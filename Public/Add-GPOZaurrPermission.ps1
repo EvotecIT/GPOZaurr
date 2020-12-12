@@ -108,7 +108,7 @@
                 }
             }
             #>
-            if (-not $PermissionsAnalysis['Skip']) {
+            if (-not $PermissionsAnalysis.'Skip') {
                 if (-not $GPOPermissions) {
                     # This is bad - things went wrong
                     Write-Warning "Add-GPOZaurrPermission - Couldn't get permissions for GPO. Things aren't what they should be. Skipping!"
@@ -118,7 +118,7 @@
                         # We asked, we got response, now we need to check if maybe we're missing one of the two administrative groups
                         if ($Type -eq 'Administrative') {
                             # this is a case where something was returned. Be it Domain Admins or Enterprise Admins or both. But we still need to check because it may have been Domain Admins from other domain or just one of the two required groups
-                            if ($PermissionsAnalysis['DomainAdmins'] -eq $false) {
+                            if ($PermissionsAnalysis.'DomainAdmins' -eq $false) {
                                 $Principal = $ADAdministrativeGroups[$GPO.DomainName]['DomainAdmins']
                                 Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
                                 $CountFixed++
@@ -132,7 +132,7 @@
                                     }
                                 }
                             }
-                            if ($PermissionsAnalysis['EnterpriseAdmins'] -eq $false) {
+                            if ($PermissionsAnalysis.'EnterpriseAdmins' -eq $false) {
                                 $Principal = $ADAdministrativeGroups[$ForestInformation.Forest.RootDomain]['EnterpriseAdmins']
                                 Write-Verbose "Add-GPOZaurrPermission - Adding permission $PermissionType for $($Principal) to $($GPO.DisplayName) at $($GPO.DomainName)"
                                 $CountFixed++

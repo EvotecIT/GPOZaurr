@@ -8,6 +8,7 @@
             Permissions = Get-GPOZaurrPermission -Type Administrative -IncludePermissionType GpoEditDeleteModifySecurity -ReturnSecurityWhenNoData -IncludeGPOObject -ReturnSingleObject -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
         }
         $Object['PermissionsPerRow'] = $Object['Permissions'] | ForEach-Object { $_ }
+        $Object['PermissionsAnalysis'] = [System.Collections.Generic.List[PSCustomObject]]::new()
         $Object
     }
     Processing = {
@@ -33,6 +34,8 @@
                 $Script:Reporting['GPOPermissionsAdministrative']['Variables']['WillFix']++
                 $Script:Reporting['GPOPermissionsAdministrative']['Variables']['WillFixPerDomain'][$GPO[0].DomainName]++
             }
+            # lets create table and add it there
+            $Script:Reporting['GPOPermissionsAdministrative']['Data'].'PermissionsAnalysis'.Add($Analysis)
         }
         if ($Script:Reporting['GPOPermissionsAdministrative']['Variables']['WillFix'] -gt 0) {
             $Script:Reporting['GPOPermissionsAdministrative']['ActionRequired'] = $true
@@ -88,9 +91,14 @@
                 } -Title 'Group Policy Permissions' -TitleAlignment center
             }
         }
-        New-HTMLSection -Name 'Group Policy Administrative Users Analysis' {
+        New-HTMLSection -Name 'Group Policy Administrative Users Permissions Summary' {
             New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsAdministrative']['Data'].PermissionsPerRow -Filtering {
                 New-HTMLTableCondition -Name 'Permission' -Value '' -BackgroundColor Salmon -ComparisonType string -Row
+            } -PagingOptions 7, 15, 30, 45, 60
+        }
+        New-HTMLSection -Name 'Group Policy Administrative Users Analysis' {
+            New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsAdministrative']['Data'].PermissionsAnalysis -Filtering {
+                # New-HTMLTableCondition -Name 'Permission' -Value '' -BackgroundColor Salmon -ComparisonType string -Row
             } -PagingOptions 7, 15, 30, 45, 60
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
