@@ -5,7 +5,7 @@
     GPODuplicates                = $GPOZaurrDuplicates
     GPOList                      = $GPOZaurrList
     GPOPassword                  = $GPOZaurrPassword
-    GPOPermissions               = $GPOZaurrPermissions
+    GPOPermissions               = $GPOZaurrPermissionsAnalysis
     GPOPermissionsAdministrative = $GPOZaurrPermissionsAdministrative
     GPOPermissionsRead           = $GPOZaurrPermissionsRead
     GPOPermissionsRoot           = $GPOZaurrPermissionsRoot
