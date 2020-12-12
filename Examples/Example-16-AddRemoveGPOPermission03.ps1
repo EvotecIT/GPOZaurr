@@ -9,4 +9,4 @@ Invoke-GPOZaurrPermission -Linked Root -Verbose {
     Remove-GPOPermission -Type NotAdministrative, NotWellKnownAdministrative -IncludePermissionType GpoEdit, GpoEditDeleteModifySecurity
     Add-GPOPermission -Type Administrative -IncludePermissionType GpoEditDeleteModifySecurity
     #Add-GPOPermission -Type WellKnownAdministrative -IncludePermissionType GpoEditDeleteModifySecurity
-} #-WhatIf #| Format-Table *
+} -WhatIf
