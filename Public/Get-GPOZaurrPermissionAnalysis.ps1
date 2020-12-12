@@ -3,13 +3,17 @@
     param(
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
-        [alias('Domain', 'Domains')][string[]] $IncludeDomains
+        [alias('Domain', 'Domains')][string[]] $IncludeDomains,
+
+        [Array] $Permissions
     )
     if (-not $ADAdministrativeGroups) {
         $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     }
 
-    $Permissions = Get-GPOZaurrPermission -IncludePermissionType GpoEditDeleteModifySecurity, GpoApply, GpoCustom, GpoRead -ReturnSecurityWhenNoData -IncludeGPOObject -ReturnSingleObject -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+    if (-not $Permissions) {
+        $Permissions = Get-GPOZaurrPermission -IncludePermissionType GpoEditDeleteModifySecurity, GpoApply, GpoCustom, GpoRead -ReturnSecurityWhenNoData -IncludeGPOObject -ReturnSingleObject -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+    }
     foreach ($GPO in $Permissions) {
         $AdministrativeExists = [ordered] @{
             DisplayName                  = $GPO[0].DisplayName
