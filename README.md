@@ -61,6 +61,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOList` - require GPO to be 7 days old for deletion to be proposed
   - [x] Improved `Remove-GPOZaurr` - added `RequireDays` parameter to prevent deletion of just modified GPOs
+  - [x] Added `Get-GPOZaurrPermissionAnalysis`
 - 0.0.98 - 10.12.2020
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOList` - fixed unexpected ending of cmdlet when error occurs (for example deleted GPO while script is running) which could impact results
