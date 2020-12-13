@@ -299,7 +299,7 @@
                             New-HTMLWizardStep -Name 'Prepare report' {
                                 New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with fixing Group Policy Authenticated Users. To generate new report please use:"
                                 New-HTMLCodeBlock -Code {
-                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOPermissionsAdministrativeBefore.html -Verbose -Type GPOPermissions
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOPermissionsBefore.html -Verbose -Type GPOPermissions
                                 }
                                 New-HTMLText -TextBlock {
                                     "When executed it will take a while to generate all data and provide you with new report depending on size of environment. "
@@ -488,7 +488,7 @@
                                     "Once cleanup task was executed properly, we need to verify that report now shows no problems."
                                 }
                                 New-HTMLCodeBlock -Code {
-                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOPermissionsAdministrativeAfter.html -Verbose -Type GPOPermissionsAdministrative
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOPermissionsAfter.html -Verbose -Type GPOPermissions
                                 }
                                 New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                             }
