@@ -57,9 +57,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.99
+- 0.0.99 - 13.10.2020
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOList` - require GPO to be 7 days old for deletion to be proposed
+    - [x] Type `GPOPermissions` - one stop for permissions
   - [x] Improved `Remove-GPOZaurr` - added `RequireDays` parameter to prevent deletion of just modified GPOs
   - [x] Added `Get-GPOZaurrPermissionAnalysis`
   - [x] Added `Repair-GPOZaurrPermission`
