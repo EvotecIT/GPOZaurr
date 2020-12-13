@@ -171,6 +171,18 @@
             "In such case we're assuming you know what you're doing. However it's always possible to review those permissions, as those are marked in the table for review. "
         } -LineBreak
 
+        New-HTMLText -FontSize 10pt -Text "Assesment results " -FontWeight bold
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Group Policies requiring Administrative Permissions Fix: ', $Script:Reporting['GPOPermissions']['Variables']['WillFixAdministrative'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies which don't require changes: ", $Script:Reporting['GPOPermissions']['Variables']['WillNotTouchAdministrative'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOPermissions']['Variables']['WillFixAdministrativePerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOPermissions']['Variables']['WillFixAdministrativePerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            }
+        } -FontSize 10pt
+
         New-HTMLText -Text "Third problem relates to SYSTEM account" -FontSize 10pt -FontWeight bold -TextDecoration underline -Alignment center
         New-HTMLText -FontSize 10pt -TextBlock {
             "When GPO is created by default it gets SYSTEM account with Edit/Delete/Modify Security permissions. "
@@ -182,6 +194,18 @@
             "Sometimes groups or users are deleted in Active Directory and unfortunetly their permissions are not cleaned automatically. "
             "Those are left in-place and stay there forever until removed. "
         } -LineBreak
+
+        New-HTMLText -FontSize 10pt -Text "Assesment results " -FontWeight bold
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Group Policies requiring Unknown permission removal: ', $Script:Reporting['GPOPermissions']['Variables']['WillFixUnknown'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies which don't require changes: ", $Script:Reporting['GPOPermissions']['Variables']['WillNotTouchUnknown'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOPermissions']['Variables']['WillFixUnknownPerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOPermissions']['Variables']['WillFixUnknownPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            }
+        } -FontSize 10pt
     }
     Solution   = {
         New-HTMLSection -Invisible {
@@ -262,7 +286,7 @@
                             New-HTMLWizardStep -Name 'Prepare report' {
                                 New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with fixing Group Policy Authenticated Users. To generate new report please use:"
                                 New-HTMLCodeBlock -Code {
-                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOPermissionsAdministrativeBefore.html -Verbose -Type GPOPermissionsAdministrative
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOPermissionsAdministrativeBefore.html -Verbose -Type GPOPermissions
                                 }
                                 New-HTMLText -TextBlock {
                                     "When executed it will take a while to generate all data and provide you with new report depending on size of environment. "
@@ -271,8 +295,13 @@
                                 }
                                 New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
                                 New-HTMLCodeBlock -Code {
-                                    $AdministrativeUsers = Get-GPOZaurrPermission -Type Administrative -IncludePermissionType GpoEditDeleteModifySecurity -ReturnSecurityWhenNoData
-                                    $AdministrativeUsers | Format-Table
+                                    # This gets all permissions
+                                    $AllPermissions = Get-GPOZaurrPermission
+                                    $AllPermissions | Format-Table
+
+                                    # this analyses permissions
+                                    $PermissionsAnalysis = Get-GPOZaurrPermissionAnalysis
+                                    $PermissionsAnalysis | Format-Table
                                 }
                                 New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
                             }
@@ -289,7 +318,44 @@
                                     "Above command when executed will make a backup to Desktop, create GPO folder and within it it will put all those GPOs. "
                                 }
                             }
-
+                            New-HTMLWizardStep -Name 'Add Authenticated Users ability to read all GPO' {
+                                New-HTMLText -Text @(
+                                    "Following command will find any GPO which doesn't have Authenticated User as GpoRead or GpoApply and will add it as GpoRead. ",
+                                    "This change doesn't change GpoApply permission, therefore it won't change to whom the GPO applies to. ",
+                                    "It ensures that COMPUTERS can read GPO properly to be able to Apply it. ",
+                                    "Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental adding of permissions."
+                                ) -FontWeight normal, normal, normal, normal, bold, normal -Color Black, Black, Black, Black, Red, Black
+                                New-HTMLCodeBlock -Code {
+                                    Add-GPOZaurrPermission -Type AuthenticatedUsers -PermissionType GpoRead -All -WhatIf -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Add-GPOZaurrPermission -Type AuthenticatedUsers -PermissionType GpoRead -All -WhatIf -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be changed matches expected data."
+                                } -LineBreak
+                                New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    Add-GPOZaurrPermission -Type AuthenticatedUsers -PermissionType GpoRead -All -Verbose -LimitProcessing 2
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Add-GPOZaurrPermission -Type AuthenticatedUsers -PermissionType GpoRead -All -Verbose -LimitProcessing 2 -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed adds Authenticated Users (GpoRead permission) only on first X non-compliant Group Policies. "
+                                    "Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur. "
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. "
+                                    "In case of any issues please review and action accordingly."
+                                }
+                            }
                             New-HTMLWizardStep -Name 'Add Administrative Groups proper permissions GPO' {
                                 New-HTMLText -Text @(
                                     "Following command will find any GPO which doesn't have Domain Admins and Enterprise Admins added with GpoEditDeleteModifySecurity and will add it as GpoEditDeleteModifySecurity. ",
@@ -323,6 +389,44 @@
                                 }
                                 New-HTMLText -TextBlock {
                                     "This command when executed adds Enterprise Admins or/and Domain Admins (GpoEditDeleteModifySecurity permission) only on first X non-compliant Group Policies. "
+                                    "Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur. "
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. "
+                                    "In case of any issues please review and action accordingly. "
+                                }
+                            }
+                            New-HTMLWizardStep -Name 'Remove Unknown Permissions' {
+                                New-HTMLText -Text @(
+                                    "Following command will find any GPO which has an unknown SID and will remove it. ",
+                                    "This change doesn't change any other permissions. ",
+                                    "It ensures that GPOs have no unknown permissions present. ",
+                                    "Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental adding of permissions."
+                                ) -FontWeight normal, normal, normal, normal, bold, normal -Color Black, Black, Black, Black, Red, Black
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrPermission -Verbose -Type Unknown -WhatIf
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrPermission -Verbose -Type Unknown -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be changed matches expected data."
+                                } -LineBreak
+                                New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrPermission -Verbose -Type Unknown -LimitProcessing 2
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrPermission -Verbose -Type Unknown -LimitProcessing 2 -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed removes only first X unknwon permissions from Group Policies. "
                                     "Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur. "
                                     "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. "
                                     "In case of any issues please review and action accordingly. "
