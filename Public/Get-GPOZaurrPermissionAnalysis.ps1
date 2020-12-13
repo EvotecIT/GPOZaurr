@@ -77,7 +77,7 @@
                     $AdministrativeExists['Unknown'] = $true
                     $AdministrativeExists['UnknownPermission'] = $Permission.Permission
                 }
-                if ( $AdministrativeExists['System'] -eq $true -and $AdministrativeExists['AuthenticatedUsers'] -eq $true -and $AdministrativeExists['Administrative'] -eq $true) {
+                if ( $AdministrativeExists['System'] -eq $true -and $AdministrativeExists['AuthenticatedUsers'] -eq $true -and $AdministrativeExists['Administrative'] -eq $true -and $AdministrativeExists['Unknown'] -eq $false) {
                     $AdministrativeExists['Status'] = $true
                 }
             }
