@@ -1,4 +1,4 @@
-Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
+﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 # Extracts CSE from registry
 $AllRegistryExtensions = Find-CSExtension
