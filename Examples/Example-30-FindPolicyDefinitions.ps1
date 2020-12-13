@@ -1,4 +1,4 @@
-Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
+﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
 $Policies = Get-GPOZaurrFilesPolicyDefinition -Signature
 $Policies | Format-Table
