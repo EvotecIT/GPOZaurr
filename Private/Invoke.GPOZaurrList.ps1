@@ -628,7 +628,7 @@
                                 }
                                 New-HTMLText -Text "If there are no more problems to solve, GPOs to optimize in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                             }
-                        } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                        } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center -EnableAllAnchors
                     }
                 }
             }

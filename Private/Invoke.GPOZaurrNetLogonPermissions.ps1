@@ -202,7 +202,7 @@
         #                         }
         #                         New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
         #                     }
-        #                 } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+        #                 } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center -EnableAllAnchors
         #             }
         #         }
         #     }
@@ -283,7 +283,7 @@
                                 }
                                 New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                             }
-                        } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center
+                        } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center -EnableAllAnchors
                     }
                 }
             }
