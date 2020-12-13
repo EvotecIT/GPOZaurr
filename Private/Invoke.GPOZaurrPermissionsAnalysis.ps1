@@ -173,7 +173,7 @@
 
         New-HTMLText -FontSize 10pt -Text "Assesment results " -FontWeight bold
         New-HTMLList -Type Unordered {
-            New-HTMLListItem -Text 'Group Policies requiring Administrative Permissions Fix: ', $Script:Reporting['GPOPermissions']['Variables']['WillFixAdministrative'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Group Policies requiring Administrative permission fix: ', $Script:Reporting['GPOPermissions']['Variables']['WillFixAdministrative'] -FontWeight normal, bold
             New-HTMLListItem -Text "Group Policies which don't require changes: ", $Script:Reporting['GPOPermissions']['Variables']['WillNotTouchAdministrative'] -FontWeight normal, bold
         } -FontSize 10pt
         New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
@@ -189,6 +189,19 @@
             "For some reason, some Administrators remove those permissions or modify them when they shouldn't touch those at all. "
             "Since having Edit/Delete/Modify Security permissions doesn't affect GPOApply permissions there's no reason to remove SYSTEM from permissions, or limit their rights. "
         } -LineBreak
+
+        New-HTMLText -FontSize 10pt -Text "Assesment results " -FontWeight bold
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Group Policies requiring SYSTEM permission fix: ', $Script:Reporting['GPOPermissions']['Variables']['WillFixSystem'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies which don't require changes: ", $Script:Reporting['GPOPermissions']['Variables']['WillNotTouchSystem'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOPermissions']['Variables']['WillFixSystemPerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOPermissions']['Variables']['WillFixSystemPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            }
+        } -FontSize 10pt
+
         New-HTMLText -Text "Fourth problem relates to UNKNOWN SID" -FontSize 10pt -FontWeight bold -TextDecoration underline -Alignment center
         New-HTMLText -FontSize 10pt -TextBlock {
             "Sometimes groups or users are deleted in Active Directory and unfortunetly their permissions are not cleaned automatically. "
@@ -318,7 +331,7 @@
                                     "Above command when executed will make a backup to Desktop, create GPO folder and within it it will put all those GPOs. "
                                 }
                             }
-                            New-HTMLWizardStep -Name 'Add Authenticated Users ability to read all GPO' {
+                            New-HTMLWizardStep -Name 'Add Authenticated Users permissions' {
                                 New-HTMLText -Text @(
                                     "Following command will find any GPO which doesn't have Authenticated User as GpoRead or GpoApply and will add it as GpoRead. ",
                                     "This change doesn't change GpoApply permission, therefore it won't change to whom the GPO applies to. ",
@@ -356,7 +369,7 @@
                                     "In case of any issues please review and action accordingly."
                                 }
                             }
-                            New-HTMLWizardStep -Name 'Add Administrative Groups proper permissions GPO' {
+                            New-HTMLWizardStep -Name 'Add Administrative Groups permissions' {
                                 New-HTMLText -Text @(
                                     "Following command will find any GPO which doesn't have Domain Admins and Enterprise Admins added with GpoEditDeleteModifySecurity and will add it as GpoEditDeleteModifySecurity. ",
                                     "This change doesn't change GpoApply permission, therefore it won't change to whom the GPO applies to. ",
@@ -394,7 +407,45 @@
                                     "In case of any issues please review and action accordingly. "
                                 }
                             }
-                            New-HTMLWizardStep -Name 'Remove Unknown Permissions' {
+                            New-HTMLWizardStep -Name 'Add SYSTEM permissions' {
+                                New-HTMLText -Text @(
+                                    "Following command will find any GPO which doesn't have SYSTEM account added with GpoEditDeleteModifySecurity and will add it as GpoEditDeleteModifySecurity. ",
+                                    "This change doesn't change GpoApply permission, therefore it won't change to whom the GPO applies to. ",
+                                    "It ensures that SYSTEM can manage GPO. ",
+                                    "Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental adding of permissions."
+                                ) -FontWeight normal, normal, normal, normal, bold, normal -Color Black, Black, Black, Black, Red, Black
+                                New-HTMLCodeBlock -Code {
+                                    Add-GPOZaurrPermission -Type WellKnownAdministrative -PermissionType GpoEditDeleteModifySecurity -All -WhatIf -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Add-GPOZaurrPermission -Type WellKnownAdministrative -PermissionType GpoEditDeleteModifySecurity -All -WhatIf -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be changed matches expected data."
+                                } -LineBreak
+                                New-HTMLText -Text "Once happy with results please follow with command (this will start fixing process): " -LineBreak -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    Add-GPOZaurrPermission -Type WellKnownAdministrative -PermissionType GpoEditDeleteModifySecurity -All -Verbose -LimitProcessing 2
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Add-GPOZaurrPermission -Type WellKnownAdministrative -PermissionType GpoEditDeleteModifySecurity -All -Verbose -LimitProcessing 2 -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed adds SYSTEM account (GpoEditDeleteModifySecurity permission) only on first X non-compliant Group Policies. "
+                                    "Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur. "
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. "
+                                    "In case of any issues please review and action accordingly. "
+                                }
+                            }
+                            New-HTMLWizardStep -Name 'Remove UNKNOWN permissions' {
                                 New-HTMLText -Text @(
                                     "Following command will find any GPO which has an unknown SID and will remove it. ",
                                     "This change doesn't change any other permissions. ",
