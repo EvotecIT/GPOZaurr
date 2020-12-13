@@ -1,0 +1,57 @@
+function Repair-GPOZaurrPermission {
+    [cmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory)][ValidateSet('AuthenticatedUsers', 'Unknown', 'System', 'Administrative', 'All')][string[]] $Type,
+
+        [alias('ForestName')][string] $Forest,
+        [string[]] $ExcludeDomains,
+        [alias('Domain', 'Domains')][string[]] $IncludeDomains,
+        [System.Collections.IDictionary] $ExtendedForestInformation,
+
+        [int] $LimitProcessing = [int32]::MaxValue
+    )
+    Get-GPOZaurrPermissionAnalysis -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains | Where-Object {
+        $RequiresProcessing = $false
+        if ($_.Status -eq $false) {
+            if ($Type -contains 'System' -or $Type -contains 'All') {
+                if ($_.System -eq $false) {
+                    $RequiresProcessing = $true
+                }
+            }
+            if ($Type -contains 'Administrative' -or $Type -contains 'All') {
+                if ($_.Administrative -eq $false) {
+                    $RequiresProcessing = $true
+                }
+            }
+            if ($Type -contains 'AuthenticatedUsers' -or $Type -contains 'All') {
+                if ($_.AuthenticatedUsers -eq $false) {
+                    $RequiresProcessing = $true
+                }
+            }
+            if ($Type -contains 'Unknown' -or $Type -contains 'All') {
+                if ($_.Unknown -eq $true) {
+                    $RequiresProcessing = $true
+                }
+            }
+            if ($RequiresProcessing -eq $true) {
+                $_
+            }
+        }
+    } | Select-Object -First $LimitProcessing | ForEach-Object {
+        $GPO = $_
+        if ($GPO.Status -eq $false) {
+            if ($GPO.System -eq $false) {
+                Add-GPOZaurrPermission -Type WellKnownAdministrative -PermissionType GpoEditDeleteModifySecurity -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName
+            }
+            if ($GPO.Administrative -eq $false) {
+                Add-GPOZaurrPermission -Type Administrative -PermissionType GpoEditDeleteModifySecurity -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName
+            }
+            if ($GPO.AuthenticatedUsers -eq $false) {
+                Add-GPOZaurrPermission -Type AuthenticatedUsers -PermissionType GpoRead -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName
+            }
+            if ($GPO.Unknown -eq $true) {
+                Remove-GPOZaurrPermission -Type Unknown -GPOGuid $GPO.GUID -IncludeDomains $GPO.DomainName
+            }
+        }
+    }
+}
