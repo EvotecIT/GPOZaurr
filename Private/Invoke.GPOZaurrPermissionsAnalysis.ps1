@@ -9,6 +9,7 @@
         }
         $Object['PermissionsPerRow'] = $Object['Permissions'] | ForEach-Object { $_ }
         $Object['PermissionsAnalysis'] = Get-GPOZaurrPermissionAnalysis -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -Permissions $Object.Permissions
+        $Object['PermissionsIssues'] = Get-GPOZaurrPermissionIssue -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
         $Object
     }
     Processing = {
@@ -28,6 +29,31 @@
         $Script:Reporting['GPOPermissions']['Variables']['WillNotFixPerDomain'] = @{}
         $Script:Reporting['GPOPermissions']['Variables']['WillFixPerDomain'] = @{}
 
+        $Script:Reporting['GPOPermissions']['Variables']['ReadPerDomain'] = @{}
+        $Script:Reporting['GPOPermissions']['Variables']['CouldNotReadPerDomain'] = @{}
+        $Script:Reporting['GPOPermissions']['Variables']['TotalPerDomain'] = @{}
+
+        foreach ($GPO in $Script:Reporting['GPOPermissions']['Data'].PermissionsIssues) {
+            # Create Per Domain Variables
+            if (-not $Script:Reporting['GPOPermissions']['Variables']['CouldNotReadPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOPermissions']['Variables']['CouldNotReadPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOPermissions']['Variables']['ReadPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOPermissions']['Variables']['ReadPerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOPermissions']['Variables']['TotalPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOPermissions']['Variables']['TotalPerDomain'][$GPO.DomainName] = 0
+            }
+            if ($GPO.PermissionIssue) {
+                $Script:Reporting['GPOPermissions']['Variables']['CouldNotRead']++
+                $Script:Reporting['GPOPermissions']['Variables']['CouldNotReadPerDomain'][$GPO.DomainName]++
+            } else {
+                $Script:Reporting['GPOPermissions']['Variables']['Read']++
+                $Script:Reporting['GPOPermissions']['Variables']['ReadPerDomain'][$GPO.DomainName]++
+            }
+            $Script:Reporting['GPOPermissions']['Variables']['Total']++
+            $Script:Reporting['GPOPermissions']['Variables']['TotalPerDomain'][$GPO.DomainName]++
+        }
         foreach ($GPO in $Script:Reporting['GPOPermissions']['Data'].PermissionsAnalysis) {
             # Create Per Domain Variables
             if (-not $Script:Reporting['GPOPermissions']['Variables']['WillFixPerDomain'][$GPO.DomainName]) {
@@ -99,13 +125,21 @@
                 $Script:Reporting['GPOPermissions']['Variables']['WillNotFixPerDomain'][$GPO.DomainName]++
             }
         }
-        if ($Script:Reporting['GPOPermissions']['Variables']['WillFix'] -gt 0) {
+        if ($Script:Reporting['GPOPermissions']['Variables']['WillFix'] -gt 0 -or $Script:Reporting['GPOPermissions']['Variables']['CouldNotRead'] -gt 0) {
             $Script:Reporting['GPOPermissions']['ActionRequired'] = $true
         } else {
             $Script:Reporting['GPOPermissions']['ActionRequired'] = $false
         }
     }
     Variables  = @{
+        # Issues / Couldnt read report
+        Read                                    = 0
+        ReadPerDomain                           = $null
+        CouldNotRead                            = 0
+        CouldNotReadPerDomain                   = $null
+        TotalPerDomain                          = $null
+        Total                                   = 0
+        # Permissions analysis
         WillFix                                 = 0
         WillNotFix                              = 0
         WillFixAdministrative                   = 0
@@ -150,7 +184,34 @@
             New-HTMLListItem -Text "After MS16-072 is installed, user group policies are retrieved by using the computer's security context."
         } -FontSize 10pt
 
-        New-HTMLText -FontSize 10pt -Text "Assesment results " -FontWeight bold
+        New-HTMLText -FontSize 10pt -Text @(
+            "Unfortunetly it's not as simple as it sounds. While checking for permissions mostly works fine, it's possible a Group Policy has totally removed account permissions from being able to asses any of it. ",
+            "The account we're using "
+            "$($Env:USERDOMAIN)\$($Env:USERNAME.ToUpper())",
+            " may simply not have enough permisions to properly asses permissions for a GPO. "
+            "Therefore we're using dual assesment for this situation, where first assesment is checking for GPO visibility or lack of it, and second assesment is checking for direct permissions assignement. "
+            "We just were able to detect the problem, but hopefully higher level account (Domain Admin) should be able to provide full assesment. "
+        ) -FontWeight normal, normal, bold, normal -Color None, None, BlueDiamond, none, none
+
+        New-HTMLText -FontSize 10pt -Text "First assesment results: " -FontWeight bold
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text "Group Policies couldn't read at all: ", $Script:Reporting['GPOPermissions']['Variables']['CouldNotRead'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies with permissions allowing read: ", $Script:Reporting['GPOPermissions']['Variables']['Read'] -FontWeight normal, bold
+        } -FontSize 10pt
+        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+        New-HTMLList -Type Unordered {
+            foreach ($Domain in $Script:Reporting['GPOPermissions']['Variables']['CouldNotReadPerDomain'].Keys) {
+                New-HTMLListItem -Text @(
+                    "$Domain requires ",
+                    $Script:Reporting['GPOPermissions']['Variables']['CouldNotReadPerDomain'][$Domain],
+                    " changes out of ",
+                    $Script:Reporting['GPOPermissions']['Variables']['TotalPerDomain'][$Domain],
+                    "."
+                ) -FontWeight normal, bold, normal
+            }
+        } -FontSize 10pt
+
+        New-HTMLText -FontSize 10pt -Text "Second Assesment results " -FontWeight bold
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Group Policies requiring Authenticated Users with GpoRead permission: ', $Script:Reporting['GPOPermissions']['Variables']['WillFixAuthenticatedUsers'] -FontWeight normal, bold
             New-HTMLListItem -Text "Group Policies which don't require changes: ", $Script:Reporting['GPOPermissions']['Variables']['WillNotTouchAuthenticatedUsers'] -FontWeight normal, bold
@@ -229,6 +290,7 @@
                 New-HTMLChart {
                     New-ChartBarOptions -Type barStacked
                     New-ChartLegend -Name 'Yes', 'No' -Color SpringGreen, Salmon
+                    New-ChartBar -Name 'Visible Permissions' -Value $Script:Reporting['GPOPermissions']['Variables']['Read'], $Script:Reporting['GPOPermissions']['Variables']['CouldNotRead']
                     New-ChartBar -Name 'Overall Permissions' -Value $Script:Reporting['GPOPermissions']['Variables']['WillNotFix'], $Script:Reporting['GPOPermissions']['Variables']['WillFix']
                     New-ChartBar -Name 'Administrative Permissions' -Value $Script:Reporting['GPOPermissions']['Variables']['WillNotTouchAdministrative'], $Script:Reporting['GPOPermissions']['Variables']['WillFixAdministrative']
                     New-ChartBar -Name 'Authenticated Users Permissions' -Value $Script:Reporting['GPOPermissions']['Variables']['WillNotTouchAdministrative'], $Script:Reporting['GPOPermissions']['Variables']['WillFixAuthenticatedUsers']
@@ -236,6 +298,11 @@
                     New-ChartBar -Name 'Unknown Permissions' -Value $Script:Reporting['GPOPermissions']['Variables']['WillNotTouchUnknown'], $Script:Reporting['GPOPermissions']['Variables']['WillFixUnknown']
                 } -Title 'Group Policy Permissions' -TitleAlignment center
             }
+        }
+        New-HTMLSection -Name 'Group Policy Visibility Analysis' {
+            New-HTMLTable -DataTable $Script:Reporting['GPOPermissions']['Data'].PermissionsIssues -Filtering {
+                New-HTMLTableCondition -Name 'PermissionIssue' -Value $true -BackgroundColor Salmon -ComparisonType string -Row
+            } -PagingOptions 7, 15, 30, 45, 60 -DefaultSortColumn PermissionIssue -DefaultSortOrder Descending
         }
         New-HTMLSection -Name 'Group Policy Permissions Analysis' {
             New-HTMLContainer {

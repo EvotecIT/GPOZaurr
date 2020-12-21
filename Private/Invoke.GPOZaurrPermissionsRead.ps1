@@ -6,7 +6,7 @@
     Execute    = {
         [ordered] @{
             Permissions = Get-GPOZaurrPermission -Type AuthenticatedUsers -ReturnSecurityWhenNoData -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
-            Issues      = Get-GPOZaurrPermissionIssue
+            Issues      = Get-GPOZaurrPermissionIssue -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
         }
     }
     Processing = {
@@ -93,7 +93,7 @@
         } -FontStyle italic -FontSize 10pt -FontWeight bold -LineBreak
         New-HTMLText -FontSize 10pt -Text @(
             "There are two parts to this assesment. Reading all Group Policies Permissions that account ",
-            $($Env:USERNAME.ToUpper()),
+            "$($Env:USERDOMAIN)\$($Env:USERNAME.ToUpper())",
             " has permissions to read and provide detailed assesment about permissions. ",
             "Second assesment checks for permissions that this account is not able to read at all, and therefore it has no visibility about permissions set on it. "
             "We just were able to detect the problem, but hopefully higher level account (Domain Admin) should be able to provide full assesment. "
