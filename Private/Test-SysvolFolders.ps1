@@ -9,8 +9,7 @@
     )
     $Differences = @{ }
     $SysvolHash = @{ }
-
-    $GPOGUIDS = $GPOs.ID.GUID
+    $GPOGUIDS = ConvertFrom-DistinguishedName -DistinguishedName $GPOs.DistinguishedName
     $SysVolPath = "\\$($Server)\SYSVOL\$Domain\Policies"
     Write-Verbose "Get-GPOZaurrBroken - Processing SYSVOL from \\$($Server)\SYSVOL\$Domain\Policies"
     try {
@@ -19,10 +18,10 @@
         $Sysvol = $Null
     }
     foreach ($_ in $SYSVOL) {
-        $GUID = $_.Name -replace '{' -replace '}'
+        $GUID = $_.Name
         $SysvolHash[$GUID] = $_
     }
-    $Files = $SYSVOL.Name -replace '{' -replace '}'
+    $Files = $SYSVOL.Name
     if ($Files) {
         $Comparing = Compare-Object -ReferenceObject $GPOGUIDS -DifferenceObject $Files -IncludeEqual
         foreach ($_ in $Comparing) {
@@ -30,8 +29,10 @@
                 # we skip policy definitions
                 continue
             }
+            $ADStatus = $PoliciesAD[$_.InputObject]
             if ($_.SideIndicator -eq '==') {
-                $Found = 'Exists'
+                #$Found = 'Exists'
+                $Found = $ADStatus
             } elseif ($_.SideIndicator -eq '<=') {
                 $Found = 'Not available on SYSVOL'
             } elseif ($_.SideIndicator -eq '=>') {
@@ -41,8 +42,10 @@
                     $Found = 'Not available in AD'
                 }
             } else {
+                # This shouldn't happen at all
                 $Found = 'Orphaned GPO'
             }
+
             $Differences[$_.InputObject] = $Found
         }
     }
@@ -50,85 +53,60 @@
         $Count = 0
         foreach ($GPO in $GPOS) {
             $Count++
-            Write-Verbose "Get-GPOZaurrBroken - Processing [$($GPO.DomainName)]($Count/$($GPOS.Count)) $($GPO.DisplayName)"
-            if ($null -ne $SysvolHash[$GPO.Id.GUID].FullName) {
-                $FullPath = $SysvolHash[$GPO.Id.GUID].FullName
-                try {
-                    $ACL = Get-Acl -Path $SysvolHash[$GPO.Id.GUID].FullName -ErrorAction Stop -Verbose:$false
-                    $Owner = $ACL.Owner
-                    $ErrorMessage = ''
-                } catch {
-                    Write-Warning "Get-GPOZaurrBroken - ACL reading (1) failed for $FullPath with error: $($_.Exception.Message)"
-                    $ACL = $null
-                    $Owner = ''
-                    $ErrorMessage = $_.Exception.Message
-                }
+            $GPOGuid = ConvertFrom-DistinguishedName -DistinguishedName $GPO.DistinguishedName
+            if ($GPO.DisplayName) {
+                $GPODisplayName = $GPO.DisplayName
+                $GPOName = $GPO.Name
+                Write-Verbose "Get-GPOZaurrBroken - Processing [$($Domain)]($Count/$($GPOS.Count)) $($GPO.DisplayName)"
             } else {
-                $FullPath = -join ($SysVolPath, "\{$($GPO.Id.Guid)}")
-                $ACL = $null
-                $Owner = ''
+                $GPOName = $GPOGuid
+                $GPODisplayName = $GPOGuid
+                Write-Verbose "Get-GPOZaurrBroken - Processing [$($Domain)]($Count/$($GPOS.Count)) $($GPOGuid)"
+            }
+            if ($null -ne $SysvolHash[$GPOGuid].FullName) {
+                $FullPath = $SysvolHash[$GPOGuid].FullName
+                $ErrorMessage = ''
+            } else {
+                $FullPath = -join ($SysVolPath, "\$($GPOGuid)")
                 $ErrorMessage = 'Not found on SYSVOL'
             }
-            if ($null -eq $Differences[$GPO.Id.Guid]) {
-                $SysVolStatus = 'Unknown Issue'
+            if ($null -eq $Differences[$GPOGuid]) {
+                $SysVolStatus = 'Unknown issue'
             } else {
-                $SysVolStatus = $Differences[$GPO.Id.Guid]
+                $SysVolStatus = $Differences[$GPOGuid]
             }
             [PSCustomObject] @{
-                DisplayName       = $GPO.DisplayName
+                DisplayName       = $GPODisplayName
                 Status            = $SysVolStatus
-                DomainName        = $GPO.DomainName
+                DomainName        = $Domain
                 SysvolServer      = $Server
-                SysvolStatus      = $SysVolStatus
-                GpoStatus         = $GPO.GpoStatus
-                Owner             = $GPO.Owner
-                FileOwner         = $Owner
-                Id                = $GPO.Id.Guid
+                ObjectClass       = $GPO.ObjectClass
+                Id                = $GPOName
                 Path              = $FullPath
-                DistinguishedName = -join ("CN={", $GPO.Id.Guid, "},", $PoliciesSearchBase)
+                DistinguishedName = -join ("CN=", $GPOGuid, ",", $PoliciesSearchBase)
                 Description       = $GPO.Description
-                CreationTime      = $GPO.CreationTime
-                ModificationTime  = $GPO.ModificationTime
-                UserVersion       = $GPO.UserVersion
-                ComputerVersion   = $GPO.ComputerVersion
-                WmiFilter         = $GPO.WmiFilter
+                CreationTime      = $GPO.Created
+                ModificationTime  = $GPO.Modified
                 Error             = $ErrorMessage
             }
         }
         # Now we need to list thru Sysvol files and fine those that do not exists as GPO and create dummy GPO objects to show orphaned gpos
         Write-Verbose "Get-GPOZaurrBroken - Processing SYSVOL differences"
         foreach ($_ in $Differences.Keys) {
-            if ($Differences[$_] -in 'Not available in AD', 'Permissions issue') {
+            if ($Differences[$_] -in 'Not available in AD') {
                 $FullPath = $SysvolHash[$_].FullName
-                try {
-                    $ACL = Get-Acl -Path $FullPath -ErrorAction Stop
-                    $Owner = $ACL.Owner
-                    $ErrorMessage = ''
-                } catch {
-                    Write-Warning "Get-GPOZaurrBroken - ACL reading (2) failed for $FullPath with error: $($_.Exception.Message)"
-                    $ACL = $null
-                    $Owner = $null
-                    $ErrorMessage = $_.Exception.Message
-                }
-
                 [PSCustomObject] @{
                     DisplayName       = $SysvolHash[$_].BaseName
                     Status            = $Differences[$_]
                     DomainName        = $Domain
                     SysvolServer      = $Server
-                    SysvolStatus      = 'Exists' #$Differences[$GPO.Id.Guid]
-                    GpoStatus         = $Differences[$_]
-                    Owner             = ''
-                    FileOwner         = $Owner
+                    ObjectClass       = ''
                     Id                = $_
                     Path              = $FullPath
-                    DistinguishedName = -join ("CN={", $_, "},", $PoliciesSearchBase)
+                    DistinguishedName = -join ("CN=", $_, ",", $PoliciesSearchBase)
                     Description       = $null
                     CreationTime      = $SysvolHash[$_].CreationTime
                     ModificationTime  = $SysvolHash[$_].LastWriteTime
-                    UserVersion       = $null
-                    ComputerVersion   = $null
-                    WmiFilter         = $null
                     Error             = $ErrorMessage
                 }
             }
