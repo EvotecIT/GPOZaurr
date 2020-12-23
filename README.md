@@ -57,7 +57,7 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.101
+- 0.0.101 - 23.12.2020
   - [x] Improved `Get-GPOZaurrBroken`
     - [x] It now detects `ObjectClass Issue`
     - [x] Heavily improved performance
@@ -70,6 +70,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
     - [x] Removed some useless properties for this particular cmdlet
     - [x] Now requires manual type insert AD, SYSVOL or ObjectClass (or all of them). Before it was auto using AD/SYSVOL.
     - [x] Improved help
+  - [x] Improved `Invoke-GPOZaurr`
+    - [x] Type `GPOList`
+    - [x] Renamed `GPOOrphans` to `GPOBroken`
+    - [x] Improved `GPOBroken` with `ObjectClass issue`
 - 0.0.100 - 21.12.2020
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOPermissionsRead`
