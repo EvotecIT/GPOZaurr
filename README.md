@@ -63,6 +63,13 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
     - [x] Heavily improved performance
     - [x] Removed some useless properties for this particular cmdlet
     - [x] All states: `Not available on SYSVOL`, `Not available in AD`, `Exists`, `Permissions Issue`, `ObjectClass Issue`
+    - [x] Improved help
+  - [x] Improved `Remove-GPOZaurrBroken`
+    - [x] It now deals with `ObjectClass Issue`
+    - [x] Heavily improved performance
+    - [x] Removed some useless properties for this particular cmdlet
+    - [x] Now requires manual type insert AD, SYSVOL or ObjectClass (or all of them). Before it was auto using AD/SYSVOL.
+    - [x] Improved help
 - 0.0.100 - 21.12.2020
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOPermissionsRead`
