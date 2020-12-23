@@ -57,6 +57,12 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.101
+  - [x] Improved `Get-GPOZaurrBroken`
+    - [x] It now detects `ObjectClass Issue`
+    - [x] Heavily improved performance
+    - [x] Removed some useless properties for this particular cmdlet
+    - [x] All states: `Not available on SYSVOL`, `Not available in AD`, `Exists`, `Permissions Issue`, `ObjectClass Issue`
 - 0.0.100 - 21.12.2020
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Type `GPOPermissionsRead`
