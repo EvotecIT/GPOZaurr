@@ -7,41 +7,41 @@
         Get-GPOZaurrBroken -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing     = {
-        $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'] = @{}
-        $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'] = @{}
-        $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssuePerDomain'] = @{}
-        foreach ($GPO in $Script:Reporting['GPOOrphans']['Data']) {
-            if (-not $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]) {
-                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName] = 0
+        $Script:Reporting['GPOBroken']['Variables']['ToBeDeletedPerDomain'] = @{}
+        $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssuePerDomain'] = @{}
+        $Script:Reporting['GPOBroken']['Variables']['NotAvailableObjectClassIssuePerDomain'] = @{}
+        foreach ($GPO in $Script:Reporting['GPOBroken']['Data']) {
+            if (-not $Script:Reporting['GPOBroken']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOBroken']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName] = 0
             }
-            if (-not $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName]) {
-                $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName] = 0
+            if (-not $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName] = 0
             }
-            if (-not $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssuePerDomain'][$GPO.DomainName]) {
-                $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssuePerDomain'][$GPO.DomainName] = 0
+            if (-not $Script:Reporting['GPOBroken']['Variables']['NotAvailableObjectClassIssuePerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOBroken']['Variables']['NotAvailableObjectClassIssuePerDomain'][$GPO.DomainName] = 0
             }
             if ($GPO.Status -eq 'Not available in AD') {
-                $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD']++
-                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted']++
-                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]++
+                $Script:Reporting['GPOBroken']['Variables']['NotAvailableInAD']++
+                $Script:Reporting['GPOBroken']['Variables']['ToBeDeleted']++
+                $Script:Reporting['GPOBroken']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]++
             } elseif ($GPO.Status -eq 'Not available on SYSVOL') {
-                $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol']++
-                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted']++
-                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]++
+                $Script:Reporting['GPOBroken']['Variables']['NotAvailableOnSysvol']++
+                $Script:Reporting['GPOBroken']['Variables']['ToBeDeleted']++
+                $Script:Reporting['GPOBroken']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]++
             } elseif ($GPO.Status -eq 'Permissions issue') {
-                $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue']++
-                $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName]++
+                $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssue']++
+                $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName]++
             } elseif ($GPO.Status -eq 'ObjectClass issue') {
-                $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssue']++
-                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted']++
-                $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssuePerDomain'][$GPO.DomainName]++
-                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]++
+                $Script:Reporting['GPOBroken']['Variables']['NotAvailableObjectClassIssue']++
+                $Script:Reporting['GPOBroken']['Variables']['ToBeDeleted']++
+                $Script:Reporting['GPOBroken']['Variables']['NotAvailableObjectClassIssuePerDomain'][$GPO.DomainName]++
+                $Script:Reporting['GPOBroken']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]++
             }
         }
-        if ($Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted'] -gt 0) {
-            $Script:Reporting['GPOOrphans']['ActionRequired'] = $true
+        if ($Script:Reporting['GPOBroken']['Variables']['ToBeDeleted'] -gt 0) {
+            $Script:Reporting['GPOBroken']['ActionRequired'] = $true
         } else {
-            $Script:Reporting['GPOOrphans']['ActionRequired'] = $false
+            $Script:Reporting['GPOBroken']['ActionRequired'] = $false
         }
     }
     Variables      = @{
@@ -69,15 +69,15 @@
             }
             New-HTMLText -Text 'Following chart presents ', 'Broken / Orphaned Group Policies' -FontSize 10pt -FontWeight normal, bold
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
-                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
-                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:Reporting['GPOBroken']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
+                New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:Reporting['GPOBroken']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
+                New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
             } -FontSize 10pt
             New-HTMLText -FontSize 10pt -Text 'Those problems must be resolved before doing other clenaup activities.'
             New-HTMLChart {
                 New-ChartBarOptions -Type barStacked
                 New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'Permissions Issue' -Color Crimson, LightCoral, IndianRed
-                New-ChartBar -Name 'Orphans' -Value $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue']
+                New-ChartBar -Name 'Orphans' -Value $Script:Reporting['GPOBroken']['Variables']['NotAvailableInAD'], $Script:Reporting['GPOBroken']['Variables']['NotAvailableOnSysvol'], $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssue']
             } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
         }
         #>
@@ -96,15 +96,15 @@
         } -FontSize 10pt
         New-HTMLText -Text 'Following problems were detected:' -FontSize 10pt -FontWeight bold
         New-HTMLList -Type Unordered {
-            New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
-            New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
-            New-HTMLListItem -Text 'Group Policies which exists, but have wrong ObjectClass: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssue'] -FontWeight normal, bold
-            New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:Reporting['GPOBroken']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:Reporting['GPOBroken']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Group Policies which exists, but have wrong ObjectClass: ', $Script:Reporting['GPOBroken']['Variables']['NotAvailableObjectClassIssue'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
         } -FontSize 10pt
         New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
         New-HTMLList -Type Unordered {
-            foreach ($Domain in $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'].Keys) {
-                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+            foreach ($Domain in $Script:Reporting['GPOBroken']['Variables']['ToBeDeletedPerDomain'].Keys) {
+                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOBroken']['Variables']['ToBeDeletedPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
             }
         } -FontSize 10pt
         New-HTMLText -Text "Please review output in table and follow the steps below table to get Active Directory Group Policies in healthy state." -FontSize 10pt
@@ -112,18 +112,18 @@
     Solution       = {
         New-HTMLSection -Invisible {
             New-HTMLPanel {
-                & $Script:GPOConfiguration['GPOOrphans']['Summary']
+                & $Script:GPOConfiguration['GPOBroken']['Summary']
             }
             New-HTMLPanel {
                 New-HTMLChart {
                     New-ChartBarOptions -Type barStacked
                     New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'ObjectClass Issue', 'Permissions Issue' -Color Crimson, LightCoral, MediumOrchid, IndianRed
-                    New-ChartBar -Name 'Broken' -Value $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssue'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue']
+                    New-ChartBar -Name 'Broken' -Value $Script:Reporting['GPOBroken']['Variables']['NotAvailableInAD'], $Script:Reporting['GPOBroken']['Variables']['NotAvailableOnSysvol'], $Script:Reporting['GPOBroken']['Variables']['NotAvailableObjectClassIssue'], $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssue']
                 } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
             }
         }
         New-HTMLSection -Name 'Health State of Group Policies' {
-            New-HTMLTable -DataTable $Script:Reporting['GPOOrphans']['Data'] -Filtering {
+            New-HTMLTable -DataTable $Script:Reporting['GPOBroken']['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'Status' -Value "Not available in AD" -BackgroundColor Salmon -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "Not available on SYSVOL" -BackgroundColor LightCoral -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "ObjectClass issue" -BackgroundColor MediumOrchid -ComparisonType string
@@ -308,9 +308,9 @@
                 }
             }
         }
-        if ($Script:Reporting['GPOOrphans']['WarningsAndErrors']) {
+        if ($Script:Reporting['GPOBroken']['WarningsAndErrors']) {
             New-HTMLSection -Name 'Warnings & Errors to Review' {
-                New-HTMLTable -DataTable $Script:Reporting['GPOOrphans']['WarningsAndErrors'] -Filtering {
+                New-HTMLTable -DataTable $Script:Reporting['GPOBroken']['WarningsAndErrors'] -Filtering {
                     New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
                     New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
                 }

@@ -1,5 +1,5 @@
 ﻿$Script:GPOConfiguration = [ordered] @{
-    GPOOrphans                   = $GPOZaurrOrphans
+    GPOBroken                    = $GPOZaurrOrphans
     GPOOwners                    = $GPOZaurrOwners
     GPOConsistency               = $GPOZaurrConsistency
     GPODuplicates                = $GPOZaurrDuplicates
