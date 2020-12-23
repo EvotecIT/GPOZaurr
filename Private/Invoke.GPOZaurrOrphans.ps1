@@ -1,5 +1,5 @@
 ﻿$GPOZaurrOrphans = [ordered] @{
-    Name           = 'Orphaned Group Policies'
+    Name           = 'Broken Group Policies'
     Enabled        = $true
     ActionRequired = $null
     Data           = $null
@@ -9,12 +9,16 @@
     Processing     = {
         $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'] = @{}
         $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'] = @{}
+        $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssuePerDomain'] = @{}
         foreach ($GPO in $Script:Reporting['GPOOrphans']['Data']) {
             if (-not $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]) {
                 $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName] = 0
             }
             if (-not $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName]) {
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName] = 0
+            }
+            if (-not $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssuePerDomain'][$GPO.DomainName]) {
+                $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssuePerDomain'][$GPO.DomainName] = 0
             }
             if ($GPO.Status -eq 'Not available in AD') {
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD']++
@@ -27,6 +31,11 @@
             } elseif ($GPO.Status -eq 'Permissions issue') {
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue']++
                 $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssuePerDomain'][$GPO.DomainName]++
+            } elseif ($GPO.Status -eq 'ObjectClass issue') {
+                $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssue']++
+                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted']++
+                $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssuePerDomain'][$GPO.DomainName]++
+                $Script:Reporting['GPOOrphans']['Variables']['ToBeDeletedPerDomain'][$GPO.DomainName]++
             }
         }
         if ($Script:Reporting['GPOOrphans']['Variables']['ToBeDeleted'] -gt 0) {
@@ -36,12 +45,14 @@
         }
     }
     Variables      = @{
-        NotAvailableInAD                     = 0
-        NotAvailableOnSysvol                 = 0
-        NotAvailablePermissionIssue          = 0
-        NotAvailablePermissionIssuePerDomain = $null
-        ToBeDeleted                          = 0
-        ToBeDeletedPerDomain                 = $null
+        NotAvailableInAD                      = 0
+        NotAvailableOnSysvol                  = 0
+        NotAvailablePermissionIssue           = 0
+        NotAvailablePermissionIssuePerDomain  = $null
+        ToBeDeleted                           = 0
+        ToBeDeletedPerDomain                  = $null
+        NotAvailableObjectClassIssue          = 0
+        NotAvailableObjectClassIssuePerDomain = $null
     }
     Overview       = {
         <#
@@ -87,6 +98,7 @@
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
             New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Group Policies which exists, but have wrong ObjectClass: ', $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssue'] -FontWeight normal, bold
             New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
         } -FontSize 10pt
         New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
@@ -105,8 +117,8 @@
             New-HTMLPanel {
                 New-HTMLChart {
                     New-ChartBarOptions -Type barStacked
-                    New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'Permissions Issue' -Color Crimson, LightCoral, IndianRed
-                    New-ChartBar -Name 'Orphans' -Value $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue']
+                    New-ChartLegend -Name 'Not in AD', 'Not on SYSVOL', 'ObjectClass Issue', 'Permissions Issue' -Color Crimson, LightCoral, MediumOrchid, IndianRed
+                    New-ChartBar -Name 'Broken' -Value $Script:Reporting['GPOOrphans']['Variables']['NotAvailableInAD'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailableOnSysvol'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailableObjectClassIssue'], $Script:Reporting['GPOOrphans']['Variables']['NotAvailablePermissionIssue']
                 } -Title 'Broken / Orphaned Group Policies' -TitleAlignment center
             }
         }
@@ -114,11 +126,12 @@
             New-HTMLTable -DataTable $Script:Reporting['GPOOrphans']['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'Status' -Value "Not available in AD" -BackgroundColor Salmon -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "Not available on SYSVOL" -BackgroundColor LightCoral -ComparisonType string
+                New-HTMLTableCondition -Name 'Status' -Value "ObjectClass issue" -BackgroundColor MediumOrchid -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "Permissions issue" -BackgroundColor MediumVioletRed -ComparisonType string -Color White
             } -PagingOptions 10, 20, 30, 40, 50
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
-            New-HTMLSection -Name 'Steps to fix - Not available on SYSVOL / Active Directory' {
+            New-HTMLSection -Name 'Steps to fix - Not available on SYSVOL / Active Directory / ObjectClass issue' {
                 New-HTMLContainer {
                     New-HTMLSpanStyle -FontSize 10pt {
                         New-HTMLWizard {
@@ -241,6 +254,44 @@
                                     "This command when executed deletes only first X broken GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
                                     "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
                                     "If there's nothing else to be deleted on AD side, we can skip to next step step. "
+                                }
+                            }
+                            New-HTMLWizardStep -Name 'Fix GPOs of wrong ObjectClass' {
+                                New-HTMLText -Text @(
+                                    "Following command when executed runs cleanup procedure that removes all GPOs which have ObjectClass of Container, rather than required groupPolicyContainer. "
+                                    "Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental removal."
+                                    'When run it will remove GPO metadata from AD, and any files/folders from SYSVOL.'
+                                ) -FontWeight normal, normal, bold, normal -Color Black, Black, Red, Black
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrBroken -Type ObjectClass -WhatIf -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrBroken -Type ObjectClass -WhatIf -IncludeDomains 'YourDomainYouHavePermissionsFor' -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be deleted matches expected data. "
+                                    "Keep in mind that there is no backup for this as backup process doesn't see GPOs that are of wrong ObjectClass. "
+                                    "Once you delete it, it's gone. "
+                                } -LineBreak
+                                New-HTMLText -Text 'Once happy with results please follow with command (this will start deletion process): ' -LineBreak -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrBroken -Type ObjectClass -LimitProcessing 2 -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrBroken -Type ObjectClass -LimitProcessing 2 -IncludeDomains 'YourDomainYouHavePermissionsFor' -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed deletes only first X broken GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
+                                    "If there's nothing else to be deleted, we can skip to next step step. "
                                 }
                             }
                             New-HTMLWizardStep -Name 'Verification report' {
