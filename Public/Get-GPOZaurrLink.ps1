@@ -240,8 +240,19 @@
                 }
             }
         } else {
-            foreach ($Object in $ADObject) {
-                Get-PrivGPOZaurrLink -Object $Object -Limited:$Limited.IsPresent -GPOCache $GPOCache
+            foreach ($_ in $ADObject) {
+                $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                foreach ($OutputGPO in $OutputGPOs) {
+                    if (-not $SkipDuplicates) {
+                        $OutputGPO
+                    } else {
+                        $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                        if (-not $CacheReturnedGPOs[$UniqueGuid]) {
+                            $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
+                            $OutputGPO
+                        }
+                    }
+                }
             }
         }
     }
