@@ -1,5 +1,5 @@
 ﻿function Get-GPOZaurrLink {
-    [cmdletbinding()]
+    [cmdletbinding(DefaultParameterSetName = 'Filter')]
     param(
         [parameter(ParameterSetName = 'ADObject', ValueFromPipeline, ValueFromPipelineByPropertyName, Mandatory)][Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,
         # weirdly enough site doesn't really work this way unless you give it 'CN=Configuration,DC=ad,DC=evotec,DC=xyz' as SearchBase
@@ -42,7 +42,12 @@
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
-        [System.Collections.IDictionary] $ExtendedForestInformation
+        [System.Collections.IDictionary] $ExtendedForestInformation,
+
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
+        [switch] $AsHashTable
     )
     Begin {
         $CacheReturnedGPOs = [ordered] @{}
@@ -88,7 +93,7 @@
                                 if (-not $SkipDuplicates) {
                                     $OutputGPO
                                 } else {
-                                    $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                    $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
                                     if (-not $CacheReturnedGPOs[$UniqueGuid]) {
                                         $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
                                         $OutputGPO
@@ -116,7 +121,7 @@
                                 if (-not $SkipDuplicates) {
                                     $OutputGPO
                                 } else {
-                                    $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                    $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
                                     if (-not $CacheReturnedGPOs[$UniqueGuid]) {
                                         $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
                                         $OutputGPO
@@ -141,7 +146,18 @@
                                 Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                             }
                             foreach ($_ in $ADObjectGPO) {
-                                Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                                $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
+                                foreach ($OutputGPO in $OutputGPOs) {
+                                    if (-not $SkipDuplicates) {
+                                        $OutputGPO
+                                    } else {
+                                        $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                        if (-not $CacheReturnedGPOs[$UniqueGuid]) {
+                                            $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
+                                            $OutputGPO
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -169,7 +185,7 @@
                                     if (-not $SkipDuplicates) {
                                         $OutputGPO
                                     } else {
-                                        $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                        $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
                                         if (-not $CacheReturnedGPOs[$UniqueGuid]) {
                                             $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
                                             $OutputGPO
@@ -213,7 +229,7 @@
                             if (-not $SkipDuplicates) {
                                 $OutputGPO
                             } else {
-                                $UniqueGuid = -join ($OutputGPO.DomainName, $OutputGPO.Guid)
+                                $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
                                 if (-not $CacheReturnedGPOs[$UniqueGuid]) {
                                     $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
                                     $OutputGPO
