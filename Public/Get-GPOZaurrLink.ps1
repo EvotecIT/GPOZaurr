@@ -1,13 +1,13 @@
 ﻿function Get-GPOZaurrLink {
-    [cmdletbinding(DefaultParameterSetName = 'Filter')]
+    [cmdletbinding(DefaultParameterSetName = 'Linked')]
     param(
         [parameter(ParameterSetName = 'ADObject', ValueFromPipeline, ValueFromPipelineByPropertyName, Mandatory)][Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,
         # weirdly enough site doesn't really work this way unless you give it 'CN=Configuration,DC=ad,DC=evotec,DC=xyz' as SearchBase
-        [parameter(ParameterSetName = 'Filter')][string] $Filter = "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')",
+        [parameter(ParameterSetName = 'Filter')][string] $Filter, # "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')"
         [parameter(ParameterSetName = 'Filter')][string] $SearchBase,
         [parameter(ParameterSetName = 'Filter')][Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
 
-        [parameter(ParameterSetName = 'Linked', Mandatory)][validateset('Root', 'DomainControllers', 'Site', 'Other')][string] $Linked,
+        [parameter(ParameterSetName = 'Linked')][validateset('All', 'Root', 'DomainControllers', 'Site', 'Other')][string[]] $Linked,
 
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
@@ -66,7 +66,11 @@
     }
     Process {
         if (-not $ADObject) {
-            if ($Linked) {
+            if (-not $Filter) {
+                # if not linked, we force it to All
+                if (-not $Linked) {
+                    $Linked = 'All'
+                }
                 foreach ($Domain in $ForestInformation.Domains) {
                     $Splat = @{
                         #Filter     = $Filter
@@ -74,40 +78,8 @@
                         # Filter     = "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')"
                         Server     = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
                     }
-                    if ($Linked -contains 'DomainControllers') {
-                        $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DomainControllersContainer']
-                        #if ($SearchBase -notlike "*$DomainDistinguishedName") {
-                        # we check if SearchBase is part of domain distinugishname. If it isn't we skip
-                        #    continue
-                        #}
-                        $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
-                        $Splat['SearchBase'] = $SearchBase
-                        try {
-                            $ADObjectGPO = Get-ADObject @Splat
-                        } catch {
-                            Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
-                        }
-                        foreach ($_ in $ADObjectGPO) {
-                            $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
-                            foreach ($OutputGPO in $OutputGPOs) {
-                                if (-not $SkipDuplicates) {
-                                    $OutputGPO
-                                } else {
-                                    $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
-                                    if (-not $CacheReturnedGPOs[$UniqueGuid]) {
-                                        $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
-                                        $OutputGPO
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if ($Linked -contains 'Root') {
+                    if ($Linked -contains 'Root' -or $Linked -contains 'All') {
                         $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
-                        #if ($SearchBase -notlike "*$DomainDistinguishedName") {
-                        # we check if SearchBase is part of domain distinugishname. If it isn't we skip
-                        #    continue
-                        # }
                         $Splat['Filter'] = "objectClass -eq 'domainDNS'"
                         $Splat['SearchBase'] = $SearchBase
                         try {
@@ -115,29 +87,12 @@
                         } catch {
                             Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                         }
-                        foreach ($_ in $ADObjectGPO) {
-                            $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
-                            foreach ($OutputGPO in $OutputGPOs) {
-                                if (-not $SkipDuplicates) {
-                                    $OutputGPO
-                                } else {
-                                    $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
-                                    if (-not $CacheReturnedGPOs[$UniqueGuid]) {
-                                        $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
-                                        $OutputGPO
-                                    }
-                                }
-                            }
-                        }
+                        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
                     }
-                    if ($Linked -contains 'Site') {
+                    if ($Linked -contains 'Site' -or $Linked -contains 'All') {
                         # Sites are defined only in primary domain
                         if ($ForestInformation['DomainsExtended'][$Domain]['DNSRoot'] -eq $ForestInformation['DomainsExtended'][$Domain]['Forest']) {
                             $SearchBase = -join ("CN=Configuration,", $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName'])
-                            # if ($SearchBase -notlike "*$DomainDistinguishedName") {
-                            # we check if SearchBase is part of domain distinugishname. If it isn't we skip
-                            #continue
-                            #}
                             $Splat['Filter'] = "(objectClass -eq 'site')"
                             $Splat['SearchBase'] = $SearchBase
                             try {
@@ -145,28 +100,11 @@
                             } catch {
                                 Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                             }
-                            foreach ($_ in $ADObjectGPO) {
-                                $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
-                                foreach ($OutputGPO in $OutputGPOs) {
-                                    if (-not $SkipDuplicates) {
-                                        $OutputGPO
-                                    } else {
-                                        $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
-                                        if (-not $CacheReturnedGPOs[$UniqueGuid]) {
-                                            $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
-                                            $OutputGPO
-                                        }
-                                    }
-                                }
-                            }
+                            Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
                         }
                     }
-                    if ($Linked -contains 'Other') {
-                        $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
-                        #if ($SearchBase -notlike "*$DomainDistinguishedName") {
-                        # we check if SearchBase is part of domain distinugishname. If it isn't we skip
-                        #    continue
-                        #}
+                    if ($Linked -contains 'DomainControllers' -or $Linked -contains 'All') {
+                        $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DomainControllersContainer']
                         $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
                         $Splat['SearchBase'] = $SearchBase
                         try {
@@ -174,29 +112,21 @@
                         } catch {
                             Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                         }
-                        foreach ($_ in $ADObjectGPO) {
-                            if ($_.DistinguishedName -eq $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']) {
-                                # other skips Domain Root
-                            } elseif ($_.DistinguishedName -eq $ForestInformation['DomainsExtended'][$Domain]['DomainControllersContainer']) {
-                                # other skips Domain Controllers
-                            } else {
-                                $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
-                                foreach ($OutputGPO in $OutputGPOs) {
-                                    if (-not $SkipDuplicates) {
-                                        $OutputGPO
-                                    } else {
-                                        $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
-                                        if (-not $CacheReturnedGPOs[$UniqueGuid]) {
-                                            $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
-                                            $OutputGPO
-                                        }
-                                    }
-                                }
-                            }
+                        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
+                    }
+                    if ($Linked -contains 'Other' -or $Linked -contains 'All') {
+                        $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
+                        $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
+                        $Splat['SearchBase'] = $SearchBase
+                        try {
+                            $ADObjectGPO = Get-ADObject @Splat
+                        } catch {
+                            Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                         }
+                        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -SkipDomainRoot -SkipDomainControllers -AsHashTable:$AsHashTable
                     }
                 }
-            } else {
+            } elseif ($Filter) {
                 foreach ($Domain in $ForestInformation.Domains) {
                     $Splat = @{
                         Filter     = $Filter
@@ -223,37 +153,11 @@
                     } catch {
                         Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                     }
-                    foreach ($_ in $ADObjectGPO) {
-                        $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
-                        foreach ($OutputGPO in $OutputGPOs) {
-                            if (-not $SkipDuplicates) {
-                                $OutputGPO
-                            } else {
-                                $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
-                                if (-not $CacheReturnedGPOs[$UniqueGuid]) {
-                                    $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
-                                    $OutputGPO
-                                }
-                            }
-                        }
-                    }
+                    Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
                 }
             }
         } else {
-            foreach ($_ in $ADObject) {
-                $OutputGPOs = Get-PrivGPOZaurrLink -Object $_ -Limited:$Limited.IsPresent -GPOCache $GPOCache
-                foreach ($OutputGPO in $OutputGPOs) {
-                    if (-not $SkipDuplicates) {
-                        $OutputGPO
-                    } else {
-                        $UniqueGuid = $OutputGPO.GPODistinguishedName #-join ($OutputGPO.DomainName, $OutputGPO.Guid)
-                        if (-not $CacheReturnedGPOs[$UniqueGuid]) {
-                            $CacheReturnedGPOs[$UniqueGuid] = $OutputGPO
-                            $OutputGPO
-                        }
-                    }
-                }
-            }
+            Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObject -Domain '' -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
         }
     }
     End {
