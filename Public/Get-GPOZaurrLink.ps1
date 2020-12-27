@@ -47,7 +47,12 @@
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
-        [switch] $AsHashTable
+        [switch] $AsHashTable,
+
+        [parameter(ParameterSetName = 'Filter')]
+        [parameter(ParameterSetName = 'ADObject')]
+        [parameter(ParameterSetName = 'Linked')]
+        [switch] $Summary
     )
     Begin {
         $CacheReturnedGPOs = [ordered] @{}
@@ -65,99 +70,58 @@
         }
     }
     Process {
-        if (-not $ADObject) {
-            if (-not $Filter) {
-                # if not linked, we force it to All
-                if (-not $Linked) {
-                    $Linked = 'All'
-                }
-                foreach ($Domain in $ForestInformation.Domains) {
-                    $Splat = @{
-                        #Filter     = $Filter
-                        Properties = 'distinguishedName', 'gplink', 'CanonicalName'
-                        # Filter     = "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')"
-                        Server     = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
-                    }
-                    if ($Linked -contains 'Root' -or $Linked -contains 'All') {
-                        $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
-                        $Splat['Filter'] = "objectClass -eq 'domainDNS'"
-                        $Splat['SearchBase'] = $SearchBase
-                        try {
-                            $ADObjectGPO = Get-ADObject @Splat
-                        } catch {
-                            Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
-                        }
-                        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
-                    }
-                    if ($Linked -contains 'Site' -or $Linked -contains 'All') {
-                        # Sites are defined only in primary domain
-                        if ($ForestInformation['DomainsExtended'][$Domain]['DNSRoot'] -eq $ForestInformation['DomainsExtended'][$Domain]['Forest']) {
-                            $SearchBase = -join ("CN=Configuration,", $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName'])
-                            $Splat['Filter'] = "(objectClass -eq 'site')"
-                            $Splat['SearchBase'] = $SearchBase
-                            try {
-                                $ADObjectGPO = Get-ADObject @Splat
-                            } catch {
-                                Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
-                            }
-                            Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
-                        }
-                    }
-                    if ($Linked -contains 'DomainControllers' -or $Linked -contains 'All') {
-                        $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DomainControllersContainer']
-                        $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
-                        $Splat['SearchBase'] = $SearchBase
-                        try {
-                            $ADObjectGPO = Get-ADObject @Splat
-                        } catch {
-                            Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
-                        }
-                        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
-                    }
-                    if ($Linked -contains 'Other' -or $Linked -contains 'All') {
-                        $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
-                        $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
-                        $Splat['SearchBase'] = $SearchBase
-                        try {
-                            $ADObjectGPO = Get-ADObject @Splat
-                        } catch {
-                            Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
-                        }
-                        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -SkipDomainRoot -SkipDomainControllers -AsHashTable:$AsHashTable
-                    }
-                }
-            } elseif ($Filter) {
-                foreach ($Domain in $ForestInformation.Domains) {
-                    $Splat = @{
-                        Filter     = $Filter
-                        Properties = 'distinguishedName', 'gplink', 'CanonicalName'
-                        Server     = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
+        $getGPOLoopSplat = @{
+            Linked            = $Linked
+            ForestInformation = $ForestInformation
+            CacheReturnedGPOs = $CacheReturnedGPOs
+            SearchScope       = $SearchScope
+            SearchBase        = $SearchBase
+            ADObject          = $ADObject
+            Filter            = $Filter
+        }
+        Remove-EmptyValue -Hashtable $getGPOLoopSplat -Recursive
 
-                    }
-                    if ($PSBoundParameters.ContainsKey('SearchBase')) {
-                        $DomainDistinguishedName = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
-                        $SearchBaseDC = ConvertFrom-DistinguishedName -DistinguishedName $SearchBase -ToDC
-                        if ($SearchBaseDC -ne $DomainDistinguishedName) {
-                            # we check if SearchBase is part of domain distinugishname. If it isn't we skip
-                            continue
-                        }
-                        $Splat['SearchBase'] = $SearchBase
-
-                    }
-                    if ($PSBoundParameters.ContainsKey('SearchScope')) {
-                        $Splat['SearchScope'] = $SearchScope
-                    }
-
-                    try {
-                        $ADObjectGPO = Get-ADObject @Splat
-                    } catch {
-                        Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
-                    }
-                    Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
+        if ($AsHashTable -or $Summary) {
+            $HashTable = [ordered] @{}
+            $SummaryHashtable = [ordered] @{}
+            $Links = Get-GPOZaurrLinkLoop @getGPOLoopSplat
+            foreach ($Link in $Links) {
+                $Key = -join ($Link.DomainName, $Link.GUID)
+                if (-not $HashTable[$Key]) {
+                    $HashTable[$Key] = [System.Collections.Generic.List[PSCustomObject]]::new()
                 }
+                $HashTable[$Key].Add($Link)
+            }
+            foreach ($Key in $HashTable.Keys) {
+                [Array] $Link = $HashTable[$Key]
+                $EnabledLinks = $Link.Enabled.Where( { $_ -eq $true }, 'split')
+                if ($EnabledLinks[0].Count -gt 0) {
+                    $IsLinked = $true
+                } else {
+                    $IsLinked = $false
+                }
+                $SummaryLink = [PSCustomObject] @{
+                    DisplayName        = $Link[0].DisplayName
+                    DomainName         = $Link[0].DomainName
+                    GUID               = $Link[0].GUID
+                    Linked             = $IsLinked
+                    LinksCount         = $Link.Count
+                    LinksEnabledCount  = $EnabledLinks[0].Count
+                    LinksDisabledCount = $EnabledLinks[1].Count
+                    Links              = $Link.DistinguishedName
+                    LinksObjects       = $Link
+                }
+                $SummaryHashtable[$Key] = $SummaryLink
+            }
+            if ($AsHashTable -and $Summary) {
+                $SummaryHashtable
+            } elseif ($AsHashTable) {
+                $HashTable
+            } elseif ($Summary) {
+                $SummaryHashtable.Values
             }
         } else {
-            Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObject -Domain '' -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
+            Get-GPOZaurrLinkLoop @getGPOLoopSplat
         }
     }
     End {

@@ -13,7 +13,7 @@
     $CacheSummaryLinks = [ordered] @{} # cache
 
     # Get all links
-    $Links = Get-GPOZaurrLink -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+    $Links = Get-GPOZaurrLink -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Linked Root, DomainControllers, Other
     foreach ($Link in $Links) {
         if (-not $CacheSummaryLinks["$($Link.DomainName)$($Link.Guid)"]) {
             $CacheSummaryLinks["$($Link.DomainName)$($Link.Guid)"] = [System.Collections.Generic.List[System.Object]]::new()
