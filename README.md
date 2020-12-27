@@ -57,6 +57,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.102
+  - [x] Improved `Get-GPOZaurrLink`
+  - [x] Improved `Get-GPOZaurrLinkSummary`
 - 0.0.101 - 23.12.2020
   - [x] Improved `Get-GPOZaurrBroken`
     - [x] It now detects `ObjectClass Issue`
