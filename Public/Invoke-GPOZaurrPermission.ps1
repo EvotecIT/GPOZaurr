@@ -21,7 +21,7 @@
         [parameter(ParameterSetName = 'Level', Mandatory)][int] $Limit,
 
         # ParameterSet4
-        [parameter(ParameterSetName = 'Linked', Mandatory)][validateset('Root', 'DomainControllers', 'Site', 'Other')][string] $Linked,
+        [parameter(ParameterSetName = 'Linked', Mandatory)][validateset('Root', 'DomainControllers', 'Site', 'OrganizationalUnit')][string] $Linked,
 
         # ParameterSet5
         [parameter(ParameterSetName = 'ADObject', ValueFromPipeline, ValueFromPipelineByPropertyName, Mandatory)][Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,
