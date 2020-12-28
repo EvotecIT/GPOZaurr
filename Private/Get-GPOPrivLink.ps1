@@ -7,7 +7,8 @@ function Get-GPOPrivLink {
         [string] $Domain,
         [switch] $SkipDomainRoot,
         [switch] $SkipDomainControllers,
-        [switch] $AsHashTable
+        [switch] $AsHashTable,
+        [switch] $SkipDuplicates
     )
     foreach ($Object in $ADObject) {
         if ($SkipDomainRoot) {

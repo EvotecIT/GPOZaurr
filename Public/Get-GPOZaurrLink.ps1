@@ -74,14 +74,14 @@
         $getGPOLoopSplat = @{
             Linked            = $Linked
             ForestInformation = $ForestInformation
-            CacheReturnedGPOs = $CacheReturnedGPOs
             SearchScope       = $SearchScope
             SearchBase        = $SearchBase
             ADObject          = $ADObject
             Filter            = $Filter
+            SkipDuplicates    = $SkipDuplicates
         }
         Remove-EmptyValue -Hashtable $getGPOLoopSplat -Recursive
-
+        $getGPOLoopSplat['CacheReturnedGPOs'] = $CacheReturnedGPOs
         if ($AsHashTable -or $Summary) {
             $HashTable = [ordered] @{}
             $SummaryHashtable = [ordered] @{}
@@ -96,21 +96,51 @@
             foreach ($Key in $HashTable.Keys) {
                 [Array] $Link = $HashTable[$Key]
                 $EnabledLinks = $Link.Enabled.Where( { $_ -eq $true }, 'split')
+
+                $LinkedRoot = $false
+                $LinkedRootPlaces = [System.Collections.Generic.List[string]]::new()
+                $LinkedSite = $false
+                $LinkedSitePlaces = [System.Collections.Generic.List[string]]::new()
+                $LinkedOU = $false
+                $LinkedCrossDomain = $false
+                $LinkedCrossDomainPlaces = [System.Collections.Generic.List[string]]::new()
+                foreach ($InternalLink in $Link) {
+                    if ($InternalLink.ObjectClass -eq 'domainDNS') {
+                        $LinkedRoot = $true
+                        $LinkedRootPlaces.Add($InternalLink.DistinguishedName)
+                    } elseif ($InternalLink.ObjectClass -eq 'site') {
+                        $LinkedSite = $true
+                        $LinkedSitePlaces.Add($InternalLink.DistinguishedName)
+                    } else {
+                        $LinkedOU = $true
+                    }
+                    if ($InternalLink.DistinguishedName -notlike "*$($InternalLink.GPODomainDistinguishedName)*") {
+                        $LinkedCrossDomain = $true
+                        $LinkedCrossDomainPlaces.Add($InternalLink.DistinguishedName)
+                    }
+                }
                 if ($EnabledLinks[0].Count -gt 0) {
                     $IsLinked = $true
                 } else {
                     $IsLinked = $false
                 }
                 $SummaryLink = [PSCustomObject] @{
-                    DisplayName        = $Link[0].DisplayName
-                    DomainName         = $Link[0].DomainName
-                    GUID               = $Link[0].GUID
-                    Linked             = $IsLinked
-                    LinksCount         = $Link.Count
-                    LinksEnabledCount  = $EnabledLinks[0].Count
-                    LinksDisabledCount = $EnabledLinks[1].Count
-                    Links              = $Link.DistinguishedName
-                    LinksObjects       = $Link
+                    DisplayName             = $Link[0].DisplayName
+                    DomainName              = $Link[0].DomainName
+                    GUID                    = $Link[0].GUID
+                    Linked                  = $IsLinked
+                    LinksCount              = $Link.Count
+                    LinksEnabledCount       = $EnabledLinks[0].Count
+                    LinksDisabledCount      = $EnabledLinks[1].Count
+                    LinkedCrossDomain       = $LinkedCrossDomain
+                    LinkedRoot              = $LinkedRoot
+                    LinkedSite              = $LinkedSite
+                    LinkedOU                = $LinkedOU
+                    LinkedSitePlaces        = $LinkedSitePlaces
+                    LinkedRootPlaces        = $LinkedRootPlaces
+                    LinkedCrossDomainPlaces = $LinkedCrossDomainPlaces
+                    Links                   = $Link.DistinguishedName
+                    LinksObjects            = $Link
                 }
                 $SummaryHashtable[$Key] = $SummaryLink
             }

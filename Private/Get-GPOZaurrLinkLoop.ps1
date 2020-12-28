@@ -7,7 +7,8 @@ function Get-GPOZaurrLinkLoop {
         [validateset('All', 'Root', 'DomainControllers', 'Site', 'OrganizationalUnit')][string[]] $Linked,
         [string] $SearchBase,
         [Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
-        [string] $Filter
+        [string] $Filter,
+        [switch] $SkipDuplicates
     )
     if (-not $ADObject) {
         if (-not $Filter) {
@@ -33,7 +34,7 @@ function Get-GPOZaurrLinkLoop {
                     } catch {
                         Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                     }
-                    Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
+                    Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable -SkipDuplicates:$SkipDuplicates
                 }
                 if ($Linked -contains 'Site' -or $Linked -contains 'All') {
                     Write-Verbose "Get-GPOZaurrLink - Getting GPO links for domain $Domain at SITE level"
@@ -47,7 +48,7 @@ function Get-GPOZaurrLinkLoop {
                         } catch {
                             Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                         }
-                        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
+                        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable -SkipDuplicates:$SkipDuplicates
                     }
                 }
                 if ($Linked -contains 'DomainControllers' -or $Linked -contains 'All') {
@@ -60,7 +61,7 @@ function Get-GPOZaurrLinkLoop {
                     } catch {
                         Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                     }
-                    Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
+                    Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable -SkipDuplicates:$SkipDuplicates
                 }
                 if ($Linked -contains 'OrganizationalUnit' -or $Linked -contains 'All') {
                     Write-Verbose "Get-GPOZaurrLink - Getting GPO links for domain $Domain at OU level"
@@ -72,7 +73,7 @@ function Get-GPOZaurrLinkLoop {
                     } catch {
                         Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                     }
-                    Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -SkipDomainRoot -SkipDomainControllers -AsHashTable:$AsHashTable
+                    Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -SkipDomainRoot -SkipDomainControllers -AsHashTable:$AsHashTable -SkipDuplicates:$SkipDuplicates
                 }
             }
         } elseif ($Filter) {
@@ -102,10 +103,10 @@ function Get-GPOZaurrLinkLoop {
                 } catch {
                     Write-Warning "Get-GPOZaurrLink - Get-ADObject error $($_.Exception.Message)"
                 }
-                Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
+                Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable -SkipDuplicates:$SkipDuplicates
             }
         }
     } else {
-        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObject -Domain '' -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
+        Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObject -Domain '' -ForestInformation $ForestInformation -AsHashTable:$AsHashTable -SkipDuplicates:$SkipDuplicates
     }
 }
