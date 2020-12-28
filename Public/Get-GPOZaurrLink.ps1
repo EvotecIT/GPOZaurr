@@ -124,7 +124,9 @@
                     } else {
                         $LinkedOU = $true
                     }
-                    if ($InternalLink.DistinguishedName -notlike "*$($InternalLink.GPODomainDistinguishedName)*") {
+                    $CN = ConvertFrom-DistinguishedName -ToDomainCN -DistinguishedName $InternalLink.distinguishedName
+                    $GPOCN = ConvertFrom-DistinguishedName -ToDomainCN -DistinguishedName $InternalLink.GPODomainDistinguishedName
+                    if ($CN -ne $GPOCN) {
                         $LinkedCrossDomain = $true
                         $LinkedCrossDomainPlaces.Add($InternalLink.DistinguishedName)
                     }
