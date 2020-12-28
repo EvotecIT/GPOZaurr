@@ -65,6 +65,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
   - [x] Improved/BugFix `Get-GPOZaurr` to properly detect linked GPOs in sites/cross-domain
   - [x] Improved `Invoke-GPOZaurrPermission`
     - [x] Renamed Linked validate set from `Other` to `OrganizationalUnit`
+  - [x] Improved `Invoke-GPOZaurr`
+    - [x] Added `GPOLinks` basic list
 - 0.0.101 - 23.12.2020
   - [x] Improved `Get-GPOZaurrBroken`
     - [x] It now detects `ObjectClass Issue`
