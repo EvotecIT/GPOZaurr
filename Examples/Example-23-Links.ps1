@@ -8,7 +8,7 @@ Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 #Get-GPOZaurrLinkSummary -Report 'LinksSummary' -UnlimitedProperties | Format-Table *
 
 $Report = Get-GPOZaurrLinkSummary #-UnlimitedProperties
-$Report | Format-Table *
+$Report | Format-Table
 $Report.MultipleLinks | Format-Table *
 $Report.OneLink | Format-Table *
 $Report.LinksSummary | Format-Table *
