@@ -2,12 +2,14 @@
     [cmdletbinding(DefaultParameterSetName = 'Linked')]
     param(
         [parameter(ParameterSetName = 'ADObject', ValueFromPipeline, ValueFromPipelineByPropertyName, Mandatory)][Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,
-        # weirdly enough site doesn't really work this way unless you give it 'CN=Configuration,DC=ad,DC=evotec,DC=xyz' as SearchBase
+        # site doesn't really work this way unless you give it 'CN=Configuration,DC=ad,DC=evotec,DC=xyz' as SearchBase
         [parameter(ParameterSetName = 'Filter')][string] $Filter, # "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')"
         [parameter(ParameterSetName = 'Filter')][string] $SearchBase,
         [parameter(ParameterSetName = 'Filter')][Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
 
         [parameter(ParameterSetName = 'Linked')][validateset('All', 'Root', 'DomainControllers', 'Site', 'OrganizationalUnit')][string[]] $Linked,
+
+        [parameter(ParameterSetName = 'Site')][string[]] $Site,
 
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
@@ -19,36 +21,43 @@
         [parameter(ParameterSetName = 'Linked')]
         [switch] $SkipDuplicates,
 
+        [parameter(ParameterSetName = 'Site')]
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
         [System.Collections.IDictionary] $GPOCache,
 
+        [parameter(ParameterSetName = 'Site')]
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
         [alias('ForestName')][string] $Forest,
 
+        [parameter(ParameterSetName = 'Site')]
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
         [string[]] $ExcludeDomains,
 
+        [parameter(ParameterSetName = 'Site')]
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
 
+        [parameter(ParameterSetName = 'Site')]
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
         [System.Collections.IDictionary] $ExtendedForestInformation,
 
+        [parameter(ParameterSetName = 'Site')]
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
         [switch] $AsHashTable,
 
+        [parameter(ParameterSetName = 'Site')]
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
         [parameter(ParameterSetName = 'Linked')]
@@ -79,6 +88,7 @@
             ADObject          = $ADObject
             Filter            = $Filter
             SkipDuplicates    = $SkipDuplicates
+            Site              = $Site
         }
         Remove-EmptyValue -Hashtable $getGPOLoopSplat -Recursive
         $getGPOLoopSplat['CacheReturnedGPOs'] = $CacheReturnedGPOs
