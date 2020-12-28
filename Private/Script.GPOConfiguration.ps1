@@ -4,6 +4,7 @@
     GPOConsistency               = $GPOZaurrConsistency
     GPODuplicates                = $GPOZaurrDuplicates
     GPOList                      = $GPOZaurrList
+    GPOLinks                     = $GPOZaurrLinks
     GPOPassword                  = $GPOZaurrPassword
     GPOPermissions               = $GPOZaurrPermissionsAnalysis
     GPOPermissionsAdministrative = $GPOZaurrPermissionsAdministrative

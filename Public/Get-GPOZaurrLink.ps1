@@ -120,7 +120,7 @@
                         $LinkedRootPlaces.Add($InternalLink.DistinguishedName)
                     } elseif ($InternalLink.ObjectClass -eq 'site') {
                         $LinkedSite = $true
-                        $LinkedSitePlaces.Add($InternalLink.DistinguishedName)
+                        $LinkedSitePlaces.Add($InternalLink.Name)
                     } else {
                         $LinkedOU = $true
                     }

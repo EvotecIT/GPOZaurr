@@ -60,6 +60,8 @@
                     $Output['ModificationTime'] = $GPOCache[$Search].ModificationTime
                     $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $DN -ToDC
                     $Output['GPODistinguishedName'] = $DN
+                    # This is object name, usually used for sites
+                    $Output['Name'] = $Object.Name
                     [PSCustomObject] $Output
                 } else {
                     Write-Warning "Get-PrivGPOZaurrLink - Couldn't find link $Search in a GPO Cache. Lack of permissions for given GPO? Are you running as admin? Skipping."
