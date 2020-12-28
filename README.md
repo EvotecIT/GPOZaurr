@@ -59,7 +59,10 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 - 0.0.102
   - [x] Improved `Get-GPOZaurrLink`
+    - [x] Supports all links across forest
+    - [x] Renamed Linked validate set from `Other` to `OrganizationalUnit`
   - [x] Improved `Get-GPOZaurrLinkSummary`
+  - [x] Improved/BugFix `Get-GPOZaurr` to properly detect linked GPOs in sites/cross-domain
 - 0.0.101 - 23.12.2020
   - [x] Improved `Get-GPOZaurrBroken`
     - [x] It now detects `ObjectClass Issue`
