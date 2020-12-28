@@ -4,7 +4,7 @@ function Get-GPOPrivInheritanceLoop {
         [Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,
         [System.Collections.IDictionary] $CacheReturnedGPOs,
         [System.Collections.IDictionary] $ForestInformation,
-        [validateset('Root', 'DomainControllers', 'Other')][string[]] $Linked,
+        [validateset('Root', 'DomainControllers', 'OrganizationalUnit')][string[]] $Linked,
         [string] $SearchBase,
         [Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
         [string] $Filter
@@ -44,7 +44,7 @@ function Get-GPOPrivInheritanceLoop {
                     # Sites are defined only in primary domain
                     # Sites are not supported by Get-GPInheritance
                 }
-                if ($Linked -contains 'Other') {
+                if ($Linked -contains 'OrganizationalUnit') {
                     $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
                     $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
                     $Splat['SearchBase'] = $SearchBase

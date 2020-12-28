@@ -1,4 +1,65 @@
 function Get-GPOZaurrLinkInheritance {
+    <#
+    .SYNOPSIS
+    Short description
+
+    .DESCRIPTION
+    Long description
+
+    .PARAMETER ADObject
+    Parameter description
+
+    .PARAMETER Filter
+    Parameter description
+
+    .PARAMETER SearchBase
+    Parameter description
+
+    .PARAMETER SearchScope
+    Parameter description
+
+    .PARAMETER Linked
+    Parameter description
+
+    .PARAMETER Limited
+    Parameter description
+
+    .PARAMETER SkipDuplicates
+    Parameter description
+
+    .PARAMETER GPOCache
+    Parameter description
+
+    .PARAMETER Forest
+    Parameter description
+
+    .PARAMETER ExcludeDomains
+    Parameter description
+
+    .PARAMETER IncludeDomains
+    Parameter description
+
+    .PARAMETER ExtendedForestInformation
+    Parameter description
+
+    .PARAMETER AsHashTable
+    Parameter description
+
+    .PARAMETER Summary
+    Parameter description
+
+    .EXAMPLE
+    $Output = Get-GPOZaurrLinkInheritance -Summary
+    $Output | Format-Table
+
+    $Output[5]
+
+    $Output[5].Links | Format-Table
+    $Output[5].LinksObjects | Format-Table
+
+    .NOTES
+    This is based on Get-GPInheritance which isn't ideal and doesn't support sites. Get-GPOZaurrLink is better. Leaving in case I need it later on for private use only.
+    #>
     [cmdletbinding(DefaultParameterSetName = 'All')]
     param(
         [parameter(ParameterSetName = 'ADObject', ValueFromPipeline, ValueFromPipelineByPropertyName, Mandatory)][Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,
@@ -7,7 +68,7 @@ function Get-GPOZaurrLinkInheritance {
         [parameter(ParameterSetName = 'Filter')][string] $SearchBase,
         [parameter(ParameterSetName = 'Filter')][Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
 
-        [parameter(ParameterSetName = 'Linked', Mandatory)][validateset('Root', 'DomainControllers', 'Other')][string[]] $Linked,
+        [parameter(ParameterSetName = 'Linked', Mandatory)][validateset('Root', 'DomainControllers', 'OrganizationalUnit')][string[]] $Linked,
 
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
@@ -71,8 +132,9 @@ function Get-GPOZaurrLinkInheritance {
     }
     Process {
         if (-not $Filter -and -not $Linked) {
-            # We choose ALL
-            #$Linked = 'Root', 'DomainControllers', 'Site', 'Other'
+            # We choose ALL, except SITE which is not supported gor Get-GPInheritance
+            # that's why it's better to use Get-GPOZaurrLink
+            #$Linked = 'Root', 'DomainControllers', 'Site', 'OrganizationalUnit'
         }
         $getGPOPrivInheritanceLoopSplat = @{
             Linked            = $Linked
