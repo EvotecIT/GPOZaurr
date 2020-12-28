@@ -7,7 +7,7 @@
         [parameter(ParameterSetName = 'Filter')][string] $SearchBase,
         [parameter(ParameterSetName = 'Filter')][Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
 
-        [parameter(ParameterSetName = 'Linked')][validateset('All', 'Root', 'DomainControllers', 'Site', 'Other')][string[]] $Linked,
+        [parameter(ParameterSetName = 'Linked')][validateset('All', 'Root', 'DomainControllers', 'Site', 'OrganizationalUnit')][string[]] $Linked,
 
         [parameter(ParameterSetName = 'Filter')]
         [parameter(ParameterSetName = 'ADObject')]
@@ -62,6 +62,7 @@
             # While initially we used $ForestInformation.Domains but the thing is GPOs can be linked to other domains so we need to get them all so we can use cache of it later on even if we're processing just one domain
             # That's why we use $ForestInformation.Forest.Domains instead
             foreach ($Domain in $ForestInformation.Forest.Domains) {
+                Write-Verbose "Get-GPOZaurrLink - Building GPO cache for domain $Domain"
                 $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
                 Get-GPO -All -DomainName $Domain -Server $QueryServer | ForEach-Object {
                     $GPOCache["$Domain$($_.ID.Guid)"] = $_

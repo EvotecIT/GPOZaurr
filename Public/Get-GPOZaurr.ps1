@@ -47,6 +47,10 @@
         if ($OwnerOnly -or $PermissionsOnly -and $Type) {
             Write-Warning "Get-GPOZaurr - Using PermissionOnly or OwnerOnly with Type is not supported. "
         }
+        if (-not $GPOPath) {
+            # This is needed, because Get-GPOReport doesn't deliver full scope of links, just some of it. It doesn't cover OUs with blocked inheritance, sites or crosslinked
+            $LinksSummaryCache = Get-GPOZaurrLink -AsHashTable -Summary -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        }
     }
     Process {
         if (-not $GPOPath) {
@@ -86,7 +90,7 @@
                             Write-Warning "Get-GPOZaurr - Failed to get [$($GPO.DomainName)]($Count/$($GroupPolicies.Count)) $($GPO.DisplayName) GPOReport: $($_.Exception.Message). Skipping."
                             continue
                         }
-                        Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $GPO -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO -Type $Type
+                        Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $GPO -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO -Type $Type -LinksSummaryCache $LinksSummaryCache
                     } else {
                         $GPO
                     }
