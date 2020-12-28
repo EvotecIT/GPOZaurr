@@ -9,25 +9,63 @@
         [string] $Splitter = [System.Environment]::NewLine,
         [switch] $ReturnObject,
         [System.Collections.IDictionary] $ExcludeGroupPolicies,
-        [string[]] $Type
+        [string[]] $Type,
+        [System.Collections.IDictionary] $LinksSummaryCache
     )
-    if ($XMLContent.GPO.LinksTo) {
-        $LinkSplit = ([Array] $XMLContent.GPO.LinksTo).Where( { $_.Enabled -eq $true }, 'Split')
-        [Array] $LinksEnabled = $LinkSplit[0]
-        [Array] $LinksDisabled = $LinkSplit[1]
-        $LinksEnabledCount = $LinksEnabled.Count
-        $LinksDisabledCount = $LinksDisabled.Count
-        $LinksTotalCount = ([Array] $XMLContent.GPO.LinksTo).Count
-        if ($LinksEnabledCount -eq 0) {
-            $Linked = $false
+    if ($LinksSummaryCache) {
+        $SearchGUID = -join ($XMLContent.GPO.Identifier.Domain.'#text', $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}')
+        if ($LinksSummaryCache[$SearchGUID]) {
+            $Linked = $LinksSummaryCache[$SearchGUID].Linked
+            $LinksEnabledCount = $LinksSummaryCache[$SearchGUID].LinksEnabledCount
+            $LinksDisabledCount = $LinksSummaryCache[$SearchGUID].LinksDisabledCount
+            $LinksTotalCount = $LinksSummaryCache[$SearchGUID].LinksCount
+            $Links = $LinksSummaryCache[$SearchGUID].Links
+            $LinksObjects = $LinksSummaryCache[$SearchGUID].LinksObjects
         } else {
-            $Linked = $true
+            $Linked = $false
+            $LinksEnabledCount = 0
+            $LinksDisabledCount = 0
+            $LinksTotalCount = 0
+            $Links = $null
+            $LinksObjects = $null
         }
     } else {
-        $Linked = $false
-        $LinksEnabledCount = 0
-        $LinksDisabledCount = 0
-        $LinksTotalCount = 0
+        if ($XMLContent.GPO.LinksTo) {
+            $LinkSplit = ([Array] $XMLContent.GPO.LinksTo).Where( { $_.Enabled -eq $true }, 'Split')
+            [Array] $LinksEnabled = $LinkSplit[0]
+            [Array] $LinksDisabled = $LinkSplit[1]
+            $LinksEnabledCount = $LinksEnabled.Count
+            $LinksDisabledCount = $LinksDisabled.Count
+            $LinksTotalCount = ([Array] $XMLContent.GPO.LinksTo).Count
+            if ($LinksEnabledCount -eq 0) {
+                $Linked = $false
+            } else {
+                $Linked = $true
+            }
+            $Links = @(
+                $XMLContent.GPO.LinksTo | ForEach-Object -Process {
+                    if ($_) {
+                        $_.SOMPath
+                    }
+                }
+            ) -join $Splitter
+            $LinksObjects = $XMLContent.GPO.LinksTo | ForEach-Object -Process {
+                if ($_) {
+                    [PSCustomObject] @{
+                        CanonicalName = $_.SOMPath
+                        Enabled       = $_.Enabled
+                        NoOverride    = $_.NoOverride
+                    }
+                }
+            }
+        } else {
+            $Linked = $false
+            $LinksEnabledCount = 0
+            $LinksDisabledCount = 0
+            $LinksTotalCount = 0
+            $Links = $null
+            $LinksObjects = $null
+        }
     }
     # Find proper values for enabled/disabled user/computer settings
     if ($XMLContent.GPO.Computer.Enabled -eq 'False') {
@@ -281,22 +319,8 @@
                 }
             )
             'Auditing'                          = if ($XMLContent.GPO.SecurityDescriptor.AuditingPresent.'#text' -eq 'true') { $true } else { $false }
-            'Links'                             = @(
-                $XMLContent.GPO.LinksTo | ForEach-Object -Process {
-                    if ($_) {
-                        $_.SOMPath
-                    }
-                }
-            ) -join $Splitter
-            'LinksObjects'                      = $XMLContent.GPO.LinksTo | ForEach-Object -Process {
-                if ($_) {
-                    [PSCustomObject] @{
-                        CanonicalName = $_.SOMPath
-                        Enabled       = $_.Enabled
-                        NoOverride    = $_.NoOverride
-                    }
-                }
-            }
+            'Links'                             = $Links
+            'LinksObjects'                      = $LinksObjects
             'GPOObject'                         = $GPO
         }
         if ($GPOOutput.ACL) {
