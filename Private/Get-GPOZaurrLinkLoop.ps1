@@ -4,7 +4,7 @@ function Get-GPOZaurrLinkLoop {
         [Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,
         [System.Collections.IDictionary] $CacheReturnedGPOs,
         [System.Collections.IDictionary] $ForestInformation,
-        [validateset('All', 'Root', 'DomainControllers', 'Site', 'Other')][string[]] $Linked,
+        [validateset('All', 'Root', 'DomainControllers', 'Site', 'OrganizationalUnit')][string[]] $Linked,
         [string] $SearchBase,
         [Microsoft.ActiveDirectory.Management.ADSearchScope] $SearchScope,
         [string] $Filter
@@ -16,6 +16,7 @@ function Get-GPOZaurrLinkLoop {
                 $Linked = 'All'
             }
             foreach ($Domain in $ForestInformation.Domains) {
+                Write-Verbose "Get-GPOZaurrLink - Getting GPO links for domain $Domain"
                 $Splat = @{
                     #Filter     = $Filter
                     Properties = 'distinguishedName', 'gplink', 'CanonicalName'
@@ -23,6 +24,7 @@ function Get-GPOZaurrLinkLoop {
                     Server     = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
                 }
                 if ($Linked -contains 'Root' -or $Linked -contains 'All') {
+                    Write-Verbose "Get-GPOZaurrLink - Getting GPO links for domain $Domain at ROOT level"
                     $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
                     $Splat['Filter'] = "objectClass -eq 'domainDNS'"
                     $Splat['SearchBase'] = $SearchBase
@@ -34,6 +36,7 @@ function Get-GPOZaurrLinkLoop {
                     Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
                 }
                 if ($Linked -contains 'Site' -or $Linked -contains 'All') {
+                    Write-Verbose "Get-GPOZaurrLink - Getting GPO links for domain $Domain at SITE level"
                     # Sites are defined only in primary domain
                     if ($ForestInformation['DomainsExtended'][$Domain]['DNSRoot'] -eq $ForestInformation['DomainsExtended'][$Domain]['Forest']) {
                         $SearchBase = -join ("CN=Configuration,", $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName'])
@@ -48,6 +51,7 @@ function Get-GPOZaurrLinkLoop {
                     }
                 }
                 if ($Linked -contains 'DomainControllers' -or $Linked -contains 'All') {
+                    Write-Verbose "Get-GPOZaurrLink - Getting GPO links for domain $Domain at DC level"
                     $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DomainControllersContainer']
                     $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
                     $Splat['SearchBase'] = $SearchBase
@@ -58,7 +62,8 @@ function Get-GPOZaurrLinkLoop {
                     }
                     Get-GPOPrivLink -CacheReturnedGPOs $CacheReturnedGPOs -ADObject $ADObjectGPO -Domain $Domain -ForestInformation $ForestInformation -AsHashTable:$AsHashTable
                 }
-                if ($Linked -contains 'Other' -or $Linked -contains 'All') {
+                if ($Linked -contains 'OrganizationalUnit' -or $Linked -contains 'All') {
+                    Write-Verbose "Get-GPOZaurrLink - Getting GPO links for domain $Domain at OU level"
                     $SearchBase = $ForestInformation['DomainsExtended'][$Domain]['DistinguishedName']
                     $Splat['Filter'] = "(objectClass -eq 'organizationalUnit')"
                     $Splat['SearchBase'] = $SearchBase
