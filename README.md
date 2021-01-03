@@ -57,6 +57,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.103
+  - [x] Added `Get-GPOZaurrBrokenLink`
+  - [x] Added `Repair-GPOZaurrBrokenLink`
 - 0.0.102 - 2021.01.02
   - [x] Improved `Get-GPOZaurrLink`
     - [x] Supports all links across forest
