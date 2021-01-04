@@ -68,7 +68,7 @@
                                 New-HTMLCodeBlock -Code {
                                     Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrDuplicateObjectsBefore.html -Verbose -Type GPODuplicates
                                 }
-                                New-HTMLText -Text {
+                                New-HTMLText -TextBlock {
                                     "When executed it will take a while to generate all data and provide you with new report depending on size of environment. "
                                     "Once confirmed that data is still showing issues and requires fixing please proceed with next step. "
                                 }
