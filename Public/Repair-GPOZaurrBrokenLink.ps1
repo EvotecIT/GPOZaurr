@@ -1,4 +1,35 @@
 function Repair-GPOZaurrBrokenLink {
+    <#
+    .SYNOPSIS
+    Removes any link to GPO that no longer exists.
+
+    .DESCRIPTION
+    Removes any link to GPO that no longer exists. It scans all site, organizational unit or domain root making sure every single link that may be linking to GPO that doesn't exists anymore is gone.
+
+    .PARAMETER Forest
+    Target different Forest, by default current forest is used
+
+    .PARAMETER ExcludeDomains
+    Exclude domain from search, by default whole forest is scanned
+
+    .PARAMETER IncludeDomains
+    Include only specific domains, by default whole forest is scanned
+
+    .PARAMETER ExtendedForestInformation
+    Ability to provide Forest Information from another command to speed up processing
+
+    .PARAMETER LimitProcessing
+    Allows to specify maximum number of items that will be fixed in a single run. It doesn't affect amount of GPOs processed
+
+    .EXAMPLE
+    Repair-GPOZaurrBrokenLink -Verbose -LimitProcessing 1 -WhatIf
+
+    .EXAMPLE
+    Repair-GPOZaurrBrokenLink -Verbose -IncludeDomains ad.evotec.pl -LimitProcessing 1 -WhatIf
+
+    .NOTES
+    General notes
+    #>
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [alias('ForestName')][string] $Forest,
@@ -7,7 +38,7 @@ function Repair-GPOZaurrBrokenLink {
         [System.Collections.IDictionary] $ExtendedForestInformation,
         [int] $LimitProcessing
     )
-    $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Extended
+    $ForestInformation = Get-WinADForestDetails -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -Extended
     $Links = Get-GPOZaurrBrokenLink -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ForestInformation
     $Cache = @{}
     foreach ($Link in $Links) {
@@ -38,7 +69,6 @@ function Repair-GPOZaurrBrokenLink {
                 Write-Verbose "Repair-GPOZaurrBrokenLink - preparing for removal link to $GPODN ($Key)"
             }
         }
-        #
         if ($Found) {
             $NewGpLink = $($FixedLinks -join '')
             try {

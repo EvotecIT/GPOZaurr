@@ -42,6 +42,7 @@
             $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $DN -ToDomainCN
             $Output = [ordered] @{
                 DistinguishedName = $Object.DistinguishedName
+                #Domain            = ConvertFrom-DistinguishedName -DistinguishedName $Object.DistinguishedName -ToDomainCN
                 CanonicalName     = if ($Object.CanonicalName) { $Object.CanonicalName.TrimEnd('/') } else { $Object.CanonicalName }
                 Guid              = [Regex]::Match($DN, '(?={)(.*)(?<=})').Value -replace '{' -replace '}'
                 Enforced          = $Enforced
