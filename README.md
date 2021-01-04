@@ -57,7 +57,9 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
-- 0.0.103
+- 0.0.103 - 2021.01.04
+  - [x] Improved `Get-GPOZaurr`
+    - [x] Added new report `GPOBrokenLink`
   - [x] Added `Get-GPOZaurrBrokenLink`
   - [x] Added `Repair-GPOZaurrBrokenLink`
 - 0.0.102 - 2021.01.02
