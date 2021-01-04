@@ -71,11 +71,20 @@ function Repair-GPOZaurrBrokenLink {
         }
         if ($Found) {
             $NewGpLink = $($FixedLinks -join '')
-            try {
-                Write-Verbose "Repair-GPOZaurrBrokenLink - setting gpLink to $Key - $NewGPLink"
-                Set-ADObject -Identity $Key -Server $Server -Replace @{ gPLink = $NewGpLink } -ErrorAction Stop
-            } catch {
-                Write-Warning "Repair-GPOZaurrBrokenLink - couldn't replace gpLink at $Key with $NewGpLink"
+            if ($NewGpLink) {
+                try {
+                    Write-Verbose "Repair-GPOZaurrBrokenLink - setting gpLink to $Key - $NewGPLink"
+                    Set-ADObject -Identity $Key -Server $Server -Replace @{ gPLink = $NewGpLink } -ErrorAction Stop
+                } catch {
+                    Write-Warning "Repair-GPOZaurrBrokenLink - setting gpLink to $Key - $NewGpLink failed! Error $($_.Exception.Message)"
+                }
+            } else {
+                try {
+                    Write-Verbose "Repair-GPOZaurrBrokenLink - clearing gpLink for $Key (no other links)"
+                    Set-ADObject -Identity $Key -Server $Server -Clear gPLink -ErrorAction Stop
+                } catch {
+                    Write-Warning "Repair-GPOZaurrBrokenLink - clearing gpLink for $Key failed! Error $($_.Exception.Message)"
+                }
             }
             if ($LimitProcessing -eq $Count) {
                 break
