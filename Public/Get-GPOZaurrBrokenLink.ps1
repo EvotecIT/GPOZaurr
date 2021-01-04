@@ -34,6 +34,7 @@ function Get-GPOZaurrBrokenLink {
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
+    $ErrorFound = $false
     $PoliciesAD = @{}
     # We need to request all GPOS from Forest. Requesting just for any domain won't be enough
     $ForestInformation = Get-WinADForestDetails -Forest $Forest -Extended # -Extended
@@ -42,7 +43,13 @@ function Get-GPOZaurrBrokenLink {
         $SystemsContainer = $ForestInformation['DomainsExtended'][$Domain].SystemsContainer
         if ($SystemsContainer) {
             $PoliciesSearchBase = -join ("CN=Policies,", $SystemsContainer)
-            $PoliciesInAD = Get-ADObject -SearchBase $PoliciesSearchBase -SearchScope OneLevel -Filter * -Server $QueryServer -Properties Name, gPCFileSysPath, DisplayName, DistinguishedName, Description, Created, Modified, ObjectClass, ObjectGUID
+            try {
+                $PoliciesInAD = Get-ADObject -ErrorAction Stop -SearchBase $PoliciesSearchBase -SearchScope OneLevel -Filter * -Server $QueryServer -Properties Name, gPCFileSysPath, DisplayName, DistinguishedName, Description, Created, Modified, ObjectClass, ObjectGUID
+            } catch {
+                Write-Warning "Get-GPOZaurrBrokenLink - An error occured while searching $PoliciesSearchBase. Error $($_.Exception.Message). Please resolve this before continuing."
+                $ErrorFound = $true
+                break
+            }
             foreach ($Policy in $PoliciesInAD) {
                 $GUIDFromDN = ConvertFrom-DistinguishedName -DistinguishedName $Policy.DistinguishedName
                 # $Key = "$($Domain)$($GuidFromDN)"
@@ -62,6 +69,9 @@ function Get-GPOZaurrBrokenLink {
         } else {
             Write-Warning "Get-GPOZaurrBroken - Couldn't get GPOs from $Domain. Skipping"
         }
+    }
+    if ($ErrorFound) {
+        return
     }
     # In case of links we can request here whatever user requested.
     # This will search for broken links in domain user requested
