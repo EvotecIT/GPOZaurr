@@ -42,6 +42,8 @@ $GPOZaurrBrokenLink = [ordered] @{
             "When GPO is deleted in a proper way it usually is removed from AD, SYSVOL and any link to it is also discarded. "
             "Unfortunetly this is true only if the GPO is created and linked within same domain. "
             "If GPO is linked in another domain, this leaves a broken link hanging on wherever it was linked before. "
+            "Additionally Remove-GPO cmdlet doesn't handle site link deletions, which causes dead links to be stuck on sites until those are manually deleted. "
+            "This means that any GPOs deleted using PowerShell may leave trail. "
         }
         New-HTMLText -Text @(
             'As it stands currently there are ',
@@ -49,14 +51,15 @@ $GPOZaurrBrokenLink = [ordered] @{
             ' broken links that need to be deleted over '
             $Script:Reporting['GPOBrokenLink']['Variables']['UniqueObjects'].Count,
             ' unique objects. '
-
-        ) -FontSize 10pt -FontWeight normal, bold, normal, bold, normal
-        New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
-        New-HTMLList -Type Unordered {
-            foreach ($Domain in $Script:Reporting['GPOBrokenLink']['Variables']['WillFixPerDomain'].Keys) {
-                New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOBrokenLink']['Variables']['WillFixPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
-            }
-        } -FontSize 10pt
+        ) -FontSize 10pt -FontWeight normal, bold, normal, bold, normal -LineBreak
+        if ($Script:Reporting['GPOBrokenLink']['Data'].Count -ne 0) {
+            New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
+            New-HTMLList -Type Unordered {
+                foreach ($Domain in $Script:Reporting['GPOBrokenLink']['Variables']['WillFixPerDomain'].Keys) {
+                    New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOBrokenLink']['Variables']['WillFixPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
+                }
+            } -FontSize 10pt
+        }
     }
     Solution       = {
         New-HTMLSection -Invisible {
