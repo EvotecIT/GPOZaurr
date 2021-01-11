@@ -143,8 +143,12 @@
                                 New-HTMLText -Text "If there's nothing else to be fixed, we can skip to next step step"
                             }
                             New-HTMLWizardStep -Name 'Fix inconsistent downlevel permissions' {
-                                New-HTMLText -Text "Unfortunetly this step is manual until automation is developed. "
-                                New-HTMLText -Text "If there are inconsistent permissions found inside GPO one has to fix them manually by going into SYSVOL and making sure inheritance is enabled, and that permissions are consistent across all files."
+                                New-HTMLText -Text @(
+                                    "Unfortunetly this step is manual until automation is developed. "
+                                    "If there are inconsistent permissions found inside GPO one has to fix them manually by going into SYSVOL and making sure inheritance is enabled, and that permissions are consistent across all files."
+                                    "Please keep in mind that it's possible inconsistent downlevel permissions fix will not be required once the top level fix is applied. "
+                                    "Rerun report to find out if you've just fixed top-level permissions. "
+                                )
                             }
                             New-HTMLWizardStep -Name 'Verification report' {
                                 New-HTMLText -TextBlock {
