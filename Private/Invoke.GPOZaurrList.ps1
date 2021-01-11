@@ -292,6 +292,13 @@
                 New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOList']['Variables']['GPONotOptimizedPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
             }
         } -FontSize 10pt
+        # Just in case report is too big and the full file is not attached
+        New-HTMLText -FontSize 10pt -Text "To generate up to date report please execute: " -FontWeight bold
+        New-HTMLList -Type Unordered {
+            New-HTMLListItem -Text 'Install-Module GPOZaurr -Force', ' or ', ' install module manually.' -FontWeight bold, normal, bold
+            New-HTMLListItem -Text 'Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOPListBefore.html -Verbose -Type GPOList' -FontWeight bold
+        } -FontSize 10pt
+        New-HTMLText -FontSize 10pt -Text 'Steps above will generate above summary with more details allowing you to get up to date report and steps on how to fix it.'
     }
     Solution   = {
         New-HTMLSection -Invisible {
