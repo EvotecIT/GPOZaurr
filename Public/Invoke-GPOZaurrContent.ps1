@@ -95,7 +95,10 @@
     $Output['CategoriesFull'] = [ordered] @{}
 
     Write-Verbose "Invoke-GPOZaurrContent - Loading GPO Report to Categories"
+    $CountGPO = 0
     [Array] $GPOCategories = foreach ($GPO in $GPOs) {
+        $CountGPO++
+        Write-Verbose "Invoke-GPOZaurrContent - Processing [$CountGPO/$($GPOs.Count)] $($GPO.DisplayName)"
         if ($GPOPath) {
             $GPOOutput = $GPO.GPOOutput
         } else {
