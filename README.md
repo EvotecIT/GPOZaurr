@@ -57,6 +57,8 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 ## Changelog
 
+- 0.0.110 - 2021.01.22
+  - [x] Improved `Invoke-GPOZaurr`
 - 0.0.109 - 2021.01.11
   - [x] Improved `Invoke-GPOZaurr`
 - 0.0.108 - 2021.01.11
