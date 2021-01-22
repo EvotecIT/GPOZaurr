@@ -111,10 +111,10 @@
                                 New-HTMLCodeBlock -Code {
                                     Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrPermissionsInconsistentBefore.html -Verbose -Type GPOConsistency
                                 }
-                                New-HTMLText -Text {
+                                New-HTMLText -Text @(
                                     "When executed it will take a while to generate all data and provide you with new report depending on size of environment."
                                     "Once confirmed that data is still showing issues and requires fixing please proceed with next step."
-                                }
+                                )
                                 New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
                                 New-HTMLCodeBlock -Code {
                                     $GPOOutput = Get-GPOZaurrPermissionConsistency
