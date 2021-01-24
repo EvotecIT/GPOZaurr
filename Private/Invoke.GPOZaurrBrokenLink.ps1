@@ -39,11 +39,11 @@ $GPOZaurrBrokenLink = [ordered] @{
     }
     Summary        = {
         New-HTMLText -FontSize 10pt -TextBlock {
-            "When GPO is deleted in a proper way it usually is removed from AD, SYSVOL and any link to it is also discarded. "
-            "Unfortunetly this is true only if the GPO is created and linked within same domain. "
-            "If GPO is linked in another domain, this leaves a broken link hanging on wherever it was linked before. "
-            "Additionally Remove-GPO cmdlet doesn't handle site link deletions, which causes dead links to be stuck on sites until those are manually deleted. "
-            "This means that any GPOs deleted using PowerShell may leave trail. "
+            "When GPO is deleted correctly, it usually is removed from AD, SYSVOL, and any link to it is also discarded. "
+            "Unfortunately, this is true only if the GPO is created and linked within the same domain. "
+            "If GPO is linked in another domain, this leaves a broken link hanging on before it was linked. "
+            "Additionally, the Remove-GPO cmdlet doesn't handle site link deletions, which causes dead links to be stuck on sites until those are manually deleted. "
+            "This means that any GPOs deleted using PowerShell may leave a trail."
         }
         New-HTMLText -Text @(
             'As it stands currently there are ',
