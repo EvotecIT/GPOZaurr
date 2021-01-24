@@ -77,18 +77,19 @@
         #>
     }
     Summary        = {
-        New-HTMLText -FontSize 10pt -TextBlock {
-            "By default GPO creation is usually maintained by Domain Admins or Enterprise Admins. "
-            "When GPO is created by member of Domain Admins or Enterprise Admins group the GPO Owner is set to Domain Admins. "
-            "When GPO is created by member of Group Policy Creator Owners or other group has delegated rights to create a GPO the owner of said GPO is not Domain Admins group but is assigned to relevant user. "
-            "GPO Owners should be Domain Admins or Enterprise Admins to prevent abuse. If that isn't so it means owner is able to fully control GPO and potentially change it's settings in uncontrolled way. "
-            "While at the moment of creation of new GPO it's not a problem, in long term it's possible such person may no longer be admin, yet keep their rights over GPO. "
-        }
-        New-HTMLText -FontSize 10pt -TextBlock {
-            "As you're aware Group Policies are stored in 2 places. In Active Directory (metadata) and SYSVOL (settings). This means that there are 2 places where GPO Owners exists. "
-            "This also means that for multiple reasons AD and SYSVOL can be out of sync when it comes to their permissions which can lead to uncontrolled ability to modify them. "
-            "Ownership in Active Directory and Ownership of SYSVOL for said GPO are required to be the same. "
-        }
+        New-HTMLText -FontSize 10pt -Text @(
+            "By default, GPO creation is usually maintained by Domain Admins or Enterprise Admins. "
+            "When GPO is created by Domain Admins or Enterprise Admins group members, the GPO Owner is set to Domain Admins. "
+            "When GPO is created by a member of Group Policy Creator Owners or other group has delegated rights to create a GPO, "
+            "the owner of said GPO is not Domain Admins group but is assigned to the relevant user. "
+            "GPO Owners should be Domain Admins or Enterprise Admins to prevent abuse. "
+            "If that isn't so, it means the owner can fully control GPO and potentially change its settings in an uncontrolled way. "
+            "While at the moment of creation of new GPO, it's not a problem, in the long term, it's possible such a person may no longer be admin, yet keep their rights over GPO. "
+            "As your aware, Group Policies are stored in 2 places. In Active Directory (metadata) and SYSVOL (settings). "
+            "This means that there are 2 places where GPO Owners exists. "
+            "This also means that for multiple reasons, AD and SYSVOL can be out of sync when it comes to their permissions, which can lead to uncontrolled ability to modify them. "
+            "Ownership in Active Directory and Ownership of SYSVOL for said GPO is required to be the same."
+        )
         New-HTMLText -Text "Here's a short summary of ", "Group Policy Owners", ": " -FontSize 10pt -FontWeight normal, bold, normal
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Administrative Owners: ', $Script:Reporting['GPOOwners']['Variables']['IsAdministrative'] -FontWeight normal, bold
