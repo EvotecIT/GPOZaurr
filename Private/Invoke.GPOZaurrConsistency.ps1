@@ -52,11 +52,12 @@
     }
     Summary        = {
         New-HTMLText -FontSize 10pt -TextBlock {
-            "When GPO is created it creates an entry in Active Directory (metadata) and SYSVOL (content). "
-            "Two different places meens two different sets of permissions. Group Policy module is making sure the data in both places is correct. "
-            "However, for different reasons it's not nessecary the case and often permissions go out of sync between AD and SYSVOL. "
-            "This test verifies consistency of policies between AD and SYSVOL in two ways. "
-            "It checks top level permissions for a GPO, and then checks if all files within said GPO are inheriting permissions or have different permissions in place. "
+            "When GPO is created, it creates an entry in Active Directory (metadata) and SYSVOL (content). "
+            "Two different places mean two different sets of permissions. "
+            "The group Policy module is making sure the data in both places is correct. "
+            "However, it's not necessarily the case for different reasons, and often permissions go out of sync between AD and SYSVOL. "
+            "This test verifies the consistency of policies between AD and SYSVOL in two ways. "
+            "It checks top-level permissions for a GPO and then checks if all files within said GPO is inheriting permissions or have different permissions in place."
         }
         New-HTMLText -Text 'Following list presents ', 'permissions consistency between Active Directory and SYSVOL for Group Policies' -FontSize 10pt -FontWeight normal, bold
         New-HTMLList -Type Unordered {
