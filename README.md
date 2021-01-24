@@ -25,6 +25,7 @@
   - [Table of Contents](#table-of-contents)
   - [Installing](#installing)
   - [Updating](#updating)
+  - [Resources](#resources)
   - [Changelog](#changelog)
 
 ## Installing
@@ -55,8 +56,16 @@ That's it. Whenever there's a new version, you run the command, and you can enjo
 
 **The essential thing** is if something works for you on production, keep using it till you test the new version on a test computer. I do changes that may not be big, but big enough that auto-update may break your code. For example, small rename to a parameter and your code stops working! Be responsible!
 
+## Resources
+
+To understand the usage I've created blog post you may find useful
+
+- [The only command you will ever need to understand and fix your Group Policies (GPO)](https://evotec.xyz/the-only-command-you-will-ever-need-to-understand-and-fix-your-group-policies-gpo/)
+
 ## Changelog
 
+- 0.0.111 - 2021.01.24
+  - [x] Improved `Invoke-GPOZaurr`
 - 0.0.110 - 2021.01.22
   - [x] Improved `Invoke-GPOZaurr`
 - 0.0.109 - 2021.01.11
