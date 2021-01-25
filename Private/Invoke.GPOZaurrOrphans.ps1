@@ -146,7 +146,7 @@
                             New-HTMLWizardStep -Name 'Prepare report' {
                                 New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with removal. To generate new report please use:"
                                 New-HTMLCodeBlock -Code {
-                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrBrokenGpoBefore.html -Verbose -Type GPOOrphans
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrBrokenGpoBefore.html -Verbose -Type GPOBroken
                                 }
                                 New-HTMLText -TextBlock {
                                     "When executed it will take a while to generate all data and provide you with new report depending on size of environment."
@@ -299,7 +299,7 @@
                                     "Once cleanup task was executed properly, we need to verify that report now shows no problems."
                                 }
                                 New-HTMLCodeBlock -Code {
-                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrBrokenGpoAfter.html -Verbose -Type GPOOrphans
+                                    Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrBrokenGpoAfter.html -Verbose -Type GPOBroken
                                 }
                                 New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                             }
