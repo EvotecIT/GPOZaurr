@@ -64,6 +64,11 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.113 - 2021.01.25
+  - [x] Improved `Invoke-GPOZaurr`
+    - [x] Report GPOAnalysis - added WindowsTimeService
+  - [x] Improved `Invoke-GPOZaurrContent`
+    - [x] Added `WindowsTimeService` type
 - 0.0.112 - 2021.01.25
   - [x] Improved `Invoke-GPOZaurr`
 - 0.0.111 - 2021.01.24
