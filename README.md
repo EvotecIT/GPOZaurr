@@ -64,6 +64,8 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.112 - 2021.01.25
+  - [x] Improved `Invoke-GPOZaurr`
 - 0.0.111 - 2021.01.24
   - [x] Improved `Invoke-GPOZaurr`
 - 0.0.110 - 2021.01.22
