@@ -1252,6 +1252,21 @@
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Remote Management (WinRM)*' -SingleObject
         }
     }
+    WindowsTimeService                = @{
+        Types      = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        GPOPath    = 'Policies -> Administrative Templates -> System/Windows Time Service'
+        Code       = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Windows Time Service*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'System/Windows Time Service*' -SingleObject
+        }
+    }
     WindowsUpdate                     = @{
         Types      = @(
             @{
