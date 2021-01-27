@@ -3,14 +3,9 @@
     param(
         [System.Collections.IDictionary] $Support,
         [string] $Path,
-        [switch] $Offline,
+        [switch] $Online,
         [switch] $Open
     )
-
-
-
-
-
     $PSDefaultParameterValues = @{
         "New-HTMLTable:WarningAction" = 'SilentlyContinue'
     }
@@ -194,5 +189,5 @@
                 }
             }
         }
-    } -Online:(-not $Offline.IsPresent) -Open:$Open.IsPresent -FilePath $Path
+    } -Online:$Online.IsPresent -Open:$Open.IsPresent -FilePath $Path
 }

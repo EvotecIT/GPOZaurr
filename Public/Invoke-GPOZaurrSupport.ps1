@@ -7,8 +7,7 @@
         [string] $Path,
         [string] $Splitter = [System.Environment]::NewLine,
         [switch] $PreventShow,
-        [switch] $Offline #,
-        # [switch] $ForceGPResult
+        [switch] $Online
     )
     # if user didn't choose anything, lets run as currently logged in user locally
     if (-not $UserName -and -not $ComputerName) {
@@ -154,7 +153,7 @@
         if ($Type -contains 'Object') {
             $Output
         } elseif ($Type -contains 'HTML') {
-            New-GPOZaurrReportHTML -Path $Path -Offline:$Offline -Open:(-not $PreventShow) -Support $Output
+            New-GPOZaurrReportHTML -Path $Path -Online:$Online -Open:(-not $PreventShow) -Support $Output
         }
     }
 }
