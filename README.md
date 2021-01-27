@@ -64,6 +64,15 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.114 - 2021.01.27
+  - [x] Improved `Invoke-GPOZaurr`
+    - [x] HTML now uses offline mode by default (no CDN) - increase in size of HTML up to 3MB
+    - [x] Using Online switch forces use of CDN - smaller files. For example `Invoke-GPOZaurr -Type GPOList -Online`
+  - [ ] Improved `Invoke-GPOZaurrSupport`
+    - [x] HTML now uses offline mode by default (no CDN) - increase in size of HTML up to 3MB
+    - [x] Using Online switch forces use of CDN - smaller files. For example `Invoke-GPOZaurrSupport -Online`
+    - [x] Removed parameter Offline, added parameter Online
+    - [x] The cmdlet is not really production ready. It's work in progress
 - 0.0.113 - 2021.01.25
   - [x] Improved `Invoke-GPOZaurr`
     - [x] Report GPOAnalysis - added WindowsTimeService
