@@ -12,7 +12,8 @@
         [switch] $ShowWarning,
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
-        [alias('Domain', 'Domains')][string[]] $IncludeDomains
+        [alias('Domain', 'Domains')][string[]] $IncludeDomains,
+        [switch] $Online
     )
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
@@ -182,7 +183,7 @@
                 }
             }
         }
-    } -Online -ShowHTML:(-not $HideHTML) -FilePath $FilePath
+    } -Online:$Online.IsPresent -ShowHTML:(-not $HideHTML) -FilePath $FilePath
     $TimeLogEndHTML = Stop-TimeLog -Time $TimeLogHTML -Option OneLiner
     Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report', " [Time to execute: $TimeLogEndHTML]" -Color Yellow, DarkGray, Yellow, DarkGray
     if ($PassThru) {
