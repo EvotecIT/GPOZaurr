@@ -64,6 +64,9 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.115
+  - [x] Improved `Invoke-GPOZaurr`
+    - [ ] `GPOList` - clarified some texts, changed 7 days to 30 days as default
 - 0.0.114 - 2021.01.27
   - [x] Improved `Invoke-GPOZaurr`
     - [x] HTML now uses offline mode by default (no CDN) - increase in size of HTML up to 3MB
