@@ -272,6 +272,7 @@
                                 New-HTMLText -Text @(
                                     "In case of NETLOGON permissions it's impossible to tell what in a given moment for given domain should be automatically removed except for the very obvious ",
                                     "unknown ", 'permissions. Domain Admins have to make their assesment on and remove permissions from users or groups that '
+                                    "they think do not belong. "
                                 ) -FontWeight normal, bold, normal
                             }
                             New-HTMLWizardStep -Name 'Verification report' {
