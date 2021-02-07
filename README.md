@@ -64,7 +64,7 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
-- 0.0.115
+- 0.0.115 - 2021.02.07
   - [x] Improved `Invoke-GPOZaurr`
     - [x] `GPOList` - clarified some texts, changed 7 days to 30 days as default
     - [x] `NetLogonPermissions` - fixed missing text
