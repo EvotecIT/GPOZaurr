@@ -26,13 +26,13 @@
             } catch {
                 Write-Warning "Get-GPOZaurrNetLogon - ACL reading failed for $($File.FullName) with error $($_.Exception.Message) ($($_.CategoryInfo.Reason))"
             }
-            #if ($ACL.Owner) {
-            $IdentityOwner = Convert-Identity -Identity $ACL.Owner -Verbose:$false
-            $IdentityOwnerAdvanced = Get-WinADObject -Identity $ACL.Owner -Cache -Verbose:$false
-            #} else {
-            #    $IdentityOwner = [PSCustomObject] @{ SID = ''; Type = 'Unknown' }
-            #    $IdentityOwnerAdvanced = [PSCustomObject] @{ ObjectClass = '' }
-            #}
+            if ($ACL.Owner) {
+                $IdentityOwner = Convert-Identity -Identity $ACL.Owner -Verbose:$false
+                $IdentityOwnerAdvanced = Get-WinADObject -Identity $ACL.Owner -Cache -Verbose:$false
+            } else {
+                $IdentityOwner = [PSCustomObject] @{ Name = ''; SID = ''; Type = 'Unknown' }
+                $IdentityOwnerAdvanced = [PSCustomObject] @{ ObjectClass = '' }
+            }
             if (-not $OwnerOnly) {
                 if (-not $SkipOwner) {
                     if ($IdentityOwner.SID -eq "S-1-5-32-544") {
