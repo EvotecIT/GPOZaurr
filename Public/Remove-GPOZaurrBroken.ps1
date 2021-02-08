@@ -108,21 +108,23 @@
         }
         if ($GPO.Status -in 'Not available on SYSVOL', 'ObjectClass issue') {
             Write-Verbose "Remove-GPOZaurrBroken - Removing from AD [$($GPO.Status)] $($GPO.DistinguishedName)"
+            <#
             try {
                 $ExistingObject = Get-ADObject -Identity $GPO.DistinguishedName -Server $GPO.DomainName -ErrorAction Stop
             } catch {
                 Write-Warning "Remove-GPOZaurrBroken - Error getting $($GPO.DistinguishedName) from AD error: $($_.Exception.Message)"
                 $ExistingObject = $null
             }
-            if ($ExistingObject -and $ExistingObject.ObjectClass -eq 'groupPolicyContainer') {
-                Write-Verbose "Remove-GPOZaurrBroken - Removing DN: $($GPO.DistinguishedName) / ObjectClass: $($ExistingObject.ObjectClass)"
+            #>
+            if ($GPO -and $GPO.ObjectClass -in 'groupPolicyContainer', 'Container') {
+                Write-Verbose "Remove-GPOZaurrBroken - Removing DN: $($GPO.DistinguishedName) / ObjectClass: $($GPO.ObjectClass)"
                 try {
                     Remove-ADObject -Server $GPO.DomainName -Identity $GPO.DistinguishedName -Recursive -Confirm:$false -ErrorAction Stop
                 } catch {
                     Write-Warning "Remove-GPOZaurrBroken - Failed to remove $($GPO.DistinguishedName) from AD error: $($_.Exception.Message)"
                 }
             } else {
-                Write-Warning "Remove-GPOZaurrBroken - DistinguishedName $($GPO.DistinguishedName) not found or ObjectClass is not groupPolicyContainer ($($ExistingObject.ObjectClass))"
+                Write-Warning "Remove-GPOZaurrBroken - DistinguishedName $($GPO.DistinguishedName) not found or ObjectClass is not groupPolicyContainer/Container ($($GPO.ObjectClass))"
             }
         }
     }
