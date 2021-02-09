@@ -144,7 +144,10 @@
 
     # Generate pretty HTML
     $TimeLogHTML = Start-TimeLog
-    Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report' -Color Yellow, DarkGray, Yellow
+    if (-not $FilePath) {
+        $FilePath = Get-FileName -Extension 'html' -Temporary
+    }
+    Write-Color -Text '[i]', '[HTML ] ', "Generating HTML report ($FilePath)" -Color Yellow, DarkGray, Yellow
     New-HTML -Author 'Przemysław Kłys' -TitleText 'GPOZaurr Report' {
         New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
         New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
