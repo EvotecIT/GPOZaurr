@@ -100,8 +100,8 @@
     }
 
     # This is kind of old way of doing things, but it's superseded by other way below
-    $ComputerSettingsAvailable = if ($null -eq $XMLContent.GPO.Computer.ExtensionData) { $false } else { $true }
-    $UserSettingsAvailable = if ($null -eq $XMLContent.GPO.User.ExtensionData) { $false } else { $true }
+    [bool] $ComputerSettingsAvailable = if ($null -eq $XMLContent.GPO.Computer.ExtensionData) { $false } else { $true }
+    [bool] $UserSettingsAvailable = if ($null -eq $XMLContent.GPO.User.ExtensionData) { $false } else { $true }
 
     if ($ComputerSettingsAvailable -eq $false -and $UserSettingsAvailable -eq $false) {
         $NoSettings = $true
@@ -112,7 +112,7 @@
     # $OutputUser = $XMLContent.GPO.User.ExtensionData.Extension | Where-Object { $_.PSObject.Properties.TypeNameOfValue -in 'System.Xml.XmlElement', 'System.Object[]' }
     # $OutputComputer = $XMLContent.GPO.Computer.ExtensionData.Extension | Where-Object { $_.PSObject.Properties.TypeNameOfValue -in 'System.Xml.XmlElement', 'System.Object[]' }
 
-    $OutputUser = foreach ($ExtensionType in $XMLContent.GPO.User.ExtensionData.Extension) {
+    [Array] $OutputUser = foreach ($ExtensionType in $XMLContent.GPO.User.ExtensionData.Extension) {
         if ($ExtensionType) {
             $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
             try {
@@ -124,7 +124,7 @@
         }
         $KeysToLoop
     }
-    $OutputComputer = foreach ($ExtensionType in $XMLContent.GPO.Computer.ExtensionData.Extension) {
+    [Array] $OutputComputer = foreach ($ExtensionType in $XMLContent.GPO.Computer.ExtensionData.Extension) {
         if ($ExtensionType) {
             $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
             try {
@@ -137,10 +137,10 @@
         $KeysToLoop
     }
 
-    $ComputerSettingsAvailable = if ($OutputComputer) { $true } else { $false }
-    $UserSettingsAvailable = if ($OutputUser) { $true } else { $false }
+    [bool] $ComputerSettingsAvailable = if ($OutputComputer.Count -gt 0) { $true } else { $false }
+    [bool] $UserSettingsAvailable = if ($OutputUser.Count -gt 0) { $true } else { $false }
 
-    if (-not $ComputerSettingsAvailable -and -not $UserSettingsAvailable) {
+    if ($ComputerSettingsAvailable -eq $false -and $UserSettingsAvailable -eq $false) {
         $Empty = $true
     } else {
         $Empty = $false
@@ -277,8 +277,8 @@
             'UserSettingsAvailable'             = $UserSettingsAvailable
             #'ComputerSettingsAvailableReal'         = $ComputerSettingsAvailableReal
             #'UserSettingsAvailableReal'             = $UserSettingsAvailableReal
-            'ComputerSettingsTypes'             = $OutputComputer.Name
-            'UserSettingsTypes'                 = $OutputUser.Name
+            'ComputerSettingsTypes'             = $OutputComputer.Name -join ", "
+            'UserSettingsTypes'                 = $OutputUser.Name -join ", "
             'ComputerEnabled'                   = $ComputerEnabled
             'UserEnabled'                       = $UserEnabled
             'ComputerSettingsStatus'            = if ($XMLContent.GPO.Computer.VersionDirectory -eq 0 -and $XMLContent.GPO.Computer.VersionSysvol -eq 0) { "NeverModified" } else { "Modified" }
