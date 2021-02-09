@@ -64,6 +64,9 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.118 - 2021.02.09
+  - [x] Added information where the report is saved
+  - [x] Small improvement to `Get-GPOZaurr` to exlicitly define variable types
 - 0.0.117 - 2021.02.09
   - [x] Small fix to `Get-GPOZaurr` to exclude GPOList.xml which is used in offline mode by `Save-GPOZaurrFiles`
 - 0.0.116 - 2021.02.08
