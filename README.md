@@ -64,6 +64,8 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.117
+  - [x] Small fix to `Get-GPOZaurr` to exclude GPOList.xml which is used in offline mode by `Save-GPOZaurrFiles`
 - 0.0.116 - 2021.02.08
   - [x] Improved `Remove-GPOZaurrBroken` to handle ObjectClass problem, and removed reduntant check
 - 0.0.115 - 2021.02.07
