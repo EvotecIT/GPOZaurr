@@ -100,9 +100,11 @@
             foreach ($Path in $GPOPath) {
                 Write-Verbose "Get-GPOZaurr - Getting GPO content from XML files"
                 Get-ChildItem -LiteralPath $Path -Recurse -Filter *.xml | ForEach-Object {
-                    $XMLContent = [XML]::new()
-                    $XMLContent.Load($_.FullName)
-                    Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -PermissionsOnly:$PermissionsOnly.IsPresent -ExcludeGroupPolicies $ExcludeGPO -Type $Type
+                    if ($_.Name -ne 'GPOList.xml') {
+                        $XMLContent = [XML]::new()
+                        $XMLContent.Load($_.FullName)
+                        Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -PermissionsOnly:$PermissionsOnly.IsPresent -ExcludeGroupPolicies $ExcludeGPO -Type $Type
+                    }
                 }
                 Write-Verbose "Get-GPOZaurr - Finished GPO content from XML files"
             }
