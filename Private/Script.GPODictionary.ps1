@@ -1162,6 +1162,36 @@
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard*' -SingleObject
         }
     }
+    WindowsFirewall                   = @{
+        Types      = @(
+            @{
+                Category = 'WindowsFirewallSettings'
+                Settings = 'InboundFirewallRules'
+            }
+            @{
+                Category = 'WindowsFirewallSettings'
+                Settings = 'OutboundFirewallRules'
+            }
+            <#
+            ----                           -----
+            ConnectionSecurityRules        {@{DisplayName=TEST | Windows Firewall; DomainName=ad.evotec.xyz; GUID=540020A2-61AD-468A-AB61-2F8E7429A9DD; GpoType=Computer; GpoCategory=WindowsFirewallSettings; GpoSettings=ConnectionSecurityRules; Linked=False; LinksCount=0; Links=; IncludeComments=True; CreatedTime=10.02.2021 17:29:35; ModifiedTime=10.02.2021 19:18:45; ReadTime=10.02.2021 20:23:26; SecurityDescriptor=System.Xml.XmlEleme...
+            DomainProfile                  {@{DisplayName=TEST | Windows Firewall; DomainName=ad.evotec.xyz; GUID=540020A2-61AD-468A-AB61-2F8E7429A9DD; GpoType=Computer; GpoCategory=WindowsFirewallSettings; GpoSettings=DomainProfile; Linked=False; LinksCount=0; Links=; IncludeComments=True; CreatedTime=10.02.2021 17:29:35; ModifiedTime=10.02.2021 19:18:45; ReadTime=10.02.2021 20:23:26; SecurityDescriptor=System.Xml.XmlElement; Filter...
+            GlobalSettings                 {@{DisplayName=TEST | Windows Firewall; DomainName=ad.evotec.xyz; GUID=540020A2-61AD-468A-AB61-2F8E7429A9DD; GpoType=Computer; GpoCategory=WindowsFirewallSettings; GpoSettings=GlobalSettings; Linked=False; LinksCount=0; Links=; IncludeComments=True; CreatedTime=10.02.2021 17:29:35; ModifiedTime=10.02.2021 19:18:45; ReadTime=10.02.2021 20:23:26; SecurityDescriptor=System.Xml.XmlElement; Filte...
+            InboundFirewallRules           {@{DisplayName=TEST | Windows Firewall; DomainName=ad.evotec.xyz; GUID=540020A2-61AD-468A-AB61-2F8E7429A9DD; GpoType=Computer; GpoCategory=WindowsFirewallSettings; GpoSettings=InboundFirewallRules; Linked=False; LinksCount=0; Links=; IncludeComments=True; CreatedTime=10.02.2021 17:29:35; ModifiedTime=10.02.2021 19:18:45; ReadTime=10.02.2021 20:23:26; SecurityDescriptor=System.Xml.XmlElement;...
+            OutboundFirewallRules          {@{DisplayName=TEST | Windows Firewall; DomainName=ad.evotec.xyz; GUID=540020A2-61AD-468A-AB61-2F8E7429A9DD; GpoType=Computer; GpoCategory=WindowsFirewallSettings; GpoSettings=OutboundFirewallRules; Linked=False; LinksCount=0; Links=; IncludeComments=True; CreatedTime=10.02.2021 17:29:35; ModifiedTime=10.02.2021 19:18:45; ReadTime=10.02.2021 20:23:26; SecurityDescriptor=System.Xml.XmlElement...
+            Phase1AuthenticationSets       {@{DisplayName=TEST | Windows Firewall; DomainName=ad.evotec.xyz; GUID=540020A2-61AD-468A-AB61-2F8E7429A9DD; GpoType=Computer; GpoCategory=WindowsFirewallSettings; GpoSettings=Phase1AuthenticationSets; Linked=False; LinksCount=0; Links=; IncludeComments=True; CreatedTime=10.02.2021 17:29:35; ModifiedTime=10.02.2021 19:18:45; ReadTime=10.02.2021 20:23:26; SecurityDescriptor=System.Xml.XmlElem...
+            Phase2AuthenticationSets       {@{DisplayName=TEST | Windows Firewall; DomainName=ad.evotec.xyz; GUID=540020A2-61AD-468A-AB61-2F8E7429A9DD; GpoType=Computer; GpoCategory=WindowsFirewallSettings; GpoSettings=Phase2AuthenticationSets; Linked=False; LinksCount=0; Links=; IncludeComments=True; CreatedTime=10.02.2021 17:29:35; ModifiedTime=10.02.2021 19:18:45; ReadTime=10.02.2021 20:23:26; SecurityDescriptor=System.Xml.XmlElem...
+            PublicProfile
+            #>
+        )
+        GPOPath    = 'Policies -> Windows Settings -> Security Settings -> Windows Firewall with Advanced Security -> '
+        Code       = {
+            ConvertTo-XMLWindowsFirewall -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLWindowsFirewall -GPO $GPO -SingleObject
+        }
+    }
     WindowsHelloForBusiness           = @{
         Types      = @(
             @{
