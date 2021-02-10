@@ -15,22 +15,33 @@
             Count       = 0
             Settings    = $null
         }
-        [Array] $CreateGPO['Settings'] = foreach ($Folder in $GPO.DataSet) {
-            foreach ($Location in $Folder.Location) {
-                [PSCustomObject] @{
-                    DestinationPath           = $Location.DestinationPath
-                    SecuritySID               = $Location.SecurityGroup.SID.'#text'
-                    SecurityName              = $Location.SecurityGroup.Name.'#text'
-                    GrantExclusiveRights      = if ($Folder.GrantExclusiveRights -eq 'true') { $true } else { $false }
-                    MoveContents              = if ($Folder.MoveContents -eq 'true') { $true } else { $false }
-                    FollowParent              = if ($Folder.FollowParent -eq 'true') { $true } else { $false }
-                    ApplyToDownLevel          = if ($Folder.ApplyToDownLevel -eq 'true') { $true } else { $false }
-                    DoNotCare                 = if ($Folder.DoNotCare -eq 'true') { $true } else { $false }
-                    RedirectToLocal           = if ($Folder.RedirectToLocal -eq 'true') { $true } else { $false }
-                    PolicyRemovalBehavior     = $Folder.PolicyRemovalBehavior     # : LeaveContents
-                    ConfigurationControl      = if ($Folder.ConfigurationControl -eq 'GP') { 'Group Policy' } else { $Folder.ConfigurationControl }      # : GP
-                    PrimaryComputerEvaluation = $Folder.PrimaryComputerEvaluation # : PrimaryComputerPolicyDisabled
-                }
+        [Array] $CreateGPO['Settings'] = foreach ($Rule in $GPO.DataSet) {
+            [PSCustomObject] @{
+                Version           = $Rule.Version
+                Type              = if ($Rule.Dir -eq 'In') { 'Inbound' } elseif ($Rule.Dir -eq 'Out') { 'Outbound' } else { $Rule.Dir }
+                Name              = $Rule.Name
+                Action            = $Rule.Action
+                Enabled           = if ($Rule.Active -eq 'true') { $true } else { $false }
+                Profile           = $Rule.Profile
+                Svc               = $Rule.Svc
+                LocalAddressIPv4  = $Rule.LA4
+                LocalAddressIPv6  = $Rule.LA6
+                RemoteAddressIPV4 = $Rule.RA4
+                RemoteAddressIPV6 = $Rule.RA6
+                LocalPort         = $Rule.LPort
+                RemotePort        = $Rule.RPort
+                Description       = $Rule.Desc
+                EmbedCtxt         = $Rule.EmbedCtxt
+                Edge              = $Rule.Edge
+                IFType            = $Rule.IFType
+                Security          = $Rule.Security
+                App               = $Rule.App
+                Protocol          = $Rule.Protocol
+                RMAuth            = $Rule.RMAuth
+                RUAuth            = $Rule.RUAuth
+                ICMP4             = $Rule.ICMP4
+                LocalName         = $Rule.LocalName
+
             }
         }
         $CreateGPO['Count'] = $CreateGPO['Settings'].Count
@@ -40,7 +51,7 @@
         [PSCustomObject] $CreateGPO
     } else {
         foreach ($Rule in $GPO.DataSet) {
-            $CreateGPO = [ordered]@{
+            [PSCustomObject]@{
                 DisplayName       = $GPO.DisplayName
                 DomainName        = $GPO.DomainName
                 GUID              = $GPO.GUID
@@ -63,7 +74,6 @@
                 Edge              = $Rule.Edge
                 IFType            = $Rule.IFType
                 Security          = $Rule.Security
-
                 App               = $Rule.App
                 Protocol          = $Rule.Protocol
                 RMAuth            = $Rule.RMAuth
@@ -74,7 +84,6 @@
                 LinksCount        = $GPO.LinksCount
                 Links             = $GPO.Links
             }
-            [PSCustomObject] $CreateGPO
         }
     }
 }
