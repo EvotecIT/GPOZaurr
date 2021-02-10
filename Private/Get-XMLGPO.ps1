@@ -121,7 +121,7 @@
     $PreCheckOutputUser = $false
     $PreCheckOutputComputer = $false
     foreach ($Extension in $XMLContent.GPO.User.ExtensionData) {
-        if ($ExtensionType.Error) {
+        if ($Extension.Error) {
             $PreCheckOutputUser = $true
         }
     }
