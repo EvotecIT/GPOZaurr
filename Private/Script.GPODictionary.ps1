@@ -338,6 +338,21 @@
     FolderRedirection                 = @{
         Types      = @(
             @{
+                Category = 'FolderRedirectionSettings'
+                Settings = 'Folder'
+            }
+        )
+        GPOPath    = 'Windows Settings -> Folder Redirection'
+        Code       = {
+            ConvertTo-XMLFolderRedirection -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLFolderRedirection -GPO $GPO -SingleObject
+        }
+    }
+    FolderRedirectionPolicy           = @{
+        Types      = @(
+            @{
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
