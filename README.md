@@ -64,7 +64,7 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
-- 0.0.119 - 2021.02.10
+- 0.0.119
   - [x] Improvement to `Get-GPOZaurr` to warn if there is potential issue with EMPTY (which can happen on non-english system)
     - [x] In such case GPOZaurr will asses EMPTY or not using old method which doesn't detect all EMPTY cases but shouldn't provide false positives
 - 0.0.118 - 2021.02.09
