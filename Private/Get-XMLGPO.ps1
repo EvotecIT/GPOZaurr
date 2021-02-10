@@ -12,6 +12,10 @@
         [string[]] $Type,
         [System.Collections.IDictionary] $LinksSummaryCache
     )
+
+    $DisplayName = $XMLContent.GPO.Name
+    $DomainName = $XMLContent.GPO.Identifier.Domain.'#text'
+
     if ($LinksSummaryCache) {
         $SearchGUID = -join ($XMLContent.GPO.Identifier.Domain.'#text', $XMLContent.GPO.Identifier.Identifier.InnerText -replace '{' -replace '}')
         if ($LinksSummaryCache[$SearchGUID]) {
@@ -73,7 +77,7 @@
     } elseif ($XMLContent.GPO.Computer.Enabled -eq 'True') {
         $ComputerEnabled = $true
     } else {
-        Write-Warning "Get-XMLGPO - Computer enabled not set to true or false. Weird."
+        Write-Warning "Get-XMLGPO - Computer enabled not set to true or false [$DisplayName/$DomainName]. Weird."
         $ComputerEnabled = $null
     }
     if ($XMLContent.GPO.User.Enabled -eq 'False') {
@@ -81,7 +85,7 @@
     } elseif ($XMLContent.GPO.User.Enabled -eq 'True') {
         $UserEnabled = $true
     } else {
-        Write-Warning "Get-XMLGPO - User enabled not set to true or false. Weird."
+        Write-Warning "Get-XMLGPO - User enabled not set to true or false [$DisplayName/$DomainName] . Weird."
         $UserEnabled = $null
     }
     # Translate Enabled to same as GPO GUI
@@ -112,33 +116,56 @@
     # $OutputUser = $XMLContent.GPO.User.ExtensionData.Extension | Where-Object { $_.PSObject.Properties.TypeNameOfValue -in 'System.Xml.XmlElement', 'System.Object[]' }
     # $OutputComputer = $XMLContent.GPO.Computer.ExtensionData.Extension | Where-Object { $_.PSObject.Properties.TypeNameOfValue -in 'System.Xml.XmlElement', 'System.Object[]' }
 
-    [Array] $OutputUser = foreach ($ExtensionType in $XMLContent.GPO.User.ExtensionData.Extension) {
-        if ($ExtensionType) {
-            $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
-            try {
-                $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] -and $_.Name -notin @('Blocked') }
-            } catch {
-                Write-Warning "Get-XMLGPO - things went sideways $($_.Exception.Message)"
-                continue
-            }
-        }
-        $KeysToLoop
-    }
-    [Array] $OutputComputer = foreach ($ExtensionType in $XMLContent.GPO.Computer.ExtensionData.Extension) {
-        if ($ExtensionType) {
-            $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
-            try {
-                $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] -and $_.Name -notin @('Blocked') }
-            } catch {
-                Write-Warning "Get-XMLGPO - things went sideways $($_.Exception.Message)"
-                continue
-            }
-        }
-        $KeysToLoop
-    }
 
-    [bool] $ComputerSettingsAvailable = if ($OutputComputer.Count -gt 0) { $true } else { $false }
-    [bool] $UserSettingsAvailable = if ($OutputUser.Count -gt 0) { $true } else { $false }
+    # This is additional check we do for error check to prevent false-positives for EMPTY on non-english language
+    $PreCheckOutputUser = $false
+    $PreCheckOutputComputer = $false
+    foreach ($Extension in $XMLContent.GPO.User.ExtensionData) {
+        if ($ExtensionType.Error) {
+            $PreCheckOutputUser = $true
+        }
+    }
+    foreach ($Extension in $XMLContent.GPO.Computer.ExtensionData) {
+        if ($Extension.Error) {
+            $PreCheckOutputComputer = $true
+        }
+    }
+    if ($PreCheckOutputComputer -eq $true -or $PreCheckOutputUser -eq $true) {
+        # in some cases GPResult seems to return an error - this was first noticed by user when using Dutch based system
+        # I am not sure if it's possible to fix this error for users, but once that happens checking if GPO is empty fails using the method below
+        # therefore we will use the old method of assuming something is empty or not empty in such case
+        Write-Warning "Get-XMLGPO - Reading GPO content [$DisplayName/$DomainName] returned an error. This may be because of non-english language. Assesing EMPTY using old method which can report false positives. Be careful please."
+        $OutputUser = @()
+        $OutputComputer = @()
+    } else {
+        [Array] $OutputUser = foreach ($ExtensionType in $XMLContent.GPO.User.ExtensionData.Extension) {
+            if ($ExtensionType) {
+                $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
+                try {
+                    $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] -and $_.Name -notin @('Blocked') }
+                } catch {
+                    Write-Warning "Get-XMLGPO - things went sideways [$DisplayName/$DomainName]. Error $($_.Exception.Message)"
+                    continue
+                }
+            }
+            $KeysToLoop
+        }
+        [Array] $OutputComputer = foreach ($ExtensionType in $XMLContent.GPO.Computer.ExtensionData.Extension) {
+            if ($ExtensionType) {
+                $GPOSettingTypeSplit = ($ExtensionType.type -split ':')
+                try {
+                    $KeysToLoop = $ExtensionType | Get-Member -MemberType Properties -ErrorAction Stop | Where-Object { $_.Name -notin 'type', $GPOSettingTypeSplit[0] -and $_.Name -notin @('Blocked') }
+                } catch {
+                    Write-Warning "Get-XMLGPO - things went sideways [$DisplayName/$DomainName]. Error $($_.Exception.Message)"
+                    continue
+                }
+            }
+            $KeysToLoop
+        }
+
+        [bool] $ComputerSettingsAvailable = if ($OutputComputer.Count -gt 0) { $true } else { $false }
+        [bool] $UserSettingsAvailable = if ($OutputUser.Count -gt 0) { $true } else { $false }
+    }
 
     if ($ComputerSettingsAvailable -eq $false -and $UserSettingsAvailable -eq $false) {
         $Empty = $true
