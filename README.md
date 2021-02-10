@@ -64,9 +64,13 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
-- 0.0.121
+- 0.0.121 - 2021.02.10
   - [x] Improvement to `Get-GPOZaurr` - added description [#13](https://github.com/EvotecIT/GPOZaurr/issues/13)
   - [x] Improvement to `Invoke-GPOZaurr -Type GPOList` - added description [#13](https://github.com/EvotecIT/GPOZaurr/issues/13)
+  - [x] Improved `Invoke-GPOZaurr`
+    - [x] Report GPOAnalysis - added `FolderRedirection`
+    - [x] Report GPOAnalysis - renamed `FolderRedirection` to `FolderRedirectionPolicy`
+  - [x] Improved `Invoke-GPOZaurrContent` as mentioned above for `GPOAnalysis`
 - 0.0.120 - 2021.02.10
   - [x] Improvement to `Get-GPOZaurr` to warn if there is potential issue with EMPTY (which can happen on non-english system)
     - [x] In such case GPOZaurr will asses EMPTY or not using old method which doesn't detect all EMPTY cases but shouldn't provide false positives
