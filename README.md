@@ -64,6 +64,10 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.122
+  - [x] Improved `Invoke-GPOZaurr`
+    - [x] Report GPOAnalysis - added `WindowsFirewallRules`,`WindowsFirewallProfiles`,`WindowsFirewallConnectionSecurityAuthentication`,`WindowsFirewallConnectionSecurityRules`
+  - [x] Improved `Invoke-GPOZaurrContent` as mentioned above for `GPOAnalysis`
 - 0.0.121 - 2021.02.10
   - [x] Improvement to `Get-GPOZaurr` - added description [#13](https://github.com/EvotecIT/GPOZaurr/issues/13)
   - [x] Improvement to `Invoke-GPOZaurr -Type GPOList` - added description [#13](https://github.com/EvotecIT/GPOZaurr/issues/13)
