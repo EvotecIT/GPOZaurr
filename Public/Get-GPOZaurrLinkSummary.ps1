@@ -13,7 +13,7 @@
     $CacheSummaryLinks = [ordered] @{} # cache
 
     # Get all links
-    $Links = Get-GPOZaurrLink -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Linked Root, DomainControllers, Other
+    $Links = Get-GPOZaurrLink -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Linked Root, DomainControllers, OrganizationalUnit
     foreach ($Link in $Links) {
         if (-not $CacheSummaryLinks["$($Link.DomainName)$($Link.Guid)"]) {
             $CacheSummaryLinks["$($Link.DomainName)$($Link.Guid)"] = [System.Collections.Generic.List[System.Object]]::new()
@@ -121,13 +121,13 @@
                 for ($i = 0; $i -le $HighestCount; $i++) {
                     "Level$i"
                 }
-                'Owner'
-                'GpoStatus'
-                'Description'
-                'CreationTime'
-                'ModificationTime'
-                'GPODomainDistinguishedName'
-                'GPODistinguishedName'
+                #'Owner'
+                #'GpoStatus'
+                #'Description'
+                #'CreationTime'
+                #'ModificationTime'
+                #'GPODomainDistinguishedName'
+                #'GPODistinguishedName'
             )
             $ReturnObject.MultipleLinks = $ReturnObject.MultipleLinks | Select-Object -Property $Properties
         }
