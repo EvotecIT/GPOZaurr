@@ -64,7 +64,7 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
-- 0.0.123
+- 0.0.123 - 2021.03.21
   - [x] Fixes `Get-GPOZaurrLinkSummary`
 - 0.0.122 - 2021.02.11
   - [x] Improved `Invoke-GPOZaurr`
