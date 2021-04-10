@@ -134,7 +134,7 @@
             New-HTMLTable -DataTable $Script:Reporting['GPOOwners']['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'IsOwnerConsistent' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
                 New-HTMLTableCondition -Name 'IsOwnerAdministrative' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
-            } -PagingOptions 10, 20, 30, 40, 50
+            } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix Group Policy Owners' {

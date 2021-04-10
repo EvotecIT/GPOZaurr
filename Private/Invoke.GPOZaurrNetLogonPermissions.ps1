@@ -237,7 +237,7 @@
                 New-HTMLTableCondition -Name 'Status' -Value "Review permission required" -BackgroundColor PaleGoldenrod -ComparisonType string -Operator eq
                 New-HTMLTableCondition -Name 'Status' -Value "Removal permission required" -BackgroundColor Salmon -ComparisonType string -Operator eq -Row
                 New-HTMLTableCondition -Name 'Status' -Value "OK" -BackgroundColor LightGreen -ComparisonType string -Operator eq
-            }
+            } -SearchBuilder
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix NetLogon Permissions ' {

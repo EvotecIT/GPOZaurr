@@ -358,7 +358,7 @@
                     New-HTMLTableCondition -Name 'UserProblem' -Value $false -BackgroundColor SpringGreen -ComparisonType string
                     New-HTMLTableCondition -Name 'ComputerOptimized' -Value $true -BackgroundColor SpringGreen -ComparisonType string
                     New-HTMLTableCondition -Name 'UserOptimized' -Value $true -BackgroundColor SpringGreen -TextTransform capitalize -ComparisonType string
-                } -PagingOptions 10, 20, 30, 40, 50
+                } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder
             }
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {

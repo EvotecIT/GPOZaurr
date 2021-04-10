@@ -309,7 +309,7 @@
         New-HTMLSection -Name 'Group Policy Visibility Analysis' {
             New-HTMLTable -DataTable $Script:Reporting['GPOPermissions']['Data'].PermissionsIssues -Filtering {
                 New-HTMLTableCondition -Name 'PermissionIssue' -Value $true -BackgroundColor Salmon -ComparisonType string -Row
-            } -PagingOptions 7, 15, 30, 45, 60 -DefaultSortColumn PermissionIssue -DefaultSortOrder Descending
+            } -PagingOptions 7, 15, 30, 45, 60 -DefaultSortColumn PermissionIssue -DefaultSortOrder Descending -SearchBuilder
         }
         New-HTMLSection -Name 'Group Policy Permissions Analysis' {
             New-HTMLContainer {
@@ -344,7 +344,7 @@
                     New-HTMLTableCondition -Name 'EnterpriseAdmins' -Value 'True' -BackgroundColor Salmon -ComparisonType string -Operator ne
 
                     New-TableEvent -TableID 'GPOPermissionsAll' -SourceColumnName 'GUID' -TargetColumnID 1 # TargetColumnID 1 eq GUID on the other table
-                } -PagingOptions 7, 15, 30, 45, 60
+                } -PagingOptions 7, 15, 30, 45, 60 -SearchBuilder
             }
         }
         New-HTMLSection -Name 'All Permissions' {
@@ -355,7 +355,7 @@
                 New-HTMLTableCondition -Name 'Permission' -Value 'GpoApply' -BackgroundColor Orange -ComparisonType string
                 New-HTMLTableCondition -Name 'Permission' -Value 'GpoRead' -BackgroundColor MediumSpringGreen -ComparisonType string -Operator eq
                 New-HTMLTableCondition -Name 'PrincipalSidType' -Value 'Unknown' -BackgroundColor Salmon -ComparisonType string -Operator eq
-            } -PagingOptions 7, 15, 30, 45, 60 -DataTableID 'GPOPermissionsAll'
+            } -PagingOptions 7, 15, 30, 45, 60 -DataTableID 'GPOPermissionsAll' -SearchBuilder
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix Group Policy Administrative Users' {
