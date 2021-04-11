@@ -58,6 +58,7 @@ To understand the usage I've created blog post you may find useful
 - 0.0.124
   - ☑ Added `SearchBuilder` to all tables
   - ☑ Automatically joins arrays in tables in `Invoke-GPOZaurr`
+  - ☑ Improved `Get-GPOZaurrInheritance` with Exclusions and some help information
 - 0.0.123 - 2021.03.21
   - ☑ Fixes `Get-GPOZaurrLinkSummary`
 - 0.0.122 - 2021.02.11

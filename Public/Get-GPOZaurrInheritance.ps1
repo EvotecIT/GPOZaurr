@@ -1,8 +1,48 @@
 ﻿function Get-GPOZaurrInheritance {
+    <#
+    .SYNOPSIS
+    Short description
+
+    .DESCRIPTION
+    Long description
+
+    .PARAMETER IncludeBlockedObjects
+    Include OU's with blocked inheritance. Default disabled
+
+    .PARAMETER OnlyBlockedInheritance
+    Show only OU's with blocked inheritance
+
+    .PARAMETER IncludeExcludedObjects
+    Show excluded objets. Default disabled
+
+    .PARAMETER Exclusions
+    Provide exclusions for OU's approved by IT. You can provide OU by canonical name or distinguishedName
+
+    .PARAMETER Forest
+    Target different Forest, by default current forest is used
+
+    .PARAMETER ExcludeDomains
+    Exclude domain from search, by default whole forest is scanned
+
+    .PARAMETER IncludeDomains
+    Include only specific domains, by default whole forest is scanned
+
+    .PARAMETER ExtendedForestInformation
+    Ability to provide Forest Information from another command to speed up processing
+
+    .EXAMPLE
+    $Objects = Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -Exclusions $ExcludedOU
+    $Objects | Format-Table
+
+    .NOTES
+    General notes
+    #>
     [cmdletBinding()]
     param(
         [switch] $IncludeBlockedObjects,
         [switch] $OnlyBlockedInheritance,
+        [switch] $IncludeExcludedObjects,
+        [string[]] $Exclusions,
 
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
@@ -10,7 +50,11 @@
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {
+        $ExclusionsCache = @{}
         $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        foreach ($Exclusion in $Exclusions) {
+            $ExclusionsCache[$Exclusion] = $true
+        }
     }
     Process {
         foreach ($Domain in $ForestInformation.Domains) {
@@ -19,6 +63,17 @@
                 $InheritanceInformation = [Ordered] @{
                     CanonicalName      = $OU.canonicalName
                     BlockedInheritance = if ($OU.gpOptions -eq 1) { $true } else { $false }
+                    Excluded           = $false
+                }
+                if ($Exclusions) {
+                    if ($ExclusionsCache[$OU.canonicalName]) {
+                        $InheritanceInformation['Excluded'] = $true
+                    } elseif ($ExclusionsCache[$OU.DistinguishedName]) {
+                        $InheritanceInformation['Excluded'] = $true
+                    }
+                }
+                if (-not $IncludeExcludedObjects -and $InheritanceInformation['Excluded']) {
+                    continue
                 }
                 if (-not $IncludeBlockedObjects) {
                     if ($OnlyBlockedInheritance) {
@@ -57,12 +112,3 @@
         }
     }
 }
-
-<#
-
-$OrganizationalUnits = Get-ADOrganizationalUnit -Filter *
-$Output = foreach ($OU in $OrganizationalUnits) {
-    Get-GPInheritance -Target $OU.DistinguishedName
-}
-$Output | Format-Table
-#>
