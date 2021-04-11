@@ -75,7 +75,7 @@
             "By default, Default Domain Policy is linked to the domain and is inherited to all the child objects of the domain hierarchy. "
             "So does any other policies linked to the top level OU's. "
         }
-        New-HTMLText -Text "Block Inheritance" -FontSize 10pt -FontWeight bold
+        New-HTMLText -Text "Blocked Inheritance" -FontSize 10pt -FontWeight bold
         New-HTMLText -FontSize 10pt -Text @(
             "As GPOs can be inherited by default, they can also be blocked, if required using the Block Inheritance. "
             "If the Block Inheritance setting is enabled, the inheritance of group policy setting is blocked. "
@@ -85,10 +85,10 @@
         New-HTMLText -Text @(
             'As it stands currently there are ',
             $Script:Reporting['GPOBlockedInheritance']['Data'].Count,
-            ' organiational units with '
+            ' organisational units with '
             'GPO Inheritance Block'
             ' out of which '
-            $Script:Reporting['GPOBlockedInheritance']['Variables']['Exclude'].Count,
+            $Script:Reporting['GPOBlockedInheritance']['Variables']['Exclude'],
             ' are marked as Excluded '
             '(approved by IT). '
         ) -FontSize 10pt -FontWeight normal, bold, normal, bold, normal, bold, normal, bold -LineBreak
@@ -137,14 +137,14 @@
                     New-TableCondition -Name 'UsersCount' -Value 0
                     New-TableCondition -Name 'ComputersCount' -Value 0
                 } -BackgroundColor Salmon -FailBackgroundColor Amber -HighlightHeaders 'UsersCount', 'ComputersCount'
-            } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder -ExcludeProperty GroupPolicies
+            } -PagingOptions 5, 10, 20, 30, 40, 50 -SearchBuilder -ExcludeProperty GroupPolicies
         }
         New-HTMLSection -Name 'Group Policies affecting objects in Organizational Units with Blocked Inheritance' {
             New-HTMLTable -DataTable $Script:Reporting['GPOBlockedInheritance']['Data'].GroupPolicies -Filtering {
                 New-TableCondition -Name 'Enabled' -Value $true -BackgroundColor SpringGreen -FailBackgroundColor Salmon
                 New-TableCondition -Name 'Enforced' -Value $true -BackgroundColor Amber -FailBackgroundColor AirForceBlue
                 New-TableCondition -Name 'LinkedDirectly' -Value $true -BackgroundColor Amber -FailBackgroundColor AirForceBlue
-            } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder -ExcludeProperty GroupPolicies -DataTableID 'TableWithGroupPoliciesBlockedInheritance'
+            } -PagingOptions 5, 10, 20, 30, 40, 50 -SearchBuilder -DataTableID 'TableWithGroupPoliciesBlockedInheritance'
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix - Organizational Units with Group Policy Blocked Inheritance' {
