@@ -4,7 +4,7 @@
     ActionRequired = $null
     Data           = $null
     Execute        = {
-        Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+        Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -IncludeGroupPoliciesForBlockedObjects -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing     = {
         foreach ($GPO in $Script:Reporting['GPOBlockedInheritance']['Data']) {
@@ -33,6 +33,10 @@
                 $Script:Reporting['GPOBlockedInheritance']['Variables']['DeletionHarmless']++
                 $Script:Reporting['GPOBlockedInheritance']['Variables']['DeletionHarmlessPerDomain'][$GPO.DomainName]++
             }
+            # add gpo from blocked inheritance to create additional table
+            #foreach ($GpoBlocked in $Script:Reporting['GPOBlockedInheritance']['Data'].GroupPolicies) {
+            #$Script:Reporting['GPOBlockedInheritance']['Variables']['GroupPolicies'].Add($GpoBlocked)
+            #}
         }
         if ($Script:Reporting['GPOBlockedInheritance']['Variables']['RequiresInvesigation'] -gt 0 -or $Script:Reporting['GPOBlockedInheritance']['Variables']['DeletionHarmless'] -gt 0) {
             $Script:Reporting['GPOBlockedInheritance']['ActionRequired'] = $true
@@ -56,6 +60,7 @@
         ComputersAffected                  = 0
         ComputersAffectedIncludingExcluded = 0
         ComputersAffectedExcluded          = 0
+        GroupPolicies                      = [System.Collections.Generic.List[PSCustomObject]]::new()
     }
     Overview       = {
 
@@ -86,10 +91,10 @@
         if ($Script:Reporting['GPOBlockedInheritance']['Data'].Count -ne 0) {
             New-HTMLText -Text 'Users & Computers affected by inheritance blocks:' -FontSize 10pt -FontWeight bold
             New-HTMLList -Type Unordered {
-                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['UsersAffected'], ' users affected due to inheritance blocks'
-                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['UsersAffectedExcluded'], ' users affected, but approved/excluded, due to inheritance blocks'
-                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['ComputersAffected'], ' computers affected due to inheritance blocks'
-                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['ComputersAffectedExcluded'], ' computers affected, but approved/excluded, due to inheritance blocks'
+                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['UsersAffected'], ' users affected due to inheritance blocks' -FontWeight bold, normal
+                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['UsersAffectedExcluded'], ' users affected, but approved/excluded, due to inheritance blocks' -FontWeight bold, normal
+                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['ComputersAffected'], ' computers affected due to inheritance blocks' -FontWeight bold, normal
+                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['ComputersAffectedExcluded'], ' computers affected, but approved/excluded, due to inheritance blocks' -FontWeight bold, normal
             } -FontSize 10pt
 
             New-HTMLText -Text 'Following domains require:' -FontSize 10pt -FontWeight bold
@@ -118,6 +123,7 @@
         }
         New-HTMLSection -Name 'Organizational Units with Group Policy Blocked Inheritance' {
             New-HTMLTable -DataTable $Script:Reporting['GPOBlockedInheritance']['Data'] -Filtering {
+                New-TableEvent -TableID 'TableWithGroupPoliciesBlockedInheritance' -SourceColumnID 8 -TargetColumnID 9
                 New-TableConditionGroup {
                     New-TableCondition -Name 'BlockedInheritance' -Value $true
                     New-TableCondition -Name 'Excluded' -Value $false
@@ -126,7 +132,14 @@
                     New-TableCondition -Name 'UsersCount' -Value 0
                     New-TableCondition -Name 'ComputersCount' -Value 0
                 } -BackgroundColor Salmon -FailBackgroundColor Amber -HighlightHeaders 'UsersCount', 'ComputersCount'
-            } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder
+            } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder -ExcludeProperty GroupPolicies
+        }
+        New-HTMLSection -Name 'Group Policies affecting objects in Organizational Units with Blocked Inheritance' {
+            New-HTMLTable -DataTable $Script:Reporting['GPOBlockedInheritance']['Data'].GroupPolicies -Filtering {
+                New-TableCondition -Name 'Enabled' -Value $true -BackgroundColor SpringGreen -FailBackgroundColor Salmon
+                New-TableCondition -Name 'Enforced' -Value $true -BackgroundColor Amber -FailBackgroundColor AirForceBlue
+                New-TableCondition -Name 'LinkedDirectly' -Value $true -BackgroundColor Amber -FailBackgroundColor AirForceBlue
+            } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder -ExcludeProperty GroupPolicies -DataTableID 'TableWithGroupPoliciesBlockedInheritance'
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix - Organizational Units with Group Policy Blocked Inheritance' {

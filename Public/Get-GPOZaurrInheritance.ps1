@@ -42,6 +42,7 @@
         [switch] $IncludeBlockedObjects,
         [switch] $OnlyBlockedInheritance,
         [switch] $IncludeExcludedObjects,
+        [switch] $IncludeGroupPoliciesForBlockedObjects,
         [string[]] $Exclusions,
 
         [alias('ForestName')][string] $Forest,
@@ -64,7 +65,26 @@
                     CanonicalName      = $OU.canonicalName
                     BlockedInheritance = if ($OU.gpOptions -eq 1) { $true } else { $false }
                     Excluded           = $false
-                    DomainName = ConvertFrom-DistinguishedName -ToDomainCN -DistinguishedName $OU.DistinguishedName
+                    DomainName         = ConvertFrom-DistinguishedName -ToDomainCN -DistinguishedName $OU.DistinguishedName
+                }
+                if ($InheritanceInformation.BlockedInheritance -and $IncludeGroupPoliciesForBlockedObjects.IsPresent) {
+                    $GPInheritance = Get-GPInheritance -Target $OU.distinguishedName
+                    $ActiveGroupPolicies = foreach ($GPO in $GPInheritance.InheritedGpoLinks) {
+                        [PSCustomObject] @{
+                            OrganizationalUnit   = $OU.canonicalName
+                            DisplayName          = $GPO.DisplayName
+                            DomainName           = $GPO.GpoDomainName
+                            LinkedDirectly       = if ($OU.DistinguishedName -eq $GPO.Target) { $true } else { $false }
+                            GPOID                = $GPO.GPOID
+                            Enabled              = $GPO.Enabled
+                            Enforced             = $GPO.Enforced
+                            Order                = $GPO.Order
+                            LinkedTo             = $GPO.Target
+                            OrganizationalUnitDN = $OU.DistinguishedName
+                        }
+                    }
+                } else {
+                    $ActiveGroupPolicies = $null
                 }
                 if ($Exclusions) {
                     if ($ExclusionsCache[$OU.canonicalName]) {
@@ -100,6 +120,8 @@
                             $InheritanceInformation['Computers'] = $null
                         }
                     }
+                    $InheritanceInformation['DistinguishedName'] = $OU.DistinguishedName
+                    $InheritanceInformation['GroupPolicies'] = $ActiveGroupPolicies
                     if ($OnlyBlockedInheritance) {
                         if ($InheritanceInformation.BlockedInheritance -eq $true) {
                             [PSCustomObject] $InheritanceInformation
@@ -108,7 +130,6 @@
                         [PSCustomObject] $InheritanceInformation
                     }
                 }
-                $InheritanceInformation['DistinguishedName'] = $OU.DistinguishedName
             }
         }
     }
