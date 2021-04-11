@@ -19,15 +19,6 @@
 
 # GPOZaurr
 
-## Table of Contents
-
-- [GPOZaurr](#gpozaurr)
-  - [Table of Contents](#table-of-contents)
-  - [Installing](#installing)
-  - [Updating](#updating)
-  - [Resources](#resources)
-  - [Changelog](#changelog)
-
 ## Installing
 
 GPOZaurr requires `RSAT` installed to provide results. If you don't have them you can install them as below. Keep in mind it also installs GUI tools so it shouldn't be installed on user workstations.
@@ -66,6 +57,7 @@ To understand the usage I've created blog post you may find useful
 
 - 0.0.124
   - ☑ Added `SearchBuilder` to all tables
+  - ☑ Automatically joins arrays in tables in `Invoke-GPOZaurr`
 - 0.0.123 - 2021.03.21
   - ☑ Fixes `Get-GPOZaurrLinkSummary`
 - 0.0.122 - 2021.02.11
