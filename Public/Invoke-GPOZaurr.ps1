@@ -152,7 +152,7 @@
         New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
         New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
         New-HTMLPanelStyle -BorderRadius 0px
-        New-HTMLTableOption -DataStore JavaScript -BoolAsString
+        New-HTMLTableOption -DataStore JavaScript -BoolAsString -ArrayJoinString ', ' -ArrayJoin
 
         New-HTMLHeader {
             New-HTMLSection -Invisible {
