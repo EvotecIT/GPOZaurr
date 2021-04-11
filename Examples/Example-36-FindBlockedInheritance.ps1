@@ -6,5 +6,10 @@
 
 # Get same output DN, CanonicalName, BlockInheritance (True/False) + Users/Computers + UsersCount/ComputerCount for those with Blocked Inhertiance
 # This is so you can have a list what machines are affected
-$Objects = Get-GPOZaurrInheritance -IncludeBlockedObjects -OnlyBlockedInheritance
+$ExcludedOU = @(
+    # Works on OU/
+    'ad.evotec.xyz/ITR02/Test'
+)
+
+$Objects = Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -Exclusions $ExcludedOU -IncludeGroupPoliciesForBlockedObjects
 $Objects | Format-Table
