@@ -2,7 +2,7 @@
     [alias('Show-GPOZaurr', 'Show-GPO')]
     [cmdletBinding()]
     param(
-        [Parameter(Position = 1)][scriptblock] $ExcludeGroupPolicies,
+        [alias('ExcludeGroupPolicies', 'ExclusionsCode')][Parameter(Position = 1)][object] $Exclusions,
         [string] $FilePath,
         [Parameter(Position = 0)][string[]] $Type,
         [switch] $PassThru,
@@ -50,27 +50,6 @@
     Write-Color '[i]', "[GPOZaurr] ", 'Domain Information', ' [Informative] ', "Included Domains: ", $DisplayIncludedDomains -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
     Write-Color '[i]', "[GPOZaurr] ", 'Domain Information', ' [Informative] ', "Excluded Domains: ", $DisplayExcludedDomains -Color Yellow, DarkGray, Yellow, DarkGray, Yellow, Magenta
 
-    # Exclusions support, converts ScriptBlock into list of GPOs
-    <#
-    $Exclusions = [ordered]@{}
-    if ($Extension) {
-        $Exclusions['All'] = [System.Collections.Generic.List[PSCustomObject]]::new()
-        [Array] $ExecuteExtension = & $Extension
-        foreach ($Ext in $ExecuteExtension) {
-            if ($Ext.Type -eq 'Exclusion') {
-                if ($Ext.Type) {
-                    if (-not $Exclusions[$Ext.Type]) {
-                        $Exclusions[$Ext.Type] = [System.Collections.Generic.List[PSCustomObject]]::new()
-                    }
-                    $Exclusions[$Ext.Type].Add($Ext)
-                } else {
-                    $Exclusions['All'].Add($Ext)
-                }
-            }
-        }
-    }
-    #>
-
     # Lets make sure we only enable those types which are requestd by user
     if ($Type) {
         foreach ($T in $Script:GPOConfiguration.Keys) {
@@ -96,8 +75,12 @@
                 Variables         = Copy-Dictionary -Dictionary $Script:GPOConfiguration[$T]['Variables']
             }
             if ($Exclusions) {
-                $Script:Reporting[$T]['ExclusionsCode'] = $ExcludeGroupPolicies
-                $Script:Reporting[$T]['Exclusions'] = & $ExcludeGroupPolicies
+                if ($Exclusions -is [scriptblock]) {
+                    $Script:Reporting[$T]['ExclusionsCode'] = $Exclusions
+                }
+                if ($Exclusions -is [Array]) {
+                    $Script:Reporting[$T]['Exclusions'] = $Exclusions
+                }
             }
 
             $TimeLogGPOList = Start-TimeLog

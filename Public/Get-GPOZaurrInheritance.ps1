@@ -64,7 +64,7 @@
                 $InheritanceInformation = [Ordered] @{
                     CanonicalName      = $OU.canonicalName
                     BlockedInheritance = if ($OU.gpOptions -eq 1) { $true } else { $false }
-                    Excluded           = $false
+                    Exclude            = $false
                     DomainName         = ConvertFrom-DistinguishedName -ToDomainCN -DistinguishedName $OU.DistinguishedName
                 }
                 if ($InheritanceInformation.BlockedInheritance -and $IncludeGroupPoliciesForBlockedObjects.IsPresent) {
@@ -88,12 +88,12 @@
                 }
                 if ($Exclusions) {
                     if ($ExclusionsCache[$OU.canonicalName]) {
-                        $InheritanceInformation['Excluded'] = $true
+                        $InheritanceInformation['Exclude'] = $true
                     } elseif ($ExclusionsCache[$OU.DistinguishedName]) {
-                        $InheritanceInformation['Excluded'] = $true
+                        $InheritanceInformation['Exclude'] = $true
                     }
                 }
-                if (-not $IncludeExcludedObjects -and $InheritanceInformation['Excluded']) {
+                if (-not $IncludeExcludedObjects -and $InheritanceInformation['Exclude']) {
                     continue
                 }
                 if (-not $IncludeBlockedObjects) {

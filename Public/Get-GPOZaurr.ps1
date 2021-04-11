@@ -99,7 +99,7 @@
         } else {
             foreach ($Path in $GPOPath) {
                 Write-Verbose "Get-GPOZaurr - Getting GPO content from XML files"
-                Get-ChildItem -LiteralPath $Path -Recurse -Filter *.xml | ForEach-Object {
+                Get-ChildItem -LiteralPath $Path -Recurse -Filter *.xml -ErrorAction SilentlyContinue | ForEach-Object {
                     if ($_.Name -ne 'GPOList.xml') {
                         $XMLContent = [XML]::new()
                         $XMLContent.Load($_.FullName)
