@@ -64,6 +64,7 @@
                     CanonicalName      = $OU.canonicalName
                     BlockedInheritance = if ($OU.gpOptions -eq 1) { $true } else { $false }
                     Excluded           = $false
+                    DomainName = ConvertFrom-DistinguishedName -ToDomainCN -DistinguishedName $OU.DistinguishedName
                 }
                 if ($Exclusions) {
                     if ($ExclusionsCache[$OU.canonicalName]) {
