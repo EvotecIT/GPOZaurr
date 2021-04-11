@@ -1,4 +1,4 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-$FilesAll = Get-GPOZaurrNetLogon -SkipOwner -IncludeDomains 'ad.evotec.pl' #-OwnerOnly
+$FilesAll = Get-GPOZaurrNetLogon -IncludeDomains 'ad.evotec.xyz' -Verbose -OwnerOnly
 $FilesAll | Format-Table -a *
