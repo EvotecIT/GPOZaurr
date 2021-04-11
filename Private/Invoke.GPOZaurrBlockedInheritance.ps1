@@ -137,6 +137,7 @@
                     New-TableCondition -Name 'UsersCount' -Value 0
                     New-TableCondition -Name 'ComputersCount' -Value 0
                 } -BackgroundColor Salmon -FailBackgroundColor Amber -HighlightHeaders 'UsersCount', 'ComputersCount'
+                New-TableColumnOption -Hidden $true -ColumnIndex 8
             } -PagingOptions 5, 10, 20, 30, 40, 50 -SearchBuilder -ExcludeProperty GroupPolicies
         }
         New-HTMLSection -Name 'Group Policies affecting objects in Organizational Units with Blocked Inheritance' {
