@@ -55,6 +55,9 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.125 - 2021.04.11
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Report `GPOBlockedInheritance` - small fixes
 - 0.0.124 - 2021.04.11
   - ☑ Added `SearchBuilder` to all tables
   - ☑ Automatically joins arrays in tables in `Invoke-GPOZaurr`
