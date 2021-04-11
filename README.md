@@ -64,211 +64,213 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.124
+  - ☑ Added `SearchBuilder` to all tables
 - 0.0.123 - 2021.03.21
-  - [x] Fixes `Get-GPOZaurrLinkSummary`
+  - ☑ Fixes `Get-GPOZaurrLinkSummary`
 - 0.0.122 - 2021.02.11
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Report `GPOAnalysis` - added `WindowsFirewallRules`,`WindowsFirewallProfiles`,`WindowsFirewallConnectionSecurityAuthentication`,`WindowsFirewallConnectionSecurityRules`
-  - [x] Improved `Invoke-GPOZaurrContent` as mentioned above for `GPOAnalysis`
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Report `GPOAnalysis` - added `WindowsFirewallRules`,`WindowsFirewallProfiles`,`WindowsFirewallConnectionSecurityAuthentication`,`WindowsFirewallConnectionSecurityRules`
+  - ☑ Improved `Invoke-GPOZaurrContent` as mentioned above for `GPOAnalysis`
 - 0.0.121 - 2021.02.10
-  - [x] Improvement to `Get-GPOZaurr` - added description [#13](https://github.com/EvotecIT/GPOZaurr/issues/13)
-  - [x] Improvement to `Invoke-GPOZaurr -Type GPOList` - added description [#13](https://github.com/EvotecIT/GPOZaurr/issues/13)
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Report GPOAnalysis - added `FolderRedirection`
-    - [x] Report GPOAnalysis - renamed `FolderRedirection` to `FolderRedirectionPolicy`
-  - [x] Improved `Invoke-GPOZaurrContent` as mentioned above for `GPOAnalysis`
+  - ☑ Improvement to `Get-GPOZaurr` - added description [#13](https://github.com/EvotecIT/GPOZaurr/issues/13)
+  - ☑ Improvement to `Invoke-GPOZaurr -Type GPOList` - added description [#13](https://github.com/EvotecIT/GPOZaurr/issues/13)
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Report GPOAnalysis - added `FolderRedirection`
+    - ☑ Report GPOAnalysis - renamed `FolderRedirection` to `FolderRedirectionPolicy`
+  - ☑ Improved `Invoke-GPOZaurrContent` as mentioned above for `GPOAnalysis`
 - 0.0.120 - 2021.02.10
-  - [x] Improvement to `Get-GPOZaurr` to warn if there is potential issue with EMPTY (which can happen on non-english system)
-    - [x] In such case GPOZaurr will asses EMPTY or not using old method which doesn't detect all EMPTY cases but shouldn't provide false positives
+  - ☑ Improvement to `Get-GPOZaurr` to warn if there is potential issue with EMPTY (which can happen on non-english system)
+    - ☑ In such case GPOZaurr will asses EMPTY or not using old method which doesn't detect all EMPTY cases but shouldn't provide false positives
 - 0.0.119
   - Broken release - weird
 - 0.0.118 - 2021.02.09
-  - [x] Added information where the report is saved
-  - [x] Small improvement to `Get-GPOZaurr` to exlicitly define variable types
+  - ☑ Added information where the report is saved
+  - ☑ Small improvement to `Get-GPOZaurr` to exlicitly define variable types
 - 0.0.117 - 2021.02.09
-  - [x] Small fix to `Get-GPOZaurr` to exclude GPOList.xml which is used in offline mode by `Save-GPOZaurrFiles`
+  - ☑ Small fix to `Get-GPOZaurr` to exclude GPOList.xml which is used in offline mode by `Save-GPOZaurrFiles`
 - 0.0.116 - 2021.02.08
-  - [x] Improved `Remove-GPOZaurrBroken` to handle ObjectClass problem, and removed reduntant check
+  - ☑ Improved `Remove-GPOZaurrBroken` to handle ObjectClass problem, and removed reduntant check
 - 0.0.115 - 2021.02.07
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] `GPOList` - clarified some texts, changed 7 days to 30 days as default
-    - [x] `NetLogonPermissions` - fixed missing text
-  - [x] Fixes `Get-GPOZaurrNetLogon` error on empty Owner - [#9](https://github.com/EvotecIT/GPOZaurr/issues/9)
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ `GPOList` - clarified some texts, changed 7 days to 30 days as default
+    - ☑ `NetLogonPermissions` - fixed missing text
+  - ☑ Fixes `Get-GPOZaurrNetLogon` error on empty Owner - [#9](https://github.com/EvotecIT/GPOZaurr/issues/9)
 - 0.0.114 - 2021.01.27
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] HTML now uses offline mode by default (no CDN) - increase in size of HTML up to 3MB
-    - [x] Using Online switch forces use of CDN - smaller files. For example `Invoke-GPOZaurr -Type GPOList -Online`
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ HTML now uses offline mode by default (no CDN) - increase in size of HTML up to 3MB
+    - ☑ Using Online switch forces use of CDN - smaller files. For example `Invoke-GPOZaurr -Type GPOList -Online`
   - [ ] Improved `Invoke-GPOZaurrSupport`
-    - [x] HTML now uses offline mode by default (no CDN) - increase in size of HTML up to 3MB
-    - [x] Using Online switch forces use of CDN - smaller files. For example `Invoke-GPOZaurrSupport -Online`
-    - [x] Removed parameter Offline, added parameter Online
-    - [x] The cmdlet is not really production ready. It's work in progress
+    - ☑ HTML now uses offline mode by default (no CDN) - increase in size of HTML up to 3MB
+    - ☑ Using Online switch forces use of CDN - smaller files. For example `Invoke-GPOZaurrSupport -Online`
+    - ☑ Removed parameter Offline, added parameter Online
+    - ☑ The cmdlet is not really production ready. It's work in progress
 - 0.0.113 - 2021.01.25
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Report GPOAnalysis - added WindowsTimeService
-  - [x] Improved `Invoke-GPOZaurrContent`
-    - [x] Added `WindowsTimeService` type
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Report GPOAnalysis - added WindowsTimeService
+  - ☑ Improved `Invoke-GPOZaurrContent`
+    - ☑ Added `WindowsTimeService` type
 - 0.0.112 - 2021.01.25
-  - [x] Improved `Invoke-GPOZaurr`
+  - ☑ Improved `Invoke-GPOZaurr`
 - 0.0.111 - 2021.01.24
-  - [x] Improved `Invoke-GPOZaurr`
+  - ☑ Improved `Invoke-GPOZaurr`
 - 0.0.110 - 2021.01.22
-  - [x] Improved `Invoke-GPOZaurr`
+  - ☑ Improved `Invoke-GPOZaurr`
 - 0.0.109 - 2021.01.11
-  - [x] Improved `Invoke-GPOZaurr`
+  - ☑ Improved `Invoke-GPOZaurr`
 - 0.0.108 - 2021.01.11
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Improved `GPOConsistency`
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Improved `GPOConsistency`
 - 0.0.107 - 2021.01.11
-  - [x] Improved `Invoke-GPOZaurr`
+  - ☑ Improved `Invoke-GPOZaurr`
 - 0.0.106 - 2021.01.11
-  - [x] Improved `Invoke-GPOZaurrContent`
+  - ☑ Improved `Invoke-GPOZaurrContent`
 - 0.0.105 - 2021.01.05
-  - [x] Improved `Get-GPOZaurr`
-    - [x] Improved report `GPOBrokenLink`
+  - ☑ Improved `Get-GPOZaurr`
+    - ☑ Improved report `GPOBrokenLink`
 - 0.0.104 - 2021.01.04
-  - [x] Improved `Get-GPOZaurrBrokenLink`
-  - [x] Improved `Repair-GPOZaurrBrokenLink`
-  - [x] Improved `Get-GPOZaurr`
-    - [x] Improved report `GPOBrokenLink`
+  - ☑ Improved `Get-GPOZaurrBrokenLink`
+  - ☑ Improved `Repair-GPOZaurrBrokenLink`
+  - ☑ Improved `Get-GPOZaurr`
+    - ☑ Improved report `GPOBrokenLink`
 - 0.0.103 - 2021.01.04
-  - [x] Improved `Get-GPOZaurr`
-    - [x] Added new report `GPOBrokenLink`
-  - [x] Added `Get-GPOZaurrBrokenLink`
-  - [x] Added `Repair-GPOZaurrBrokenLink`
+  - ☑ Improved `Get-GPOZaurr`
+    - ☑ Added new report `GPOBrokenLink`
+  - ☑ Added `Get-GPOZaurrBrokenLink`
+  - ☑ Added `Repair-GPOZaurrBrokenLink`
 - 0.0.102 - 2021.01.02
-  - [x] Improved `Get-GPOZaurrLink`
-    - [x] Supports all links across forest
-    - [x] Renamed Linked validate set from `Other` to `OrganizationalUnit`
-  - [x] Improved `Get-GPOZaurrLinkSummary`
-  - [x] Improved/BugFix `Get-GPOZaurr` to properly detect linked GPOs in sites/cross-domain
-  - [x] Improved `Invoke-GPOZaurrPermission`
-    - [x] Renamed Linked validate set from `Other` to `OrganizationalUnit`
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Added `GPOLinks` basic list
+  - ☑ Improved `Get-GPOZaurrLink`
+    - ☑ Supports all links across forest
+    - ☑ Renamed Linked validate set from `Other` to `OrganizationalUnit`
+  - ☑ Improved `Get-GPOZaurrLinkSummary`
+  - ☑ Improved/BugFix `Get-GPOZaurr` to properly detect linked GPOs in sites/cross-domain
+  - ☑ Improved `Invoke-GPOZaurrPermission`
+    - ☑ Renamed Linked validate set from `Other` to `OrganizationalUnit`
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Added `GPOLinks` basic list
 - 0.0.101 - 23.12.2020
-  - [x] Improved `Get-GPOZaurrBroken`
-    - [x] It now detects `ObjectClass Issue`
-    - [x] Heavily improved performance
-    - [x] Removed some useless properties for this particular cmdlet
-    - [x] All states: `Not available on SYSVOL`, `Not available in AD`, `Exists`, `Permissions Issue`, `ObjectClass Issue`
-    - [x] Improved help
-  - [x] Improved `Remove-GPOZaurrBroken`
-    - [x] It now deals with `ObjectClass Issue`
-    - [x] Heavily improved performance
-    - [x] Removed some useless properties for this particular cmdlet
-    - [x] Now requires manual type insert AD, SYSVOL or ObjectClass (or all of them). Before it was auto using AD/SYSVOL.
-    - [x] Improved help
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Type `GPOList`
-    - [x] Renamed `GPOOrphans` to `GPOBroken`
-    - [x] Improved `GPOBroken` with `ObjectClass issue`
+  - ☑ Improved `Get-GPOZaurrBroken`
+    - ☑ It now detects `ObjectClass Issue`
+    - ☑ Heavily improved performance
+    - ☑ Removed some useless properties for this particular cmdlet
+    - ☑ All states: `Not available on SYSVOL`, `Not available in AD`, `Exists`, `Permissions Issue`, `ObjectClass Issue`
+    - ☑ Improved help
+  - ☑ Improved `Remove-GPOZaurrBroken`
+    - ☑ It now deals with `ObjectClass Issue`
+    - ☑ Heavily improved performance
+    - ☑ Removed some useless properties for this particular cmdlet
+    - ☑ Now requires manual type insert AD, SYSVOL or ObjectClass (or all of them). Before it was auto using AD/SYSVOL.
+    - ☑ Improved help
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Type `GPOList`
+    - ☑ Renamed `GPOOrphans` to `GPOBroken`
+    - ☑ Improved `GPOBroken` with `ObjectClass issue`
 - 0.0.100 - 21.12.2020
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Type `GPOPermissionsRead`
-    - [x] Type `GPOPermissions`
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Type `GPOPermissionsRead`
+    - ☑ Type `GPOPermissions`
 - 0.0.99 - 13.12.2020
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Type `GPOList` - require GPO to be 7 days old for deletion to be proposed
-    - [x] Type `GPOPermissions` - one stop for permissions
-    - [x] Allows Steps to be chosen via their menu and out-of-order
-  - [x] Improved `Remove-GPOZaurr` - added `RequireDays` parameter to prevent deletion of just modified GPOs
-  - [x] Added `Get-GPOZaurrPermissionAnalysis`
-  - [x] Added `Repair-GPOZaurrPermission`
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Type `GPOList` - require GPO to be 7 days old for deletion to be proposed
+    - ☑ Type `GPOPermissions` - one stop for permissions
+    - ☑ Allows Steps to be chosen via their menu and out-of-order
+  - ☑ Improved `Remove-GPOZaurr` - added `RequireDays` parameter to prevent deletion of just modified GPOs
+  - ☑ Added `Get-GPOZaurrPermissionAnalysis`
+  - ☑ Added `Repair-GPOZaurrPermission`
 - 0.0.98 - 10.12.2020
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Type `GPOList` - fixed unexpected ending of cmdlet when error occurs (for example deleted GPO while script is running) which could impact results
-    - [x] Other types - small color adjustment
-  - [x] Fixed/Improved `Get-GPOZaurr` - fixed unexpected ending of cmdlet when error occurs (for example deleted GPO while script is running), improved code base
-  - [x] Improved `Invoke-GPOZaurrSupport`
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Type `GPOList` - fixed unexpected ending of cmdlet when error occurs (for example deleted GPO while script is running) which could impact results
+    - ☑ Other types - small color adjustment
+  - ☑ Fixed/Improved `Get-GPOZaurr` - fixed unexpected ending of cmdlet when error occurs (for example deleted GPO while script is running), improved code base
+  - ☑ Improved `Invoke-GPOZaurrSupport`
 - 0.0.97 - 07.12.2020
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Type `GPOList` - added more data, did small reorganization
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Type `GPOList` - added more data, did small reorganization
 - 0.0.96 - 07.12.2020
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Type `GPOList` - added more data, added Optimization Step
-  - [x] Added `Set-GPOZaurrStatus`
-  - [x] Added `Optimize-GPOZaurr`
-  - [x] Fixed `Invoke-GPOZaurrPermission` which would not remove permission due to internal changes earlier on
-  - [x] Small change to `Backup-GPOZaurr`
-    - [x] Added support for `Disabled`. It's now possbile to backup `All` (default), `Empty`,`Unlinked`,`Disabled` or a mix of them
-    - [x] Removed useless `GPOPath` parameter
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Type `GPOList` - added more data, added Optimization Step
+  - ☑ Added `Set-GPOZaurrStatus`
+  - ☑ Added `Optimize-GPOZaurr`
+  - ☑ Fixed `Invoke-GPOZaurrPermission` which would not remove permission due to internal changes earlier on
+  - ☑ Small change to `Backup-GPOZaurr`
+    - ☑ Added support for `Disabled`. It's now possbile to backup `All` (default), `Empty`,`Unlinked`,`Disabled` or a mix of them
+    - ☑ Removed useless `GPOPath` parameter
 - 0.0.95 - 04.12.2020
-  - [x] Fix for too big int - [#4](https://github.com/EvotecIT/GPOZaurr/issues/4) - tnx neztach
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Type `GPOList` - added ability for Exclusions
-    - [x] All other types, small improvements
-    - [x] Added HideSteps, ShowError, ShowWarning -> Disabled Warnings/Errors by default as they tend to show too much information
-  - [x] Improved `Remove-GPOZaurr` - added Exclusions
+  - ☑ Fix for too big int - [#4](https://github.com/EvotecIT/GPOZaurr/issues/4) - tnx neztach
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Type `GPOList` - added ability for Exclusions
+    - ☑ All other types, small improvements
+    - ☑ Added HideSteps, ShowError, ShowWarning -> Disabled Warnings/Errors by default as they tend to show too much information
+  - ☑ Improved `Remove-GPOZaurr` - added Exclusions
 - 0.0.93 - 03.12.2020
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Type `GPOList` reverted charts colors for entries to match colors
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Type `GPOList` reverted charts colors for entries to match colors
     - [ ] Added `Skip-GroupPolicy` to use within `Invoke-GPOZaurr`
-  - [x] Improved `Invoke-GPOZaurr` with basic support for Exclusions
-  - [x] Improved `Get-GPOZaurr` with basic support for Exclusions
-  - [x] Improved `Remove-GPOZaurrPermission` error handling
+  - ☑ Improved `Invoke-GPOZaurr` with basic support for Exclusions
+  - ☑ Improved `Get-GPOZaurr` with basic support for Exclusions
+  - ☑ Improved `Remove-GPOZaurrPermission` error handling
 - 0.0.92 - 01.12.2020
-  - [x] Improved `Invoke-GPOZaurrSupport`
-  - [x] Improved `Invoke-GPOZaurr`
-    - [x] Type `GPOList` improved with more data, more problems and clearer information
-  - [x] Improved `Remove-GPOZaurr`
-    - [x] Added ability do remove disabed GPO
-  - [x] Improved `Get-GPOZaurr` detecting more issues, delivering more data
+  - ☑ Improved `Invoke-GPOZaurrSupport`
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Type `GPOList` improved with more data, more problems and clearer information
+  - ☑ Improved `Remove-GPOZaurr`
+    - ☑ Added ability do remove disabed GPO
+  - ☑ Improved `Get-GPOZaurr` detecting more issues, delivering more data
 - 0.0.91 - 24.11.2020
-  - [x] Improves `Invoke-GPOZaurr` (WIP)
-    - [x] Improve Type `GPOPermissionsUnknown`
+  - ☑ Improves `Invoke-GPOZaurr` (WIP)
+    - ☑ Improve Type `GPOPermissionsUnknown`
 - 0.0.90 - 23.11.2020
-  - [x] Improves `Invoke-GPOZaurr` (WIP)
-    - [x] Improves Type `GPODuplicates`
-      - [x] Fix for chart color to be RED
-    - [x] Add Type `GPOPermissionsUnknown`
-    - [x] Improves logic for Data with 0/1 element
-  - [x] Improves `Remove-GPOZaurrDuplicateObject` - removed `Confirm` requirement
-  - [x] Improves `Get-GPOZaurrNetLogon` with more verbose
-  - [x] Improves `Repair-GPOZaurrNetLogonOwner` with more verbose and fix for `LimitProcessing`
+  - ☑ Improves `Invoke-GPOZaurr` (WIP)
+    - ☑ Improves Type `GPODuplicates`
+      - ☑ Fix for chart color to be RED
+    - ☑ Add Type `GPOPermissionsUnknown`
+    - ☑ Improves logic for Data with 0/1 element
+  - ☑ Improves `Remove-GPOZaurrDuplicateObject` - removed `Confirm` requirement
+  - ☑ Improves `Get-GPOZaurrNetLogon` with more verbose
+  - ☑ Improves `Repair-GPOZaurrNetLogonOwner` with more verbose and fix for `LimitProcessing`
 - 0.0.89 - 22.11.2020
-  - [x] Small update `Add-GPOZaurrPermission`
-  - [x] Improves `Invoke-GPOZaurr` (WIP)
-    - [x] Added Type `GPOPermissionsAdministrative`
+  - ☑ Small update `Add-GPOZaurrPermission`
+  - ☑ Improves `Invoke-GPOZaurr` (WIP)
+    - ☑ Added Type `GPOPermissionsAdministrative`
 - 0.0.88 - 18.11.2020
-  - [x] Fix for `Add-GPOZaurrPermission`
+  - ☑ Fix for `Add-GPOZaurrPermission`
 - 0.0.87 - 18.11.2020
-  - [x] Improve error handling `Remove-GPOZaurrBroken`
+  - ☑ Improve error handling `Remove-GPOZaurrBroken`
 - 0.0.86 - 18.11.2020
-  - [x] Improve error handling `Remove-GPOZaurrBroken`
+  - ☑ Improve error handling `Remove-GPOZaurrBroken`
 - 0.0.85 - 17.11.2020
-  - [x] Improves `Invoke-GPOZaurr` (WIP)
-    - [x] Split `NetLogonPermissions` into `NetLogonPermissions` and `NetLogonOwners`
-    - [x] Improved type `NetLogonPermissions`
-    - [x] Improved type `NetLogonOwners`
-  - [x] Improves `Get-GPOZaurrFiles`
-  - [x] Improves `Get-GPOZaurrNetLogon`
-  - [x] Fix for `Get-GPOZaurrNetLogon`
+  - ☑ Improves `Invoke-GPOZaurr` (WIP)
+    - ☑ Split `NetLogonPermissions` into `NetLogonPermissions` and `NetLogonOwners`
+    - ☑ Improved type `NetLogonPermissions`
+    - ☑ Improved type `NetLogonOwners`
+  - ☑ Improves `Get-GPOZaurrFiles`
+  - ☑ Improves `Get-GPOZaurrNetLogon`
+  - ☑ Fix for `Get-GPOZaurrNetLogon`
 - 0.0.84 - 16.11.2020
-  - [x] Improves `Invoke-GPOZaurr` (WIP)
-    - [x] Type `NetLogonPermissions`
-  - [x] Fix for `Get-GPOZaurrNetLogon`
+  - ☑ Improves `Invoke-GPOZaurr` (WIP)
+    - ☑ Type `NetLogonPermissions`
+  - ☑ Fix for `Get-GPOZaurrNetLogon`
 - 0.0.83 - 14.11.2020
-  - [x] Improves `Invoke-GPOZaurr` (WIP)
-    - [x] Fix for wrong ActionRequired count
+  - ☑ Improves `Invoke-GPOZaurr` (WIP)
+    - ☑ Fix for wrong ActionRequired count
 - 0.0.82 - 14.11.2020
-  - [x] Added `Get-GPOZaurrPermissionIssue` to detect permission issue with no rights
-  - [x] Improves `Invoke-GPOZaurr` (WIP)
-    - [x] Type `GPOPermissionsRead` improved detection of problems with low permissions
+  - ☑ Added `Get-GPOZaurrPermissionIssue` to detect permission issue with no rights
+  - ☑ Improves `Invoke-GPOZaurr` (WIP)
+    - ☑ Type `GPOPermissionsRead` improved detection of problems with low permissions
 - 0.0.81 - 12.11.2020
-  - [x] Fix for `Set-GPOZaurrOwner` in case of missing permissions to not throw errors
-  - [x] Improves `Invoke-GPOZaurr` (WIP)
-    - [x] Type `GPOPermissionsRead` added
+  - ☑ Fix for `Set-GPOZaurrOwner` in case of missing permissions to not throw errors
+  - ☑ Improves `Invoke-GPOZaurr` (WIP)
+    - ☑ Type `GPOPermissionsRead` added
 - 0.0.80 - 12.11.2020
-  - [x] Improves `Invoke-GPOZaurr` (WIP)
-    - [x] Type `GPOOrphans` clearer options, updated texts, split per domain
-    - [x] Type `GPOOwners` clearer options, updated texts, split per domain
-  - [x] Improves `Add-GPOZaurrPermission`
-    - [x] Fixes LimitProcessing to work correctly
-    - [x] Added `All` to process all GPOs
-  - [x] Fixes `Remove-GPOZaurrPermission`
-  - [x] Improves `Set-GPOZaurrOwner`
-    - [x] Added `Force` to force `GPO Owner` to any principal (normally only Domain Admins)
+  - ☑ Improves `Invoke-GPOZaurr` (WIP)
+    - ☑ Type `GPOOrphans` clearer options, updated texts, split per domain
+    - ☑ Type `GPOOwners` clearer options, updated texts, split per domain
+  - ☑ Improves `Add-GPOZaurrPermission`
+    - ☑ Fixes LimitProcessing to work correctly
+    - ☑ Added `All` to process all GPOs
+  - ☑ Fixes `Remove-GPOZaurrPermission`
+  - ☑ Improves `Set-GPOZaurrOwner`
+    - ☑ Added `Force` to force `GPO Owner` to any principal (normally only Domain Admins)
 - 0.0.79 - 10.11.2020
   - Improved `Invoke-GPOZaurr` - type `GPOOrphans`
 - 0.0.78 - 10.11.2020
