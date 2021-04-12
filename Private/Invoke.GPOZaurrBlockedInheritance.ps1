@@ -96,9 +96,9 @@
             New-HTMLText -Text 'Users & Computers affected by inheritance blocks:' -FontSize 10pt -FontWeight bold
             New-HTMLList -Type Unordered {
                 New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['UsersAffected'], ' users affected due to inheritance blocks' -FontWeight bold, normal
-                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['UsersAffectedExclude'], ' users affected, but approved/Exclude, due to inheritance blocks' -FontWeight bold, normal
+                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['UsersAffectedExclude'], ' users affected, but approved/excluded, due to inheritance blocks' -FontWeight bold, normal
                 New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['ComputersAffected'], ' computers affected due to inheritance blocks' -FontWeight bold, normal
-                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['ComputersAffectedExclude'], ' computers affected, but approved/Exclude, due to inheritance blocks' -FontWeight bold, normal
+                New-HTMLListItem -Text $Script:Reporting['GPOBlockedInheritance']['Variables']['ComputersAffectedExclude'], ' computers affected, but approved/excluded, due to inheritance blocks' -FontWeight bold, normal
             } -FontSize 10pt
 
             New-HTMLText -Text 'Following domains require:' -FontSize 10pt -FontWeight bold
@@ -118,7 +118,7 @@
             }
             New-HTMLPanel {
                 New-HTMLChart {
-                    New-ChartLegend -Names 'Affected', 'Affected, but Exclude' -Color Salmon, PaleGreen
+                    New-ChartLegend -Names 'Affected', 'Affected, but excluded' -Color Salmon, PaleGreen
                     New-ChartBarOptions -Type barStacked
                     New-ChartBar -Name 'Users' -Value $Script:Reporting['GPOBlockedInheritance']['Variables']['UsersAffected'], $Script:Reporting['GPOBlockedInheritance']['Variables']['UsersAffectedExclude']
                     New-ChartBar -Name 'Computers' -Value $Script:Reporting['GPOBlockedInheritance']['Variables']['ComputersAffected'], $Script:Reporting['GPOBlockedInheritance']['Variables']['ComputersAffectedExclude']
@@ -175,7 +175,7 @@
                                 }
                                 New-HTMLText -Text "Alternatively if you prefer working with console you can run: "
                                 New-HTMLCodeBlock -Code {
-                                    $GPOOutput = Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludeObjects -OnlyBlockedInheritance
+                                    $GPOOutput = Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance
                                     $GPOOutput | Format-Table # do your actions as desired
                                 }
                                 New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
