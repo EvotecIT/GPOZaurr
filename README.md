@@ -55,6 +55,9 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.126 - 2021.04.12
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Report `GPOBlockedInheritance` - hidden DistinguishedName, fixed some small typos
 - 0.0.125 - 2021.04.11
   - ☑ Improved `Invoke-GPOZaurr`
     - ☑ Report `GPOBlockedInheritance` - small fixes
