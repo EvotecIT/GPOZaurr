@@ -55,6 +55,10 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.127 - 2021.04.15
+  - ☑ Improved `Invoke-GPOZaurr`
+    - ☑ Report `GPOList` - moved description closer to statuses
+  - ☑ Improved `Get-GPOZaurr` - moved description closer to statuses
 - 0.0.126 - 2021.04.12
   - ☑ Improved `Invoke-GPOZaurr`
     - ☑ Report `GPOBlockedInheritance` - hidden DistinguishedName, fixed some small typos
