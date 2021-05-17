@@ -212,7 +212,9 @@
             $DisplayProperties = @(
                 $FirstProperties
                 foreach ($Property in $Properties) {
-                    $Property
+                    if ($Property -notin $FirstProperties -and $Property -notin $EndProperties) {
+                        $Property
+                    }
                 }
                 $EndProperties
             )
