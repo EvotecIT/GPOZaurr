@@ -789,10 +789,10 @@
         )
         GPOPath    = 'Policies -> Windows Settings -> Security Settings -> Public Key Policies'
         Code       = {
-            ConvertTo-XMLGenericPublicKey -GPO $GPO
+            ConvertTo-XMLCertificates -GPO $GPO
         }
         CodeSingle = {
-            ConvertTo-XMLGenericPublicKey -GPO $GPO -SingleObject
+            ConvertTo-XMLCertificates -GPO $GPO -SingleObject
         }
     }
     <#
