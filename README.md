@@ -56,7 +56,7 @@ To understand the usage I've created blog post you may find useful
 ## Changelog
 
 - 0.0.128 - 2021.05.26
-  - ☑ Improved `Invoke-GPOZaurrContent` - type `PublicKeyPoliciesCertificates` - added more certificate information for
+  - ☑ Improved `Invoke-GPOZaurrContent` - type `PublicKeyPoliciesCertificates` - added more certificate information
   - ☑ Improved `Invoke-GPOZaurr` - type `GPOAnalysis` - added more certificate information
 - 0.0.128 Alpha 1 - 2021.05.17
   - 🐛 Fixes errors when normalizing properties [#17](https://github.com/EvotecIT/GPOZaurr/issues/17)
