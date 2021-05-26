@@ -14,16 +14,15 @@
         PSData = @{
             Tags                       = @('Windows', 'ActiveDirectory', 'GPO', 'GroupPolicy')
             ProjectUri                 = 'https://github.com/EvotecIT/GPOZaurr'
-            Prerelease                 = 'Alpha1'
             ExternalModuleDependencies = @('CimCmdlets', 'Microsoft.PowerShell.Management', 'Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Security')
         }
     }
     RequiredModules      = @(@{
-            ModuleVersion = '0.0.200'
+            ModuleVersion = '0.0.201'
             ModuleName    = 'PSSharedGoods'
             Guid          = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe'
         }, @{
-            ModuleVersion = '0.0.127'
+            ModuleVersion = '0.0.128'
             ModuleName    = 'ADEssentials'
             Guid          = '9fc9fd61-7f11-4f4b-a527-084086f1905f'
         }, @{
