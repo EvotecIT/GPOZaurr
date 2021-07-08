@@ -99,7 +99,7 @@
             New-HTMLListItem -Text 'Group Policies on SYSVOL, but no details in AD: ', $Script:Reporting['GPOBroken']['Variables']['NotAvailableInAD'] -FontWeight normal, bold
             New-HTMLListItem -Text 'Group Policies in AD, but no content on SYSVOL: ', $Script:Reporting['GPOBroken']['Variables']['NotAvailableOnSysvol'] -FontWeight normal, bold
             New-HTMLListItem -Text 'Group Policies which exists, but have wrong ObjectClass: ', $Script:Reporting['GPOBroken']['Variables']['NotAvailableObjectClassIssue'] -FontWeight normal, bold
-            New-HTMLListItem -Text "Group Policies which couldn't be assed due to permissions issue: ", $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies which couldn't be assessed due to permissions issue: ", $Script:Reporting['GPOBroken']['Variables']['NotAvailablePermissionIssue'] -FontWeight normal, bold
         } -FontSize 10pt
         New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
         New-HTMLList -Type Unordered {
