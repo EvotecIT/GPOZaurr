@@ -4,6 +4,7 @@
     GPOOwners                    = $GPOZaurrOwners
     GPOConsistency               = $GPOZaurrConsistency
     GPODuplicates                = $GPOZaurrDuplicates
+    GPOOrganizationalUnit        = $GPOZaurrOrganizationalUnit
     GPOList                      = $GPOZaurrList
     GPOLinks                     = $GPOZaurrLinks
     GPOPassword                  = $GPOZaurrPassword
