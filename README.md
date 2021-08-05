@@ -58,6 +58,7 @@ To understand the usage I've created blog post you may find useful
 - 0.0.129
   - Added `Get-GPOZaurrOrganizationalUnit` and added `GPOOrganizationalUnit` in `Invoke-GPOZaurr` (preview)
   - Added `Remove-GPOZaurrLinkEmptyOU` which allows removing links from Empty OUs (preview)
+  - Small update to parameter sets for `Set-GPOZaurrOwner`
 - 0.0.128 - 2021.05.26
   - ☑ Improved `Invoke-GPOZaurrContent` - type `PublicKeyPoliciesCertificates` - added more certificate information
   - ☑ Improved `Invoke-GPOZaurr` - type `GPOAnalysis` - added more certificate information
