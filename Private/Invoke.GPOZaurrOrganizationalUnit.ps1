@@ -17,15 +17,15 @@
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName] = 0
             }
 
-            if ($OU.Status -eq 'Unlink GPO') {
-                $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO']++
-                $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
-                $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
-            } elseif ($OU.Status -eq 'Unlink GPO', 'Delete OU') {
+            if ($OU.Status -contains 'Unlink GPO' -and $OU.Status -contains 'Delete OU') {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
-            } elseif ($OU.Status -eq 'Delete OU') {
+            } elseif ($OU.Status -contains 'Unlink GPO') {
+                $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO']++
+                $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
+                $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
+            } elseif ($OU.Status -contains 'Delete OU') {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
@@ -82,32 +82,22 @@
                 & $Script:GPOConfiguration['GPOOrganizationalUnit']['Summary']
             }
             New-HTMLPanel {
-                <#
                 New-HTMLChart {
-                    New-ChartBarOptions -Type barStacked
-                    New-ChartLegend -Name 'Yes', 'No' -Color LightGreen, Salmon
-                    New-ChartBar -Name 'Is administrative' -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['IsAdministrative'], $Script:Reporting['GPOOrganizationalUnit']['Variables']['IsNotAdministrative']
-                    New-ChartBar -Name 'Is consistent' -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['IsConsistent'], $Script:Reporting['GPOOrganizationalUnit']['Variables']['IsNotConsistent']
-                } -Title 'Group Policy Owners' -TitleAlignment center
-                #>
+                    New-ChartBarOptions -Type bar -Distributed
+                    New-ChartAxisY -LabelMaxWidth 200 -LabelAlign left -Show
+                    New-ChartBar -Name "Unlink GPO ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO']
+                    New-ChartBar -Name "Unlink GPO & Delete OU ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']
+                    New-ChartBar -Name "Delete OU ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']
+                } -Title 'Organizational Units' -TitleAlignment center
             }
         }
         New-HTMLSection -Name 'Group Policy Organizational Units' {
             New-HTMLTable -DataTable $Script:Reporting['GPOOrganizationalUnit']['Data'] -Filtering {
-                #New-HTMLTableCondition -Name 'IsOwnerConsistent' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
-                #New-HTMLTableCondition -Name 'IsOwnerAdministrative' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
                 New-TableHeader -ResponsiveOperations none -Names 'GPONames', 'Objects'
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Unlink GPO, Delete OU' -BackgroundColor Salmon -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Unlink GPO' -BackgroundColor YellowOrange -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Delete OU' -BackgroundColor Red -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'OK' -BackgroundColor LightGreen -Row
-                <#
-                New-HTMLTableConditionGroup {
-                    New-HTMLTableCondition -Name 'GPOCount' -Value 0 -ComparisonType number -Operator eq
-                    New-HTMLTableCondition -Name 'ObjectCount' -Value 0 -ComparisonType number -Operator eq
-                    New-HTMLTableCondition -Name 'Level' -Value 'Child' -ComparisonType string -Operator eq
-                } -HighlightHeaders 'GPOCount', 'ObjectCount' -BackgroundColor Salmon -FailBackgroundColor LightGreen
-                #>
             } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder -ExcludeProperty GPO
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
