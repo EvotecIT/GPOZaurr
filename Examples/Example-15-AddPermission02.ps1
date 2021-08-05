@@ -8,3 +8,6 @@ Add-GPOZaurrPermission -Type AuthenticatedUsers -PermissionType GpoRead -All -Wh
 
 # Add Domain Admins/Enterprise Admins to all that need it
 Add-GPOZaurrPermission -Type Administrative -PermissionType GpoEditDeleteModifySecurity -All -WhatIf -Verbose
+
+# Add ranom name to all that need it
+Add-GPOZaurrPermission -All -Principal SVC_AGPM -PrincipalType Name -PermissionType GpoEditDeleteModifySecurity -Verbose -LimitProcessing 2 -WhatIf
