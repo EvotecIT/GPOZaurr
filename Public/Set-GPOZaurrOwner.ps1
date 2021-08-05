@@ -38,6 +38,9 @@
     .PARAMETER LimitProcessing
     Allows to specify maximum number of items that will be fixed in a single run. It doesn't affect amount of GPOs processed
 
+    .PARAMETER Force
+    Pushes new owner regardless if it's already set or not
+
     .EXAMPLE
     Set-GPOZaurrOwner -Type All -Verbose -WhatIf -LimitProcessing 2
 
@@ -72,11 +75,16 @@
         [Parameter(ParameterSetName = 'Named')]
         [string] $Principal,
 
+        [Parameter(ParameterSetName = 'Type')]
+        [Parameter(ParameterSetName = 'Named')]
         [switch] $SkipSysvol,
 
         [Parameter(ParameterSetName = 'Type')]
         [Parameter(ParameterSetName = 'Named')]
         [int] $LimitProcessing = [int32]::MaxValue,
+
+        [Parameter(ParameterSetName = 'Type')]
+        [Parameter(ParameterSetName = 'Named')]
         [switch] $Force
     )
     Begin {
