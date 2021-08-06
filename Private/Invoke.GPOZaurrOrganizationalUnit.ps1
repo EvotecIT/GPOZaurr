@@ -131,10 +131,56 @@
                                 New-HTMLText -Text "It provides same data as you see in table above just doesn't prettify it for you."
                             }
                             New-HTMLWizardStep -Name 'Unlink unused Group Policies' {
-
+                                New-HTMLText -Text @(
+                                    "Following command when executed runs cleanup procedure that unlinks all Group Policies from Organizational Units that have no user or computer objects. "
+                                    "Make sure when running it for the first time to run it with ",
+                                    "WhatIf",
+                                    " parameter as shown below to prevent accidental unlinking."
+                                    'When run it will remove any GPO links from Organizational Units that have no objects applicable for GPOs.'
+                                ) -FontWeight normal, normal, bold, normal -Color Black, Black, Red, Black
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrLinkEmptyOU -WhatIf -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrLinkEmptyOU -WhatIf -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "After execution please make sure there are no errors, make sure to review provided output, and confirm that what is about to be removed matches expected data. "
+                                    "Keep in mind that there is no backup for this, and if link is removed you would need to relink it yourself."
+                                    "Once you remove it, it's gone. "
+                                } -LineBreak
+                                New-HTMLText -Text 'Once happy with results please follow with command (this will start removal process): ' -LineBreak -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrLinkEmptyOU -WhatIf -LimitProcessing 2 -Verbose
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
+                                }
+                                New-HTMLCodeBlock -Code {
+                                    Remove-GPOZaurrLinkEmptyOU -WhatIf -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                }
+                                New-HTMLText -TextBlock {
+                                    "This command when executed deletes only first X broken GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
+                                    "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
+                                } -LineBreak
+                                New-HTMLText -TextBlock {
+                                    "It's possible to exclude certain OU's from having GPO's unlinked using follwing method: "
+                                } -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    $Exclude = @(
+                                        "OU=Groups,OU=Production,DC=ad,DC=evotec,DC=pl"
+                                        "OU=Test \, OU,OU=ITR02,DC=ad,DC=evotec,DC=xyz"
+                                    )
+                                    Remove-GPOZaurrLinkEmptyOU -Verbose -LimitProcessing 3 -WhatIf -ExcludeOrganizationalUnit $Exclude
+                                }
                             }
                             New-HTMLWizardStep -Name 'Delete unused Organizational Units' {
-
+                                New-HTMLText -Text @(
+                                    "Following automation is not yet implemented. Requires more testing as potentially it could do more damage than help."
+                                )
                             }
                             New-HTMLWizardStep -Name 'Verification report' {
                                 New-HTMLText -TextBlock {
@@ -145,7 +191,6 @@
                                 }
                                 New-HTMLText -Text "If everything is healthy in the report you're done! Enjoy rest of the day!" -Color BlueDiamond
                             }
-                            #>
                         } -RemoveDoneStepOnNavigateBack -Theme arrows -ToolbarButtonPosition center -EnableAllAnchors
                     }
                 }
