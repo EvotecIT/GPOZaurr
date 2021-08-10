@@ -1,4 +1,62 @@
 ﻿function Invoke-GPOZaurr {
+    <#
+    .SYNOPSIS
+    Single cmdlet that provides 360 degree overview of Group Policies in Active Directory Forest.
+
+    .DESCRIPTION
+    Single cmdlet that provides 360 degree overview of Group Policies in Active Directory Forest with ability to pick reports and export to HTML.
+
+    .PARAMETER Exclusions
+    Allows to mark as excluded some Group Policies or Organizational Units depending on type.
+    Can be a scriptblock or array depending on supported way by underlying report.
+    Not every report support exclusions.
+    Not every report support exclusions the same way.
+    Exclusions should be used only if there is single report being asked for.
+
+    .PARAMETER FilePath
+    Path to the file where the report will be saved.
+
+    .PARAMETER Type
+    Type of report to be generated from a list of available reports.
+
+    .PARAMETER PassThru
+    Returns created objects after the report is done
+
+    .PARAMETER HideHTML
+    Do not auto open HTML report in default browser
+
+    .PARAMETER HideSteps
+    Do not show steps in report
+
+    .PARAMETER ShowError
+    Show errors in HTML report. Useful in case the report is being run as Scheduled Task
+
+    .PARAMETER ShowWarning
+    Show warnings in HTML report. Useful in case the report is being run as Scheduled Task
+
+    .PARAMETER Forest
+    Target different Forest, by default current forest is used
+
+    .PARAMETER ExcludeDomains
+    Exclude domain from search, by default whole forest is scanned
+
+    .PARAMETER IncludeDomains
+    Include only specific domains, by default whole forest is scanned
+
+    .PARAMETER Online
+    Forces report to use online resources in HTML (using CDN most of the time), by default it is run offline, and inlines all CSS/JS code.
+
+    .EXAMPLE
+    Invoke-GPOZaurr
+
+    .EXAMPLE
+    Invoke-GPOZaurr -Type GPOOrganizationalUnit -Online -FilePath $PSScriptRoot\Reports\GPOZaurrOU.html -Exclusions @(
+        '*OU=Production,DC=ad,DC=evotec,DC=pl'
+    )
+
+    .NOTES
+    General notes
+    #>
     [alias('Show-GPOZaurr', 'Show-GPO')]
     [cmdletBinding()]
     param(
