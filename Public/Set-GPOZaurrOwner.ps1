@@ -9,6 +9,7 @@
     .PARAMETER Type
     Unknown - finds unknown Owners and sets them to Administrative (Domain Admins) or chosen principal
     NotMatching - find administrative groups only and if sysvol and gpo doesn't match - replace with chosen principal or Domain Admins if not specified
+    Inconsistent - same as not NotMatching
     NotAdministrative - combination of Unknown/NotMatching and NotAdministrative - replace with chosen principal or Domain Admins if not specified
     All - if Owner is known it checks if it's Administrative, if it sn't it fixes that. If owner is unknown it fixes it
     .PARAMETER GPOName
@@ -50,7 +51,7 @@
     [cmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'Type')]
     param(
         [Parameter(ParameterSetName = 'Type', Mandatory)]
-        [validateset('Unknown', 'NotAdministrative', 'NotMatching', 'All')][string] $Type,
+        [validateset('Unknown', 'NotAdministrative', 'NotMatching', 'Inconsistent', 'All')][string] $Type,
 
         [Parameter(ParameterSetName = 'Named')][string] $GPOName,
         [Parameter(ParameterSetName = 'Named')][alias('GUID', 'GPOID')][string] $GPOGuid,
@@ -85,12 +86,18 @@
 
         [Parameter(ParameterSetName = 'Type')]
         [Parameter(ParameterSetName = 'Named')]
+        [alias('Exclusion', 'Exclusions')][string[]] $ApprovedOwner,
+
+        [Parameter(ParameterSetName = 'Type')]
+        [Parameter(ParameterSetName = 'Named')]
+        [validateset('OnlyAD', 'OnlyFileSystem')][string] $Action,
+
+        [Parameter(ParameterSetName = 'Type')]
+        [Parameter(ParameterSetName = 'Named')]
         [switch] $Force
     )
     Begin {
-        #Write-Verbose "Set-GPOZaurrOwner - Getting ADAdministrativeGroups"
         $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
-        #Write-Verbose "Set-GPOZaurrOwner - Processing GPO for Type $Type"
     }
     Process {
         $getGPOZaurrOwnerSplat = @{
@@ -102,6 +109,7 @@
             ADAdministrativeGroups    = $ADAdministrativeGroups
             Verbose                   = $VerbosePreference
             SkipBroken                = $true
+            ApprovedOwner             = $ApprovedOwner
         }
         if ($GPOName) {
             $getGPOZaurrOwnerSplat['GPOName'] = $GPOName
@@ -111,11 +119,13 @@
         $Count = 0
         Get-GPOZaurrOwner @getGPOZaurrOwnerSplat | Where-Object {
             $Count++
+            <#
             if ($_.Owner) {
                 $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($_.Owner)"]
             } else {
                 $AdministrativeGroup = $null
             }
+
             if (-not $SkipSysvol) {
                 if ($_.SysvolOwner) {
                     $AdministrativeGroupSysvol = $ADAdministrativeGroups['ByNetBIOS']["$($_.SysvolOwner)"]
@@ -123,11 +133,19 @@
                     $AdministrativeGroupSysvol = $null
                 }
             }
+
+            #>
             if ($Force) {
                 Write-Verbose "Set-GPOZaurrOwner - Force was used to push new owner to $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner)."
                 $_
             } else {
                 if ($Type -eq 'NotAdministrative') {
+                    if ($_.Status -contains 'NotAdministrative' -and $_.Status -notcontains 'Approved') {
+                        $_
+                    } elseif ($_.Status -contains 'Inconsistent') {
+                        $_
+                    }
+                    <#
                     if (-not $AdministrativeGroup -or (-not $AdministrativeGroupSysvol -and -not $SkipSysvol)) {
                         $_
                     } else {
@@ -136,23 +154,35 @@
                             $_
                         }
                     }
+                    #>
                 } elseif ($Type -eq 'Unknown') {
                     if (-not $_.Owner -or (-not $_.SysvolOwner -and -not $SkipSysvol)) {
                         $_
                     }
-                } elseif ($Type -eq 'NotMatching') {
+                } elseif ($Type -in 'NotMatching', 'Inconsistent') {
                     if ($SkipSysvol) {
                         Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). SysVol scanning is disabled. Skipping."
                     } else {
+                        if ($_.Status -contains 'Inconsistent') {
+                            $_
+                        }
+                        <#
                         if ($AdministrativeGroup -ne $AdministrativeGroupSysvol) {
                             #Write-Verbose "Set-GPOZaurrOwner - Detected mismatch GPO: $($_.DisplayName) from domain: $($_.DomainName) - owner $($_.Owner) / sysvol owner $($_.SysvolOwner). Fixing required."
                             $_
                         }
+                        #>
                     }
                 } else {
                     # we run with no type, that means we need to either set it to principal or to Administrative
                     if ($_.Owner) {
                         # we check if Principal is not set
+                        if ($_.Status -contains 'NotAdministrative' -and $_.Status -notcontains 'Approved') {
+                            $_
+                        } elseif ($_.Status -contains 'Inconsistent') {
+                            $_
+                        }
+                        <#
                         $AdministrativeGroup = $ADAdministrativeGroups['ByNetBIOS']["$($_.Owner)"]
                         if (-not $SkipSysvol -and $_.SysvolOwner) {
                             $AdministrativeGroupSysvol = $ADAdministrativeGroups['ByNetBIOS']["$($_.SysvolOwner)"]
@@ -164,6 +194,7 @@
                                 $_
                             }
                         }
+                        #>
                     } else {
                         $_
                     }
@@ -176,7 +207,7 @@
             } else {
                 $DefaultPrincipal = $Principal
             }
-            if ($Action -eq 'OnlyGPO') {
+            if ($Action -eq 'OnlyAD') {
                 Write-Verbose "Set-GPOZaurrOwner - Changing GPO: $($GPO.DisplayName) from domain: $($GPO.DomainName) from owner $($GPO.Owner) (SID: $($GPO.OwnerSID)) to $DefaultPrincipal"
                 Set-ADACLOwner -ADObject $GPO.DistinguishedName -Principal $DefaultPrincipal -Verbose:$false -WhatIf:$WhatIfPreference
             } elseif ($Action -eq 'OnlyFileSystem') {
