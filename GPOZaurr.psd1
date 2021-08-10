@@ -8,7 +8,7 @@
     Description          = 'Group Policy Eater is a PowerShell module that aims to gather information about Group Policies but also allows fixing issues that you may find in them.'
     FunctionsToExport    = @('Add-GPOPermission', 'Add-GPOZaurrPermission', 'Backup-GPOZaurr', 'Clear-GPOZaurrSysvolDFSR', 'ConvertFrom-CSExtension', 'Find-CSExtension', 'Get-GPOZaurr', 'Get-GPOZaurrAD', 'Get-GPOZaurrBackupInformation', 'Get-GPOZaurrBroken', 'Get-GPOZaurrBrokenLink', 'Get-GPOZaurrDictionary', 'Get-GPOZaurrDuplicateObject', 'Get-GPOZaurrFiles', 'Get-GPOZaurrFilesPolicyDefinition', 'Get-GPOZaurrFolders', 'Get-GPOZaurrInheritance', 'Get-GPOZaurrLegacyFiles', 'Get-GPOZaurrLink', 'Get-GPOZaurrLinkSummary', 'Get-GPOZaurrNetLogon', 'Get-GPOZaurrOrganizationalUnit', 'Get-GPOZaurrOwner', 'Get-GPOZaurrPassword', 'Get-GPOZaurrPermission', 'Get-GPOZaurrPermissionAnalysis', 'Get-GPOZaurrPermissionConsistency', 'Get-GPOZaurrPermissionIssue', 'Get-GPOZaurrPermissionRoot', 'Get-GPOZaurrPermissionSummary', 'Get-GPOZaurrSysvolDFSR', 'Get-GPOZaurrWMI', 'Invoke-GPOZaurr', 'Invoke-GPOZaurrContent', 'Invoke-GPOZaurrPermission', 'Invoke-GPOZaurrSupport', 'New-GPOZaurrWMI', 'Optimize-GPOZaurr', 'Remove-GPOPermission', 'Remove-GPOZaurr', 'Remove-GPOZaurrBroken', 'Remove-GPOZaurrDuplicateObject', 'Remove-GPOZaurrFolders', 'Remove-GPOZaurrLegacyFiles', 'Remove-GPOZaurrLinkEmptyOU', 'Remove-GPOZaurrPermission', 'Remove-GPOZaurrWMI', 'Repair-GPOZaurrBrokenLink', 'Repair-GPOZaurrNetLogonOwner', 'Repair-GPOZaurrPermission', 'Repair-GPOZaurrPermissionConsistency', 'Restore-GPOZaurr', 'Save-GPOZaurrFiles', 'Set-GPOOwner', 'Set-GPOZaurrOwner', 'Set-GPOZaurrStatus', 'Skip-GroupPolicy')
     GUID                 = 'f7d4c9e4-0298-4f51-ad77-e8e3febebbde'
-    ModuleVersion        = '0.0.129'
+    ModuleVersion        = '0.0.130'
     PowerShellVersion    = '5.1'
     PrivateData          = @{
         PSData = @{
@@ -18,7 +18,7 @@
         }
     }
     RequiredModules      = @(@{
-            ModuleVersion = '0.0.208'
+            ModuleVersion = '0.0.209'
             ModuleName    = 'PSSharedGoods'
             Guid          = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe'
         }, @{
