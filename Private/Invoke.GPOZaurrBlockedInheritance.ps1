@@ -160,6 +160,17 @@
                                 } -Style powershell
                                 New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
                             }
+                            if ($Script:Reporting['GPOBlockedInheritance']['Exclusions']) {
+                                New-HTMLWizardStep -Name 'Required exclusions' {
+                                    New-HTMLText -Text @(
+                                        "While preparing this report following exclusions were defined. "
+                                        "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
+                                    )
+                                    [string] $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOBlockedInheritance']['Exclusions']
+
+                                    New-HTMLCodeBlock -Code $Code -Style powershell
+                                }
+                            }
                             New-HTMLWizardStep -Name 'Prepare report' {
                                 New-HTMLText -Text @(
                                     "Depending when this report was run you may want to prepare new report before proceeding removing Group Policy Inheritance Blocks. "
