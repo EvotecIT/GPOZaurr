@@ -6,10 +6,12 @@
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation,
 
-        [ValidateSet('OK', 'Unlink', 'Delete')][string[]] $Option
+        [ValidateSet('OK', 'Unlink', 'Delete')][string[]] $Option,
+        [alias('ExcludeOU', 'Exclusions')][string[]] $ExcludeOrganizationalUnit
     )
     $CachedOu = [ordered] @{}
     $CachedGPO = [ordered] @{}
+
     $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     $GroupPolicies = Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     foreach ($GPO in $GroupPolicies) {
@@ -96,7 +98,6 @@
             $Status = 'OK'
         }
 
-
         if ($Option) {
             $Found = $false
             if ($Option -contains 'Ok' -and $Status -contains 'OK') {
@@ -106,11 +107,27 @@
             } elseif ($Option -contains 'Delete' -and $Status -contains 'Delete OU') {
                 $Found = $true
             }
+            if ($ExcludeOrganizationalUnit) {
+                foreach ($ExcludedOU in $ExcludeOrganizationalUnit) {
+                    if ($OU -like $ExcludedOU) {
+                        $Found = $false
+                        break
+                    }
+                }
+            }
             if (-not $Found) {
                 continue
             }
+        } else {
+            if ($ExcludeOrganizationalUnit) {
+                foreach ($ExcludedOU in $ExcludeOrganizationalUnit) {
+                    if ($OU -like $ExcludedOU) {
+                        $Status = 'Excluded'
+                        break
+                    }
+                }
+            }
         }
-
 
         [PSCustomObject] @{
             Organizationalunit  = $OU
