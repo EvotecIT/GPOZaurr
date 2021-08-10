@@ -33,6 +33,9 @@
     .PARAMETER ADAdministrativeGroups
     Ability to provide AD Administrative Groups from another command to speed up processing
 
+    .PARAMETER ApprovedOwner
+    Ability to provide different owner (non administrative that still is approved for use)
+
     .EXAMPLE
     Get-GPOZaurrOwner -Verbose -IncludeSysvol
 
@@ -54,7 +57,9 @@
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [System.Collections.IDictionary] $ExtendedForestInformation,
-        [System.Collections.IDictionary] $ADAdministrativeGroups
+        [System.Collections.IDictionary] $ADAdministrativeGroups,
+
+        [alias('Exclusion', 'Exclusions')][string[]] $ApprovedOwner
     )
     Begin {
         $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
@@ -84,6 +89,7 @@
                 DisplayName = $_.DisplayName
                 DomainName  = $_.DomainName
                 GUID        = $_.GUID
+                Status      = [System.Collections.Generic.List[string]]::new()
                 Owner       = $ACL.OwnerName
                 OwnerSid    = $ACL.OwnerSid
                 OwnerType   = $ACL.OwnerType
@@ -103,6 +109,29 @@
                 }
             } else {
                 $Object['IsOwnerAdministrative'] = if ($Object['OwnerType'] -eq 'Administrative') { $true } else { $false }
+            }
+            if ($Object['IsOwnerAdministrative'] -eq $true) {
+                $Object['Status'].Add('Administrative')
+            } else {
+                $Object['Status'].Add('NotAdministrative')
+            }
+            if ($Object['IsOwnerConsistent']) {
+                $Object['Status'].Add('Consistent')
+            } else {
+                $Object['Status'].Add('Inconsistent')
+            }
+            if ($Object['IsOwnerConsistent'] -eq $true -and $Object['IsOwnerAdministrative'] -eq $false) {
+                # We want to approve only OWNER if it's consistent and not administrative, otherwise it makes no sense
+                # This is mostly here to allow for use of AGPM or similar approved owner of GPOs
+                foreach ($Owner in $ApprovedOwner) {
+                    if ($Owner -eq $Object['Owner']) {
+                        $Object['Status'].Add('Approved')
+                        break
+                    } elseif ($Owner -eq $Object['OwnerSid']) {
+                        $Object['Status'].Add('Approved')
+                        break
+                    }
+                }
             }
             if ($SkipBroken -and $Object['SysvolExists'] -eq $false) {
                 continue
