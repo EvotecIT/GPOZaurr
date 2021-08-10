@@ -12,7 +12,7 @@
     )
 
     $Processed = 0
-    $OrganizationalUnits = Get-GPOZaurrOrganizationalUnit -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Option Unlink
+    $OrganizationalUnits = Get-GPOZaurrOrganizationalUnit -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -Option Unlink -ExcludeOrganizationalUnit $ExcludeOrganizationalUnit
     foreach ($OU in $OrganizationalUnits) {
         if ($OU.Status -contains 'Unlink GPO') {
             if ($OU.OrganizationalUnit -in $ExcludeOrganizationalUnit) {
