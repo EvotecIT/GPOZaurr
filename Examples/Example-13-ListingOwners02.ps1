@@ -2,7 +2,9 @@
 
 $T = Get-GPOZaurrOwner -Verbose -IncludeSysvol
 $T | Format-Table *
-#$T | Out-HtmlView -ScrollX
+
+$T = Get-GPOZaurrOwner -Verbose -IncludeSysvol -ApprovedOwner @('EVOTEC\Domain Admins')
+$T | Format-Table *
 
 $T = Get-GPOZaurrOwner -Verbose -IncludeSysvol -GPOName 'Default Domain Policy'
 $T | Format-Table *
