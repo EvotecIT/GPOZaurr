@@ -4,7 +4,11 @@
     ActionRequired = $null
     Data           = $null
     Execute        = {
-        Get-GPOZaurrOrganizationalUnit -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+        if ($Script:Reporting['GPOOrganizationalUnit']['Exclusions']) {
+            Get-GPOZaurrOrganizationalUnit -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExcludeOrganizationalUnit $Script:Reporting['GPOOrganizationalUnit']['Exclusions']
+        } else {
+            Get-GPOZaurrOrganizationalUnit -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+        }
     }
     Processing     = {
         # Create Per Domain Variables
@@ -16,7 +20,6 @@
             if (-not $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]) {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName] = 0
             }
-
             if ($OU.Status -contains 'Unlink GPO' -and $OU.Status -contains 'Delete OU') {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
@@ -29,9 +32,11 @@
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
+            } elseif ($OU.Status -contains 'Excluded') {
+                $Script:Reporting['GPOOrganizationalUnit']['Variables']['Excluded']++
+                $Script:Reporting['GPOOrganizationalUnit']['Variables']['ExcludedOU'].Add($OU.Organizationalunit)
             } else {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['Legitimate']++
-
             }
         }
         if ($Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix'] -gt 0) {
@@ -46,6 +51,8 @@
         UnlinkGPODeleteOU = 0
         DeleteOU          = 0
         Legitimate        = 0
+        Excluded          = 0
+        ExcludedOU        = [System.Collections.Generic.List[string]]::new()
         WillFix           = 0
         WillFixPerDomain  = $null
     }
@@ -71,6 +78,23 @@
                 New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
             }
         } -FontSize 10pt
+
+        if ($Script:Reporting['GPOOrganizationalUnit']['Variables']['ExcludedOU'].Count -gt 0) {
+            New-HTMLText -Text @(
+                'There are ',
+                $Script:Reporting['GPOOrganizationalUnit']['Variables']['ExcludedOU'].Count,
+                " Organizational Units that are excluded.",
+                " Please make sure to exclude those when executing unlinking/removal procedures. "
+            ) -FontSize 10pt -FontWeight normal, bold, normal, bold -Color None, Red, None, Red
+            <#
+            New-HTMLList -Type Unordered {
+                foreach ($OU in $Script:Reporting['GPOOrganizationalUnit']['Variables']['ExcludedOU']) {
+                    New-HTMLListItem -Text $OU -FontWeight normal, bold, normal
+                }
+            } -FontSize 10pt
+            #>
+        }
+
         New-HTMLText -Text @(
             "Please make sure that you really want to unlink GPO or delete Organizational Unit before executing changes. Sometimes it's completly valid to keep one or the other. "
             "Unlinking GPO from OU that has no Computer or User objects is fairly safe exercise. Removing OU requires a bit more dive in, and should only be executed if you know what you're doing. "
@@ -86,7 +110,7 @@
                     New-ChartBarOptions -Type bar -Distributed
                     New-ChartAxisY -LabelMaxWidth 200 -LabelAlign left -Show
                     New-ChartBar -Name "Unlink GPO ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO']
-                    New-ChartBar -Name "Unlink GPO & Delete OU ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']
+                    New-ChartBar -Name "Unlink GPO Delete OU ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']
                     New-ChartBar -Name "Delete OU ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']
                 } -Title 'Organizational Units' -TitleAlignment center
             }
@@ -98,6 +122,7 @@
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Unlink GPO' -BackgroundColor YellowOrange -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Delete OU' -BackgroundColor Red -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'OK' -BackgroundColor LightGreen -Row
+                New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Excluded' -BackgroundColor DeepSkyBlue -Row
             } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder -ExcludeProperty GPO
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
@@ -113,6 +138,17 @@
                                     Import-Module GPOZaurr -Force
                                 } -Style powershell
                                 New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
+                            }
+                            if ($Script:Reporting['GPOOrganizationalUnit']['Exclusions']) {
+                                New-HTMLWizardStep -Name 'Required exclusions' {
+                                    New-HTMLText -Text @(
+                                        "While preparing this report following exclusions were defined. "
+                                        "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
+                                    )
+                                    [string] $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOOrganizationalUnit']['Exclusions']
+
+                                    New-HTMLCodeBlock -Code $Code -Style powershell
+                                }
                             }
                             New-HTMLWizardStep -Name 'Prepare report' {
                                 New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with unlinking unused Group Policies. To generate new report please use:"
