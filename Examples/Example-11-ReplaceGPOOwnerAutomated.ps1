@@ -5,7 +5,7 @@
 # regardless if current user is still Domain Admin or not
 
 $GPOs = Get-GPOZaurrOwner -IncludeSysvol
-$GPOs | Format-Table DisplayName, Owner, OwnerSID, OwnerType, SysvolOwner, SysvolSID, SysvolType
+$GPOs | Format-Table DisplayName, Status, Owner, OwnerSID, OwnerType, SysvolOwner, SysvolSID, SysvolType
 
 Set-GPOZaurrOwner -Type Unknown -Verbose -WhatIf  #-LimitProcessing 2
 Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2 -WhatIf -IncludeDomains 'ad.evotec.pl'
