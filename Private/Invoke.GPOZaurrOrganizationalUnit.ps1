@@ -123,7 +123,7 @@
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Delete OU' -BackgroundColor Red -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'OK' -BackgroundColor LightGreen -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Excluded' -BackgroundColor DeepSkyBlue -Row
-            } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder -ExcludeProperty GPO
+            } -PagingOptions 10, 20, 30, 40, 50 -ExcludeProperty GPO
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix Group Organizational Units' {

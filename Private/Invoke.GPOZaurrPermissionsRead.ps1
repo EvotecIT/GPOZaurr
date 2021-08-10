@@ -151,12 +151,12 @@
         New-HTMLSection -Name 'Group Policy Authenticated Users Analysis' {
             New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsRead']['Data'].Permissions -Filtering {
                 New-HTMLTableCondition -Name 'Permission' -Value '' -BackgroundColor Salmon -ComparisonType string -Row
-            } -PagingOptions 7, 15, 30, 45, 60 -SearchBuilder
+            } -PagingOptions 7, 15, 30, 45, 60
         }
         New-HTMLSection -Name 'Group Policy Issues Assesment' {
             New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsRead']['Data'].Issues -Filtering {
                 New-HTMLTableCondition -Name 'PermissionIssue' -Value $true -BackgroundColor Salmon -ComparisonType string -Row
-            } -PagingOptions 7, 15, 30, 45, 60 -DefaultSortColumn PermissionIssue -DefaultSortOrder Descending -SearchBuilder
+            } -PagingOptions 7, 15, 30, 45, 60 -DefaultSortColumn PermissionIssue -DefaultSortOrder Descending
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix Group Policy Authenticated Users' {

@@ -48,7 +48,7 @@
         New-HTMLSection -Name 'Group Policy CNF (Duplicate) Objects' {
             New-HTMLTable -DataTable $Script:Reporting['GPODuplicates']['Data'] -Filtering {
 
-            } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder
+            } -PagingOptions 10, 20, 30, 40, 50
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix - Remove duplicate (CNF) objects' {

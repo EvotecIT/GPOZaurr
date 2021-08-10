@@ -135,7 +135,7 @@
                 New-HTMLTableCondition -Name 'OwnerType' -Value "WellKnownAdministrative" -BackgroundColor LightGreen -ComparisonType string -Operator eq
                 New-HTMLTableCondition -Name 'Status' -Value "OK" -BackgroundColor LightGreen -ComparisonType string -Operator eq
                 New-HTMLTableCondition -Name 'Status' -Value "OK" -BackgroundColor Salmon -ComparisonType string -Operator ne
-            } -SearchBuilder
+            }
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix NetLogon Owners ' {

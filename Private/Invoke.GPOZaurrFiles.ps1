@@ -22,7 +22,7 @@
                 New-HTMLTable -DataTable $Script:Reporting['GPOFiles']['WarningsAndErrors'] -Filtering {
                     New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
                     New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
-                } -SearchBuilder
+                }
             }
         }
     }
