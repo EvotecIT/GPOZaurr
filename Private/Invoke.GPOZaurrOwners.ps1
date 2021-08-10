@@ -4,7 +4,11 @@
     ActionRequired = $null
     Data           = $null
     Execute        = {
-        Get-GPOZaurrOwner -IncludeSysvol -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+        if ($Script:Reporting['GPOOwners']['Exclusions']) {
+            Get-GPOZaurrOwner -IncludeSysvol -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ApprovedOwner $Script:Reporting['GPOOwners']['Exclusions']
+        } else {
+            Get-GPOZaurrOwner -IncludeSysvol -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+        }
     }
     Processing     = {
         # Create Per Domain Variables
@@ -19,17 +23,35 @@
                 $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'][$GPO.DomainName] = 0
             }
             # Checks
-            if ($GPO.IsOwnerConsistent) {
+            if ($GPO.Status -contains 'Consistent') {
                 $Script:Reporting['GPOOwners']['Variables']['IsConsistent']++
-            } else {
+            } elseif ($GPO.Status -contains 'Inconsistent') {
                 $Script:Reporting['GPOOwners']['Variables']['IsNotConsistent']++
             }
-            if ($GPO.IsOwnerAdministrative) {
+            if ($GPO.Status -contains 'Administrative') {
                 $Script:Reporting['GPOOwners']['Variables']['IsAdministrative']++
+            } elseif ($GPO.Status -contains 'Approved') {
+                $Script:Reporting['GPOOwners']['Variables']['IsApproved']++
             } else {
                 $Script:Reporting['GPOOwners']['Variables']['IsNotAdministrative']++
             }
-            if (($GPO.IsOwnerAdministrative -eq $false -or $GPO.IsOwnerConsistent -eq $false) -and $GPO.SysvolExists -eq $true) {
+
+            if ($GPO.SysvolExists -eq $false) {
+                $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFix']++
+                $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFixPerDomain'][$GPO.DomainName]++
+            } else {
+                if ($GPO.Status -contains 'Inconsistent') {
+                    $Script:Reporting['GPOOwners']['Variables']['WillFix']++
+                    $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'][$GPO.DomainName]++
+                } elseif ($GPO.Status -contains 'NotAdministrative' -and $GPO.Status -notcontains 'Approved') {
+                    $Script:Reporting['GPOOwners']['Variables']['WillFix']++
+                    $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'][$GPO.DomainName]++
+                } else {
+                    $Script:Reporting['GPOOwners']['Variables']['WillNotTouch']++
+                }
+            }
+            <#
+            if (($GPO.IsOwnerAdministrative -eq $false -or $GPO.IsOwnerConsistent -eq $false) -and $GPO.Status -and $GPO.SysvolExists -eq $true) {
                 $Script:Reporting['GPOOwners']['Variables']['WillFix']++
                 $Script:Reporting['GPOOwners']['Variables']['WillFixPerDomain'][$GPO.DomainName]++
             } elseif ($GPO.SysvolExists -eq $false) {
@@ -38,6 +60,7 @@
             } else {
                 $Script:Reporting['GPOOwners']['Variables']['WillNotTouch']++
             }
+            #>
         }
         if ($Script:Reporting['GPOOwners']['Variables']['WillFix'] -gt 0) {
             $Script:Reporting['GPOOwners']['ActionRequired'] = $true
@@ -47,6 +70,7 @@
     }
     Variables      = @{
         IsAdministrative         = 0
+        IsApproved               = 0
         IsNotAdministrative      = 0
         IsConsistent             = 0
         IsNotConsistent          = 0
@@ -93,6 +117,7 @@
         New-HTMLText -Text "Here's a short summary of ", "Group Policy Owners", ": " -FontSize 10pt -FontWeight normal, bold, normal
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Administrative Owners: ', $Script:Reporting['GPOOwners']['Variables']['IsAdministrative'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Non-Administrative, but approved Owners (for example AGPM): ', $Script:Reporting['GPOOwners']['Variables']['IsApproved'] -FontWeight normal, bold
             New-HTMLListItem -Text 'Non-Administrative Owners: ', $Script:Reporting['GPOOwners']['Variables']['IsNotAdministrative'] -FontWeight normal, bold
             New-HTMLListItem -Text "Owners consistent in AD and SYSVOL: ", $Script:Reporting['GPOOwners']['Variables']['IsConsistent'] -FontWeight normal, bold
             New-HTMLListItem -Text "Owners not-consistent in AD and SYSVOL: ", $Script:Reporting['GPOOwners']['Variables']['IsNotConsistent'] -FontWeight normal, bold
@@ -124,16 +149,25 @@
             New-HTMLPanel {
                 New-HTMLChart {
                     New-ChartBarOptions -Type barStacked
-                    New-ChartLegend -Name 'Yes', 'No' -Color LightGreen, Salmon
-                    New-ChartBar -Name 'Is administrative' -Value $Script:Reporting['GPOOwners']['Variables']['IsAdministrative'], $Script:Reporting['GPOOwners']['Variables']['IsNotAdministrative']
+                    New-ChartLegend -Name 'Yes', 'No', 'Approved' -Color LightGreen, Salmon, DeepSkyBlue
+                    New-ChartBar -Name 'Is administrative' -Value $Script:Reporting['GPOOwners']['Variables']['IsAdministrative'], $Script:Reporting['GPOOwners']['Variables']['IsNotAdministrative'], $Script:Reporting['GPOOwners']['Variables']['IsApproved']
                     New-ChartBar -Name 'Is consistent' -Value $Script:Reporting['GPOOwners']['Variables']['IsConsistent'], $Script:Reporting['GPOOwners']['Variables']['IsNotConsistent']
                 } -Title 'Group Policy Owners' -TitleAlignment center
             }
         }
         New-HTMLSection -Name 'Group Policy Owners' {
             New-HTMLTable -DataTable $Script:Reporting['GPOOwners']['Data'] -Filtering {
-                New-HTMLTableCondition -Name 'IsOwnerConsistent' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
-                New-HTMLTableCondition -Name 'IsOwnerAdministrative' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
+                #New-HTMLTableCondition -Name 'IsOwnerConsistent' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
+                #New-HTMLTableCondition -Name 'IsOwnerAdministrative' -Value $false -BackgroundColor Salmon -ComparisonType string -Row
+
+                New-HTMLTableCondition -Name 'Status' -Value 'Administrative, Consistent' -BackgroundColor LightGreen -ComparisonType string -Row
+                New-HTMLTableCondition -Name 'Status' -Value 'NotAdministrative, Consistent, Approved' -BackgroundColor DeepSkyBlue -ComparisonType string -Row
+
+                New-HTMLTableCondition -Name 'Status' -Value 'Administrative, Inconsistent' -BackgroundColor Salmon -ComparisonType string -Row
+                New-HTMLTableCondition -Name 'Status' -Value 'NotAdministrative, Inconsistent' -BackgroundColor Salmon -ComparisonType string -Row
+                #New-HTMLTableCondition -Name 'Status' -Value 'Administrative, Inconsistent, Approved' -BackgroundColor Salmon -ComparisonType string -Row
+                # New-HTMLTableCondition -Name 'Status' -Value 'NotAdministrative, Inconsistent, Approved' -BackgroundColor Salmon -ComparisonType string -Row
+
             } -PagingOptions 10, 20, 30, 40, 50 -SearchBuilder
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
@@ -149,6 +183,17 @@
                                     Import-Module GPOZaurr -Force
                                 } -Style powershell
                                 New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
+                            }
+                            if ($Script:Reporting['GPOOwners']['Exclusions']) {
+                                New-HTMLWizardStep -Name 'Required exclusions' {
+                                    New-HTMLText -Text @(
+                                        "While preparing this report following exclusions were defined. "
+                                        "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
+                                    )
+                                    [string] $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOOwners']['Exclusions']
+
+                                    New-HTMLCodeBlock -Code $Code -Style powershell
+                                }
                             }
                             New-HTMLWizardStep -Name 'Prepare report' {
                                 New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with fixing Group Policy Owners. To generate new report please use:"
@@ -207,6 +252,22 @@
                                 New-HTMLText -TextBlock {
                                     "This command when executed sets new owner only on first X non-compliant GPO Owners for AD/SYSVOL. Use LimitProcessing parameter to prevent mass change and increase the counter when no errors occur. "
                                     "Repeat step above as much as needed increasing LimitProcessing count till there's nothing left. In case of any issues please review and action accordingly. "
+                                } -LineBreak
+                                New-HTMLText -TextBlock {
+                                    "It's possible to define certain owners as being approved (for example with domain that have AGPM). "
+                                    "Make sure to verify if excluded/approved owners were provided in Required Exclusions tab, or add your own when nessecary. "
+                                    "You can approve owners with following code: "
+                                } -FontWeight bold
+                                New-HTMLCodeBlock -Code {
+                                    $Approved = @(
+                                        'EVOTEC\przemyslaw.klys'
+                                        'EVOTEC\green.b'
+                                    )
+                                    Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2 -ApprovedOwner $Approved
+                                }
+                                New-HTMLText -TextBlock {
+                                    "Please keep in mind that ApprovedOwner is only applicable to Non-Administrative permissions to provide a way to approve special use cases. "
+                                    "It won't do anything for inconsistent, unknown permissions as those are still treated as wrong. "
                                 }
                             }
                             New-HTMLWizardStep -Name 'Verification report' {
