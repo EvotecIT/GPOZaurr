@@ -55,60 +55,59 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
-- 0.0.130 - 2021.08.10
+- 0.0.130
   - 💡 Updated HTML to new version of `PSWriteHTML` that fixes complains about `SearchBuilder` option
   - ☑ Improved `Invoke-GPOZaurr` - type `GPOOrganizationalUnit` with exclusions
 
-```powershell
-Invoke-GPOZaurr -Type GPOOrganizationalUnit -Online -FilePath $PSScriptRoot\Reports\GPOZaurrOU.html -Exclusions @(
-    '*OU=Production,DC=ad,DC=evotec,DC=pl'
-    '*OU=Production,DC=ad,DC=evotec,DC=pl'
-    '*DC=ad,DC=evotec,DC=pl'
-)
-```
+    ```powershell
+    Invoke-GPOZaurr -Type GPOOrganizationalUnit -Online -FilePath $PSScriptRoot\Reports\GPOZaurrOU.html -Exclusions @(
+        '*OU=Production,DC=ad,DC=evotec,DC=pl'
+        '*OU=Production,DC=ad,DC=evotec,DC=pl'
+        '*DC=ad,DC=evotec,DC=pl'
+    )
+    ```
 
-- ☑ Improved `Get-GPOZaurrOrganizationalUnit` with exclusions
+  - ☑ Improved `Get-GPOZaurrOrganizationalUnit` with exclusions
 
-```powershell
-Get-GPOZaurrOrganizationalUnit -Verbose -ExcludeOrganizationalUnit @(
-   '*,OU=Production,DC=ad,DC=evotec,DC=pl'
-) | Format-Table
-```
+      ```powershell
+      Get-GPOZaurrOrganizationalUnit -Verbose -ExcludeOrganizationalUnit @(
+        '*,OU=Production,DC=ad,DC=evotec,DC=pl'
+      ) | Format-Table
+      ```
 
-- ☑ Improved `Remove-GPOZaurrLinkEmptyOU` with exclusions
+  - ☑ Improved `Remove-GPOZaurrLinkEmptyOU` with exclusions
 
-```powershell
+    ```powershell
+    $Exclude = @(
+        "OU=Groups,OU=Production,DC=ad,DC=evotec,DC=pl"
+        "OU=Test \, OU,OU=ITR02,DC=ad,DC=evotec,DC=xyz"
+    )
 
-$Exclude = @(
-    "OU=Groups,OU=Production,DC=ad,DC=evotec,DC=pl"
-    "OU=Test \, OU,OU=ITR02,DC=ad,DC=evotec,DC=xyz"
-)
+    Remove-GPOZaurrLinkEmptyOU -Verbose -LimitProcessing 3 -WhatIf -ExcludeOrganizationalUnit $Exclude
+    ```
 
-Remove-GPOZaurrLinkEmptyOU -Verbose -LimitProcessing 3 -WhatIf -ExcludeOrganizationalUnit $Exclude
-```
+  - ☑ Improved `Invoke-GPOZaurr` - type `GPOOwners` with exclusions
 
-- ☑ Improved `Invoke-GPOZaurr` - type `GPOOwners` with exclusions
+    ```powershell
+    Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurrGPOOwners.html -Type GPOOwners -Online -Exclusions @(
+        'EVOTEC\przemyslaw.klys'
+    )
+    ```
 
-```powershell
-Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurrGPOOwners.html -Type GPOOwners -Online -Exclusions @(
-    'EVOTEC\przemyslaw.klys'
-)
-```
+  - ☑ Improved `Set-GPOZaurrOwner` with exclusions/approved owners
 
-- ☑ Improved `Set-GPOZaurrOwner` with exclusions/approved owners
+    ```powershell
+    Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2 -WhatIf -IncludeDomains 'ad.evotec.xyz' -ApprovedOwner @(
+        'EVOTEC\przemyslaw.klys'
+    )
+    ```
 
-```powershell
-Set-GPOZaurrOwner -Type All -Verbose -LimitProcessing 2 -WhatIf -IncludeDomains 'ad.evotec.xyz' -ApprovedOwner @(
-    'EVOTEC\przemyslaw.klys'
-)
-```
+  - ☑ Improved `Get-GPOZaurrOwner` with exclusions/approved owners
 
-- ☑ Improved `Get-GPOZaurrOwner` with exclusions/approved owners
-
-```powershell
-$T = Get-GPOZaurrOwner -Verbose -IncludeSysvol -ApprovedOwner @('EVOTEC\przemyslaw.klys')
-$T | Format-Table *
-```
+    ```powershell
+    $T = Get-GPOZaurrOwner -Verbose -IncludeSysvol -ApprovedOwner @('EVOTEC\przemyslaw.klys')
+    $T | Format-Table *
+    ```
 
 - 0.0.129 - 2021.08.06
   - Added `Get-GPOZaurrOrganizationalUnit` and added `GPOOrganizationalUnit` in `Invoke-GPOZaurr` (preview)
