@@ -27,22 +27,21 @@
     .NOTES
     General notes
     #>
-    [cmdletBinding()]
+    [cmdletBinding(DefaultParameterSetName = 'Name')]
     param(
         #[ValidateSet('GPOList')][string] $Type,
-        [alias('GpoName', 'DisplayName')][string] $Name,
+        [parameter(ParameterSetName = 'Name')][alias('GpoName', 'DisplayName')][string] $Name,
+        [parameter(ParameterSetName = 'Guid')]
+        [alias('ID')][string] $GUID,
+        [parameter(ParameterSetName = 'Name')]
+        [parameter(ParameterSetName = 'Guid')]
         [string] $DomaiName
     )
-    #if ($Type) {
-    #    [PSCustomObject] @{
-    #        Type       = $Type
-    #        Name       = $Name
-    #        DomainName = $DomaiName
-    #    }
-    #} else {
-    [PSCustomObject] @{
+    $Output = @{
         Name       = $Name
+        ID         = $GUID
         DomainName = $DomaiName
     }
-    #}
+    Remove-EmptyValue -Hashtable $Output
+    [PSCustomObject] $Output
 }
