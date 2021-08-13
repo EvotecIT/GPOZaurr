@@ -55,7 +55,7 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
-- 0.0.130
+- 0.0.130 - 2021.08.13
   - 💡 Updated HTML to new version of `PSWriteHTML` that fixes complains about `SearchBuilder` option
   - ☑ Improved `Invoke-GPOZaurr` - type `GPOOrganizationalUnit` with exclusions
 
@@ -107,6 +107,29 @@ To understand the usage I've created blog post you may find useful
     ```powershell
     $T = Get-GPOZaurrOwner -Verbose -IncludeSysvol -ApprovedOwner @('EVOTEC\przemyslaw.klys')
     $T | Format-Table *
+    ```
+
+  - ☑ Improved `Get-GPOZaurr` with exclusions and support for GUID, strings
+
+    ```powershell
+    $GPOS = Get-GPOZaurr -ExcludeGroupPolicies {
+        Skip-GroupPolicy -Name 'de14_usr_std'
+        Skip-GroupPolicy -Name 'de14_usr_std' -DomaiName 'ad.evotec.xyz'
+        Skip-GroupPolicy -Name 'All | Trusted Websites' #-DomaiName 'ad.evotec.xyz'
+        '{D39BF08A-87BF-4662-BFA0-E56240EBD5A2}'
+        'COMPUTERS | Enable Sets'
+    }
+    $GPOS | Format-Table -AutoSize *
+    ```
+
+  - ☑ Improved `Invoke-GPOZaurr` with exclusions and support for GUID, strings
+
+    ```powershell
+    Invoke-GPOZaurr -Type GPOList -Exclusions {
+        Skip-GroupPolicy -Name 'All | Trusted Websites' -DomaiName 'ad.evotec.xyz'
+        '{D39BF08A-87BF-4662-BFA0-E56240EBD5A2}'
+        'COMPUTERS | Enable Sets'
+    }
     ```
 
 - 0.0.129 - 2021.08.06
