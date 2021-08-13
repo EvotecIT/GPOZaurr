@@ -190,9 +190,11 @@
                                         "While preparing this report following exclusions were defined. "
                                         "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
                                     )
-                                    [string] $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOOwners']['Exclusions']
+                                    $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOOwners']['Exclusions']
 
-                                    New-HTMLCodeBlock -Code $Code -Style powershell
+                                    if ($Code) {
+                                        New-HTMLCodeBlock -Code $Code -Style powershell
+                                    }
                                 }
                             }
                             New-HTMLWizardStep -Name 'Prepare report' {

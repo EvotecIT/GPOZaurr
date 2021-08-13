@@ -4,9 +4,8 @@
     Action     = $null
     Data       = $null
     Execute    = {
-        if ($Script:Reporting['GPOList']['ExclusionsCode']) {
-            Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExcludeGroupPolicies $Script:Reporting['GPOList']['ExclusionsCode']
-
+        if ($Script:Reporting['GPOList']['Exclusions']) {
+            Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExcludeGroupPolicies $Script:Reporting['GPOList']['Exclusions']
         } else {
             Get-GPOZaurr -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
         }
@@ -375,6 +374,18 @@
                                 } -Style powershell
                                 New-HTMLText -Text "Using force makes sure newest version is downloaded from PowerShellGallery regardless of what is currently installed. Once installed you're ready for next step."
                             }
+                            if ($Script:Reporting['GPOList']['Exclusions']) {
+                                New-HTMLWizardStep -Name 'Required exclusions' {
+                                    New-HTMLText -Text @(
+                                        "While preparing this report following exclusions were defined. "
+                                        "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
+                                    )
+                                    $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOList']['Exclusions']
+                                    if ($Code) {
+                                        New-HTMLCodeBlock -Code $Code -Style powershell
+                                    }
+                                }
+                            }
                             New-HTMLWizardStep -Name 'Prepare report' {
                                 New-HTMLText -Text "Depending when this report was run you may want to prepare new report before proceeding with removal. To generate new report please use:"
                                 New-HTMLCodeBlock -Code {
@@ -415,11 +426,14 @@
                                     "You would do so using following approach "
                                 ) -FontSize 10pt -FontWeight bold, normal
                                 New-HTMLCodeBlock -Code {
-                                    Remove-GPOZaurr -RequireDays 30 -Type Empty, Unlinked, Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor' {
+                                    $Exclusions = {
                                         Skip-GroupPolicy -Name 'TEST | Drive Mapping'
                                         Skip-GroupPolicy -Name 'Default Domain Policy'
                                         Skip-GroupPolicy -Name 'Default Domain Controllers Policy' -DomaiName 'JustOneDomain'
-                                    } -WhatIf
+                                        '{D39BF08A-87BF-4662-BFA0-E56240EBD5A2}'
+                                        'COMPUTERS | Enable Sets'
+                                    }
+                                    Remove-GPOZaurr -RequireDays 30 -Type Empty, Unlinked, Disabled -BackupPath "$Env:UserProfile\Desktop\GPO" -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor' -WhatIf -ExcludeGroupPolicies $Exclusions
                                 }
                                 New-HTMLText -Text @(
                                     "Code above when executed will scan YourDomainYouHavePermissionsFor, find all empty, unlinked, disabled group policies, backup any GPO just before it's to be deleted to `$Env:UserProfile\Desktop\GPO. "
@@ -646,6 +660,7 @@
                     }
                 }
             }
+            <#
             if ($Script:Reporting['GPOList']['Exclusions']) {
                 New-HTMLSection -Invisible {
                     New-HTMLSection -Name 'Group Policies Exclusions' {
@@ -656,11 +671,12 @@
                     New-HTMLSection -Name 'Group Policies Exclusions Code' {
                         New-HTMLContainer {
                             New-HTMLText -Text 'Please make sure to use following exclusions when executing removal' -FontSize 10pt
-                            New-HTMLCodeBlock -Code $Script:Reporting['GPOList']['ExclusionsCode']
+                            New-HTMLCodeBlock -Code $Script:Reporting['GPOList']['Exclusions']
                         }
                     }
                 }
             }
+            #>
         }
         if ($Script:Reporting['GPOList']['WarningsAndErrors']) {
             New-HTMLSection -Name 'Errors to Review' {

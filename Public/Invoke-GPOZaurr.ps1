@@ -134,7 +134,8 @@
             }
             if ($Exclusions) {
                 if ($Exclusions -is [scriptblock]) {
-                    $Script:Reporting[$T]['ExclusionsCode'] = $Exclusions
+                    $Script:Reporting[$T]['Exclusions'] = $Exclusions
+                    #$Script:Reporting[$T]['ExclusionsCode'] = $Exclusions
                 }
                 if ($Exclusions -is [Array]) {
                     $Script:Reporting[$T]['Exclusions'] = $Exclusions
