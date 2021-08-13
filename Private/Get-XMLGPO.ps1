@@ -231,7 +231,8 @@
     $Exclude = $false
     if ($ExcludeGroupPolicies) {
         $PolicyWithDomain = -join ($XMLContent.GPO.Identifier.Domain.'#text', $XMLContent.GPO.Name)
-        if ($ExcludeGroupPolicies[$XMLContent.GPO.Name] -or $ExcludeGroupPolicies[$PolicyWithDomain]) {
+        $PolicyWithDomainID = -join ($XMLContent.GPO.Identifier.Domain.'#text', $XMLContent.GPO.Identifier.Identifier.'#text')
+        if ($ExcludeGroupPolicies[$XMLContent.GPO.Name] -or $ExcludeGroupPolicies[$PolicyWithDomain] -or $ExcludeGroupPolicies[$PolicyWithDomainID] -or $ExcludeGroupPolicies[$XMLContent.GPO.Identifier.Identifier.'#text']) {
             $Exclude = $true
         }
     }
