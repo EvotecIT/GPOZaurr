@@ -146,9 +146,9 @@
             New-HTMLText -Text @(
                 "While preparing this report following exclusions were defined. "
                 "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
-            ) -FontSize 10pt -FontWeight bold, normal -Color Red, None
+            ) -FontSize 10pt -FontWeight bold, normal -Color Red, None -LineBreak
 
-            New-HTMLText -Text "Code to use: " -FontSize 10pt -FontWeight bold
+            New-HTMLText -Text "Code to use: " -FontSize 10pt -FontWeight bold -LineBreak
 
             $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOOwners']['Exclusions']
 
