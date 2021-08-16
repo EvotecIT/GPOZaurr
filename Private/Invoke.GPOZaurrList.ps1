@@ -298,6 +298,23 @@
             New-HTMLListItem -Text 'Invoke-GPOZaurr -FilePath $Env:UserProfile\Desktop\GPOZaurrGPOPListBefore.html -Verbose -Type GPOList' -Color RoyalBlue
         } -FontSize 10pt
         New-HTMLText -FontSize 10pt -Text 'Steps above will generate above summary with more details allowing you to get up to date report and steps on how to fix it.'
+
+        if ($Script:Reporting['GPOList']['Exclusions']) {
+            New-HTMLText -LineBreak
+            New-HTMLText -Text @(
+                "While preparing this report following exclusions were defined. "
+                "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
+            ) -FontSize 10pt
+
+            New-HTMLText -LineBreak
+            New-HTMLText -Text "Code to use: " -LineBreak -FontSize 10pt -FontWeight bold
+
+            $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOList']['Exclusions']
+
+            if ($Code) {
+                New-HTMLCodeBlock -Code $Code -Style powershell
+            }
+        }
     }
     Solution   = {
         New-HTMLSection -Invisible {

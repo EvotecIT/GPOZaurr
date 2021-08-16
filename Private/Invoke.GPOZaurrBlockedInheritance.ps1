@@ -110,6 +110,23 @@
             } -FontSize 10pt
         }
         New-HTMLText -FontSize 10pt -Text "Please review output in table and follow the steps below table to get Active Directory Group Policies in healthy state."
+
+        if ($Script:Reporting['GPOBlockedInheritance']['Exclusions']) {
+            New-HTMLText -LineBreak
+            New-HTMLText -Text @(
+                "While preparing this report following exclusions were defined. "
+                "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
+            ) -FontSize 10pt
+
+            New-HTMLText -LineBreak
+            New-HTMLText -Text "Code to use: " -LineBreak -FontSize 10pt -FontWeight bold
+
+            $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOBlockedInheritance']['Exclusions']
+
+            if ($Code) {
+                New-HTMLCodeBlock -Code $Code -Style powershell
+            }
+        }
     }
     Solution       = {
         New-HTMLSection -Invisible {

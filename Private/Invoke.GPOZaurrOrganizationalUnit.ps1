@@ -99,6 +99,23 @@
             "Please make sure that you really want to unlink GPO or delete Organizational Unit before executing changes. Sometimes it's completly valid to keep one or the other. "
             "Unlinking GPO from OU that has no Computer or User objects is fairly safe exercise. Removing OU requires a bit more dive in, and should only be executed if you know what you're doing. "
         ) -FontWeight normal, bold -Color None, Red -FontSize 10pt
+
+        if ($Script:Reporting['GPOOrganizationalUnit']['Exclusions']) {
+            New-HTMLText -LineBreak
+            New-HTMLText -Text @(
+                "While preparing this report following exclusions were defined. "
+                "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
+            ) -FontSize 10pt
+
+            New-HTMLText -LineBreak
+            New-HTMLText -Text "Code to use: " -LineBreak -FontSize 10pt -FontWeight bold
+
+            $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOOrganizationalUnit']['Exclusions']
+
+            if ($Code) {
+                New-HTMLCodeBlock -Code $Code -Style powershell
+            }
+        }
     }
     Solution       = {
         New-HTMLSection -Invisible {

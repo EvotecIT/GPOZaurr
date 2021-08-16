@@ -140,6 +140,23 @@
                 New-HTMLListItem -Text "$Domain requires ", $Script:Reporting['GPOOwners']['Variables']['RequiresDiffFixPerDomain'][$Domain], " changes." -FontWeight normal, bold, normal
             }
         } -FontSize 10pt
+
+        if ($Script:Reporting['GPOOwners']['Exclusions']) {
+            New-HTMLText -LineBreak
+            New-HTMLText -Text @(
+                "While preparing this report following exclusions were defined. "
+                "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
+            ) -FontSize 10pt
+
+            New-HTMLText -LineBreak
+            New-HTMLText -Text "Code to use: " -LineBreak -FontSize 10pt -FontWeight bold
+
+            $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOOwners']['Exclusions']
+
+            if ($Code) {
+                New-HTMLCodeBlock -Code $Code -Style powershell
+            }
+        }
     }
     Solution       = {
         New-HTMLSection -Invisible {
