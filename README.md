@@ -55,6 +55,8 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.133 - 2021.08.16
+  - ☑ Improved exclusions for email use
 - 0.0.132 - 2021.08.16
   - ☑ Improved exclusions for email use
 - 0.0.131 - 2021.08.16
