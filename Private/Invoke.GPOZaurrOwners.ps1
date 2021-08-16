@@ -148,7 +148,7 @@
                 "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
             ) -FontSize 10pt -FontWeight bold, normal -Color Red, None
 
-            New-HTMLText -Text "Code to use: " -LineBreak -FontSize 10pt -FontWeight bold
+            New-HTMLText -Text "Code to use: " -FontSize 10pt -FontWeight bold
 
             $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOOwners']['Exclusions']
 
