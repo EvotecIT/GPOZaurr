@@ -55,8 +55,10 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.132 - 2021.08.16
+  - ☑ Improved exclusions for email use
 - 0.0.131 - 2021.08.16
-  - Improved exclusions for email use
+  - ☑ Improved exclusions for email use
 - 0.0.130 - 2021.08.13
   - 💡 Updated HTML to new version of `PSWriteHTML` that fixes complains about `SearchBuilder` option
   - ☑ Improved `Invoke-GPOZaurr` - type `GPOOrganizationalUnit` with exclusions
