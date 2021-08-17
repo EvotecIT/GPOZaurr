@@ -51,9 +51,17 @@
                 # Skip GPOS that are younger than 30 days
                 $Script:Reporting['GPOList']['Variables']['GPOSkip']++
             }
-            if (($GPO.Enabled -eq $false -or $GPO.Empty -eq $true -or $GPO.Linked -eq $false -or $GPO.ApplyPermission -eq $false) -and $GPO.Days -le $Script:Reporting['GPOList']['Variables']['GPOOlderThan']) {
+            if ($GPO.Exclude -eq $true) {
+                # Skip GPOS that are excluded
+                $Script:Reporting['GPOList']['Variables']['GPOSkipExcluded']++
+            }
+            if (($GPO.Enabled -eq $false -or $GPO.Empty -eq $true -or $GPO.Linked -eq $false -or $GPO.ApplyPermission -eq $false) -and $GPO.Exclude -eq $true) {
+                $Script:Reporting['GPOList']['Variables']['GPONotValidButExcluded']++
+                $Script:Reporting['GPOList']['Variables']['GPONotValidButSkippedOrExcluded']++
+            } elseif (($GPO.Enabled -eq $false -or $GPO.Empty -eq $true -or $GPO.Linked -eq $false -or $GPO.ApplyPermission -eq $false) -and $GPO.Days -le $Script:Reporting['GPOList']['Variables']['GPOOlderThan']) {
                 # Skip GPOS that are younger than 30 days
                 $Script:Reporting['GPOList']['Variables']['GPONotValidButSkip']++
+                $Script:Reporting['GPOList']['Variables']['GPONotValidButSkippedOrExcluded']++
             }
             if (($GPO.Enabled -eq $false -or $GPO.Empty -eq $true -or $GPO.Linked -eq $false -or $GPO.ApplyPermission -eq $false) -and $GPO.Days) {
                 $Script:Reporting['GPOList']['Variables']['GPONotValid']++
@@ -141,52 +149,55 @@
             }
         }
         $Script:Reporting['GPOList']['Variables']['GPOTotal'] = $Script:Reporting['GPOList']['Data'].Count
-        if ($Script:Reporting['GPOList']['Variables']['GPONotValid'] -gt 0 -and $Script:Reporting['GPOList']['Variables']['GPONotValidButSkip'] -ne $Script:Reporting['GPOList']['Variables']['GPONotValid']) {
+        if ($Script:Reporting['GPOList']['Variables']['GPONotValid'] -gt 0 -and $Script:Reporting['GPOList']['Variables']['GPONotValidButSkippedOrExcluded'] -ne $Script:Reporting['GPOList']['Variables']['GPONotValid']) {
             $Script:Reporting['GPOList']['ActionRequired'] = $true
         } else {
             $Script:Reporting['GPOList']['ActionRequired'] = $false
         }
     }
     Variables  = @{
-        GPOOlderThan                   = 30
-        GPONotValidPerDomain           = $null
-        GPOValidPerDomain              = $null
-        GPONotOptimizedPerDomain       = $null
-        GPOOptimizedPerDomain          = $null
-        GPOProblemPerDomain            = $null
-        GPONoProblemPerDomain          = $null
-        GPOApplyPermissionYesPerDomain = $null
-        GPOApplyPermissionNoPerDomain  = $null
-        GPOWithProblems                = 0
-        ComputerOptimizedYes           = 0
-        ComputerOptimizedNo            = 0
-        ComputerProblemYes             = 0
-        ComputerProblemNo              = 0
-        UserOptimizedYes               = 0
-        UserOptimizedNo                = 0
-        UserProblemYes                 = 0
-        UserProblemNo                  = 0
-        GPOOptimized                   = 0
-        GPONotOptimized                = 0
-        GPOProblem                     = 0
-        GPONoProblem                   = 0
-        GPONotLinked                   = 0
-        GPOLinked                      = 0
-        GPOEmpty                       = 0
-        GPONotEmpty                    = 0
-        GPOEmptyAndUnlinked            = 0
-        GPOEmptyOrUnlinked             = 0
-        GPOLinkedButEmpty              = 0
-        GPOEnabled                     = 0
-        GPODisabled                    = 0
-        GPOSkip                        = 0
-        GPOValid                       = 0
-        GPONotValid                    = 0
-        GPONotValidButSkip             = 0
-        GPOLinkedButLinkDisabled       = 0
-        GPOTotal                       = 0
-        ApplyPermissionYes             = 0
-        ApplyPermissionNo              = 0
+        GPOOlderThan                    = 30
+        GPONotValidPerDomain            = $null
+        GPOValidPerDomain               = $null
+        GPONotOptimizedPerDomain        = $null
+        GPOOptimizedPerDomain           = $null
+        GPOProblemPerDomain             = $null
+        GPONoProblemPerDomain           = $null
+        GPOApplyPermissionYesPerDomain  = $null
+        GPOApplyPermissionNoPerDomain   = $null
+        GPOWithProblems                 = 0
+        ComputerOptimizedYes            = 0
+        ComputerOptimizedNo             = 0
+        ComputerProblemYes              = 0
+        ComputerProblemNo               = 0
+        UserOptimizedYes                = 0
+        UserOptimizedNo                 = 0
+        UserProblemYes                  = 0
+        UserProblemNo                   = 0
+        GPOOptimized                    = 0
+        GPONotOptimized                 = 0
+        GPOProblem                      = 0
+        GPONoProblem                    = 0
+        GPONotLinked                    = 0
+        GPOLinked                       = 0
+        GPOEmpty                        = 0
+        GPONotEmpty                     = 0
+        GPOEmptyAndUnlinked             = 0
+        GPOEmptyOrUnlinked              = 0
+        GPOLinkedButEmpty               = 0
+        GPOEnabled                      = 0
+        GPODisabled                     = 0
+        GPOSkip                         = 0
+        GPOSkipExcluded                 = 0
+        GPOValid                        = 0
+        GPONotValid                     = 0
+        GPONotValidButSkip              = 0
+        GPONotValidButExcluded          = 0
+        GPONotValidButSkippedOrExcluded = 0
+        GPOLinkedButLinkDisabled        = 0
+        GPOTotal                        = 0
+        ApplyPermissionYes              = 0
+        ApplyPermissionNo               = 0
     }
     Overview   = {
 
@@ -202,6 +213,7 @@
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Group Policies total: ', $Script:Reporting['GPOList']['Variables']['GPOTotal'] -FontWeight normal, bold
             New-HTMLListItem -Text "Group Policies valid: ", $Script:Reporting['GPOList']['Variables']['GPOValid'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Group Policies exclusions defined: ", $Script:Reporting['GPOList']['Variables']['GPOSkipExcluded'] -FontWeight normal, bold -Color None, DeepSkyBlue
             New-HTMLListItem -Text "Group Policies ", "NOT", " valid: ", $Script:Reporting['GPOList']['Variables']['GPONotValid'] -FontWeight normal, bold, normal, bold {
                 New-HTMLList -Type Unordered {
                     New-HTMLListItem -Text 'Group Policies that are unlinked (are not doing anything currently): ', $Script:Reporting['GPOList']['Variables']['GPONotLinked'] -FontWeight normal, bold
@@ -213,7 +225,10 @@
                 }
             } -Color Black, Red, Black, Red, Black
             New-HTMLListItem -Text @(
-                "Group Policies ", "NOT", " valid, to skip: ", $Script:Reporting['GPOList']['Variables']['GPONotValidButSkip'], " (modified less than $($Script:Reporting['GPOList']['Variables']['GPOOlderThan']) days ago)"
+                "Group Policies ", "NOT", " valid, to skip (because of age): ", $Script:Reporting['GPOList']['Variables']['GPONotValidButSkip'], " (modified less than $($Script:Reporting['GPOList']['Variables']['GPOOlderThan']) days ago)"
+            ) -FontWeight 'normal', 'bold', 'normal', 'bold', 'normal' -Color 'Black', 'Red', 'Black', 'Red', 'Black'
+            New-HTMLListItem -Text @(
+                "Group Policies ", "NOT", " valid, to skip (because of exclusions): ", $Script:Reporting['GPOList']['Variables']['GPONotValidButExcluded']
             ) -FontWeight 'normal', 'bold', 'normal', 'bold', 'normal' -Color 'Black', 'Red', 'Black', 'Red', 'Black'
             New-HTMLListItem -Text "Group Policies recently modified: ", $Script:Reporting['GPOList']['Variables']['GPOSkip'], " (modified less than $($Script:Reporting['GPOList']['Variables']['GPOOlderThan']) days ago)" -FontWeight normal, bold
         } -FontSize 10pt
@@ -306,7 +321,7 @@
                 "Please make sure that when you execute your steps to include those exclusions to prevent any issues. "
             ) -FontSize 10pt -FontWeight bold, normal -Color Red, None -LineBreak
 
-            New-HTMLText -Text "Code to use: " -FontSize 10pt -FontWeight bold -LineBreak
+            New-HTMLText -Text "Code to use for exclusions: " -FontSize 10pt -FontWeight bold -LineBreak
 
             $Code = New-GPOZaurrExclusions -ExclusionsArray $Script:Reporting['GPOList']['Exclusions']
 
