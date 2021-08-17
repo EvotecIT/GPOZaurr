@@ -55,7 +55,9 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
-- 0.0.134 - 2021.08.17
+- 0.0.136 - 2021.08.17
+  - ☑ Improved wording
+- 0.0.135 - 2021.08.17
   - ☑ Improved exclusions
 - 0.0.134 - 2021.08.16
   - ☑ Improved exclusions for email use
