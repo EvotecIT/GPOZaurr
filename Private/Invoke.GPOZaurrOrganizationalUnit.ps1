@@ -30,8 +30,8 @@
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
             } elseif ($OU.Status -contains 'Delete OU') {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']++
-                $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
-                $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
+                #$Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
+                #$Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
             } elseif ($OU.Status -contains 'Excluded') {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['Excluded']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['ExcludedOU'].Add($OU.Organizationalunit)
@@ -70,7 +70,7 @@
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Organizational Units that can have Group Policies unlinked (objects exists): ', $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO'] -FontWeight normal, bold
             New-HTMLListItem -Text 'Organizational Units that can have Group Policies unlinked (no applicable objects): ', $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPOEmpty'] -FontWeight normal, bold
-            New-HTMLListItem -Text "Organizational Units that can be deleted (no objects/no gpos): ", $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU'] -FontWeight normal, bold
+            New-HTMLListItem -Text "Organizational Units that can be deleted (no objects/no gpos) - ", "optional", ": ", $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU'] -FontWeight normal, bold, normal, bold -Color None, red, None, None
         } -FontSize 10pt
         New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
         New-HTMLList -Type Unordered {
