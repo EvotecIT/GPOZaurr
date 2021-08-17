@@ -2,8 +2,6 @@
 
 Invoke-GPOZaurr -Type GPOOrganizationalUnit -Online -FilePath $PSScriptRoot\Reports\GPOZaurr.html
 
-return
-
 # Shows how to use exclusions (supported only in GPOBlockedInheritance)
 Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurr.html -Type GPOBlockedInheritance -Online -Exclusions @(
     'OU=Test,OU=ITR02,DC=ad,DC=evotec,DC=xyz'
