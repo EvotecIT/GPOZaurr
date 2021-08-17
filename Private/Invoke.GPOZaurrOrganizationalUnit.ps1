@@ -21,7 +21,7 @@
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName] = 0
             }
             if ($OU.Status -contains 'Unlink GPO' -and $OU.Status -contains 'Delete OU') {
-                $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']++
+                $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPOEmpty']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
             } elseif ($OU.Status -contains 'Unlink GPO') {
@@ -46,15 +46,15 @@
         }
     }
     Variables      = @{
-        TotalOU           = 0
-        UnlinkGPO         = 0
-        UnlinkGPODeleteOU = 0
-        DeleteOU          = 0
-        Legitimate        = 0
-        Excluded          = 0
-        ExcludedOU        = [System.Collections.Generic.List[string]]::new()
-        WillFix           = 0
-        WillFixPerDomain  = $null
+        TotalOU          = 0
+        UnlinkGPO        = 0
+        UnlinkGPOEmpty   = 0
+        DeleteOU         = 0
+        Legitimate       = 0
+        Excluded         = 0
+        ExcludedOU       = [System.Collections.Generic.List[string]]::new()
+        WillFix          = 0
+        WillFixPerDomain = $null
     }
     Overview       = {
 
@@ -69,7 +69,7 @@
         New-HTMLText -FontSize 10pt -Text "Following can happen: " -FontWeight bold
         New-HTMLList -Type Unordered {
             New-HTMLListItem -Text 'Organizational Units that can have Group Policies unlinked (objects exists): ', $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO'] -FontWeight normal, bold
-            New-HTMLListItem -Text 'Organizational Units that can have Group Policies unlinked and OU removed (be careful!) (no objects): ', $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU'] -FontWeight normal, bold
+            New-HTMLListItem -Text 'Organizational Units that can have Group Policies unlinked (no applicable objects): ', $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPOEmpty'] -FontWeight normal, bold
             New-HTMLListItem -Text "Organizational Units that can be deleted (no objects/no gpos): ", $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU'] -FontWeight normal, bold
         } -FontSize 10pt
         New-HTMLText -Text 'Following domains require actions (permissions required):' -FontSize 10pt -FontWeight bold
@@ -126,7 +126,7 @@
                     New-ChartBarOptions -Type bar -Distributed
                     New-ChartAxisY -LabelMaxWidth 200 -LabelAlign left -Show
                     New-ChartBar -Name "Unlink GPO ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPO']
-                    New-ChartBar -Name "Unlink GPO Delete OU ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPODeleteOU']
+                    New-ChartBar -Name "Unlink GPO Delete OU ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPOEmpty']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['UnlinkGPOEmpty']
                     New-ChartBar -Name "Delete OU ($($Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']))" -Value $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']
                 } -Title 'Organizational Units' -TitleAlignment center
             }
