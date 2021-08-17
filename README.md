@@ -55,6 +55,8 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.137 - 2021.08.17
+  - ☑ Improved `Invoke-GPOZaurr` - type `GPOOrganizationalUnit` - moving delete of OU as non-mandatory option
 - 0.0.136 - 2021.08.17
   - ☑ Improved wording
 - 0.0.135 - 2021.08.17
