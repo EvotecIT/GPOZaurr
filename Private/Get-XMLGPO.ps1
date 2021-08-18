@@ -230,9 +230,18 @@
     # Mark GPO as excluded
     $Exclude = $false
     if ($ExcludeGroupPolicies) {
+        $GUID = $XMLContent.GPO.Identifier.Identifier.'#text'
+        $GUIDWithOutBrackets = $GUID.Replace('{', '').Replace('}', '')
         $PolicyWithDomain = -join ($XMLContent.GPO.Identifier.Domain.'#text', $XMLContent.GPO.Name)
-        $PolicyWithDomainID = -join ($XMLContent.GPO.Identifier.Domain.'#text', $XMLContent.GPO.Identifier.Identifier.'#text')
-        if ($ExcludeGroupPolicies[$XMLContent.GPO.Name] -or $ExcludeGroupPolicies[$PolicyWithDomain] -or $ExcludeGroupPolicies[$PolicyWithDomainID] -or $ExcludeGroupPolicies[$XMLContent.GPO.Identifier.Identifier.'#text']) {
+        $PolicyWithDomainID = -join ($XMLContent.GPO.Identifier.Domain.'#text', $GUID)
+        $PolicyWithDomainIDWithoutBrackets = -join ($XMLContent.GPO.Identifier.Domain.'#text', $GUIDWithOutBrackets)
+        if ($ExcludeGroupPolicies[$XMLContent.GPO.Name] -or
+            $ExcludeGroupPolicies[$PolicyWithDomain] -or
+            $ExcludeGroupPolicies[$PolicyWithDomainID] -or
+            $ExcludeGroupPolicies[$GUID] -or
+            $ExcludeGroupPolicies[$GUIDWithOutBrackets] -or
+            $ExcludeGroupPolicies[$PolicyWithDomainIDWithoutBrackets]
+        ) {
             $Exclude = $true
         }
     }
