@@ -39,6 +39,7 @@
                 'ObjectsCountIndirect'     = 0
                 'ObjectsCountTotal'        = 0
                 'Level'                    = 'Top'
+                'RootLevel'                = $TopOU.Name
                 'Domain'                   = $Domain
             }
 
@@ -61,6 +62,7 @@
                         'ObjectsCountIndirect'     = 0
                         'ObjectsCountTotal'        = 0
                         'Level'                    = 'Child'
+                        'RootLevel'                = $TopOU.Name
                         'Domain'                   = $Domain
                     }
                 }
@@ -132,6 +134,7 @@
         [PSCustomObject] @{
             Organizationalunit  = $OU
             Level               = $CachedOu[$OU]['Level']
+            RootLevel           = $CachedOu[$OU]['RootLevel']
             DomainName          = $CachedOu[$OU]['Domain']
             Status              = $Status
             GPOCount            = $CachedOu[$OU]['LinkedGroupPolicyObjects'].Count
