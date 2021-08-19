@@ -55,6 +55,8 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.139 - 2021.08.19
+  - ☑ Improved `Invoke-GPOZaurr` - type `GPOOrganizationalUnit` - adding RootLevel information
 - 0.0.138 - 2021.08.18
   - 🐛 Fix for exclusions using GUID with brackets for Invoke-GPOZaurr `GPOList` and related options
 - 0.0.137 - 2021.08.17
