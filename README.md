@@ -55,6 +55,8 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.140 - 2021.08.24
+  - ☑ Improved `Invoke-GPOZaurr` - type `GPOAnalysis` - added folder redirection type - [tnx PatrickOnGit](https://github.com/EvotecIT/GPOZaurr/pull/24)
 - 0.0.139 - 2021.08.19
   - ☑ Improved `Invoke-GPOZaurr` - type `GPOOrganizationalUnit` - adding RootLevel information
 - 0.0.138 - 2021.08.18
