@@ -34,6 +34,7 @@
         [Array] $CreateGPO['Settings'] = foreach ($Folder in $GPO.DataSet) {
             foreach ($Location in $Folder.Location) {
                 [PSCustomObject] @{
+                    ID                        = $Folder.ID
                     FolderType                = $FolderID[$Folder.Id]
                     DestinationPath           = $Location.DestinationPath
                     SecuritySID               = $Location.SecurityGroup.SID.'#text'
@@ -63,8 +64,8 @@
                     DomainName                = $GPO.DomainName
                     GUID                      = $GPO.GUID
                     GpoType                   = $GPO.GpoType
-                    FolderType                = $FolderID[$Folder.Id]
                     Id                        = $Folder.Id
+                    FolderType                = $FolderID[$Folder.Id]
                     DestinationPath           = $Location.DestinationPath
                     SecuritySID               = $Location.SecurityGroup.SID.'#text'
                     SecurityName              = $Location.SecurityGroup.Name.'#text'
