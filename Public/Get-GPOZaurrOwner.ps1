@@ -84,7 +84,7 @@
         foreach ($_ in $Objects) {
             $Count++
             Write-Verbose "Get-GPOZaurrOwner - Processing GPO [$Count/$($Objects.Count)]: $($_.DisplayName) from domain: $($_.DomainName)"
-            $ACL = Get-ADACLOwner -ADObject $_.GPODistinguishedName -Resolve -ADAdministrativeGroups $ADAdministrativeGroups -Verbose:$false
+            $ACL = Get-ADACLOwner -ADObject $_.GPODistinguishedName -Resolve -Verbose:$false
             $Object = [ordered] @{
                 DisplayName = $_.DisplayName
                 DomainName  = $_.DomainName
