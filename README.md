@@ -55,7 +55,7 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
-- 0.0.141
+- 0.0.141 - 2021.10.17
   - Removed property from `Get-GPOZaurrAD` - `FunctionalityVersion`
   - Added property to `Get-GPOZaurrAD` - `Owner`
   - Added ability to choose date ranges for `Get-GPOZaurrAD`
