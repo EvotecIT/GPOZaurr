@@ -22,7 +22,7 @@
             ModuleName    = 'PSSharedGoods'
             Guid          = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe'
         }, @{
-            ModuleVersion = '0.0.133'
+            ModuleVersion = '0.0.134'
             ModuleName    = 'ADEssentials'
             Guid          = '9fc9fd61-7f11-4f4b-a527-084086f1905f'
         }, @{
