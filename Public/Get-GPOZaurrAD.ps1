@@ -10,6 +10,11 @@
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
+
+        [DateTime] $DateFrom,
+        [DateTime] $DateTo,
+        [ValidateSet('PastHour', 'CurrentHour', 'PastDay', 'CurrentDay', 'PastMonth', 'CurrentMonth', 'PastQuarter', 'CurrentQuarter', 'Last14Days', 'Last7Days', 'Last3Days', 'Last1Days')][string] $DateRange,
+        [ValidateSet('WhenCreated', 'WhenChanged')][string] $DateProperty = 'WhenCreated',
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {
@@ -48,7 +53,21 @@
                     Server = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
                 }
             }
-            Get-ADObject @Splat -Properties DisplayName, Name, Created, Modified, gPCFileSysPath, gPCFunctionalityVersion, gPCWQLFilter, gPCMachineExtensionNames, Description, CanonicalName, DistinguishedName | ForEach-Object -Process {
+            # allows to only get GPOs from a specific date range
+            if ($PSBoundParameters.ContainsKey('DateRange')) {
+                $Dates = Get-ChoosenDates -DateRange $DateRange
+                $DateFrom = $($Dates.DateFrom)
+                $DateTo = $($Dates.DateTo)
+                $Splat['Filter'] = -join ($Splat['Filter'], '-and ($DateProperty -ge $DateFrom -and $DateProperty -le $DateTo)')
+            } elseif ($PSBoundParameters.ContainsKey('DateFrom') -and $PSBoundParameters.ContainsKey('DateTo')) {
+                # already set $DateFrom,DateTo
+                $Splat['Filter'] = -join ($Splat['Filter'], '-and ($DateProperty -ge $DateFrom -and $DateProperty -le $DateTo)')
+            } else {
+                # not needed
+            }
+
+
+            Get-ADObject @Splat -Properties DisplayName, Name, Created, Modified, ntSecurityDescriptor, gPCFileSysPath, gPCFunctionalityVersion, gPCWQLFilter, gPCMachineExtensionNames, Description, CanonicalName, DistinguishedName | ForEach-Object -Process {
                 $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDomainCN
                 $GUID = $_.Name -replace '{' -replace '}'
                 if (($GUID).Length -ne 36) {
@@ -60,9 +79,10 @@
                     $Output['Description'] = $_.Description
                     $Output['GUID'] = $GUID
                     $Output['Path'] = $_.gPCFileSysPath
-                    $Output['FunctionalityVersion'] = $_.gPCFunctionalityVersion
+                    #$Output['FunctionalityVersion'] = $_.gPCFunctionalityVersion
                     $Output['Created'] = $_.Created
                     $Output['Modified'] = $_.Modified
+                    $Output['Owner'] = $_.ntSecurityDescriptor.Owner
                     $Output['GPOCanonicalName'] = $_.CanonicalName
                     $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDC
                     $Output['GPODistinguishedName'] = $_.DistinguishedName
