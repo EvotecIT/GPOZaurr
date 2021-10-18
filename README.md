@@ -55,6 +55,8 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.142 - 2021.10.18
+  - Fixes `Get-GPOZaurrUpdates` when GPO is not linked
 - 0.0.141 - 2021.10.17
   - Removed property from `Get-GPOZaurrAD` - `FunctionalityVersion`
   - Added property to `Get-GPOZaurrAD` - `Owner`
