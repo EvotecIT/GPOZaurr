@@ -44,9 +44,16 @@
                 }
             }
         }
-
-        $OrganizationalUnitsObjects = Get-ADOrganizationalUnitObject -OrganizationalUnit $LinksDN -Summary -IncludeAffectedOnly
-
+        if ($LinksDN.Count -gt 0) {
+            $OrganizationalUnitsObjects = Get-ADOrganizationalUnitObject -OrganizationalUnit $LinksDN -Summary -IncludeAffectedOnly
+        } else {
+            # GPO is not linked
+            $OrganizationalUnitsObjects = [PSCUstomObject] @{
+                ObjectsTotalCount              = 0
+                ObjectsBlockedInheritanceCount = 0
+                ObjectsClasses                 = @()
+            }
+        }
         [PSCustomObject] @{
             DisplayName             = $GPO.DisplayName
             DomainName              = $GPO.DomainName
