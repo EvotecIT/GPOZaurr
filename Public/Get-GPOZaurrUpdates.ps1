@@ -28,13 +28,17 @@
 
     $OUCache = [ordered] @{}
     foreach ($Domain in $ForestInformation.Domains) {
+        Write-Verbose -Message "Get-GPOZaurrUpdates - Getting OU's for $Domain"
         $OrganizationalUnits = Get-ADOrganizationalUnit -Filter * -Properties gpOptions, canonicalName -Server $ForestInformation['QueryServers'][$Domain]['HostName'][0]
         $OUCache[$OrganizationalUnits.DistinguishedName] = if ($OrganizationalUnits.gpOptions -eq 1) { $true } else { $false } # blocked inheritance
     }
 
-
-    $GPOs = Get-GPOZaurrAD @getGPOZaurrADSplat
+    $CurrentCount = 0
+    Write-Verbose -Message "Get-GPOZaurrUpdates - Getting all GPOs for defined ranges"
+    [Array] $GPOs = Get-GPOZaurrAD @getGPOZaurrADSplat
     foreach ($GPO in $GPOs) {
+        $CurrentCount++
+        Write-Verbose -Message "Get-GPOZaurrUpdates - Processing $($GPO.DisplayName) / $($GPO.DomainName) [$CurrentCount/$($GPOs.Count)]"
         $GPOLinkData = $LinksSummaryCache["$($GPO.DomainName)$($GPO.GUID)"]
         #$GPOLinkData
         [Array] $LinksDN = if ($GPOLinkData.Links.Count -gt 0) {
