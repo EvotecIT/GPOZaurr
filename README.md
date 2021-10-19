@@ -55,6 +55,8 @@ To understand the usage I've created blog post you may find useful
 
 ## Changelog
 
+- 0.0.143 - 2021.10.19
+  - Improves `Get-GPOZaurrUpdates` with more verbose messages
 - 0.0.142 - 2021.10.18
   - Fixes `Get-GPOZaurrUpdates` when GPO is not linked
 - 0.0.141 - 2021.10.17
