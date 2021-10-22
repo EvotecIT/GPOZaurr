@@ -72,9 +72,13 @@
             # That's why we use $ForestInformation.Forest.Domains instead
             foreach ($Domain in $ForestInformation.Forest.Domains) {
                 Write-Verbose "Get-GPOZaurrLink - Building GPO cache for domain $Domain"
-                $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
-                Get-GPO -All -DomainName $Domain -Server $QueryServer | ForEach-Object {
-                    $GPOCache["$Domain$($_.ID.Guid)"] = $_
+                if ($ForestInformation['QueryServers'][$Domain]) {
+                    $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
+                    Get-GPO -All -DomainName $Domain -Server $QueryServer | ForEach-Object {
+                        $GPOCache["$Domain$($_.ID.Guid)"] = $_
+                    }
+                } else {
+                    Write-Warning -Message "Get-GPOZaurrLink - Couldn't get query server for $Domain. Skipped."
                 }
             }
         }
