@@ -31,13 +31,13 @@ function Get-GPOZaurrLinkInheritance {
     Parameter description
 
     .PARAMETER Forest
-    Parameter description
+    Target different Forest, by default current forest is used
 
     .PARAMETER ExcludeDomains
-    Parameter description
+    Exclude domain from search, by default whole forest is scanned
 
     .PARAMETER IncludeDomains
-    Parameter description
+    Include only specific domains, by default whole forest is scanned
 
     .PARAMETER ExtendedForestInformation
     Parameter description
@@ -123,9 +123,13 @@ function Get-GPOZaurrLinkInheritance {
             # While initially we used $ForestInformation.Domains but the thing is GPOs can be linked to other domains so we need to get them all so we can use cache of it later on even if we're processing just one domain
             # That's why we use $ForestInformation.Forest.Domains instead
             foreach ($Domain in $ForestInformation.Forest.Domains) {
-                $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
-                Get-GPO -All -DomainName $Domain -Server $QueryServer | ForEach-Object {
-                    $GPOCache["$Domain$($_.ID.Guid)"] = $_
+                if ($ForestInformation['QueryServers'][$Domain]) {
+                    $QueryServer = $ForestInformation['QueryServers'][$Domain]['HostName'][0]
+                    Get-GPO -All -DomainName $Domain -Server $QueryServer | ForEach-Object {
+                        $GPOCache["$Domain$($_.ID.Guid)"] = $_
+                    }
+                } else {
+                    Write-Warning -Message "Get-GPOZaurrLinkInheritance - Couldn't get query server for $Domain. Skipped."
                 }
             }
         }
