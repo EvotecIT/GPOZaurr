@@ -13,8 +13,8 @@
 
         [DateTime] $DateFrom,
         [DateTime] $DateTo,
-        [ValidateSet('PastHour', 'CurrentHour', 'PastDay', 'CurrentDay', 'PastMonth', 'CurrentMonth', 'PastQuarter', 'CurrentQuarter', 'Last14Days', 'Last7Days', 'Last3Days', 'Last1Days')][string] $DateRange,
-        [ValidateSet('WhenCreated', 'WhenChanged')][string] $DateProperty = 'WhenCreated',
+        [ValidateSet('PastHour', 'CurrentHour', 'PastDay', 'CurrentDay', 'PastMonth', 'CurrentMonth', 'PastQuarter', 'CurrentQuarter', 'Last14Days', 'Last21Days', 'Last30Days', 'Last7Days', 'Last3Days', 'Last1Days')][string] $DateRange,
+        [ValidateSet('WhenCreated', 'WhenChanged')][string[]] $DateProperty = 'WhenCreated',
         [System.Collections.IDictionary] $ExtendedForestInformation
     )
     Begin {
@@ -58,15 +58,33 @@
                 $Dates = Get-ChoosenDates -DateRange $DateRange
                 $DateFrom = $($Dates.DateFrom)
                 $DateTo = $($Dates.DateTo)
-                $Splat['Filter'] = -join ($Splat['Filter'], '-and ($DateProperty -ge $DateFrom -and $DateProperty -le $DateTo)')
+
+                if ($DateProperty -contains 'WhenChanged' -and $DateProperty -contains 'WhenCreated') {
+                    $Splat['Filter'] = -join ($Splat['Filter'], ' -and ((WhenChanged -ge $DateFrom -and WhenChanged -le $DateTo) -or (WhenCreated -ge $DateFrom -and WhenCreated -le $DateTo))')
+                } elseif ($DateProperty -eq 'WhenChanged' -or $DateProperty -eq 'WhenCreated') {
+                    $Property = $DateProperty[0]
+                    $Splat['Filter'] = -join ($Splat['Filter'], ' -and ($Property -ge $DateFrom -and $Property -le $DateTo)')
+                } else {
+                    Write-Warning -Message "Get-GPOZaurrAD - DateProperty parameter is empty. Provide name and try again."
+                    continue
+                }
             } elseif ($PSBoundParameters.ContainsKey('DateFrom') -and $PSBoundParameters.ContainsKey('DateTo')) {
                 # already set $DateFrom,DateTo
-                $Splat['Filter'] = -join ($Splat['Filter'], '-and ($DateProperty -ge $DateFrom -and $DateProperty -le $DateTo)')
+                #$Splat['Filter'] = -join ($Splat['Filter'], '-and ($DateProperty -ge $DateFrom -and $DateProperty -le $DateTo)')
+                if ($DateProperty -contains 'WhenChanged' -and $DateProperty -contains 'WhenCreated') {
+                    $Splat['Filter'] = -join ($Splat['Filter'], ' -and ((WhenChanged -ge $DateFrom -and WhenChanged -le $DateTo) -or (WhenCreated -ge $DateFrom -and WhenCreated -le $DateTo))')
+                } elseif ($DateProperty -eq 'WhenChanged' -or $DateProperty -eq 'WhenCreated') {
+                    $Property = $DateProperty[0]
+                    $Splat['Filter'] = -join ($Splat['Filter'], ' -and ($Property -ge $DateFrom -and $Property -le $DateTo)')
+                } else {
+                    Write-Warning -Message "Get-GPOZaurrAD - DateProperty parameter is empty. Provide name and try again."
+                    continue
+                }
             } else {
                 # not needed
             }
 
-
+            Write-Verbose -Message "Get-GPOZaurrAD - Searching domain $Domain with filter $($Splat['Filter'])"
             Get-ADObject @Splat -Properties DisplayName, Name, Created, Modified, ntSecurityDescriptor, gPCFileSysPath, gPCFunctionalityVersion, gPCWQLFilter, gPCMachineExtensionNames, Description, CanonicalName, DistinguishedName | ForEach-Object -Process {
                 $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDomainCN
                 $GUID = $_.Name -replace '{' -replace '}'
