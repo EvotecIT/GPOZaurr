@@ -12,7 +12,7 @@
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [parameter(Mandatory, ParameterSetName = 'Dates')][DateTime] $DateFrom,
         [parameter(Mandatory, ParameterSetName = 'Dates')][DateTime] $DateTo,
-        [parameter(Mandatory, ParameterSetName = 'DateRange')][ValidateSet('PastHour', 'CurrentHour', 'PastDay', 'CurrentDay', 'PastMonth', 'CurrentMonth', 'PastQuarter', 'CurrentQuarter', 'Last14Days', 'Last7Days', 'Last3Days', 'Last1Days')][string] $DateRange,
+        [parameter(Mandatory, ParameterSetName = 'DateRange')][ValidateSet('PastHour', 'CurrentHour', 'PastDay', 'CurrentDay', 'PastMonth', 'CurrentMonth', 'PastQuarter', 'CurrentQuarter', 'Last14Days', 'Last21Days', 'Last30Days', 'Last7Days', 'Last3Days', 'Last1Days')][string] $DateRange,
         [parameter(ParameterSetName = 'Dates')]
         [parameter(ParameterSetName = 'DateRange')]
         [ValidateSet('WhenCreated', 'WhenChanged')][string[]] $DateProperty = 'WhenCreated',
