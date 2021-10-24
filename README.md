@@ -20,8 +20,36 @@
 # GPOZaurr
 
 Group Policy Eater is a PowerShell module that aims to gather information about Group Policies but also allows fixing issues that you may find in them.
+**GPOZaurr** provides 360 degrees of information about Group Policies and their settings.
 
-To understand the usage I've created blog post you may find useful
+Just a single command (`Invoke-GPOZaurr`) provides following reports:
+
+- GPOBroken
+- GPOBrokenLink
+- GPOOwners
+- GPOConsistency
+- GPODuplicates
+- GPOOrganizationalUnit
+- GPOList
+- GPOLinks
+- GPOPassword
+- GPOPermissions
+- GPOPermissionsAdministrative
+- GPOPermissionsRead
+- GPOPermissionsRoot
+- GPOPermissionsUnknown
+- GPOFiles
+- GPOBlockedInheritance
+- GPOAnalysis
+- GPOUpdates
+- NetLogonOwners
+- NetLogonPermissions
+- SysVolLegacyFiles
+
+But that's not all.
+There are over 50 other commands available that make it even more powerful helping with day to day tasks to manage Group Policies.
+
+To understand the usage of `Invoke-GPOZaurr` I've created blog post you may find useful
 
 - [The only command you will ever need to understand and fix your Group Policies (GPO)](https://evotec.xyz/the-only-command-you-will-ever-need-to-understand-and-fix-your-group-policies-gpo/)
 
