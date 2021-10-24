@@ -61,9 +61,13 @@
         }
         New-HTMLSection -Name 'Group Policies added in last 7 days' {
             New-HTMLTable -DataTable $Script:Reporting['GPOUpdates']['Data'] -Filtering {
-                New-HTMLTableCondition -Name 'LinksCount' -Value 0 -BackgroundColor Salmon -ComparisonType number
-                New-HTMLTableCondition -Name 'LinksEnabledCount' -Value 0 -BackgroundColor Salmon -ComparisonType number
-                New-HTMLTableCondition -Name 'AffectedCount' -Value 0 -BackgroundColor Salmon -ComparisonType number
+                #New-HTMLTableCondition -Name 'LinksCount' -Value 0 -BackgroundColor Salmon -ComparisonType number
+                #New-HTMLTableCondition -Name 'LinksEnabledCount' -Value 0 -BackgroundColor Salmon -ComparisonType number
+                New-HTMLTableCondition -Name 'AffectedCount' -Value 0 -BackgroundColor Salmon -ComparisonType number -FailBackgroundColor Goldenrod
+                New-HTMLTableConditionGroup {
+                    New-HTMLTableCondition -Name 'LinksCount' -Value 0 -ComparisonType number
+                    New-HTMLTableCondition -Name 'LinksEnabledCount' -Value 0 -ComparisonType number
+                } -BackgroundColor Salmon -FailBackgroundColor Goldenrod -Logic OR -HighlightHeaders 'LinksCount', 'LinksEnabledCount', 'DisplayaName', 'DomainName'
             }
         }
         if ($Script:Reporting['GPOUpdates']['WarningsAndErrors']) {
