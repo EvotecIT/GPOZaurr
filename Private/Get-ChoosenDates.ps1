@@ -1,9 +1,8 @@
 ﻿function Get-ChoosenDates {
     [CmdletBinding()]
     param(
-        [ValidateSet('Everything', 'PastHour', 'CurrentHour', 'PastDay', 'CurrentDay', 'PastMonth', 'CurrentMonth', 'PastQuarter', 'CurrentQuarter', 'Last14Days', 'Last7Days', 'Last3Days', 'Last1Days')][string] $DateRange
+        [ValidateSet('Everything', 'PastHour', 'CurrentHour', 'PastDay', 'CurrentDay', 'PastMonth', 'CurrentMonth', 'PastQuarter', 'CurrentQuarter', 'Last14Days', 'Last21Days', 'Last30Days' , 'Last7Days', 'Last3Days', 'Last1Days')][string] $DateRange
     )
-    #$Dates = @(
     # Report Per Hour
     if ($DateRange -eq 'PastHour') {
         $DatesPastHour = Find-DatesPastHour
@@ -89,6 +88,16 @@
             $DatesCurrentDayMinusDaysX
         }
     }
-    #)
-    #$Dates
+    if ($DateRange -eq 'Last21days') {
+        $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX -days 21
+        if ($DatesCurrentDayMinusDaysX) {
+            $DatesCurrentDayMinusDaysX
+        }
+    }
+    if ($DateRange -eq 'Last30Days') {
+        $DatesCurrentDayMinusDaysX = Find-DatesCurrentDayMinuxDaysX -days 30
+        if ($DatesCurrentDayMinusDaysX) {
+            $DatesCurrentDayMinusDaysX
+        }
+    }
 }
