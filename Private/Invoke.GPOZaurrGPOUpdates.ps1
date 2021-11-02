@@ -4,7 +4,7 @@
     Action     = $null
     Data       = $null
     Execute    = {
-        Get-GPOZaurrUpdates -DateRange Last14Days -DateProperty WhenCreated -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
+        Get-GPOZaurrUpdates -DateRange Last7Days -DateProperty WhenCreated -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
     Processing = {
         foreach ($GPO in $Script:Reporting['GPOUpdates']['Data']) {
