@@ -1,5 +1,7 @@
 ﻿# GPOZaurr Release History
 
+## 0.0.146 - 2021.11.02
+  - Improves `GPOUpdates` report from `Invoke-GPOZaurr` - should be 7 days, not 14 days
 ## 0.0.145 - 2021.11.02
   - Improves `GPOUpdates` report from `Invoke-GPOZaurr` by fixing conditional formatting
 ## 0.0.144 - 2021.10.24
