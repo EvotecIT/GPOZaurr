@@ -67,7 +67,7 @@
                 New-HTMLTableConditionGroup {
                     New-HTMLTableCondition -Name 'LinksCount' -Value 0 -ComparisonType number
                     New-HTMLTableCondition -Name 'LinksEnabledCount' -Value 0 -ComparisonType number
-                } -BackgroundColor Salmon -FailBackgroundColor Goldenrod -Logic OR -HighlightHeaders 'LinksCount', 'LinksEnabledCount', 'DisplayaName', 'DomainName'
+                } -BackgroundColor Salmon -FailBackgroundColor Goldenrod -Logic OR -HighlightHeaders 'LinksCount', 'LinksEnabledCount', 'DisplayName', 'DomainName'
             }
         }
         if ($Script:Reporting['GPOUpdates']['WarningsAndErrors']) {
