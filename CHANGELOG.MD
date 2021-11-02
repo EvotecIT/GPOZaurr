@@ -1,6 +1,8 @@
 ﻿# GPOZaurr Release History
 
-## 0.0.144-- 2021.10.24
+## 0.0.145 - 2021.11.02
+  - Improves `GPOUpdates` report from `Invoke-GPOZaurr` by fixing conditional formatting
+## 0.0.144 - 2021.10.24
   - Improves `Get-GPOZaurrUpdates`
   - Adds `GPOUpdates` report to `Invoke-GPOZaurr`
 ## 0.0.143 - 2021.10.19
