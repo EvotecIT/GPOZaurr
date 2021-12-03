@@ -8,32 +8,96 @@ schema: 2.0.0
 # Get-GPOZaurrInheritance
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Short description
 
 ## SYNTAX
 
 ```
-Get-GPOZaurrInheritance [-IncludeBlockedObjects] [-OnlyBlockedInheritance] [[-Forest] <String>]
+Get-GPOZaurrInheritance [-IncludeBlockedObjects] [-OnlyBlockedInheritance] [-IncludeExcludedObjects]
+ [-IncludeGroupPoliciesForBlockedObjects] [[-Exclusions] <String[]>] [[-Forest] <String>]
  [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>] [[-ExtendedForestInformation] <IDictionary>]
  [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Long description
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+$Objects = Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -Exclusions $ExcludedOU
 ```
 
-{{ Add example description here }}
+$Objects | Format-Table
 
 ## PARAMETERS
 
-### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+### -IncludeBlockedObjects
+Include OU's with blocked inheritance.
+Default disabled
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OnlyBlockedInheritance
+Show only OU's with blocked inheritance
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -IncludeExcludedObjects
+Show excluded objets.
+Default disabled
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -IncludeGroupPoliciesForBlockedObjects
+{{ Fill IncludeGroupPoliciesForBlockedObjects Description }}
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Exclusions
+Provide exclusions for OU's approved by IT.
+You can provide OU by canonical name or distinguishedName
 
 ```yaml
 Type: String[]
@@ -47,11 +111,26 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
+### -Forest
+Target different Forest, by default current forest is used
 
 ```yaml
-Type: IDictionary
+Type: String
+Parameter Sets: (All)
+Aliases: ForestName
+
+Required: False
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExcludeDomains
+Exclude domain from search, by default whole forest is scanned
+
+```yaml
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 
@@ -62,38 +141,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Forest
-{{ Fill Forest Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases: ForestName
-
-Required: False
-Position: 0
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -IncludeBlockedObjects
-{{ Fill IncludeBlockedObjects Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+Include only specific domains, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -101,22 +150,22 @@ Parameter Sets: (All)
 Aliases: Domain, Domains
 
 Required: False
-Position: 2
+Position: 4
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -OnlyBlockedInheritance
-{{ Fill OnlyBlockedInheritance Description }}
+### -ExtendedForestInformation
+Ability to provide Forest Information from another command to speed up processing
 
 ```yaml
-Type: SwitchParameter
+Type: IDictionary
 Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
+Position: 5
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -127,11 +176,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

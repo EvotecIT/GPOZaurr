@@ -16,21 +16,21 @@ Gets owners of GPOs from Active Directory and SYSVOL
 ```
 Get-GPOZaurrOwner [-IncludeSysvol] [-SkipBroken] [-Forest <String>] [-ExcludeDomains <String[]>]
  [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
- [-ADAdministrativeGroups <IDictionary>] [<CommonParameters>]
+ [-ADAdministrativeGroups <IDictionary>] [-ApprovedOwner <String[]>] [<CommonParameters>]
 ```
 
 ### GPOName
 ```
 Get-GPOZaurrOwner [-GPOName <String>] [-IncludeSysvol] [-SkipBroken] [-Forest <String>]
  [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
- [-ADAdministrativeGroups <IDictionary>] [<CommonParameters>]
+ [-ADAdministrativeGroups <IDictionary>] [-ApprovedOwner <String[]>] [<CommonParameters>]
 ```
 
 ### GPOGUID
 ```
 Get-GPOZaurrOwner [-GPOGuid <String>] [-IncludeSysvol] [-SkipBroken] [-Forest <String>]
  [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
- [-ADAdministrativeGroups <IDictionary>] [<CommonParameters>]
+ [-ADAdministrativeGroups <IDictionary>] [-ApprovedOwner <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -179,6 +179,21 @@ Ability to provide AD Administrative Groups from another command to speed up pro
 Type: IDictionary
 Parameter Sets: (All)
 Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ApprovedOwner
+Ability to provide different owner (non administrative that still is approved for use)
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases: Exclusion, Exclusions
 
 Required: False
 Position: Named

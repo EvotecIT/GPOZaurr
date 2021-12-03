@@ -8,7 +8,7 @@ schema: 2.0.0
 # Repair-GPOZaurrNetLogonOwner
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Sets new owner to each file in NetLogon share.
 
 ## SYNTAX
 
@@ -19,41 +19,24 @@ Repair-GPOZaurrNetLogonOwner [[-Forest] <String>] [[-ExcludeDomains] <String[]>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Sets new owner to each file in NetLogon share.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
 ```
-
-{{ Add example description here }}
+Repair-GPOZaurrNetLogonOwner -WhatIf -Verbose -IncludeDomains ad.evotec.pl
+```
 
 ## PARAMETERS
 
-### -Confirm
-Prompts you for confirmation before running the cmdlet.
+### -Forest
+Target different Forest, by default current forest is used
 
 ```yaml
-Type: SwitchParameter
+Type: String
 Parameter Sets: (All)
-Aliases: cf
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
+Aliases: ForestName
 
 Required: False
 Position: 1
@@ -62,43 +45,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
-
-```yaml
-Type: IDictionary
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Forest
-{{ Fill Forest Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases: ForestName
-
-Required: False
-Position: 0
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+### -ExcludeDomains
+Exclude domain from search, by default whole forest is scanned
 
 ```yaml
 Type: String[]
 Parameter Sets: (All)
-Aliases: Domain, Domains
+Aliases:
 
 Required: False
 Position: 2
@@ -107,23 +60,39 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -LimitProcessing
-{{ Fill LimitProcessing Description }}
+### -IncludeDomains
+Include only specific domains, by default whole forest is scanned
 
 ```yaml
-Type: Int32
+Type: String[]
+Parameter Sets: (All)
+Aliases: Domain, Domains
+
+Required: False
+Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExtendedForestInformation
+Ability to provide Forest Information from another command to speed up processing
+
+```yaml
+Type: IDictionary
 Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 5
+Position: 4
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -Principal
-{{ Fill Principal Description }}
+Provide named owner.
+If not provided default S-1-5-32-544 is used.
 
 ```yaml
 Type: String
@@ -131,8 +100,24 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 4
-Default value: None
+Position: 5
+Default value: S-1-5-32-544
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -LimitProcessing
+Allows to specify maximum number of items that will be fixed in a single run.
+It doesn't affect amount of GPOs processed
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 6
+Default value: 2147483647
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -153,16 +138,29 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

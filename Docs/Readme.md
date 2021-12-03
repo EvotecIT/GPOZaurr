@@ -39,7 +39,10 @@ Provides Backup functionality to Group Policies
 {{ Fill in the Synopsis }}
 
 ### [Get-GPOZaurrBroken](Get-GPOZaurrBroken.md)
-{{ Fill in the Synopsis }}
+Detects broken or otherwise damaged Group Policies
+
+### [Get-GPOZaurrBrokenLink](Get-GPOZaurrBrokenLink.md)
+Finds any GPO link that doesn't have a matching GPO (already removed GPO).
 
 ### [Get-GPOZaurrDictionary](Get-GPOZaurrDictionary.md)
 {{ Fill in the Synopsis }}
@@ -57,7 +60,7 @@ Provides Backup functionality to Group Policies
 {{ Fill in the Synopsis }}
 
 ### [Get-GPOZaurrInheritance](Get-GPOZaurrInheritance.md)
-{{ Fill in the Synopsis }}
+Short description
 
 ### [Get-GPOZaurrLegacyFiles](Get-GPOZaurrLegacyFiles.md)
 {{ Fill in the Synopsis }}
@@ -71,6 +74,9 @@ Provides Backup functionality to Group Policies
 ### [Get-GPOZaurrNetLogon](Get-GPOZaurrNetLogon.md)
 {{ Fill in the Synopsis }}
 
+### [Get-GPOZaurrOrganizationalUnit](Get-GPOZaurrOrganizationalUnit.md)
+{{ Fill in the Synopsis }}
+
 ### [Get-GPOZaurrOwner](Get-GPOZaurrOwner.md)
 Gets owners of GPOs from Active Directory and SYSVOL
 
@@ -78,6 +84,9 @@ Gets owners of GPOs from Active Directory and SYSVOL
 Tries to find CPassword in Group Policies or given path and translate it to readable value
 
 ### [Get-GPOZaurrPermission](Get-GPOZaurrPermission.md)
+{{ Fill in the Synopsis }}
+
+### [Get-GPOZaurrPermissionAnalysis](Get-GPOZaurrPermissionAnalysis.md)
 {{ Fill in the Synopsis }}
 
 ### [Get-GPOZaurrPermissionConsistency](Get-GPOZaurrPermissionConsistency.md)
@@ -93,13 +102,16 @@ Detects Group Policy missing Authenticated Users permission while not having hig
 {{ Fill in the Synopsis }}
 
 ### [Get-GPOZaurrSysvolDFSR](Get-GPOZaurrSysvolDFSR.md)
+Gets DFSR information from the SYSVOL DFSR
+
+### [Get-GPOZaurrUpdates](Get-GPOZaurrUpdates.md)
 {{ Fill in the Synopsis }}
 
 ### [Get-GPOZaurrWMI](Get-GPOZaurrWMI.md)
 Get Group Policy WMI filter
 
 ### [Invoke-GPOZaurr](Invoke-GPOZaurr.md)
-{{ Fill in the Synopsis }}
+Single cmdlet that provides 360 degree overview of Group Policies in Active Directory Forest.
 
 ### [Invoke-GPOZaurrContent](Invoke-GPOZaurrContent.md)
 {{ Fill in the Synopsis }}
@@ -123,7 +135,7 @@ Enables or disables user/computer section of group policy based on it's content.
 {{ Fill in the Synopsis }}
 
 ### [Remove-GPOZaurrBroken](Remove-GPOZaurrBroken.md)
-{{ Fill in the Synopsis }}
+Finds and removes broken Group Policies from SYSVOL or AD or both.
 
 ### [Remove-GPOZaurrDuplicateObject](Remove-GPOZaurrDuplicateObject.md)
 {{ Fill in the Synopsis }}
@@ -134,13 +146,22 @@ Enables or disables user/computer section of group policy based on it's content.
 ### [Remove-GPOZaurrLegacyFiles](Remove-GPOZaurrLegacyFiles.md)
 {{ Fill in the Synopsis }}
 
+### [Remove-GPOZaurrLinkEmptyOU](Remove-GPOZaurrLinkEmptyOU.md)
+{{ Fill in the Synopsis }}
+
 ### [Remove-GPOZaurrPermission](Remove-GPOZaurrPermission.md)
 {{ Fill in the Synopsis }}
 
 ### [Remove-GPOZaurrWMI](Remove-GPOZaurrWMI.md)
 {{ Fill in the Synopsis }}
 
+### [Repair-GPOZaurrBrokenLink](Repair-GPOZaurrBrokenLink.md)
+Removes any link to GPO that no longer exists.
+
 ### [Repair-GPOZaurrNetLogonOwner](Repair-GPOZaurrNetLogonOwner.md)
+Sets new owner to each file in NetLogon share.
+
+### [Repair-GPOZaurrPermission](Repair-GPOZaurrPermission.md)
 {{ Fill in the Synopsis }}
 
 ### [Repair-GPOZaurrPermissionConsistency](Repair-GPOZaurrPermissionConsistency.md)
@@ -150,7 +171,7 @@ Enables or disables user/computer section of group policy based on it's content.
 {{ Fill in the Synopsis }}
 
 ### [Save-GPOZaurrFiles](Save-GPOZaurrFiles.md)
-{{ Fill in the Synopsis }}
+Exports GPO XML data to files and saves it to a given path
 
 ### [Set-GPOOwner](Set-GPOOwner.md)
 Used within Invoke-GPOZaurrPermission only.

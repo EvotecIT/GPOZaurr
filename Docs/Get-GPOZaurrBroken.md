@@ -8,32 +8,51 @@ schema: 2.0.0
 # Get-GPOZaurrBroken
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Detects broken or otherwise damaged Group Policies
 
 ## SYNTAX
 
 ```
 Get-GPOZaurrBroken [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-ExcludeDomainControllers] <String[]>]
- [[-IncludeDomains] <String[]>] [[-IncludeDomainControllers] <String[]>] [-SkipRODC] [[-GPOs] <Array>]
+ [[-IncludeDomains] <String[]>] [[-IncludeDomainControllers] <String[]>] [-SkipRODC]
  [[-ExtendedForestInformation] <IDictionary>] [-VerifyDomainControllers] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Detects broken or otherwise damaged Group Policies providing insight whether GPO exists in both AD and SYSVOL.
+It provides few statuses:
+- Permissions issue - means account couldn't read GPO due to permissions
+- ObjectClass issue - means that ObjectClass is of type Container, rather than expected groupPolicyContainer
+- Not available on SYSVOL - means SYSVOL data is missing, yet AD metadata is available
+- Not available in AD - means AD metadata is missing, yet SYSVOL data is available
+- Exists - means AD metadata and SYSVOL data are available
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
 ```
-
-{{ Add example description here }}
+Get-GPOZaurrBroken -Verbose | Format-Table
+```
 
 ## PARAMETERS
 
-### -ExcludeDomainControllers
-{{ Fill ExcludeDomainControllers Description }}
+### -Forest
+Target different Forest, by default current forest is used
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: ForestName
+
+Required: False
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExcludeDomains
+Exclude domain from search, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -47,8 +66,9 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+### -ExcludeDomainControllers
+Exclude specific domain controllers, by default there are no exclusions, as long as VerifyDomainControllers switch is enabled.
+Otherwise this parameter is ignored.
 
 ```yaml
 Type: String[]
@@ -56,14 +76,61 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 1
+Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -IncludeDomains
+Include only specific domains, by default whole forest is scanned
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases: Domain, Domains
+
+Required: False
+Position: 4
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -IncludeDomainControllers
+Include only specific domain controllers, by default all domain controllers are included, as long as VerifyDomainControllers switch is enabled.
+Otherwise this parameter is ignored.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases: DomainControllers
+
+Required: False
+Position: 5
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SkipRODC
+Skip Read-Only Domain Controllers.
+By default all domain controllers are included.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
+Ability to provide Forest Information from another command to speed up processing
 
 ```yaml
 Type: IDictionary
@@ -77,83 +144,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Forest
-{{ Fill Forest Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases: ForestName
-
-Required: False
-Position: 0
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GPOs
-{{ Fill GPOs Description }}
-
-```yaml
-Type: Array
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 5
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -IncludeDomainControllers
-{{ Fill IncludeDomainControllers Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases: DomainControllers
-
-Required: False
-Position: 4
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -IncludeDomains
-{{ Fill IncludeDomains Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases: Domain, Domains
-
-Required: False
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SkipRODC
-{{ Fill SkipRODC Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -VerifyDomainControllers
-{{ Fill VerifyDomainControllers Description }}
+Forces cmdlet to check GPO Existance on Domain Controllers rather then per domain
 
 ```yaml
 Type: SwitchParameter
@@ -162,7 +154,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -172,11 +164,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

@@ -5,32 +5,24 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-GPOZaurrAD
+# Get-GPOZaurrUpdates
 
 ## SYNOPSIS
 {{ Fill in the Synopsis }}
 
 ## SYNTAX
 
-### Default (Default)
+### DateRange (Default)
 ```
-Get-GPOZaurrAD [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
- [-DateFrom <DateTime>] [-DateTo <DateTime>] [-DateRange <String>] [-DateProperty <String[]>]
- [-ExtendedForestInformation <IDictionary>] [<CommonParameters>]
-```
-
-### GPOName
-```
-Get-GPOZaurrAD [-GPOName <String>] [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
- [-DateFrom <DateTime>] [-DateTo <DateTime>] [-DateRange <String>] [-DateProperty <String[]>]
- [-ExtendedForestInformation <IDictionary>] [<CommonParameters>]
+Get-GPOZaurrUpdates [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
+ -DateRange <String> [-DateProperty <String[]>] [-ExtendedForestInformation <IDictionary>] [<CommonParameters>]
 ```
 
-### GPOGUID
+### Dates
 ```
-Get-GPOZaurrAD [-GPOGuid <String>] [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
- [-DateFrom <DateTime>] [-DateTo <DateTime>] [-DateRange <String>] [-DateProperty <String[]>]
- [-ExtendedForestInformation <IDictionary>] [<CommonParameters>]
+Get-GPOZaurrUpdates [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
+ -DateFrom <DateTime> -DateTo <DateTime> [-DateProperty <String[]>] [-ExtendedForestInformation <IDictionary>]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -52,10 +44,10 @@ PS C:\> {{ Add example code here }}
 
 ```yaml
 Type: DateTime
-Parameter Sets: (All)
+Parameter Sets: Dates
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -83,11 +75,11 @@ Accept wildcard characters: False
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: DateRange
 Aliases:
 Accepted values: PastHour, CurrentHour, PastDay, CurrentDay, PastMonth, CurrentMonth, PastQuarter, CurrentQuarter, Last14Days, Last21Days, Last30Days, Last7Days, Last3Days, Last1Days
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -99,10 +91,10 @@ Accept wildcard characters: False
 
 ```yaml
 Type: DateTime
-Parameter Sets: (All)
+Parameter Sets: Dates
 Aliases:
 
-Required: False
+Required: True
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -146,36 +138,6 @@ Accept wildcard characters: False
 Type: String
 Parameter Sets: (All)
 Aliases: ForestName
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GPOGuid
-{{ Fill GPOGuid Description }}
-
-```yaml
-Type: String
-Parameter Sets: GPOGUID
-Aliases: GUID, GPOID
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GPOName
-{{ Fill GPOName Description }}
-
-```yaml
-Type: String
-Parameter Sets: GPOName
-Aliases:
 
 Required: False
 Position: Named

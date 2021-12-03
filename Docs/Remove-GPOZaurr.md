@@ -16,7 +16,7 @@ schema: 2.0.0
 Remove-GPOZaurr [[-ExcludeGroupPolicies] <ScriptBlock>] [-Type] <String[]> [-LimitProcessing <Int32>]
  [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
  [-ExtendedForestInformation <IDictionary>] [-GPOPath <String[]>] [-BackupPath <String>] [-BackupDated]
- [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-RequireDays <Int32>] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -183,6 +183,21 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -RequireDays
+{{ Fill RequireDays Description }}
+
+```yaml
+Type: Int32
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Type
 {{ Fill Type Description }}
 
@@ -190,7 +205,7 @@ Accept wildcard characters: False
 Type: String[]
 Parameter Sets: (All)
 Aliases:
-Accepted values: Empty, Unlinked, Disabled
+Accepted values: Empty, Unlinked, Disabled, NoApplyPermission
 
 Required: True
 Position: 0

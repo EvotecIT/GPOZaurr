@@ -13,8 +13,14 @@ Allows to exclude Group Policy from being affected by fixes
 
 ## SYNTAX
 
+### Name (Default)
 ```
-Skip-GroupPolicy [[-Name] <String>] [[-DomaiName] <String>] [<CommonParameters>]
+Skip-GroupPolicy [-Name <String>] [-DomaiName <String>] [<CommonParameters>]
+```
+
+### Guid
+```
+Skip-GroupPolicy [-GUID <String>] [-DomaiName <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -50,11 +56,26 @@ Define Group Policy Name to skip
 
 ```yaml
 Type: String
-Parameter Sets: (All)
+Parameter Sets: Name
 Aliases: GpoName, DisplayName
 
 Required: False
-Position: 1
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GUID
+{{ Fill GUID Description }}
+
+```yaml
+Type: String
+Parameter Sets: Guid
+Aliases: ID
+
+Required: False
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -70,7 +91,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 2
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

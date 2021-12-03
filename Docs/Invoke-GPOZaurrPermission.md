@@ -298,7 +298,7 @@ Accept wildcard characters: False
 Type: String
 Parameter Sets: Linked
 Aliases:
-Accepted values: Root, DomainControllers, Site, Other
+Accepted values: Root, DomainControllers, Site, OrganizationalUnit
 
 Required: True
 Position: Named

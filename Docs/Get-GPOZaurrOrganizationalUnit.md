@@ -5,37 +5,40 @@ online version:
 schema: 2.0.0
 ---
 
-# Save-GPOZaurrFiles
+# Get-GPOZaurrOrganizationalUnit
 
 ## SYNOPSIS
-Exports GPO XML data to files and saves it to a given path
+{{ Fill in the Synopsis }}
 
 ## SYNTAX
 
 ```
-Save-GPOZaurrFiles [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>]
- [[-ExtendedForestInformation] <IDictionary>] [[-GPOPath] <String[]>] [-DeleteExisting] [<CommonParameters>]
+Get-GPOZaurrOrganizationalUnit [[-Forest] <String>] [[-ExcludeDomains] <String[]>]
+ [[-IncludeDomains] <String[]>] [[-ExtendedForestInformation] <IDictionary>] [[-Option] <String[]>]
+ [[-ExcludeOrganizationalUnit] <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Exports GPO XML data to files and saves it to a given path
+{{ Fill in the Description }}
 
 ## EXAMPLES
 
-### EXAMPLE 1
+### Example 1
+```powershell
+PS C:\> {{ Add example code here }}
 ```
-Save-GPOZaurrFiles -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExportEvotec' -DeleteExisting -Verbose
-```
+
+{{ Add example description here }}
 
 ## PARAMETERS
 
-### -Forest
-Target different Forest, by default current forest is used
+### -ExcludeDomains
+{{ Fill ExcludeDomains Description }}
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases: ForestName
+Aliases:
 
 Required: False
 Position: 1
@@ -44,58 +47,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExcludeDomains
-Exclude domain from search, by default whole forest is scanned
+### -ExcludeOrganizationalUnit
+{{ Fill ExcludeOrganizationalUnit Description }}
 
 ```yaml
 Type: String[]
 Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -IncludeDomains
-Include only specific domains, by default whole forest is scanned
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases: Domain, Domains
-
-Required: False
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExtendedForestInformation
-Ability to provide Forest Information from another command to speed up processing
-
-```yaml
-Type: IDictionary
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 4
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GPOPath
-Path where to save XML files from GPOReport
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
+Aliases: ExcludeOU, Exclusions
 
 Required: False
 Position: 5
@@ -104,17 +62,63 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -DeleteExisting
-Delete existing files before saving new ones
+### -ExtendedForestInformation
+{{ Fill ExtendedForestInformation Description }}
 
 ```yaml
-Type: SwitchParameter
+Type: IDictionary
 Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
-Default value: False
+Position: 3
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Forest
+{{ Fill Forest Description }}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: ForestName
+
+Required: False
+Position: 0
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -IncludeDomains
+{{ Fill IncludeDomains Description }}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases: Domain, Domains
+
+Required: False
+Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Option
+{{ Fill Option Description }}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+Accepted values: OK, Unlink, Delete
+
+Required: False
+Position: 4
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -124,9 +128,11 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
+### None
+
 ## OUTPUTS
 
+### System.Object
 ## NOTES
-General notes
 
 ## RELATED LINKS

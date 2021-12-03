@@ -12,24 +12,32 @@ schema: 2.0.0
 
 ## SYNTAX
 
+### Linked (Default)
+```
+Get-GPOZaurrLink [-Linked <String[]>] [-Limited] [-SkipDuplicates] [-GPOCache <IDictionary>] [-Forest <String>]
+ [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
+ [-AsHashTable] [-Summary] [<CommonParameters>]
+```
+
 ### ADObject
 ```
 Get-GPOZaurrLink -ADObject <ADObject[]> [-Limited] [-SkipDuplicates] [-GPOCache <IDictionary>]
  [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
- [-ExtendedForestInformation <IDictionary>] [<CommonParameters>]
+ [-ExtendedForestInformation <IDictionary>] [-AsHashTable] [-Summary] [<CommonParameters>]
 ```
 
 ### Filter
 ```
 Get-GPOZaurrLink [-Filter <String>] [-SearchBase <String>] [-SearchScope <ADSearchScope>] [-Limited]
  [-SkipDuplicates] [-GPOCache <IDictionary>] [-Forest <String>] [-ExcludeDomains <String[]>]
- [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [<CommonParameters>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-AsHashTable] [-Summary]
+ [<CommonParameters>]
 ```
 
-### Linked
+### Site
 ```
-Get-GPOZaurrLink -Linked <String> [-Limited] [-SkipDuplicates] [-GPOCache <IDictionary>] [-Forest <String>]
- [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>]
+Get-GPOZaurrLink [-Site <String[]>] [-GPOCache <IDictionary>] [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-AsHashTable] [-Summary]
  [<CommonParameters>]
 ```
 
@@ -59,6 +67,21 @@ Required: True
 Position: Named
 Default value: None
 Accept pipeline input: True (ByPropertyName, ByValue)
+Accept wildcard characters: False
+```
+
+### -AsHashTable
+{{ Fill AsHashTable Description }}
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
@@ -157,7 +180,7 @@ Accept wildcard characters: False
 
 ```yaml
 Type: SwitchParameter
-Parameter Sets: (All)
+Parameter Sets: Linked, ADObject, Filter
 Aliases:
 
 Required: False
@@ -171,12 +194,12 @@ Accept wildcard characters: False
 {{ Fill Linked Description }}
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: Linked
 Aliases:
-Accepted values: Root, DomainControllers, Site, Other
+Accepted values: All, Root, DomainControllers, Site, OrganizationalUnit
 
-Required: True
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
@@ -214,8 +237,38 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Site
+{{ Fill Site Description }}
+
+```yaml
+Type: String[]
+Parameter Sets: Site
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -SkipDuplicates
 {{ Fill SkipDuplicates Description }}
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: Linked, ADObject, Filter
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Summary
+{{ Fill Summary Description }}
 
 ```yaml
 Type: SwitchParameter

@@ -5,7 +5,7 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-GPOZaurr
+# Repair-GPOZaurrPermission
 
 ## SYNOPSIS
 {{ Fill in the Synopsis }}
@@ -13,10 +13,9 @@ schema: 2.0.0
 ## SYNTAX
 
 ```
-Get-GPOZaurr [[-ExcludeGroupPolicies] <ScriptBlock>] [[-GPOName] <String>] [[-GPOGuid] <String>]
- [[-Type] <String[]>] [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>]
- [[-ExtendedForestInformation] <IDictionary>] [[-GPOPath] <String[]>] [-PermissionsOnly] [-OwnerOnly]
- [-Limited] [-ReturnObject] [[-ADAdministrativeGroups] <IDictionary>] [<CommonParameters>]
+Repair-GPOZaurrPermission [-Type] <String[]> [[-Forest] <String>] [[-ExcludeDomains] <String[]>]
+ [[-IncludeDomains] <String[]>] [[-ExtendedForestInformation] <IDictionary>] [[-LimitProcessing] <Int32>]
+ [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -33,16 +32,16 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -ADAdministrativeGroups
-{{ Fill ADAdministrativeGroups Description }}
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
 
 ```yaml
-Type: IDictionary
+Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: cf
 
 Required: False
-Position: 9
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -57,22 +56,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 5
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExcludeGroupPolicies
-{{ Fill ExcludeGroupPolicies Description }}
-
-```yaml
-Type: ScriptBlock
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 0
+Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -87,7 +71,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 7
+Position: 4
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -102,52 +86,7 @@ Parameter Sets: (All)
 Aliases: ForestName
 
 Required: False
-Position: 4
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GPOGuid
-{{ Fill GPOGuid Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases: GUID, GPOID
-
-Required: False
-Position: 2
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GPOName
-{{ Fill GPOName Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
 Position: 1
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GPOPath
-{{ Fill GPOPath Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 8
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -162,67 +101,22 @@ Parameter Sets: (All)
 Aliases: Domain, Domains
 
 Required: False
-Position: 6
+Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Limited
-{{ Fill Limited Description }}
+### -LimitProcessing
+{{ Fill LimitProcessing Description }}
 
 ```yaml
-Type: SwitchParameter
+Type: Int32
 Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -OwnerOnly
-{{ Fill OwnerOnly Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -PermissionsOnly
-{{ Fill PermissionsOnly Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ReturnObject
-{{ Fill ReturnObject Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
+Position: 5
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -235,10 +129,26 @@ Accept wildcard characters: False
 Type: String[]
 Parameter Sets: (All)
 Aliases:
-Accepted values: Empty, Unlinked, Disabled, NoApplyPermission, All
+Accepted values: AuthenticatedUsers, Unknown, System, Administrative, All
+
+Required: True
+Position: 0
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -WhatIf
+Shows what would happen if the cmdlet runs.
+The cmdlet is not run.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
 
 Required: False
-Position: 3
+Position: Named
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

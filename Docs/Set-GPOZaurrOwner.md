@@ -16,14 +16,15 @@ Sets GPO Owner to Domain Admins or other choosen account
 ```
 Set-GPOZaurrOwner -Type <String> [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDomains <String[]>]
  [-ExtendedForestInformation <IDictionary>] [-Principal <String>] [-SkipSysvol] [-LimitProcessing <Int32>]
- [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-ApprovedOwner <String[]>] [-Action <String>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
 ```
 
 ### Named
 ```
 Set-GPOZaurrOwner [-GPOName <String>] [-GPOGuid <String>] [-Forest <String>] [-ExcludeDomains <String[]>]
  [-IncludeDomains <String[]>] [-ExtendedForestInformation <IDictionary>] [-Principal <String>] [-SkipSysvol]
- [-LimitProcessing <Int32>] [-Force] [-WhatIf] [-Confirm] [<CommonParameters>]
+ [-LimitProcessing <Int32>] [-ApprovedOwner <String[]>] [-Action <String>] [-Force] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -43,6 +44,7 @@ Set-GPOZaurrOwner -Type All -Verbose -WhatIf -LimitProcessing 2
 ### -Type
 Unknown - finds unknown Owners and sets them to Administrative (Domain Admins) or chosen principal
 NotMatching - find administrative groups only and if sysvol and gpo doesn't match - replace with chosen principal or Domain Admins if not specified
+Inconsistent - same as not NotMatching
 NotAdministrative - combination of Unknown/NotMatching and NotAdministrative - replace with chosen principal or Domain Admins if not specified
 All - if Owner is known it checks if it's Administrative, if it sn't it fixes that.
 If owner is unknown it fixes it
@@ -198,8 +200,38 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -ApprovedOwner
+{{ Fill ApprovedOwner Description }}
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases: Exclusion, Exclusions
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Action
+{{ Fill Action Description }}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Force
-{{ Fill Force Description }}
+Pushes new owner regardless if it's already set or not
 
 ```yaml
 Type: SwitchParameter

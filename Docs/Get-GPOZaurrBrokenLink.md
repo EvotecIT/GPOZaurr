@@ -5,26 +5,31 @@ online version:
 schema: 2.0.0
 ---
 
-# Save-GPOZaurrFiles
+# Get-GPOZaurrBrokenLink
 
 ## SYNOPSIS
-Exports GPO XML data to files and saves it to a given path
+Finds any GPO link that doesn't have a matching GPO (already removed GPO).
 
 ## SYNTAX
 
 ```
-Save-GPOZaurrFiles [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>]
- [[-ExtendedForestInformation] <IDictionary>] [[-GPOPath] <String[]>] [-DeleteExisting] [<CommonParameters>]
+Get-GPOZaurrBrokenLink [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>]
+ [[-ExtendedForestInformation] <IDictionary>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Exports GPO XML data to files and saves it to a given path
+Finds any GPO link that doesn't have a matching GPO (already removed GPO).
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-Save-GPOZaurrFiles -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExportEvotec' -DeleteExisting -Verbose
+Get-GPOZaurrBrokenLink -Verbose | Format-Table -AutoSize *
+```
+
+### EXAMPLE 2
+```
+Get-GPOZaurrBrokenLink -Verbose -IncludeDomains ad.evotec.pl | Format-Table -AutoSize *
 ```
 
 ## PARAMETERS
@@ -85,36 +90,6 @@ Aliases:
 Required: False
 Position: 4
 Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -GPOPath
-Path where to save XML files from GPOReport
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 5
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DeleteExisting
-Delete existing files before saving new ones
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

@@ -5,31 +5,34 @@ online version:
 schema: 2.0.0
 ---
 
-# Get-GPOZaurrSysvolDFSR
+# Repair-GPOZaurrBrokenLink
 
 ## SYNOPSIS
-Gets DFSR information from the SYSVOL DFSR
+Removes any link to GPO that no longer exists.
 
 ## SYNTAX
 
 ```
-Get-GPOZaurrSysvolDFSR [[-Forest] <String>] [[-ExcludeDomains] <String[]>]
- [[-ExcludeDomainControllers] <String[]>] [[-IncludeDomains] <String[]>]
- [[-IncludeDomainControllers] <String[]>] [-SkipRODC] [[-ExtendedForestInformation] <IDictionary>]
- [[-SearchDFSR] <String>] [<CommonParameters>]
+Repair-GPOZaurrBrokenLink [[-Forest] <String>] [[-ExcludeDomains] <String[]>] [[-IncludeDomains] <String[]>]
+ [[-ExtendedForestInformation] <IDictionary>] [[-LimitProcessing] <Int32>] [-WhatIf] [-Confirm]
+ [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Gets DFSR information from the SYSVOL DFSR
+Removes any link to GPO that no longer exists.
+It scans all site, organizational unit or domain root making sure every single link that may be linking to GPO that doesn't exists anymore is gone.
 
 ## EXAMPLES
 
 ### EXAMPLE 1
 ```
-$DFSR = Get-GPOZaurrSysvolDFSR
+Repair-GPOZaurrBrokenLink -Verbose -LimitProcessing 1 -WhatIf
 ```
 
-$DFSR | Format-Table *
+### EXAMPLE 2
+```
+Repair-GPOZaurrBrokenLink -Verbose -IncludeDomains ad.evotec.pl -LimitProcessing 1 -WhatIf
+```
 
 ## PARAMETERS
 
@@ -63,22 +66,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ExcludeDomainControllers
-Exclude specific domain controllers, by default there are no exclusions, as long as VerifyDomainControllers switch is enabled.
-Otherwise this parameter is ignored.
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -IncludeDomains
 Include only specific domains, by default whole forest is scanned
 
@@ -88,40 +75,8 @@ Parameter Sets: (All)
 Aliases: Domain, Domains
 
 Required: False
-Position: 4
+Position: 3
 Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -IncludeDomainControllers
-Include only specific domain controllers, by default all domain controllers are included, as long as VerifyDomainControllers switch is enabled.
-Otherwise this parameter is ignored.
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases: DomainControllers
-
-Required: False
-Position: 5
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -SkipRODC
-Skip Read-Only Domain Controllers.
-By default all domain controllers are included.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -135,24 +90,55 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 6
+Position: 4
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -SearchDFSR
-Define DFSR Share.
-By default it uses SYSVOL Share
+### -LimitProcessing
+Allows to specify maximum number of items that will be fixed in a single run.
+It doesn't affect amount of GPOs processed
 
 ```yaml
-Type: String
+Type: Int32
 Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: 7
-Default value: SYSVOL Share
+Position: 5
+Default value: 0
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -WhatIf
+Shows what would happen if the cmdlet runs.
+The cmdlet is not run.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: wi
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Confirm
+Prompts you for confirmation before running the cmdlet.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: cf
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

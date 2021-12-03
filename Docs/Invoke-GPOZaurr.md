@@ -8,62 +8,57 @@ schema: 2.0.0
 # Invoke-GPOZaurr
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Single cmdlet that provides 360 degree overview of Group Policies in Active Directory Forest.
 
 ## SYNTAX
 
 ```
-Invoke-GPOZaurr [[-ExcludeGroupPolicies] <ScriptBlock>] [-FilePath <String>] [[-Type] <String[]>] [-PassThru]
- [-HideHTML] [-HideSteps] [-ShowError] [-ShowWarning] [-Forest <String>] [-ExcludeDomains <String[]>]
- [-IncludeDomains <String[]>] [<CommonParameters>]
+Invoke-GPOZaurr [[-Exclusions] <Object>] [-FilePath <String>] [[-Type] <String[]>] [-PassThru] [-HideHTML]
+ [-HideSteps] [-ShowError] [-ShowWarning] [-Forest <String>] [-ExcludeDomains <String[]>]
+ [-IncludeDomains <String[]>] [-Online] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Single cmdlet that provides 360 degree overview of Group Policies in Active Directory Forest with ability to pick reports and export to HTML.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+Invoke-GPOZaurr
 ```
 
-{{ Add example description here }}
+### EXAMPLE 2
+```
+Invoke-GPOZaurr -Type GPOOrganizationalUnit -Online -FilePath $PSScriptRoot\Reports\GPOZaurrOU.html -Exclusions @(
+```
+
+'*OU=Production,DC=ad,DC=evotec,DC=pl'
+)
 
 ## PARAMETERS
 
-### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
+### -Exclusions
+Allows to mark as excluded some Group Policies or Organizational Units depending on type.
+Can be a scriptblock or array depending on supported way by underlying report.
+Not every report support exclusions.
+Not every report support exclusions the same way.
+Exclusions should be used only if there is single report being asked for.
 
 ```yaml
-Type: String[]
+Type: Object
 Parameter Sets: (All)
-Aliases:
+Aliases: ExcludeGroupPolicies, ExclusionsCode
 
 Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExcludeGroupPolicies
-{{ Fill ExcludeGroupPolicies Description }}
-
-```yaml
-Type: ScriptBlock
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 1
+Position: 2
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -FilePath
-{{ Fill FilePath Description }}
+Path to the file where the report will be saved.
 
 ```yaml
 Type: String
@@ -77,8 +72,100 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Type
+Type of report to be generated from a list of available reports.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 1
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -PassThru
+Returns created objects after the report is done
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -HideHTML
+Do not auto open HTML report in default browser
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -HideSteps
+Do not show steps in report
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ShowError
+Show errors in HTML report.
+Useful in case the report is being run as Scheduled Task
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ShowWarning
+Show warnings in HTML report.
+Useful in case the report is being run as Scheduled Task
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -Forest
-{{ Fill Forest Description }}
+Target different Forest, by default current forest is used
 
 ```yaml
 Type: String
@@ -92,26 +179,11 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -HideHTML
-{{ Fill HideHTML Description }}
+### -ExcludeDomains
+Exclude domain from search, by default whole forest is scanned
 
 ```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -HideSteps
-{{ Fill HideSteps Description }}
-
-```yaml
-Type: SwitchParameter
+Type: String[]
 Parameter Sets: (All)
 Aliases:
 
@@ -123,7 +195,7 @@ Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+Include only specific domains, by default whole forest is scanned
 
 ```yaml
 Type: String[]
@@ -137,8 +209,8 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -PassThru
-{{ Fill PassThru Description }}
+### -Online
+Forces report to use online resources in HTML (using CDN most of the time), by default it is run offline, and inlines all CSS/JS code.
 
 ```yaml
 Type: SwitchParameter
@@ -147,52 +219,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ShowError
-{{ Fill ShowError Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ShowWarning
-{{ Fill ShowWarning Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Type
-{{ Fill Type Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 0
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -202,11 +229,9 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS

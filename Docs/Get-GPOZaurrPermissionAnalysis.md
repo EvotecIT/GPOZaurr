@@ -5,7 +5,7 @@ online version:
 schema: 2.0.0
 ---
 
-# Invoke-GPOZaurrSupport
+# Get-GPOZaurrPermissionAnalysis
 
 ## SYNOPSIS
 {{ Fill in the Synopsis }}
@@ -13,8 +13,8 @@ schema: 2.0.0
 ## SYNTAX
 
 ```
-Invoke-GPOZaurrSupport [[-Type] <String>] [[-ComputerName] <String>] [[-UserName] <String>] [[-Path] <String>]
- [[-Splitter] <String>] [-PreventShow] [-Online] [<CommonParameters>]
+Get-GPOZaurrPermissionAnalysis [[-Forest] <String>] [[-ExcludeDomains] <String[]>]
+ [[-IncludeDomains] <String[]>] [[-Permissions] <Array>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -31,13 +31,13 @@ PS C:\> {{ Add example code here }}
 
 ## PARAMETERS
 
-### -ComputerName
-{{ Fill ComputerName Description }}
+### -ExcludeDomains
+{{ Fill ExcludeDomains Description }}
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases: Server
+Aliases:
 
 Required: False
 Position: 1
@@ -46,74 +46,13 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Online
-{{ Fill Online Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Path
-{{ Fill Path Description }}
+### -Forest
+{{ Fill Forest Description }}
 
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 3
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -PreventShow
-{{ Fill PreventShow Description }}
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Splitter
-{{ Fill Splitter Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: 4
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Type
-{{ Fill Type Description }}
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases:
-Accepted values: NativeHTML, HTML, XML, Object
+Aliases: ForestName
 
 Required: False
 Position: 0
@@ -122,16 +61,31 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -UserName
-{{ Fill UserName Description }}
+### -IncludeDomains
+{{ Fill IncludeDomains Description }}
 
 ```yaml
-Type: String
+Type: String[]
 Parameter Sets: (All)
-Aliases: User
+Aliases: Domain, Domains
 
 Required: False
 Position: 2
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Permissions
+{{ Fill Permissions Description }}
+
+```yaml
+Type: Array
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: 3
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
