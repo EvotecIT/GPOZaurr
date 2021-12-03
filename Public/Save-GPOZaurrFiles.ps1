@@ -1,4 +1,35 @@
 ﻿function Save-GPOZaurrFiles {
+    <#
+    .SYNOPSIS
+    Exports GPO XML data to files and saves it to a given path
+
+    .DESCRIPTION
+    Exports GPO XML data to files and saves it to a given path
+
+    .PARAMETER Forest
+    Target different Forest, by default current forest is used
+
+    .PARAMETER ExcludeDomains
+    Exclude domain from search, by default whole forest is scanned
+
+    .PARAMETER IncludeDomains
+    Include only specific domains, by default whole forest is scanned
+
+    .PARAMETER ExtendedForestInformation
+    Ability to provide Forest Information from another command to speed up processing
+
+    .PARAMETER GPOPath
+    Path where to save XML files from GPOReport
+
+    .PARAMETER DeleteExisting
+    Delete existing files before saving new ones
+
+    .EXAMPLE
+    Save-GPOZaurrFiles -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExportEvotec' -DeleteExisting -Verbose
+
+    .NOTES
+    General notes
+    #>
     [cmdletBinding()]
     param(
         [alias('ForestName')][string] $Forest,
