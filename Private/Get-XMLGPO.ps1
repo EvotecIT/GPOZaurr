@@ -7,7 +7,6 @@
         [switch] $OwnerOnly,
         [System.Collections.IDictionary] $ADAdministrativeGroups,
         [string] $Splitter = [System.Environment]::NewLine,
-        [switch] $ReturnObject,
         [System.Collections.IDictionary] $ExcludeGroupPolicies,
         [string[]] $Type,
         [System.Collections.IDictionary] $LinksSummaryCache
