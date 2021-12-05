@@ -32,7 +32,7 @@
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['DeleteOU']++
                 #$Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFix']++
                 #$Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
-            } elseif ($OU.Status -contains 'Excluded') {
+            } elseif ($OU.Status -contains 'Excluded' -or $OU.Status -contains 'Excluded, Default OU') {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['Excluded']++
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['ExcludedOU'].Add($OU.Organizationalunit)
             } else {
@@ -139,6 +139,7 @@
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Delete OU' -BackgroundColor Red -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'OK' -BackgroundColor LightGreen -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Excluded' -BackgroundColor DeepSkyBlue -Row
+                New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Excluded, Default OU' -BackgroundColor DeepSkyBlue -Row
             } -PagingOptions 10, 20, 30, 40, 50 -ExcludeProperty GPO
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {

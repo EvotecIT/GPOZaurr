@@ -13,6 +13,7 @@
     $CachedGPO = [ordered] @{}
 
     $ForestInformation = Get-WinADForestDetails -Extended -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+    $DefaultFolders = Get-WellKnownFolders -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     $GroupPolicies = Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     foreach ($GPO in $GroupPolicies) {
         $CachedGPO[$GPO.GPODistinguishedName] = $GPO
@@ -117,6 +118,12 @@
                     }
                 }
             }
+            foreach ($Exclude in $DefaultFolders) {
+                if ($OU -eq "$Exclude") {
+                    $Found = $false
+                    break
+                }
+            }
             if (-not $Found) {
                 continue
             }
@@ -127,6 +134,12 @@
                         $Status = 'Excluded'
                         break
                     }
+                }
+            }
+            foreach ($Exclude in $DefaultFolders) {
+                if ($OU -eq "$Exclude") {
+                    $Status = 'Excluded, Default OU'
+                    break
                 }
             }
         }

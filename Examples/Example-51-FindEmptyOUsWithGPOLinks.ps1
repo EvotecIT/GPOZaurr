@@ -1,6 +1,5 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
-
 $OUs = Get-GPOZaurrOrganizationalUnit
 $Ous | Format-Table
 
@@ -13,5 +12,6 @@ Get-GPOZaurrOrganizationalUnit -Verbose -ExcludeOrganizationalUnit @(
 ) | Format-Table
 
 Invoke-GPOZaurr -Type GPOOrganizationalUnit -Online -FilePath $PSScriptRoot\Reports\GPOZaurrOU.html -Exclusions @(
-   #'*OU=Production,DC=ad,DC=evotec,DC=pl'
+   '*OU=Production,DC=ad,DC=evotec,DC=pl'
+   '*OU=Accounts,OU=Administration,DC=ad,DC=evotec,DC=xyz'
 )
