@@ -1,4 +1,44 @@
 ﻿function Get-GPOZaurrUpdates {
+    <#
+    .SYNOPSIS
+    Gets the list of GPOs created or updated in the last X number of days.
+
+    .DESCRIPTION
+    Gets the list of GPOs created or updated in the last X number of days.
+
+    .PARAMETER Forest
+    Target different Forest, by default current forest is used
+
+    .PARAMETER ExcludeDomains
+    Exclude domain from search, by default whole forest is scanned
+
+    .PARAMETER IncludeDomains
+    Include only specific domains, by default whole forest is scanned
+ą
+    .PARAMETER DateFrom
+    Provide a date from which to start the search, by default the last X days are used
+
+    .PARAMETER DateTo
+    Provide a date to which to end the search, by default the last X days are used
+
+    .PARAMETER DateRange
+    Provide a date range to search for, by default the last X days are used
+
+    .PARAMETER DateProperty
+    Choose a date property. It can be WhenCreated or WhenChanged or both. By default whenCreated is used for comparison purposes
+
+    .PARAMETER ExtendedForestInformation
+    Ability to provide Forest Information from another command to speed up processing
+
+    .EXAMPLE
+    Get-GPOZaurrUpdates -DateRange Last14Days -DateProperty WhenCreated, WhenChanged -Verbose -IncludeDomains 'ad.evotec.pl' | Format-List
+
+    .EXAMPLE
+    Get-GPOZaurrUpdates -DateRange Last14Days -DateProperty WhenCreated -Verbose | Format-Table
+
+    .NOTES
+    General notes
+    #>
     [cmdletBinding(DefaultParameterSetName = 'DateRange')]
     param(
         [parameter(ParameterSetName = 'Dates')]
