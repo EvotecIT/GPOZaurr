@@ -5,23 +5,23 @@
   - ☑ Improved `Get-GPOZaurrOrganizationalUnit` - excludes default redirected computers/users OUs as per [#30](https://github.com/EvotecIT/GPOZaurr/issues/30)
 
 ## 0.0.147 - 2021.12.03
-  - Updates documentation
+  - 📃 Updates documentation
 ## 0.0.146 - 2021.11.02
-  - Improves `GPOUpdates` report from `Invoke-GPOZaurr` - should be 7 days, not 14 days
+  - ℹ️ Improves `GPOUpdates` report from `Invoke-GPOZaurr` - should be 7 days, not 14 days
 ## 0.0.145 - 2021.11.02
-  - Improves `GPOUpdates` report from `Invoke-GPOZaurr` by fixing conditional formatting
+  - ℹ️ Improves `GPOUpdates` report from `Invoke-GPOZaurr` by fixing conditional formatting
 ## 0.0.144 - 2021.10.24
-  - Improves `Get-GPOZaurrUpdates`
+  - ℹ️ Improves `Get-GPOZaurrUpdates`
   - Adds `GPOUpdates` report to `Invoke-GPOZaurr`
 ## 0.0.143 - 2021.10.19
-  - Improves `Get-GPOZaurrUpdates` with more verbose messages
+  - ℹ️ Improves `Get-GPOZaurrUpdates` with more verbose messages
 ## 0.0.142 - 2021.10.18
-  - Fixes `Get-GPOZaurrUpdates` when GPO is not linked
+  - 🐛 Fixes `Get-GPOZaurrUpdates` when GPO is not linked
 ## 0.0.141 - 2021.10.17
-  - Removed property from `Get-GPOZaurrAD` - `FunctionalityVersion`
-  - Added property to `Get-GPOZaurrAD` - `Owner`
-  - Added ability to choose date ranges for `Get-GPOZaurrAD`
-  - Added `Get-GPOZaurrUpdates` which shows last gpos added to forest
+  - 🛑 Removed property from `Get-GPOZaurrAD` - `FunctionalityVersion`
+  - ➕ Added property to `Get-GPOZaurrAD` - `Owner`
+  - ➕ Added ability to choose date ranges for `Get-GPOZaurrAD`
+  - ➕ Added `Get-GPOZaurrUpdates` which shows last gpos added to forest
 ## 0.0.140 - 2021.08.24
   - ☑ Improved `Invoke-GPOZaurr` - type `GPOAnalysis` - added folder redirection type - [tnx PatrickOnGit](https://github.com/EvotecIT/GPOZaurr/pull/24)
 ## 0.0.139 - 2021.08.19
