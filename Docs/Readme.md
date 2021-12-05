@@ -30,7 +30,8 @@ Provides Backup functionality to Group Policies
 {{ Fill in the Synopsis }}
 
 ### [Get-GPOZaurr](Get-GPOZaurr.md)
-{{ Fill in the Synopsis }}
+Gets information about all Group Policies.
+Similar to what Get-GPO provides by default.
 
 ### [Get-GPOZaurrAD](Get-GPOZaurrAD.md)
 {{ Fill in the Synopsis }}
