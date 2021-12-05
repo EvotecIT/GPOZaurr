@@ -106,7 +106,7 @@ Detects Group Policy missing Authenticated Users permission while not having hig
 Gets DFSR information from the SYSVOL DFSR
 
 ### [Get-GPOZaurrUpdates](Get-GPOZaurrUpdates.md)
-{{ Fill in the Synopsis }}
+Gets the list of GPOs created or updated in the last X number of days.
 
 ### [Get-GPOZaurrWMI](Get-GPOZaurrWMI.md)
 Get Group Policy WMI filter
