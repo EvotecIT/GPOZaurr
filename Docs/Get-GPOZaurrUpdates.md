@@ -8,7 +8,7 @@ schema: 2.0.0
 # Get-GPOZaurrUpdates
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+Gets the list of GPOs created or updated in the last X number of days.
 
 ## SYNTAX
 
@@ -26,113 +26,24 @@ Get-GPOZaurrUpdates [-Forest <String>] [-ExcludeDomains <String[]>] [-IncludeDom
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+Gets the list of GPOs created or updated in the last X number of days.
 
 ## EXAMPLES
 
-### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
+### EXAMPLE 1
+```
+Get-GPOZaurrUpdates -DateRange Last14Days -DateProperty WhenCreated, WhenChanged -Verbose -IncludeDomains 'ad.evotec.pl' | Format-List
 ```
 
-{{ Add example description here }}
+### EXAMPLE 2
+```
+Get-GPOZaurrUpdates -DateRange Last14Days -DateProperty WhenCreated -Verbose | Format-Table
+```
 
 ## PARAMETERS
 
-### -DateFrom
-{{ Fill DateFrom Description }}
-
-```yaml
-Type: DateTime
-Parameter Sets: Dates
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DateProperty
-{{ Fill DateProperty Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-Accepted values: WhenCreated, WhenChanged
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DateRange
-{{ Fill DateRange Description }}
-
-```yaml
-Type: String
-Parameter Sets: DateRange
-Aliases:
-Accepted values: PastHour, CurrentHour, PastDay, CurrentDay, PastMonth, CurrentMonth, PastQuarter, CurrentQuarter, Last14Days, Last21Days, Last30Days, Last7Days, Last3Days, Last1Days
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -DateTo
-{{ Fill DateTo Description }}
-
-```yaml
-Type: DateTime
-Parameter Sets: Dates
-Aliases:
-
-Required: True
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExcludeDomains
-{{ Fill ExcludeDomains Description }}
-
-```yaml
-Type: String[]
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
-
-```yaml
-Type: IDictionary
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -Forest
-{{ Fill Forest Description }}
+Target different Forest, by default current forest is used
 
 ```yaml
 Type: String
@@ -146,8 +57,24 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -ExcludeDomains
+Exclude domain from search, by default whole forest is scanned
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### -IncludeDomains
-{{ Fill IncludeDomains Description }}
+Include only specific domains, by default whole forest is scanned
+ą
 
 ```yaml
 Type: String[]
@@ -161,16 +88,91 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -DateFrom
+Provide a date from which to start the search, by default the last X days are used
+
+```yaml
+Type: DateTime
+Parameter Sets: Dates
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DateTo
+Provide a date to which to end the search, by default the last X days are used
+
+```yaml
+Type: DateTime
+Parameter Sets: Dates
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DateRange
+Provide a date range to search for, by default the last X days are used
+
+```yaml
+Type: String
+Parameter Sets: DateRange
+Aliases:
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DateProperty
+Choose a date property.
+It can be WhenCreated or WhenChanged or both.
+By default whenCreated is used for comparison purposes
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: WhenCreated
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ExtendedForestInformation
+Ability to provide Forest Information from another command to speed up processing
+
+```yaml
+Type: IDictionary
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
 ### CommonParameters
 This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
-### None
-
 ## OUTPUTS
 
-### System.Object
 ## NOTES
+General notes
 
 ## RELATED LINKS
