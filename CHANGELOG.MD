@@ -1,9 +1,10 @@
 ﻿# GPOZaurr Release History
 
+## 0.0.149 - 2021.12.05
+  - ☑ Improved docs
 ## 0.0.148 - 2021.12.05
   - ☑ Improved `Invoke-GPOZaurr` - type `GPOOrganizationalUnit` - excludes default redirected computers/users OUs [#30](https://github.com/EvotecIT/GPOZaurr/issues/30)
   - ☑ Improved `Get-GPOZaurrOrganizationalUnit` - excludes default redirected computers/users OUs as per [#30](https://github.com/EvotecIT/GPOZaurr/issues/30)
-
 ## 0.0.147 - 2021.12.03
   - 📃 Updates documentation
 ## 0.0.146 - 2021.11.02
