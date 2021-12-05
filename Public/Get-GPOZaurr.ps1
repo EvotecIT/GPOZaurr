@@ -1,4 +1,71 @@
 ﻿function Get-GPOZaurr {
+    <#
+    .SYNOPSIS
+    Gets information about all Group Policies. Similar to what Get-GPO provides by default.
+
+    .DESCRIPTION
+    Gets information about all Group Policies. Similar to what Get-GPO provides by default.
+
+    .PARAMETER ExcludeGroupPolicies
+    Marks the GPO as excluded from the list.
+
+    .PARAMETER GPOName
+    Provide a GPOName to get information about a specific GPO.
+
+    .PARAMETER GPOGuid
+    Provide a GPOGuid to get information about a specific GPO.
+
+    .PARAMETER Type
+    Choose a specific type of GPO. Options are: 'Empty', 'Unlinked', 'Disabled', 'NoApplyPermission', 'All'. Default is All.
+
+    .PARAMETER Forest
+    Target different Forest, by default current forest is used
+
+    .PARAMETER ExcludeDomains
+    Exclude domain from search, by default whole forest is scanned
+
+    .PARAMETER IncludeDomains
+    Include only specific domains, by default whole forest is scanned
+
+    .PARAMETER ExtendedForestInformation
+    Ability to provide Forest Information from another command to speed up processing
+
+    .PARAMETER GPOPath
+    Define GPOPath where the XML files are located to be analyzed instead of asking Active Directory
+
+    .PARAMETER PermissionsOnly
+    Only show permissions, by default all information is shown
+
+    .PARAMETER OwnerOnly
+    only show owner information, by default all information is shown
+
+    .PARAMETER Limited
+    Provide limited output without analyzing XML data
+
+    .PARAMETER ADAdministrativeGroups
+    Ability to provide ADAdministrativeGroups from different function to speed up processing
+
+    .EXAMPLE
+    $GPOs = Get-GPOZaurr
+    $GPOs | Format-Table DisplayName, Owner, OwnerSID, OwnerType
+
+    .EXAMPLE
+    $GPO = Get-GPOZaurr -GPOName 'ALL | Allow use of biometrics'
+    $GPO | Format-List *
+
+    .EXAMPLE
+    $GPOS = Get-GPOZaurr -ExcludeGroupPolicies {
+        Skip-GroupPolicy -Name 'de14_usr_std'
+        Skip-GroupPolicy -Name 'de14_usr_std' -DomaiName 'ad.evotec.xyz'
+        Skip-GroupPolicy -Name 'All | Trusted Websites' #-DomaiName 'ad.evotec.xyz'
+        '{D39BF08A-87BF-4662-BFA0-E56240EBD5A2}'
+        'COMPUTERS | Enable Sets'
+    }
+    $GPOS | Format-Table -AutoSize *
+
+    .NOTES
+    General notes
+    #>
     [cmdletBinding()]
     param(
         [scriptblock] $ExcludeGroupPolicies,
@@ -16,7 +83,6 @@
         [switch] $PermissionsOnly,
         [switch] $OwnerOnly,
         [switch] $Limited,
-        [switch] $ReturnObject,
         [System.Collections.IDictionary] $ADAdministrativeGroups
     )
     Begin {
@@ -90,7 +156,7 @@
                             Write-Warning "Get-GPOZaurr - Failed to get [$($GPO.DomainName)]($Count/$($GroupPolicies.Count)) $($GPO.DisplayName) GPOReport: $($_.Exception.Message). Skipping."
                             continue
                         }
-                        Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $GPO -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ReturnObject:$ReturnObject.IsPresent -ExcludeGroupPolicies $ExcludeGPO -Type $Type -LinksSummaryCache $LinksSummaryCache
+                        Get-XMLGPO -OwnerOnly:$OwnerOnly.IsPresent -XMLContent $XMLContent -GPO $GPO -PermissionsOnly:$PermissionsOnly.IsPresent -ADAdministrativeGroups $ADAdministrativeGroups -ExcludeGroupPolicies $ExcludeGPO -Type $Type -LinksSummaryCache $LinksSummaryCache
                     } else {
                         $GPO
                     }
