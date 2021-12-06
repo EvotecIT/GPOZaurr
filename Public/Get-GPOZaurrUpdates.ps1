@@ -126,6 +126,7 @@
         }
         [PSCustomObject] @{
             DisplayName             = $GPO.DisplayName
+            GUID                    = ConvertFrom-DistinguishedName -DistinguishedName $GPO.GPODistinguishedName
             DomainName              = $GPO.DomainName
             Owner                   = $GPO.Owner
             OwnerName               = $Owner.Name
