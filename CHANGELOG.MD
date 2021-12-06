@@ -1,5 +1,7 @@
 ﻿# GPOZaurr Release History
 
+## 0.0.150 - 2021.12.06
+  - ℹ️ Improves `GPOUpdates` report from `Invoke-GPOZaurr` - additional property
 ## 0.0.149 - 2021.12.05
   - ☑ Improved docs
 ## 0.0.148 - 2021.12.05
