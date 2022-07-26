@@ -1,9 +1,12 @@
 ﻿# GPOZaurr Release History
 
+## 0.0.151 - 2022.07.26
+  - ℹ️ Improves `Invoke-GPOZaurr` by adding `SplitReports` functionality. This will allow you to split the reports into multiple files with a single request.
+
 ## 0.0.150 - 2021.12.06
   - ℹ️ Improves `GPOUpdates` report from `Invoke-GPOZaurr` - additional property
 ## 0.0.149 - 2021.12.05
-  - ☑ Improved docs
+  - ℹ️ Improved docs
 ## 0.0.148 - 2021.12.05
   - ☑ Improved `Invoke-GPOZaurr` - type `GPOOrganizationalUnit` - excludes default redirected computers/users OUs [#30](https://github.com/EvotecIT/GPOZaurr/issues/30)
   - ☑ Improved `Get-GPOZaurrOrganizationalUnit` - excludes default redirected computers/users OUs as per [#30](https://github.com/EvotecIT/GPOZaurr/issues/30)
