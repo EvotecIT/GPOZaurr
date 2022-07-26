@@ -15,7 +15,7 @@ Single cmdlet that provides 360 degree overview of Group Policies in Active Dire
 ```
 Invoke-GPOZaurr [[-Exclusions] <Object>] [-FilePath <String>] [[-Type] <String[]>] [-PassThru] [-HideHTML]
  [-HideSteps] [-ShowError] [-ShowWarning] [-Forest <String>] [-ExcludeDomains <String[]>]
- [-IncludeDomains <String[]>] [-Online] [<CommonParameters>]
+ [-IncludeDomains <String[]>] [-Online] [-SplitReports] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -211,6 +211,22 @@ Accept wildcard characters: False
 
 ### -Online
 Forces report to use online resources in HTML (using CDN most of the time), by default it is run offline, and inlines all CSS/JS code.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SplitReports
+Split report into multiple files, one for each report.
+This can be useful for large domains with huge reports.
 
 ```yaml
 Type: SwitchParameter
