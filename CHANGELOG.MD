@@ -1,7 +1,8 @@
 ﻿# GPOZaurr Release History
 
 ## 0.0.151 - 2022.07.26
-  - ℹ️ Improves `Invoke-GPOZaurr` by adding `SplitReports` functionality. This will allow you to split the reports into multiple files with a single request.
+  - ℹ️ Improved `Invoke-GPOZaurr` by adding `SplitReports` functionality. This will allow you to split the reports into multiple files with a single request.
+  - ℹ️ Improved `Get-GPOZaurrInheritance` with some error handling
 
 ## 0.0.150 - 2021.12.06
   - ℹ️ Improves `GPOUpdates` report from `Invoke-GPOZaurr` - additional property
