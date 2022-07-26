@@ -68,7 +68,12 @@
                     DomainName         = ConvertFrom-DistinguishedName -ToDomainCN -DistinguishedName $OU.DistinguishedName
                 }
                 if ($InheritanceInformation.BlockedInheritance -and $IncludeGroupPoliciesForBlockedObjects.IsPresent) {
-                    $GPInheritance = Get-GPInheritance -Target $OU.distinguishedName
+                    try {
+                        $GPInheritance = Get-GPInheritance -Target $OU.distinguishedName -ErrorAction Stop
+                    } catch {
+                        Write-Warning -Message "Get-GPOZaurrInheritance - Can't get GPInheritance for $($OU.distinguishedName). Error: $($_.Exception.Message)"
+                        continue
+                    }
                     $ActiveGroupPolicies = foreach ($GPO in $GPInheritance.InheritedGpoLinks) {
                         [PSCustomObject] @{
                             OrganizationalUnit   = $OU.canonicalName
