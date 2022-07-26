@@ -1,5 +1,4 @@
 Clear-Host
-Import-Module "C:\Users\przemyslaw.klys\OneDrive - Evotec\Support\GitHub\PSPublishModule\PSPublishModule.psd1" -Force
 
 $Configuration = @{
     Information = @{
@@ -267,7 +266,7 @@ $Configuration = @{
             RefreshPSD1Only  = $false
         }
         BuildDocumentation = @{
-            Enable        = $false # enables documentation processing
+            Enable        = $true # enables documentation processing
             StartClean    = $true # always starts clean
             UpdateWhenNew = $true # always updates right after new
         }
@@ -277,10 +276,10 @@ $Configuration = @{
             Verbose         = $false
         }
         PublishModule      = @{  # requires Enable to be on to process all of that
-            Enabled      = $true
+            Enabled      = $false
             Prerelease   = ''
             RequireForce = $false
-            GitHub       = $true
+            GitHub       = $false
         }
     }
 }
