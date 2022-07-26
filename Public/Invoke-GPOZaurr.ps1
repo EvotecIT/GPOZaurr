@@ -46,6 +46,9 @@
     .PARAMETER Online
     Forces report to use online resources in HTML (using CDN most of the time), by default it is run offline, and inlines all CSS/JS code.
 
+    .PARAMETER SplitReports
+    Split report into multiple files, one for each report. This can be useful for large domains with huge reports.
+
     .EXAMPLE
     Invoke-GPOZaurr
 
@@ -71,7 +74,8 @@
         [alias('ForestName')][string] $Forest,
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
-        [switch] $Online
+        [switch] $Online,
+        [switch] $SplitReports
     )
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
@@ -189,46 +193,100 @@
     if (-not $FilePath) {
         $FilePath = Get-FileName -Extension 'html' -Temporary
     }
-    Write-Color -Text '[i]', '[HTML ] ', "Generating HTML report ($FilePath)" -Color Yellow, DarkGray, Yellow
-    New-HTML -Author 'Przemysław Kłys' -TitleText 'GPOZaurr Report' {
-        New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
-        New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
-        New-HTMLPanelStyle -BorderRadius 0px
-        New-HTMLTableOption -DataStore JavaScript -BoolAsString -ArrayJoinString ', ' -ArrayJoin
+    if ($SplitReports -and $Type.Count -gt 1) {
+        # Split reports into multiple files for easier viewing
+        $DateName = $(Get-Date -f yyyy-MM-dd_HHmmss)
+        $FileName = [io.path]::GetFileNameWithoutExtension($FilePath)
+        $DirectoryName = [io.path]::GetDirectoryName($FilePath)
+        foreach ($T in $Script:GPOConfiguration.Keys) {
+            $NewFileName = $FileName + '_' + $T + "_" + $DateName + '.html'
+            $FilePath = [io.path]::Combine($DirectoryName, $NewFileName)
 
-        New-HTMLHeader {
-            New-HTMLSection -Invisible {
-                New-HTMLSection {
-                    New-HTMLText -Text "Report generated on $(Get-Date)" -Color Blue
-                } -JustifyContent flex-start -Invisible
-                New-HTMLSection {
-                    New-HTMLText -Text "GPOZaurr - $($Script:Reporting['Version'])" -Color Blue
-                } -JustifyContent flex-end -Invisible
-            }
-        }
+            if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+                Write-Color -Text '[i]', '[HTML ] ', "Generating HTML report ($FilePath) for $T with split reports" -Color Yellow, DarkGray, Yellow
+                New-HTML -Author 'Przemysław Kłys' -TitleText 'GPOZaurr Report' {
+                    New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
+                    New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
+                    New-HTMLPanelStyle -BorderRadius 0px
+                    New-HTMLTableOption -DataStore JavaScript -BoolAsString -ArrayJoinString ', ' -ArrayJoin
 
-        if ($Type.Count -eq 1) {
-            foreach ($T in $Script:GPOConfiguration.Keys) {
-                if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
-                    if ($Script:GPOConfiguration[$T]['Summary']) {
-                        $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
+                    New-HTMLHeader {
+                        New-HTMLSection -Invisible {
+                            New-HTMLSection {
+                                New-HTMLText -Text "Report generated on $(Get-Date)" -Color Blue
+                            } -JustifyContent flex-start -Invisible
+                            New-HTMLSection {
+                                New-HTMLText -Text "GPOZaurr - $($Script:Reporting['Version'])" -Color Blue
+                            } -JustifyContent flex-end -Invisible
+                        }
                     }
-                    & $Script:GPOConfiguration[$T]['Solution']
-                }
-            }
-        } else {
-            foreach ($T in $Script:GPOConfiguration.Keys) {
-                if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+
+                    # if ($Type.Count -eq 1) {
+                    #     foreach ($T in $Script:GPOConfiguration.Keys) {
+                    #         if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+                    #             if ($Script:GPOConfiguration[$T]['Summary']) {
+                    #                 $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
+                    #             }
+                    #             & $Script:GPOConfiguration[$T]['Solution']
+                    #         }
+                    #     }
+                    # } else {
+
                     if ($Script:GPOConfiguration[$T]['Summary']) {
                         $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
                     }
                     New-HTMLTab -Name $Script:GPOConfiguration[$T]['Name'] {
                         & $Script:GPOConfiguration[$T]['Solution']
                     }
-                }
+
+                    # }
+                } -Online:$Online.IsPresent -ShowHTML:(-not $HideHTML) -FilePath $FilePath
             }
         }
-    } -Online:$Online.IsPresent -ShowHTML:(-not $HideHTML) -FilePath $FilePath
+    } else {
+        # Standard reports as requested
+        Write-Color -Text '[i]', '[HTML ] ', "Generating HTML report ($FilePath)" -Color Yellow, DarkGray, Yellow
+        New-HTML -Author 'Przemysław Kłys' -TitleText 'GPOZaurr Report' {
+            New-HTMLTabStyle -BorderRadius 0px -TextTransform capitalize -BackgroundColorActive SlateGrey
+            New-HTMLSectionStyle -BorderRadius 0px -HeaderBackGroundColor Grey -RemoveShadow
+            New-HTMLPanelStyle -BorderRadius 0px
+            New-HTMLTableOption -DataStore JavaScript -BoolAsString -ArrayJoinString ', ' -ArrayJoin
+
+            New-HTMLHeader {
+                New-HTMLSection -Invisible {
+                    New-HTMLSection {
+                        New-HTMLText -Text "Report generated on $(Get-Date)" -Color Blue
+                    } -JustifyContent flex-start -Invisible
+                    New-HTMLSection {
+                        New-HTMLText -Text "GPOZaurr - $($Script:Reporting['Version'])" -Color Blue
+                    } -JustifyContent flex-end -Invisible
+                }
+            }
+
+            if ($Type.Count -eq 1) {
+                foreach ($T in $Script:GPOConfiguration.Keys) {
+                    if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+                        if ($Script:GPOConfiguration[$T]['Summary']) {
+                            $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
+                        }
+                        & $Script:GPOConfiguration[$T]['Solution']
+                    }
+                }
+            } else {
+                foreach ($T in $Script:GPOConfiguration.Keys) {
+                    if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
+                        if ($Script:GPOConfiguration[$T]['Summary']) {
+                            $Script:Reporting[$T]['Summary'] = Invoke-Command -ScriptBlock $Script:GPOConfiguration[$T]['Summary']
+                        }
+                        New-HTMLTab -Name $Script:GPOConfiguration[$T]['Name'] {
+                            & $Script:GPOConfiguration[$T]['Solution']
+                        }
+                    }
+                }
+            }
+        } -Online:$Online.IsPresent -ShowHTML:(-not $HideHTML) -FilePath $FilePath
+    }
+
     $TimeLogEndHTML = Stop-TimeLog -Time $TimeLogHTML -Option OneLiner
     Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report', " [Time to execute: $TimeLogEndHTML]" -Color Yellow, DarkGray, Yellow, DarkGray
     if ($PassThru) {
