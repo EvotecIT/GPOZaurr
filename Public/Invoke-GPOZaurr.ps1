@@ -121,6 +121,11 @@
         foreach ($T in $Type) {
             $Script:GPOConfiguration[$T].Enabled = $true
         }
+    } else {
+        # User didn't choose any types, so we need to exclude types that are deprecated
+        foreach ($T in @('GPOPermissionsAdministrative', 'GPOPermissionsRead', 'GPOPermissionsRoot', 'GPOPermissionsUnknown')) {
+            $Script:GPOConfiguration[$T].Enabled = $false
+        }
     }
 
     # Build data
