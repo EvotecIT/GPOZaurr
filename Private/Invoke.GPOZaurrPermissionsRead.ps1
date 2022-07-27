@@ -1,6 +1,6 @@
 ﻿$GPOZaurrPermissionsRead = [ordered] @{
     Name       = 'Group Policy Authenticated Users Permissions'
-    Enabled    = $true
+    Enabled    = $false
     Action     = $null
     Data       = $null
     Execute    = {

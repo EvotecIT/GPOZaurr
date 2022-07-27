@@ -1,6 +1,6 @@
 ﻿$GPOZaurrPermissionsUnknown = [ordered] @{
     Name       = 'Group Policy Unknown Permissions'
-    Enabled    = $true
+    Enabled    = $false
     Action     = $null
     Data       = $null
     Execute    = {

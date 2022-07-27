@@ -1,6 +1,6 @@
 ﻿$GPOZaurrPermissionsRoot = [ordered] @{
     Name       = 'Group Policies Root Permissions'
-    Enabled    = $true
+    Enabled    = $false
     Action     = $null
     Data       = $null
     Execute    = {

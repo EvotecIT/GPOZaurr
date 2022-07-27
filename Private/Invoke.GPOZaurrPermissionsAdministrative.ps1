@@ -1,6 +1,6 @@
 ﻿$GPOZaurrPermissionsAdministrative = [ordered] @{
     Name       = 'Group Policy Administrative Permissions'
-    Enabled    = $true
+    Enabled    = $false
     Action     = $null
     Data       = $null
     Execute    = {
