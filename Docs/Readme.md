@@ -26,6 +26,9 @@ Provides Backup functionality to Group Policies
 ### [ConvertFrom-CSExtension](ConvertFrom-CSExtension.md)
 {{ Fill in the Synopsis }}
 
+### [Export-GPOZaurrContent](Export-GPOZaurrContent.md)
+Saves GPOs to XML or HTML files.
+
 ### [Find-CSExtension](Find-CSExtension.md)
 {{ Fill in the Synopsis }}
 
