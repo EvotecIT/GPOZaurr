@@ -187,24 +187,32 @@
             Write-Color -Text '[i]', '[End  ] ', $($Script:GPOConfiguration[$T]['Name']), " [Time to execute: $TimeEndGPOList]" -Color Yellow, DarkGray, Yellow, DarkGray
 
             if ($SplitReports) {
+                $TimeLogHTML = Start-TimeLog
                 New-HTMLReportWithSplit -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML -CurrentReport $T
+                $TimeLogEndHTML = Stop-TimeLog -Time $TimeLogHTML -Option OneLiner
+                Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report', " [Time to execute: $TimeLogEndHTML]" -Color Yellow, DarkGray, Yellow, DarkGray
             }
         }
     }
 
-    # Generate pretty HTML
-    $TimeLogHTML = Start-TimeLog
-    if (-not $FilePath) {
-        $FilePath = Get-FileName -Extension 'html' -Temporary
-    }
-    if ($Type.Count -gt 1 -and -not $SplitReports) {
-        New-HTMLReportWithSplit -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML
-    } else {
-        New-HTMLReportAll -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML -Type $Type
-    }
+    if ( -not $SplitReports) {
+        # Generate pretty HTML
+        $TimeLogHTML = Start-TimeLog
+        if (-not $FilePath) {
+            $FilePath = Get-FileName -Extension 'html' -Temporary
+        }
 
-    $TimeLogEndHTML = Stop-TimeLog -Time $TimeLogHTML -Option OneLiner
-    Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report', " [Time to execute: $TimeLogEndHTML]" -Color Yellow, DarkGray, Yellow, DarkGray
+        # Split reports are handled above so we skip if this was set
+        if ($Type.Count -gt 1) {
+            New-HTMLReportWithSplit -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML
+        } else {
+            New-HTMLReportAll -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML -Type $Type
+        }
+
+
+        $TimeLogEndHTML = Stop-TimeLog -Time $TimeLogHTML -Option OneLiner
+        Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report', " [Time to execute: $TimeLogEndHTML]" -Color Yellow, DarkGray, Yellow, DarkGray
+    }
     if ($PassThru) {
         $Script:Reporting
     }
