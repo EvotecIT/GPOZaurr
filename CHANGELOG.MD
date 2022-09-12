@@ -1,6 +1,9 @@
 ﻿# GPOZaurr Release History
 
-## 0.0.152
+## 0.0.153 - 2022.09.12
+  - Fixes `Invoke-GPOZaurr` SplitReports functionality that would generate main report anyways.
+
+## 0.0.152 - 2022.09.11
   - ℹ️ Improved `Invoke-GPOZaurr` - disable deprecated reports if user doesn't ask for them but asks for all reports to be generated. Those reports are now disabled by default: GPOPermissionsAdministrative,GPOPermissionsRead,GPOPermissionsRoot,GPOPermissionsUnknown
   - ℹ️ Improved `Invoke-GPOZaurr` SplitReports functionality to start creating HTML reports every report
   - Add `Export-GPOZaurrContent` to simplify quick export of all XML/HTML reports from GPO
