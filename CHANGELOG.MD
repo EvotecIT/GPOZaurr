@@ -1,5 +1,9 @@
 ﻿# GPOZaurr Release History
 
+## 0.0.154
+  - Fixes `Invoke-GPOZaurr` SplitReports functionality (again!) [#33](https://github.com/EvotecIT/GPOZaurr/issues/33)
+  - Fixes Sysvol property in object returned by Get-GPOZaurrPermissionConsistency contains whitespace [#31](https://github.com/EvotecIT/GPOZaurr/issues/31)
+
 ## 0.0.153 - 2022.09.12
   - Fixes `Invoke-GPOZaurr` SplitReports functionality that would generate main report anyways.
 
