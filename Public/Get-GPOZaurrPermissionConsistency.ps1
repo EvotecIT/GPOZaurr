@@ -95,7 +95,7 @@
                 }
                 $Object['Owner'] = $_.Owner           # : EVOTEC\Enterprise Admins
                 $Object['Path'] = $_.Path
-                $Object['SysVolPath '] = $SysvolPath
+                $Object['SysVolPath'] = $SysvolPath
                 $Object['Id       '] = $_.Id              # : 8a7bc515-d7fd-4d1f-90b8-e47c15f89295
                 $Object['GpoStatus'] = $_.GpoStatus       # : AllSettingsEnabled
                 $Object['Description'] = $_.Description     # :
