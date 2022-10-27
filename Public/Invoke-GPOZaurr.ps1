@@ -203,7 +203,7 @@
         }
 
         # Split reports are handled above so we skip if this was set
-        if ($Type.Count -gt 1) {
+        if ($null -eq $Type -or $Type.Count -gt 1) {
             New-HTMLReportAll -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML -Type $Type
         } else {
             New-HTMLReportWithSplit -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML
