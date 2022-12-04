@@ -1,6 +1,6 @@
 ﻿# GPOZaurr Release History
 
-## 0.0.156 - 2022.11.07
+## 0.0.156 - 2022.12.04
   - Fixes `Get-LocalComputerSid - Error: You cannot call a method on a null-valued expression` in some rare cases [#34](https://github.com/EvotecIT/GPOZaurr/issues/34)
 
 ## 0.0.155 - 2022.10.27
