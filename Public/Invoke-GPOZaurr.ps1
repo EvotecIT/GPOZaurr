@@ -195,20 +195,14 @@
         }
     }
 
-    if ( -not $SplitReports) {
+    if (-not $SplitReports) {
         # Generate pretty HTML
         $TimeLogHTML = Start-TimeLog
         if (-not $FilePath) {
             $FilePath = Get-FileName -Extension 'html' -Temporary
         }
 
-        # Split reports are handled above so we skip if this was set
-        if ($null -eq $Type -or $Type.Count -gt 1) {
-            New-HTMLReportAll -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML -Type $Type
-        } else {
-            New-HTMLReportWithSplit -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML
-        }
-
+        New-HTMLReportAll -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML -Type $Type
 
         $TimeLogEndHTML = Stop-TimeLog -Time $TimeLogHTML -Option OneLiner
         Write-Color -Text '[i]', '[HTML ] ', 'Generating HTML report', " [Time to execute: $TimeLogEndHTML]" -Color Yellow, DarkGray, Yellow, DarkGray
