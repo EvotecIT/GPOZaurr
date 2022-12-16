@@ -33,7 +33,7 @@ $Configuration = @{
 
             RequiredModules            = @(
                 @{ ModuleName = 'PSSharedGoods'; ModuleVersion = 'Latest'; Guid = 'ee272aa8-baaa-4edf-9f45-b6d6f7d844fe' }
-                @{ ModuleName = 'ADEssentials'; ModuleVersion = 'Latest'; Guid = '9fc9fd61-7f11-4f4b-a527-084086f1905f' }
+                @{ ModuleName = 'ADEssentials'; ModuleVersion = '0.0.148'; Guid = '9fc9fd61-7f11-4f4b-a527-084086f1905f' }
                 @{ ModuleName = 'PSWriteHTML'; ModuleVersion = "Latest"; Guid = 'a7bdf640-f5cb-4acf-9de0-365b322d245c' }
             )
             ExternalModuleDependencies = @(
@@ -276,10 +276,10 @@ $Configuration = @{
             Verbose         = $false
         }
         PublishModule      = @{  # requires Enable to be on to process all of that
-            Enabled      = $false
+            Enabled      = $true
             Prerelease   = ''
             RequireForce = $false
-            GitHub       = $false
+            GitHub       = $true
         }
     }
 }
