@@ -380,6 +380,23 @@
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'FSLogix' -SingleObject
         }
     }
+    Firefox                                    = @{
+        Types      = @(
+            @{
+                Category = 'RegistrySettings'
+                Settings = 'Policy'
+            }
+        )
+        GPOPath    = @(
+            'Policies -> Administrative Templates -> Mozilla -> Firefox'
+        )
+        Code       = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Mozilla\Firefox*'
+        }
+        CodeSingle = {
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Mozilla\Firefox*' -SingleObject
+        }
+    }
     GoogleChrome                                    = @{
         Types      = @(
             @{
@@ -393,10 +410,10 @@
             'Policies -> Administrative Templates -> Google Chrome - Default Settings (users can override)'
         )
         Code       = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Google Chrome', 'Google/Google Chrome', 'Google Chrome - Default Settings (users can override)'
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Google Chrome*', 'Google/Google Chrome*', 'Google Chrome - Default Settings (users can override)'
         }
         CodeSingle = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Google Chrome', 'Google/Google Chrome', 'Google Chrome - Default Settings (users can override)' -SingleObject
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Google Chrome*', 'Google/Google Chrome*', 'Google Chrome - Default Settings (users can override)' -SingleObject
         }
     }
     GroupPolicy                                     = @{
