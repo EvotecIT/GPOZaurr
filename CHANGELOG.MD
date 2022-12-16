@@ -1,5 +1,9 @@
 ﻿# GPOZaurr Release History
 
+## 0.0.157 - 2022.12.16
+ - Resolves *Group Policy Content - GPO Subfolders for Google Chrome* [#38](https://github.com/EvotecIT/GPOZaurr/issues/38)
+ - Resolves *Filename processing issue* [#37](https://github.com/EvotecIT/GPOZaurr/issues/37)
+
 ## 0.0.156 - 2022.12.04
   - Fixes `Get-LocalComputerSid - Error: You cannot call a method on a null-valued expression` in some rare cases [#34](https://github.com/EvotecIT/GPOZaurr/issues/34)
 
