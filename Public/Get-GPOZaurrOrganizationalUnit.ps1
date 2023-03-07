@@ -69,7 +69,7 @@
                 }
             }
             # Find all objects in those OUs
-            $ObjectsInOu = Get-ADObject -LDAPFilter "(|(ObjectClass=user)(ObjectClass=contact)(ObjectClass=computer)(ObjectClass=group)(objectClass=inetOrgPerson))" -SearchBase $TopOU.distinguishedName -Server $ForestInformation['QueryServers'][$Domain]['hostname'][0]
+            $ObjectsInOu = Get-ADObject -LDAPFilter "(|(ObjectClass=user)(ObjectClass=contact)(ObjectClass=computer)(ObjectClass=group)(objectClass=inetOrgPerson)(ObjectClass=PrintQueue))" -SearchBase $TopOU.distinguishedName -Server $ForestInformation['QueryServers'][$Domain]['hostname'][0]
             Write-Verbose "Get-GPOZaurrOrganizationalUnit - Processing $($Domain) / $($TOPOU.DistinguishedName) [$CountTop/$($TopOrganizationalUnits.Count)], found $($ObjectsInOu.Count) objects to process."
             foreach ($Object in $ObjectsInOu) {
                 $Place = ConvertFrom-DistinguishedName -ToOrganizationalUnit -DistinguishedName $Object.DistinguishedName

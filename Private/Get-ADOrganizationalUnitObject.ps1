@@ -106,7 +106,7 @@
 
     foreach ($OU in $ListOU) {
         $Domain = ConvertFrom-DistinguishedName -ToDomainCN -DistinguishedName $OU
-        $ObjectsInOu = Get-ADObject -LDAPFilter "(|(ObjectClass=user)(ObjectClass=contact)(ObjectClass=computer)(ObjectClass=group)(objectClass=inetOrgPerson))" -SearchBase $OU -Server $ForestInformation['QueryServers'][$Domain]['hostname'][0]
+        $ObjectsInOu = Get-ADObject -LDAPFilter "(|(ObjectClass=user)(ObjectClass=contact)(ObjectClass=computer)(ObjectClass=group)(objectClass=inetOrgPerson)(ObjectClass=PrintQueue))" -SearchBase $OU -Server $ForestInformation['QueryServers'][$Domain]['hostname'][0]
         #Write-Verbose "Get-GPOZaurrOrganizationalUnit - Processing $($Domain) / $($TOPOU.DistinguishedName) [$CountTop/$($TopOrganizationalUnits.Count)], found $($ObjectsInOu.Count) objects to process."
         if (-not $CachedOu[$OU]) {
             $CachedOu[$OU] = [ordered] @{
