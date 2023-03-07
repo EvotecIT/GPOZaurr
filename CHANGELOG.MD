@@ -1,5 +1,8 @@
 ﻿# GPOZaurr Release History
 
+## 0.0.158 - 2023.03.07
+ - Improve detection of empty OUs by including AD printers.
+
 ## 0.0.157 - 2022.12.16
  - Resolves *Group Policy Content - GPO Subfolders for Google Chrome* [#38](https://github.com/EvotecIT/GPOZaurr/issues/38)
  - Resolves *Filename processing issue* [#37](https://github.com/EvotecIT/GPOZaurr/issues/37)
