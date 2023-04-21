@@ -133,7 +133,7 @@
         # in some cases GPResult seems to return an error - this was first noticed by user when using Dutch based system
         # I am not sure if it's possible to fix this error for users, but once that happens checking if GPO is empty fails using the method below
         # therefore we will use the old method of assuming something is empty or not empty in such case
-        Write-Warning "Get-XMLGPO - Reading GPO content [$DisplayName/$DomainName] returned an error. This may be because of non-english language. Assesing EMPTY using old method which can report false positives. Be careful please."
+        Write-Warning "Get-XMLGPO - Reading GPO content [$DisplayName/$DomainName] returned an error. This may be because of non-english language. Assessing EMPTY using old method which can report false positives. Be careful please."
         $OutputUser = @()
         $OutputComputer = @()
     } else {
@@ -223,7 +223,7 @@
         } elseif ($ADAdministrativeGroups) {
             $OwnerType = 'Unknown'
         } else {
-            $OwnerType = 'Unable to asses (local files?)'
+            $OwnerType = 'Unable to assess (local files?)'
         }
     }
     # Mark GPO as excluded
