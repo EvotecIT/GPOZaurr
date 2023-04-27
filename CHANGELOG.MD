@@ -1,5 +1,9 @@
 ﻿# GPOZaurr Release History
 
+## 0.0.159
+- Fixes [#44 Extra spaces in property name 'Id' in Get-GPOZaurrPermissionConsistency?](https://github.com/EvotecIT/GPOZaurr/issues/44)
+- Fixes typos [#43](https://github.com/EvotecIT/GPOZaurr/pull/43)
+
 ## 0.0.158 - 2023.03.07
  - Improve detection of empty OUs by including AD printers.
 
