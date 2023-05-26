@@ -1,5 +1,8 @@
 ﻿# GPOZaurr Release History
 
+## 0.0.160 - 2023.05.26
+- Fixes `Remove-GPOZaurr` limit processing feature which would not stop in some cases
+
 ## 0.0.159
 - Fixes [#44 Extra spaces in property name 'Id' in Get-GPOZaurrPermissionConsistency?](https://github.com/EvotecIT/GPOZaurr/issues/44)
 - Fixes typos [#43](https://github.com/EvotecIT/GPOZaurr/pull/43)
