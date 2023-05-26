@@ -22,11 +22,11 @@
                 $BackupFinalPath = $BackupPath
             }
             Write-Verbose "Remove-GPOZaurr - Backing up to $BackupFinalPath"
-            $null = New-Item -ItemType Directory -Path $BackupFinalPath -Force
+            $null = New-Item -ItemType Directory -Path $BackupFinalPath -Force -WhatIf:$false
         } else {
             $BackupRequired = $false
         }
-        $Count = 0
+        $CountProcessedGPO = 0
     }
     Process {
         $getGPOZaurrSplat = @{
@@ -39,6 +39,11 @@
         }
 
         Get-GPOZaurr @getGPOZaurrSplat | ForEach-Object {
+            if ($LimitProcessing -ne 0 -and $CountProcessedGPO -ge $LimitProcessing) {
+                Write-Warning -Message "Remove-GPOZaurr - LimitProcessing ($CountProcessedGPO / $LimitProcessing) reached. Stopping processing"
+                break
+            }
+
             $DeleteRequired = $false
 
             if ($Type -contains 'Empty') {
@@ -89,10 +94,7 @@
                         Write-Warning "Remove-GPOZaurr - Removing GPO $($_.DisplayName) from $($_.DomainName) failed: $($_.Exception.Message)"
                     }
                 }
-                $Count++
-                if ($LimitProcessing -eq $Count) {
-                    break
-                }
+                $CountProcessedGPO++
             }
         }
     }
