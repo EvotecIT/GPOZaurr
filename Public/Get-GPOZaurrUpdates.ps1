@@ -14,7 +14,7 @@
 
     .PARAMETER IncludeDomains
     Include only specific domains, by default whole forest is scanned
-ą
+
     .PARAMETER DateFrom
     Provide a date from which to start the search, by default the last X days are used
 
