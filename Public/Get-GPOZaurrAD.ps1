@@ -91,20 +91,20 @@
                 if (($GUID).Length -ne 36) {
                     Write-Warning "Get-GPOZaurrAD - GPO GUID ($($($GUID.Replace("`n",' ')))) is incorrect. Skipping $($_.DisplayName) / Domain: $($DomainCN)"
                 } else {
-                    $Output = [ordered]@{ }
-                    $Output['DisplayName'] = $_.DisplayName
-                    $Output['DomainName'] = $DomainCN
-                    $Output['Description'] = $_.Description
-                    $Output['GUID'] = $GUID
-                    $Output['Path'] = $_.gPCFileSysPath
-                    #$Output['FunctionalityVersion'] = $_.gPCFunctionalityVersion
-                    $Output['Created'] = $_.Created
-                    $Output['Modified'] = $_.Modified
-                    $Output['Owner'] = $_.ntSecurityDescriptor.Owner
-                    $Output['GPOCanonicalName'] = $_.CanonicalName
-                    $Output['GPODomainDistinguishedName'] = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDC
-                    $Output['GPODistinguishedName'] = $_.DistinguishedName
-                    [PSCustomObject] $Output
+                    [PSCustomObject]@{
+                        'DisplayName'                = $_.DisplayName
+                        'DomainName'                 = $DomainCN
+                        'Description'                = $_.Description
+                        'GUID'                       = $GUID
+                        'Path'                       = $_.gPCFileSysPath
+                        #$Output['FunctionalityVersion'] = $_.gPCFunctionalityVersion
+                        'Created'                    = $_.Created
+                        'Modified'                   = $_.Modified
+                        'Owner'                      = $_.ntSecurityDescriptor.Owner
+                        'GPOCanonicalName'           = $_.CanonicalName
+                        'GPODomainDistinguishedName' = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDC
+                        'GPODistinguishedName'       = $_.DistinguishedName
+                    }
                 }
             }
         }
