@@ -13,6 +13,7 @@
     GPOPermissionsRead           = $GPOZaurrPermissionsRead
     GPOPermissionsRoot           = $GPOZaurrPermissionsRoot
     GPOPermissionsUnknown        = $GPOZaurrPermissionsUnknown
+    GPORedirect                  = $GPOZaurrGPORedirects
     GPOFiles                     = $GPOZaurrFiles
     GPOBlockedInheritance        = $GPOZaurrBlockedInheritance
     GPOAnalysis                  = $GPOZaurrAnalysis
