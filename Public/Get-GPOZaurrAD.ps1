@@ -85,25 +85,26 @@
             }
 
             Write-Verbose -Message "Get-GPOZaurrAD - Searching domain $Domain with filter $($Splat['Filter'])"
-            Get-ADObject @Splat -Properties DisplayName, Name, Created, Modified, ntSecurityDescriptor, gPCFileSysPath, gPCFunctionalityVersion, gPCWQLFilter, gPCMachineExtensionNames, Description, CanonicalName, DistinguishedName | ForEach-Object -Process {
-                $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDomainCN
-                $GUID = $_.Name -replace '{' -replace '}'
+            $Objects = Get-ADObject @Splat -Properties DisplayName, Name, Created, Modified, ntSecurityDescriptor, gPCFileSysPath, gPCFunctionalityVersion, gPCWQLFilter, gPCMachineExtensionNames, Description, CanonicalName, DistinguishedName
+            foreach ($Object in $Objects) {
+                $DomainCN = ConvertFrom-DistinguishedName -DistinguishedName $Object.DistinguishedName -ToDomainCN
+                $GUID = $Object.Name -replace '{' -replace '}'
                 if (($GUID).Length -ne 36) {
-                    Write-Warning "Get-GPOZaurrAD - GPO GUID ($($($GUID.Replace("`n",' ')))) is incorrect. Skipping $($_.DisplayName) / Domain: $($DomainCN)"
+                    Write-Warning "Get-GPOZaurrAD - GPO GUID ($($($GUID.Replace("`n",' ')))) is incorrect. Skipping $($Object.DisplayName) / Domain: $($DomainCN)"
                 } else {
                     [PSCustomObject]@{
-                        'DisplayName'                = $_.DisplayName
+                        'DisplayName'                = $Object.DisplayName
                         'DomainName'                 = $DomainCN
-                        'Description'                = $_.Description
+                        'Description'                = $Object.Description
                         'GUID'                       = $GUID
-                        'Path'                       = $_.gPCFileSysPath
-                        #$Output['FunctionalityVersion'] = $_.gPCFunctionalityVersion
-                        'Created'                    = $_.Created
-                        'Modified'                   = $_.Modified
-                        'Owner'                      = $_.ntSecurityDescriptor.Owner
-                        'GPOCanonicalName'           = $_.CanonicalName
-                        'GPODomainDistinguishedName' = ConvertFrom-DistinguishedName -DistinguishedName $_.DistinguishedName -ToDC
-                        'GPODistinguishedName'       = $_.DistinguishedName
+                        'Path'                       = $Object.gPCFileSysPath
+                        #$Output['FunctionalityVersion'] = $Object.gPCFunctionalityVersion
+                        'Created'                    = $Object.Created
+                        'Modified'                   = $Object.Modified
+                        'Owner'                      = $Object.ntSecurityDescriptor.Owner
+                        'GPOCanonicalName'           = $Object.CanonicalName
+                        'GPODomainDistinguishedName' = ConvertFrom-DistinguishedName -DistinguishedName $Object.DistinguishedName -ToDC
+                        'GPODistinguishedName'       = $Object.DistinguishedName
                     }
                 }
             }
