@@ -1,7 +1,7 @@
 ﻿$GPOZaurrGPORedirects = [ordered] @{
     Name       = 'Group Policies With Redirected SYSVOL'
     Enabled    = $false
-    Action     = $null
+    ActionRequired     = $null
     Data       = $null
     Execute    = {
         Get-GPOZaurrRedirect -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
@@ -14,6 +14,11 @@
             } else {
                 $Script:Reporting['GPORedirect']['Variables']['GPOIsNotCorrect']++
             }
+        }
+        if ($Script:Reporting['GPORedirect']['Variables']['GPOIsNotCorrect'] -gt 0) {
+            $Script:Reporting['GPORedirect']['ActionRequired'] = $true
+        } else {
+            $Script:Reporting['GPORedirect']['ActionRequired'] = $false
         }
     }
     Variables  = @{
