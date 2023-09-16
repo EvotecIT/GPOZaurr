@@ -1,5 +1,10 @@
 ﻿# GPOZaurr Release History
 
+## 1.0.0 - 2023.09.15
+- `Get-GPOZaurrUpdates` fix small typo
+- `Get-GPOZaurrAD` improve performance a bit
+- Added `Get-GPOZaurrRedirect` to detect if GPO path was redirected (security issue)
+
 ## 0.0.160 - 2023.05.26
 - Fixes `Remove-GPOZaurr` limit processing feature which would not stop in some cases
 
