@@ -5,6 +5,7 @@
 - `Get-GPOZaurrAD` improve performance a bit
 - `Get-GPOZaurrAD` changed pipeline into standard foreach to improve performance and potential problems for large domains
 - Added `Get-GPOZaurrRedirect` to detect if GPO path was redirected (security issue)
+- Added `GPORedirect` report type to `Invoke-GPOZaurr` to detect if GPO path was redirected (security issue)
 
 ## 0.0.160 - 2023.05.26
 - Fixes `Remove-GPOZaurr` limit processing feature which would not stop in some cases
