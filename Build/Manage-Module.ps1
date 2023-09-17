@@ -29,9 +29,9 @@ Invoke-ModuleBuild -ModuleName 'GPOZaurr' {
     }
     New-ConfigurationManifest @Manifest
 
-    New-ConfigurationModule -Type RequiredModule -Name 'PSWriteColor', 'PSSharedGoods', 'ADEssentials' -Guid Auto -Version Latest
+    New-ConfigurationModule -Type RequiredModule -Name 'PSWriteColor', 'PSSharedGoods', 'ADEssentials', 'PSWriteHTML' -Guid Auto -Version Latest
     #New-ConfigurationModule -Type ExternalModule -Name 'Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Management','Microsoft.PowerShell.Security'
-    New-ConfigurationModule -Type ApprovedModule -Name 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword'
+    New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword', 'ADEssentials'
 
     New-ConfigurationModule -Type ExternalModule -Name @(
         "CimCmdlets"
@@ -44,9 +44,14 @@ Invoke-ModuleBuild -ModuleName 'GPOZaurr' {
         # this are builtin into PowerShell, so not critical
         'powershellget'
         'GroupPolicy'
+        'ScheduledTasks'
         'ActiveDirectory'
+        'Microsoft.WSMan.Management'
+        'NetConnection'
+        'NetSecurity'
+        'NetTCPIP'
     ) -IgnoreFunctionName @(
-
+        'Select-Unique'
     )
 
     New-ConfigurationCommand -ModuleName 'ActiveDirectory' -CommandName @(
@@ -213,7 +218,7 @@ Invoke-ModuleBuild -ModuleName 'GPOZaurr' {
     # New-ConfigurationTest -TestsPath "$PSScriptRoot\..\Tests" -Enable
 
     New-ConfigurationArtefact -Type Unpacked -Enable -Path "$PSScriptRoot\..\Artefacts\Unpacked" -AddRequiredModules
-    New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot\..\Artefacts\Packed" -ArtefactName '<ModuleName>.v<ModuleVersion>.zip'
+    New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot\..\Artefacts\Packed" -ArtefactName '<ModuleName>.v<ModuleVersion>.zip' -AddRequiredModules
 
     # options for publishing to github/psgallery
     #New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true
