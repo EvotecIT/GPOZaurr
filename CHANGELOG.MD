@@ -1,6 +1,6 @@
 ﻿# GPOZaurr Release History
 
-## 1.0.0 - 2023.09.15
+## 1.0.0 - 2023.09.17
 - `Get-GPOZaurrUpdates` fix small typo
 - `Get-GPOZaurrAD` improve performance a bit
 - `Get-GPOZaurrAD` changed pipeline into standard foreach to improve performance and potential problems for large domains
