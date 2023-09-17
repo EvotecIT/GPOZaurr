@@ -29,6 +29,10 @@
             Guid          = '9fc9fd61-7f11-4f4b-a527-084086f1905f'
             ModuleName    = 'ADEssentials'
             ModuleVersion = '0.0.165'
+        }, @{
+            Guid          = 'a7bdf640-f5cb-4acf-9de0-365b322d245c'
+            ModuleName    = 'PSWriteHTML'
+            ModuleVersion = '1.8.0'
         }, 'CimCmdlets', 'Microsoft.PowerShell.Management', 'Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Security')
     RootModule           = 'GPOZaurr.psm1'
 }
