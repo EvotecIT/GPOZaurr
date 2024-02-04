@@ -63,7 +63,7 @@
                     $Splat['Filter'] = -join ($Splat['Filter'], ' -and ((WhenChanged -ge $DateFrom -and WhenChanged -le $DateTo) -or (WhenCreated -ge $DateFrom -and WhenCreated -le $DateTo))')
                 } elseif ($DateProperty -eq 'WhenChanged' -or $DateProperty -eq 'WhenCreated') {
                     $Property = $DateProperty[0]
-                    $Splat['Filter'] = -join ($Splat['Filter'], ' -and ($Property -ge $DateFrom -and $Property -le $DateTo)')
+                    $Splat['Filter'] = -join ($Splat['Filter'], " -and ($Property -ge $DateFrom -and $Property -le $DateTo)")
                 } else {
                     Write-Warning -Message "Get-GPOZaurrAD - DateProperty parameter is empty. Provide name and try again."
                     continue
@@ -75,7 +75,7 @@
                     $Splat['Filter'] = -join ($Splat['Filter'], ' -and ((WhenChanged -ge $DateFrom -and WhenChanged -le $DateTo) -or (WhenCreated -ge $DateFrom -and WhenCreated -le $DateTo))')
                 } elseif ($DateProperty -eq 'WhenChanged' -or $DateProperty -eq 'WhenCreated') {
                     $Property = $DateProperty[0]
-                    $Splat['Filter'] = -join ($Splat['Filter'], ' -and ($Property -ge $DateFrom -and $Property -le $DateTo)')
+                    $Splat['Filter'] = -join ($Splat['Filter'], " -and ($Property -ge $DateFrom -and $Property -le $DateTo)")
                 } else {
                     Write-Warning -Message "Get-GPOZaurrAD - DateProperty parameter is empty. Provide name and try again."
                     continue
