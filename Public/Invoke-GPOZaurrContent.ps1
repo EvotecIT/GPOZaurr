@@ -53,7 +53,13 @@
         [Parameter(ParameterSetName = 'Local')]
         [switch] $SkipCleanup,
 
-        [switch] $Extended
+        [switch] $Extended,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [Alias('Name')][string[]] $GPOName,
+
+        [Parameter(ParameterSetName = 'Default')]
+        [string[]] $GPOGUID
     )
     if ($Type.Count -eq 0) {
         $Type = $Script:GPODitionary.Keys
@@ -82,6 +88,16 @@
             Write-Warning "Invoke-GPOZaurrContent - $GPOPath doesn't exists."
             return
         }
+    } elseif ($GPOName) {
+        Write-Verbose "Invoke-GPOZaurrContent - Query AD for GPOs"
+        [Array] $GPOs = @(
+            foreach ($Name in $GPOName) {
+                Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOName $Name
+            }
+            foreach ($GUID in $GPOGUID) {
+                Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOGUID $GUID
+            }
+        )
     } else {
         Write-Verbose "Invoke-GPOZaurrContent - Query AD for GPOs"
         [Array] $GPOs = Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation

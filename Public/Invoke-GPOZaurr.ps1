@@ -75,7 +75,10 @@
         [string[]] $ExcludeDomains,
         [alias('Domain', 'Domains')][string[]] $IncludeDomains,
         [switch] $Online,
-        [switch] $SplitReports
+        [switch] $SplitReports,
+
+        [Alias('Name')][string[]] $GPOName,
+        [Alias('GUID')][string[]] $GPOGUID
     )
     Reset-GPOZaurrStatus # This makes sure types are at it's proper status
 
