@@ -1,5 +1,13 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.0 - 2024.04.02
+- Improve `Invoke-GPOZaurr` - by adding `GPOName` and `GPOGUID` parameters, providing ability to analyse single/multiple GPOs
+  - Those parameters are only applicable to `GPOAnalysis`,`GPOBrokenPartially` for now (need to be expanded further)
+- Improve `Invoke-GPOZaurrContent` by allowing `GPOName` and `GPOGUID` parameters, providing ability to analyse single/multiple GPOs
+- Small verbose message improvement for `Export-GPOZaurrContent`
+- Added `Get-GPOZaurrMissingFiles` to detect missing files for GPOs
+- Added `Invoke-GPOZaurr` - type `GPOBrokenPartially` to detect missing files for GPOs
+
 ## 1.0.0 - 2023.09.17
 - `Get-GPOZaurrUpdates` fix small typo
 - `Get-GPOZaurrAD` improve performance a bit
