@@ -88,7 +88,7 @@
             Write-Warning "Invoke-GPOZaurrContent - $GPOPath doesn't exists."
             return
         }
-    } elseif ($GPOName) {
+    } elseif ($GPOName -or $GPOGUID) {
         Write-Verbose "Invoke-GPOZaurrContent - Query AD for GPOs"
         [Array] $GPOs = @(
             foreach ($Name in $GPOName) {
@@ -239,7 +239,6 @@
     }
 
     $Output['PoliciesTotal'] = $Output.Reports.Policies.PolicyCategory | Group-Object | Select-Object Name, Count | Sort-Object -Property Name #-Descending
-    #$Output['PoliciesTotal'] = $Output.Reports.Policies.PolicyCategory | Group-Object | Select-Object Name, Count | Sort-Object -Property Count -Descending
 
     if (-not $SkipCleanup) {
         Write-Verbose "Invoke-GPOZaurrContent - Cleaning up output"

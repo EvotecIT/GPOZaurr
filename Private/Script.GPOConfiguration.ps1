@@ -1,6 +1,7 @@
 ﻿$Script:GPOConfiguration = [ordered] @{
     GPOBroken                    = $GPOZaurrOrphans
     GPOBrokenLink                = $GPOZaurrBrokenLink
+    GPOBrokenPartially           = $GPOZaurrMissingFiles
     GPOOwners                    = $GPOZaurrOwners
     GPOConsistency               = $GPOZaurrConsistency
     GPODuplicates                = $GPOZaurrDuplicates
