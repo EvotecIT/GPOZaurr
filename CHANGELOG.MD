@@ -7,6 +7,8 @@
 - Small verbose message improvement for `Export-GPOZaurrContent`
 - Added `Get-GPOZaurrMissingFiles` to detect missing files for GPOs
 - Added `Invoke-GPOZaurr` - type `GPOBrokenPartially` to detect missing files for GPOs
+- Improve detection of empty GPOs by including check for GPF files
+- Added `FilesCount` to `Get-GPOZaurr` to detect number of files in GPO
 
 ## 1.0.0 - 2023.09.17
 - `Get-GPOZaurrUpdates` fix small typo
