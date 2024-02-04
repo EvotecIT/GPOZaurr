@@ -33,7 +33,7 @@
             $GPOs = Get-GPO -All -Domain $Domain
             foreach ($GPO in $GPOS) {
                 $Count++
-                Write-Verbose -Message "Export-GPOZaurr - Exporting ($Count / $($GPOs.Count)) - $($GPO.DisplayName) to $ReportTypeF"
+                Write-Verbose -Message "Export-GPOZaurr - Exporting ($Count / $($GPOs.Count)) - $($GPO.DisplayName) to $ReportType"
                 $Name = "$($GPO.DomainName)_$($GPO.Id)_$($GPO.DisplayName).xml".Replace(" ", "_").Replace("|", "_")
                 $FullName = [io.path]::Combine($GPOOutput, $Name)
                 Get-GPOReport -Guid $GPO.Id -Domain $GPO.DomainName -ReportType $ReportType -Path $FullName
