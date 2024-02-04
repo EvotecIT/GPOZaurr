@@ -12,6 +12,8 @@
         [System.Collections.IDictionary] $LinksSummaryCache
     )
 
+    $SysvolGpoPath = "\\$($GPO.DomainName)\SYSVOL\$($GPO.DomainName)\Policies\{$($GPO.ID)}"
+
     $DisplayName = $XMLContent.GPO.Name
     $DomainName = $XMLContent.GPO.Identifier.Domain.'#text'
 
@@ -166,7 +168,20 @@
         [bool] $UserSettingsAvailable = if ($OutputUser.Count -gt 0) { $true } else { $false }
     }
 
-    if ($ComputerSettingsAvailable -eq $false -and $UserSettingsAvailable -eq $false) {
+    # Check if there are any GPF files in the GPO
+    # those are special files that are used to store settings for some applications (maily Citrix?)
+    # if there are any, then we can't say that GPO is empty, and they are not visible in the XML
+    $GPFFile = $false
+    $FilesCount = 0
+    Get-ChildItem -LiteralPath $SysvolGpoPath -Recurse -ErrorAction SilentlyContinue -File | ForEach-Object {
+        if ($_.Extension -eq '.gpf') {
+            #Write-Warning -Message "Get-XMLGPO - GPO [$DisplayName/$DomainName] has no data in XML, but it contains GPF files. Excluding from empty GPO list."
+            $GPFFile = $true
+        }
+        $FilesCount++
+    }
+
+    if ($ComputerSettingsAvailable -eq $false -and $UserSettingsAvailable -eq $false -and $GPFFile -eq $false) {
         $Empty = $true
     } else {
         $Empty = $false
@@ -257,6 +272,7 @@
             'Inherited'            = $false
             'Permissions'          = 'Owner'
             'GPODistinguishedName' = $GPO.Path
+            'GPOSysvolPath'        = $SysvolGpoPath
         }
         $XMLContent.GPO.SecurityDescriptor.Permissions.TrusteePermissions | ForEach-Object -Process {
             if ($_) {
@@ -285,6 +301,7 @@
             'OwnerSID'             = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'
             'OwnerType'            = $OwnerType
             'GPODistinguishedName' = $GPO.Path
+            'GPOSysvolPath'        = $SysvolGpoPath
         }
     } else {
         $GPOOutput = [PsCustomObject] @{
@@ -302,6 +319,7 @@
             'Description'                       = $GPO.Description
             'ComputerPolicies'                  = $XMLContent.GPO.Computer.ExtensionData.Name -join ", "
             'UserPolicies'                      = $XMLContent.GPO.User.ExtensionData.Name -join ", "
+            'FilesCount'                        = $FilesCount
             'LinksCount'                        = $LinksTotalCount
             'LinksEnabledCount'                 = $LinksEnabledCount
             'LinksDisabledCount'                = $LinksDisabledCount
@@ -331,6 +349,7 @@
             'WMIFilter'                         = $GPO.WmiFilter.name
             'WMIFilterDescription'              = $GPO.WmiFilter.Description
             'GPODistinguishedName'              = $GPO.Path
+            'GPOSysvolPath'                     = $SysvolGpoPath
             'SDDL'                              = if ($Splitter -ne '') { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' -join $Splitter } else { $XMLContent.GPO.SecurityDescriptor.SDDL.'#text' }
             'Owner'                             = $XMLContent.GPO.SecurityDescriptor.Owner.Name.'#text'
             'OwnerSID'                          = $XMLContent.GPO.SecurityDescriptor.Owner.SID.'#text'
