@@ -1,5 +1,9 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.1 - 2024.02.07
+- Force specific DC for `Invoke-GPOZaurrContent`
+- Update to Duplicate Object detection for error handling [#52](https://github.com/EvotecIT/GPOZaurr/issues/52)
+
 ## 1.1.0 - 2024.04.02
 - Improve `Invoke-GPOZaurr` - by adding `GPOName` and `GPOGUID` parameters, providing ability to analyse single/multiple GPOs
   - Those parameters are only applicable to `GPOAnalysis`,`GPOBrokenPartially` for now (need to be expanded further)
