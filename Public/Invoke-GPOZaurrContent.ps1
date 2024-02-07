@@ -110,6 +110,8 @@
     $Output['Reports'] = [ordered] @{}
     $Output['CategoriesFull'] = [ordered] @{}
 
+    $ForestInformation = Get-WinADForestDetails -PreferWritable
+
     Write-Verbose "Invoke-GPOZaurrContent - Loading GPO Report to Categories"
     $CountGPO = 0
     [Array] $GPOCategories = foreach ($GPO in $GPOs) {
@@ -118,7 +120,8 @@
         if ($GPOPath) {
             $GPOOutput = $GPO.GPOOutput
         } else {
-            [xml] $GPOOutput = Get-GPOReport -Guid $GPO.GUID -Domain $GPO.DomainName -ReportType Xml
+            $QueryServer = $ForestInformation['QueryServers'][$GPO.DomainName].HostName[0]
+            [xml] $GPOOutput = Get-GPOReport -Guid $GPO.GUID -Domain $GPO.DomainName -ReportType Xml -Server $QueryServer
         }
         Get-GPOCategories -GPO $GPO -GPOOutput $GPOOutput.GPO -Splitter $Splitter -FullObjects:$FullObjects -CachedCategories $Output['CategoriesFull']
     }
