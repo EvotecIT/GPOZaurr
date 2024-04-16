@@ -1,5 +1,8 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.2 - 2024.04.16
+- Fixes `Forest` parameter for GPOAnalysis [#54](https://github.com/EvotecIT/GPOZaurr/issues/54)
+
 ## 1.1.1 - 2024.02.07
 - Force specific DC for `Invoke-GPOZaurrContent`
 - Update to Duplicate Object detection for error handling [#52](https://github.com/EvotecIT/GPOZaurr/issues/52)
