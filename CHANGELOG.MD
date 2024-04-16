@@ -1,5 +1,8 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.3 - 2024.04.16
+- Fixes report showing unessecary `WhatIf` [#53](https://github.com/EvotecIT/GPOZaurr/issues/53)
+
 ## 1.1.2 - 2024.04.16
 - Fixes `Forest` parameter for GPOAnalysis [#54](https://github.com/EvotecIT/GPOZaurr/issues/54)
 
