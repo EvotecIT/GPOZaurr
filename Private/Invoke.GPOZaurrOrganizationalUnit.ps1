@@ -209,13 +209,13 @@
                                 } -LineBreak
                                 New-HTMLText -Text 'Once happy with results please follow with command (this will start removal process): ' -LineBreak -FontWeight bold
                                 New-HTMLCodeBlock -Code {
-                                    Remove-GPOZaurrLinkEmptyOU -WhatIf -LimitProcessing 2 -Verbose
+                                    Remove-GPOZaurrLinkEmptyOU -LimitProcessing 2 -Verbose
                                 }
                                 New-HTMLText -TextBlock {
                                     "Alternatively for multi-domain scenario, if you have limited Domain Admin credentials to a single domain please use following command: "
                                 }
                                 New-HTMLCodeBlock -Code {
-                                    Remove-GPOZaurrLinkEmptyOU -WhatIf -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
+                                    Remove-GPOZaurrLinkEmptyOU -LimitProcessing 2 -Verbose -IncludeDomains 'YourDomainYouHavePermissionsFor'
                                 }
                                 New-HTMLText -TextBlock {
                                     "This command when executed deletes only first X broken GPOs. Use LimitProcessing parameter to prevent mass delete and increase the counter when no errors occur. "
