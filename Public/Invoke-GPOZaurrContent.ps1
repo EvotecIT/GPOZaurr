@@ -110,7 +110,7 @@
     $Output['Reports'] = [ordered] @{}
     $Output['CategoriesFull'] = [ordered] @{}
 
-    $ForestInformation = Get-WinADForestDetails -PreferWritable
+    $ForestInformation = Get-WinADForestDetails -PreferWritable  -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
 
     Write-Verbose "Invoke-GPOZaurrContent - Loading GPO Report to Categories"
     $CountGPO = 0
