@@ -6,7 +6,7 @@ Invoke-ModuleBuild -ModuleName 'GPOZaurr' {
     # Usual defaults as per standard module
     $Manifest = @{
         # Version number of this module.
-        ModuleVersion        = '1.X.0'
+        ModuleVersion        = '1.1.X'
         # Supported PSEditions
         CompatiblePSEditions = @('Desktop')
         # ID used to uniquely identify this module
