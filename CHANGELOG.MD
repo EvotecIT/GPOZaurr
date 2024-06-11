@@ -1,5 +1,8 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.4 - 2024.06.11
+- Small improvements & fixes
+
 ## 1.1.3 - 2024.04.16
 - Fixes report showing unessecary `WhatIf` [#53](https://github.com/EvotecIT/GPOZaurr/issues/53)
 
