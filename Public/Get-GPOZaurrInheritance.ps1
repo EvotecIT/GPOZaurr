@@ -15,6 +15,9 @@
     .PARAMETER IncludeExcludedObjects
     Show excluded objets. Default disabled
 
+    .PARAMETER IncludeGroupPoliciesForBlockedObjects
+    Include Group Policies for Blocked Objects. Default disabled
+
     .PARAMETER Exclusions
     Provide exclusions for OU's approved by IT. You can provide OU by canonical name or distinguishedName
 
@@ -69,7 +72,7 @@
                 }
                 if ($InheritanceInformation.BlockedInheritance -and $IncludeGroupPoliciesForBlockedObjects.IsPresent) {
                     try {
-                        $GPInheritance = Get-GPInheritance -Target $OU.distinguishedName -ErrorAction Stop
+                        $GPInheritance = Get-GPInheritance -Target $OU.distinguishedName -ErrorAction Stop -Domain $InheritanceInformation.DomainName
                     } catch {
                         Write-Warning -Message "Get-GPOZaurrInheritance - Can't get GPInheritance for $($OU.distinguishedName). Error: $($_.Exception.Message)"
                         continue
