@@ -5,9 +5,9 @@
     Data           = $null
     Execute        = {
         if ($Script:Reporting['GPOBlockedInheritance']['Exclusions']) {
-            Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -IncludeGroupPoliciesForBlockedObjects -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $Excludeomains -Exclusions $Script:Reporting['GPOBlockedInheritance']['Exclusions']
+            Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -IncludeGroupPoliciesForBlockedObjects -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -Exclusions $Script:Reporting['GPOBlockedInheritance']['Exclusions']
         } else {
-            Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -IncludeGroupPoliciesForBlockedObjects -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $Excludeomains
+            Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -IncludeGroupPoliciesForBlockedObjects -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
         }
     }
     Processing     = {
