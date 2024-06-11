@@ -34,7 +34,7 @@
                 #$Script:Reporting['GPOOrganizationalUnit']['Variables']['WillFixPerDomain'][$OU.DomainName]++
             } elseif ($OU.Status -contains 'Excluded' -or $OU.Status -contains 'Excluded, Default OU') {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['Excluded']++
-                $Script:Reporting['GPOOrganizationalUnit']['Variables']['ExcludedOU'].Add($OU.Organizationalunit)
+                $null = $Script:Reporting['GPOOrganizationalUnit']['Variables']['ExcludedOU'].Add($OU.Organizationalunit)
             } else {
                 $Script:Reporting['GPOOrganizationalUnit']['Variables']['Legitimate']++
             }
@@ -52,6 +52,7 @@
         DeleteOU         = 0
         Legitimate       = 0
         Excluded         = 0
+        # Since we're using Copy-Dictionary this will get translated to Array List
         ExcludedOU       = [System.Collections.Generic.List[string]]::new()
         WillFix          = 0
         WillFixPerDomain = $null
