@@ -1,4 +1,22 @@
 ﻿function New-GPOZaurrReportConsole {
+    <#
+    .SYNOPSIS
+    Generates a detailed report of Group Policy Objects (GPO) applied to a computer and user.
+
+    .DESCRIPTION
+    This function provides a comprehensive overview of the Group Policy Objects (GPO) applied to a specific computer and user. It includes information such as last applied time, computer details, domain name, organizational unit, site, GPO types, slow link status, applied GPOs, and denied GPOs.
+
+    .PARAMETER Results
+    An IDictionary containing the results of Group Policy Object queries for both computer and user.
+
+    .PARAMETER ComputerName
+    The name of the computer for which the GPO report is generated.
+
+    .EXAMPLE
+    New-GPOZaurrReportConsole -Results $Results -ComputerName "MyComputer"
+    Generates a detailed report of Group Policy Objects applied to the computer named "MyComputer".
+
+    #>
     [cmdletBinding()]
     param(
         [System.Collections.IDictionary] $Results,

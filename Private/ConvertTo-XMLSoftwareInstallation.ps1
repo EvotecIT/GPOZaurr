@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLSoftwareInstallation {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Object (GPO) data into XML format for software installation.
+
+    .DESCRIPTION
+    This function takes GPO data and converts it into XML format suitable for software installation. It creates an XML structure with detailed information about each software installation entry.
+
+    .PARAMETER GPO
+    Specifies the GPO object containing software installation data.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLSoftwareInstallation -GPO $GPOObject -SingleObject
+    Converts a single GPO object into XML format for software installation.
+
+    .EXAMPLE
+    ConvertTo-XMLSoftwareInstallation -GPO $GPOObject
+    Converts multiple GPO objects into XML format for software installation.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLRegistrySettings {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Object (GPO) settings to XML format.
+
+    .DESCRIPTION
+    This function converts the settings of a Group Policy Object (GPO) to XML format. It can be used to export GPO settings for analysis or backup purposes.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) to convert to XML format.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object or multiple GPO objects.
+
+    .EXAMPLE
+    ConvertTo-XMLRegistrySettings -GPO $myGPO -SingleObject
+    Converts a single GPO object to XML format.
+
+    .EXAMPLE
+    ConvertTo-XMLRegistrySettings -GPO $myGPO
+    Converts multiple GPO objects to XML format.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

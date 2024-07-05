@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLPrinter {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Objects (GPO) to an XML printer format.
+
+    .DESCRIPTION
+    This function converts GPO objects to an XML printer format, providing detailed information about printers and printer connections.
+
+    .PARAMETER GPO
+    Specifies the GPO object to be converted.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object or multiple GPO objects.
+
+    .EXAMPLE
+    ConvertTo-XMLPrinter -GPO $myGPO -SingleObject
+    Converts a single GPO object $myGPO to an XML printer format.
+
+    .EXAMPLE
+    ConvertTo-XMLPrinter -GPO $myGPO
+    Converts multiple GPO objects to an XML printer format.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

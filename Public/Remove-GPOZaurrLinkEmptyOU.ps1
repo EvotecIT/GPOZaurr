@@ -1,4 +1,34 @@
 ﻿function Remove-GPOZaurrLinkEmptyOU {
+    <#
+    .SYNOPSIS
+    Removes Group Policy Object (GPO) links from empty Organizational Units (OUs) in a specified forest.
+
+    .DESCRIPTION
+    This function removes GPO links from OUs that are empty and meet specified criteria. It processes OUs within the specified forest based on inclusion and exclusion rules.
+
+    .PARAMETER Forest
+    Specifies the name of the forest to target for processing.
+
+    .PARAMETER ExcludeDomains
+    Specifies an array of domains to exclude from processing.
+
+    .PARAMETER IncludeDomains
+    Specifies an array of domains to include for processing.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .PARAMETER ExcludeOrganizationalUnit
+    Specifies an array of OUs to exclude from processing.
+
+    .PARAMETER LimitProcessing
+    Specifies the maximum number of OUs to process.
+
+    .EXAMPLE
+    Remove-GPOZaurrLinkEmptyOU -Forest "ContosoForest" -IncludeDomains @("domain1", "domain2") -ExcludeDomains @("domain3") -ExtendedForestInformation $info -ExcludeOrganizationalUnit @("OU=TestOU,DC=contoso,DC=com") -LimitProcessing 100
+    Removes GPO links from empty OUs in the "ContosoForest" forest, including domains "domain1" and "domain2" but excluding "domain3". Additional forest information is provided, and processing is limited to 100 OUs.
+
+    #>
     [cmdletbinding(SupportsShouldProcess)]
     param(
         [alias('ForestName')][string] $Forest,

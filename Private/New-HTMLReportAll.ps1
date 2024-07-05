@@ -1,4 +1,32 @@
 ﻿function New-HTMLReportAll {
+    <#
+    .SYNOPSIS
+    Generates an HTML report based on specified parameters.
+
+    .DESCRIPTION
+    This function generates an HTML report with customizable content based on the provided parameters. It supports generating standard reports and can be used for various reporting purposes.
+
+    .PARAMETER FilePath
+    Specifies the file path where the HTML report will be saved.
+
+    .PARAMETER Online
+    Indicates whether the report should be generated online.
+
+    .PARAMETER HideHTML
+    Hides the HTML content of the report if specified.
+
+    .PARAMETER Type
+    Specifies the type of report to generate.
+
+    .EXAMPLE
+    New-HTMLReportAll -FilePath "C:\Reports\Report.html" -Online -Type "Summary"
+    Generates an HTML report with a summary of data and saves it to the specified file path.
+
+    .EXAMPLE
+    New-HTMLReportAll -FilePath "C:\Reports\FullReport.html" -Type "Detailed"
+    Generates a detailed HTML report and saves it to the specified file path.
+
+    #>
     [CmdletBinding()]
     param(
         [string] $FilePath,

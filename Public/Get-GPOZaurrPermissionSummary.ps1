@@ -1,4 +1,47 @@
 ﻿function Get-GPOZaurrPermissionSummary {
+    <#
+    .SYNOPSIS
+    Retrieves a summary of Group Policy Object (GPO) permissions based on specified criteria.
+
+    .DESCRIPTION
+    Retrieves a summary of GPO permissions based on the specified criteria, including filtering by permission types, permit types, and more.
+
+    .PARAMETER Type
+    Specifies the type of permissions to include. Options include 'AuthenticatedUsers', 'DomainComputers', 'Unknown', 'WellKnownAdministrative', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', and 'All'.
+
+    .PARAMETER PermitType
+    Specifies the type of permission to permit. Options include 'Allow', 'Deny', and 'All'.
+
+    .PARAMETER IncludePermissionType
+    Specifies the permission types to include in the summary.
+
+    .PARAMETER ExcludePermissionType
+    Specifies the permission types to exclude from the summary.
+
+    .PARAMETER Forest
+    Specifies the target forest. By default, the current forest is used.
+
+    .PARAMETER ExcludeDomains
+    Specifies domains to exclude from the search.
+
+    .PARAMETER IncludeDomains
+    Specifies domains to include in the search.
+
+    .PARAMETER ExtendedForestInformation
+    Provides additional forest information to speed up processing.
+
+    .PARAMETER Separator
+    Specifies the separator to use in the output.
+
+    .EXAMPLE
+    Get-GPOZaurrPermissionSummary -Type 'All' -PermitType 'Allow' -IncludePermissionType 'GpoApply', 'GpoEdit' -ExcludePermissionType 'GpoOwner' -Forest 'ExampleForest' -IncludeDomains 'Domain1', 'Domain2' -ExtendedForestInformation $ForestInfo -Separator '|'
+
+    .EXAMPLE
+    Get-GPOZaurrPermissionSummary -Type 'Administrative' -PermitType 'All' -IncludePermissionType 'GpoRead' -ExcludePermissionType 'GpoRootOwner' -Forest 'AnotherForest' -ExcludeDomains 'Domain3' -Separator ','
+
+    .NOTES
+    General notes
+    #>
     [cmdletBinding()]
     param(
         [validateSet('AuthenticatedUsers', 'DomainComputers', 'Unknown', 'WellKnownAdministrative', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All')][string[]] $Type = 'All',

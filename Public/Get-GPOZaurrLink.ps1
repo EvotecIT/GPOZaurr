@@ -1,4 +1,62 @@
 ﻿function Get-GPOZaurrLink {
+    <#
+    .SYNOPSIS
+    Retrieves Group Policy Object (GPO) Zaurr links based on specified criteria.
+
+    .DESCRIPTION
+    This function retrieves GPO Zaurr links based on various parameters such as ADObject, Filter, Linked, Site, etc. It provides flexibility in searching for GPO Zaurr links within Active Directory.
+
+    .PARAMETER ADObject
+    Specifies the Active Directory object(s) to search for GPO Zaurr links.
+
+    .PARAMETER Filter
+    Specifies the filter criteria to search for GPO Zaurr links.
+
+    .PARAMETER SearchBase
+    Specifies the search base for filtering GPO Zaurr links.
+
+    .PARAMETER SearchScope
+    Specifies the search scope for filtering GPO Zaurr links.
+
+    .PARAMETER Linked
+    Specifies the type of linked GPOs to retrieve. Valid values are 'All', 'Root', 'DomainControllers', 'Site', and 'OrganizationalUnit'.
+
+    .PARAMETER Site
+    Specifies the site(s) to search for GPO Zaurr links.
+
+    .PARAMETER Limited
+    Indicates whether to limit the search results.
+
+    .PARAMETER SkipDuplicates
+    Indicates whether to skip duplicate search results.
+
+    .PARAMETER GPOCache
+    Specifies a cache for storing GPO information.
+
+    .PARAMETER Forest
+    Specifies the forest name for filtering GPO Zaurr links.
+
+    .PARAMETER ExcludeDomains
+    Specifies the domains to exclude from the search.
+
+    .PARAMETER IncludeDomains
+    Specifies the domains to include in the search.
+
+    .EXAMPLE
+    Get-GPOZaurrLink -ADObject $ADObject -Linked 'All'
+
+    Description
+    -----------
+    Retrieves all linked GPOZaurr links for the specified Active Directory object(s).
+
+    .EXAMPLE
+    Get-GPOZaurrLink -Filter "(objectClass -eq 'organizationalUnit')" -SearchBase 'CN=Configuration,DC=ad,DC=evotec,DC=xyz'
+
+    Description
+    -----------
+    Retrieves GPOZaurr links based on the specified filter and search base.
+
+    #>
     [cmdletbinding(DefaultParameterSetName = 'Linked')]
     param(
         [parameter(ParameterSetName = 'ADObject', ValueFromPipeline, ValueFromPipelineByPropertyName, Mandatory)][Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,

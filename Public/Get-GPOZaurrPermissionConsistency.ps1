@@ -1,4 +1,47 @@
 ﻿function Get-GPOZaurrPermissionConsistency {
+    <#
+    .SYNOPSIS
+    Retrieves information about Group Policy Objects (GPOs) and checks permission consistency across domains.
+
+    .DESCRIPTION
+    The Get-GPOZaurrPermissionConsistency function retrieves information about GPOs and checks permission consistency across domains. It can filter by GPO name, GPO GUID, or type of consistency. It also provides options to include/exclude specific domains and verify inheritance.
+
+    .PARAMETER GPOName
+    Specifies the name of the GPO to retrieve.
+
+    .PARAMETER GPOGuid
+    Specifies the GUID of the GPO to retrieve.
+
+    .PARAMETER Type
+    Specifies the type of consistency to check. Valid values are 'Consistent', 'Inconsistent', or 'All'.
+
+    .PARAMETER Forest
+    Specifies the forest name to retrieve GPO information from.
+
+    .PARAMETER ExcludeDomains
+    Specifies an array of domains to exclude from the search.
+
+    .PARAMETER IncludeDomains
+    Specifies an array of domains to include in the search.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .PARAMETER IncludeGPOObject
+    Indicates whether to include the GPO object in the output.
+
+    .PARAMETER VerifyInheritance
+    Indicates whether to verify inheritance of permissions.
+
+    .EXAMPLE
+    Get-GPOZaurrPermissionConsistency -GPOName "TestGPO" -Forest "Contoso" -IncludeDomains @("DomainA", "DomainB") -Type "Consistent"
+    Retrieves permission consistency information for the GPO named "TestGPO" in the forest "Contoso" for domains "DomainA" and "DomainB" with consistent permissions.
+
+    .EXAMPLE
+    Get-GPOZaurrPermissionConsistency -GPOGuid "12345678-1234-1234-1234-1234567890AB" -Forest "Fabrikam" -Type "Inconsistent" -VerifyInheritance
+    Retrieves permission consistency information for the GPO with GUID "12345678-1234-1234-1234-1234567890AB" in the forest "Fabrikam" for all domains with inconsistent permissions and verifies inheritance.
+
+    #>
     [cmdletBinding(DefaultParameterSetName = 'Type')]
     param(
         [Parameter(ParameterSetName = 'GPOName')][string] $GPOName,

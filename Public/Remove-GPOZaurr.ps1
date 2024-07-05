@@ -1,4 +1,53 @@
 ﻿function Remove-GPOZaurr {
+    <#
+    .SYNOPSIS
+    Removes Group Policy Objects based on specified criteria.
+
+    .DESCRIPTION
+    The Remove-GPOZaurr function removes Group Policy Objects (GPOs) based on the specified criteria. It allows for filtering by various parameters such as GPO type, forest, domains, and more.
+
+    .PARAMETER ExcludeGroupPolicies
+    Specifies the Group Policies to exclude from removal.
+
+    .PARAMETER Type
+    Specifies the type of GPOs to target for removal. Valid values are 'Empty', 'Unlinked', 'Disabled', 'NoApplyPermission'.
+
+    .PARAMETER LimitProcessing
+    Specifies the maximum number of GPOs to process before stopping.
+
+    .PARAMETER Forest
+    Specifies the forest to target for GPO removal.
+
+    .PARAMETER ExcludeDomains
+    Specifies the domains to exclude from GPO removal.
+
+    .PARAMETER IncludeDomains
+    Specifies the domains to include for GPO removal.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .PARAMETER GPOPath
+    Specifies the path to the GPOs to be removed.
+
+    .PARAMETER BackupPath
+    Specifies the path for backing up GPOs before removal.
+
+    .PARAMETER BackupDated
+    Indicates whether the backup should be dated.
+
+    .PARAMETER RequireDays
+    Specifies the number of days before GPO removal is required.
+
+    .EXAMPLE
+    Remove-GPOZaurr -Type 'Empty' -Forest 'Contoso' -IncludeDomains 'Domain1', 'Domain2' -BackupPath 'C:\GPOBackups' -BackupDated -RequireDays 7
+    Removes all empty GPOs from the 'Contoso' forest for 'Domain1' and 'Domain2', backs them up to 'C:\GPOBackups' with dated folders, and requires removal after 7 days.
+
+    .EXAMPLE
+    Remove-GPOZaurr -Type 'Disabled' -Forest 'Fabrikam' -ExcludeDomains 'Domain3' -LimitProcessing 10
+    Removes all disabled GPOs from the 'Fabrikam' forest excluding 'Domain3' and processes only the first 10 GPOs.
+
+    #>
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Position = 1)][scriptblock] $ExcludeGroupPolicies,

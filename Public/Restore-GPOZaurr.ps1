@@ -1,4 +1,35 @@
 ﻿function Restore-GPOZaurr {
+    <#
+    .SYNOPSIS
+    Restores Group Policy Objects (GPOs) from a specified backup folder.
+
+    .DESCRIPTION
+    Restores Group Policy Objects (GPOs) from a specified backup folder. This function allows restoring GPOs with the option to provide a new display name for the GPO.
+
+    .PARAMETER BackupFolder
+    The path to the folder containing the GPO backups.
+
+    .PARAMETER DisplayName
+    The display name of the GPO to be restored.
+
+    .PARAMETER NewDisplayName
+    (Optional) The new display name for the restored GPO.
+
+    .PARAMETER Domain
+    (Optional) The domain name where the GPO should be restored.
+
+    .PARAMETER SkipBackupSummary
+    (Switch) Skip displaying the backup summary information.
+
+    .EXAMPLE
+    Restore-GPOZaurr -BackupFolder 'C:\GPOBackups' -DisplayName 'TestGPO'
+
+    .EXAMPLE
+    Restore-GPOZaurr -BackupFolder 'C:\GPOBackups' -DisplayName 'TestGPO' -NewDisplayName 'NewTestGPO' -Domain 'example.com'
+
+    .NOTES
+    General notes
+    #>
     [cmdletBinding()]
     param(
         [parameter(Mandatory)][string] $BackupFolder,

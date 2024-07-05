@@ -1,4 +1,62 @@
 ﻿function Remove-GPOZaurrPermission {
+    <#
+    .SYNOPSIS
+    Removes permissions from a Group Policy Object (GPO) for specified principals.
+
+    .DESCRIPTION
+    The Remove-GPOZaurrPermission function removes permissions from a specified GPO for the specified principals. It allows for fine-grained control over the removal of permissions based on various parameters.
+
+    .PARAMETER GPOName
+    Specifies the name of the GPO from which permissions will be removed.
+
+    .PARAMETER GPOGuid
+    Specifies the GUID of the GPO from which permissions will be removed.
+
+    .PARAMETER Principal
+    Specifies the principal(s) for which permissions will be removed.
+
+    .PARAMETER PrincipalType
+    Specifies the type of principal(s) provided. Valid values are 'DistinguishedName', 'Name', 'NetbiosName', or 'Sid'.
+
+    .PARAMETER Type
+    Specifies the type of permissions to remove. Valid values are 'Unknown', 'NotAdministrative', or 'Default'.
+
+    .PARAMETER IncludePermissionType
+    Specifies the permission types to include in the removal process.
+
+    .PARAMETER ExcludePermissionType
+    Specifies the permission types to exclude from the removal process.
+
+    .PARAMETER SkipWellKnown
+    Skips well-known permissions during the removal process.
+
+    .PARAMETER SkipAdministrative
+    Skips administrative permissions during the removal process.
+
+    .PARAMETER Forest
+    Specifies the forest in which the GPO resides.
+
+    .PARAMETER ExcludeDomains
+    Specifies the domains to exclude from the removal process.
+
+    .PARAMETER IncludeDomains
+    Specifies the domains to include in the removal process.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .PARAMETER LimitProcessing
+    Specifies the maximum number of permissions to process.
+
+    .EXAMPLE
+    Remove-GPOZaurrPermission -GPOName "TestGPO" -Principal "User1" -PrincipalType "Name" -Type "Default" -Forest "Contoso" -IncludeDomains "Domain1", "Domain2"
+    Removes default permissions for "User1" from the GPO named "TestGPO" in the "Contoso" forest for domains "Domain1" and "Domain2".
+
+    .EXAMPLE
+    Remove-GPOZaurrPermission -GPOGuid "12345678-1234-1234-1234-1234567890AB" -Principal "Group1" -PrincipalType "Sid" -Type "Unknown" -Forest "Fabrikam" -ExcludeDomains "Domain3"
+    Removes unknown permissions for "Group1" from the GPO with GUID "12345678-1234-1234-1234-1234567890AB" in the "Fabrikam" forest excluding "Domain3".
+
+    #>
     [cmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'Global')]
     param(
         [Parameter(ParameterSetName = 'GPOName', Mandatory)]

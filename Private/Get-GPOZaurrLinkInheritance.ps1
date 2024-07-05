@@ -1,52 +1,52 @@
 function Get-GPOZaurrLinkInheritance {
     <#
     .SYNOPSIS
-    Short description
+    Retrieves the Group Policy Object (GPO) inheritance information for a given Active Directory object.
 
     .DESCRIPTION
-    Long description
+    This function retrieves the inheritance information of Group Policy Objects (GPOs) for a specified Active Directory object. It provides details on how GPOs are linked and inherited by the object.
 
     .PARAMETER ADObject
-    Parameter description
+    Specifies the Active Directory object for which to retrieve GPO inheritance information.
 
     .PARAMETER Filter
-    Parameter description
+    Specifies the filter criteria for selecting the types of objects to include in the search. Default value includes 'organizationalUnit', 'domainDNS', and 'site' objects.
 
     .PARAMETER SearchBase
-    Parameter description
+    Specifies the base distinguished name (DN) for the search operation.
 
     .PARAMETER SearchScope
-    Parameter description
+    Specifies the scope of the search operation within Active Directory.
 
     .PARAMETER Linked
-    Parameter description
+    Specifies the type of objects to include in the search. Valid values are 'Root', 'DomainControllers', and 'OrganizationalUnit'.
 
     .PARAMETER Limited
-    Parameter description
+    Indicates whether to limit the search results. If specified, only a limited set of results will be returned.
 
     .PARAMETER SkipDuplicates
-    Parameter description
+    Indicates whether to skip duplicate entries in the search results.
 
     .PARAMETER GPOCache
-    Parameter description
+    Specifies a cache of Group Policy Objects to optimize performance.
 
     .PARAMETER Forest
-    Target different Forest, by default current forest is used
+    Specifies the target forest to search for GPO inheritance information. By default, the current forest is used.
 
     .PARAMETER ExcludeDomains
-    Exclude domain from search, by default whole forest is scanned
+    Specifies the domains to exclude from the search operation. By default, the entire forest is scanned.
 
     .PARAMETER IncludeDomains
-    Include only specific domains, by default whole forest is scanned
+    Specifies the specific domains to include in the search operation. By default, the entire forest is scanned.
 
     .PARAMETER ExtendedForestInformation
-    Parameter description
+    Specifies additional information about the forest to include in the search results.
 
     .PARAMETER AsHashTable
-    Parameter description
+    Indicates whether to return the results as a hash table.
 
     .PARAMETER Summary
-    Parameter description
+    Indicates whether to provide a summary of the GPO inheritance information.
 
     .EXAMPLE
     $Output = Get-GPOZaurrLinkInheritance -Summary
@@ -58,7 +58,7 @@ function Get-GPOZaurrLinkInheritance {
     $Output[5].LinksObjects | Format-Table
 
     .NOTES
-    This is based on Get-GPInheritance which isn't ideal and doesn't support sites. Get-GPOZaurrLink is better. Leaving in case I need it later on for private use only.
+    This function is an improved version of Get-GPInheritance and provides better support for sites. It is recommended for retrieving GPO inheritance information.
     #>
     [cmdletbinding(DefaultParameterSetName = 'All')]
     param(

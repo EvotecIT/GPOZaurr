@@ -1,4 +1,32 @@
 ﻿function ConvertTo-XMLCertificates {
+    <#
+    .SYNOPSIS
+    Converts a PowerShell custom object representing certificate data into XML format.
+
+    .DESCRIPTION
+    This function takes a PowerShell custom object representing certificate data and converts it into XML format for storage or transmission.
+
+    .PARAMETER GPO
+    The PowerShell custom object representing the certificate data.
+
+    .PARAMETER Category
+    An array of categories for the certificate data.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLCertificates -GPO $certificateDataObject -Category @('Category1', 'Category2') -SingleObject
+
+    Description:
+    Converts the $certificateDataObject into XML format for multiple categories as a single object.
+
+    .EXAMPLE
+    $certificateDataObjects | ConvertTo-XMLCertificates -Category @('Category1') -SingleObject
+
+    Description:
+    Converts multiple certificate data objects in $certificateDataObjects into XML format for a single category.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

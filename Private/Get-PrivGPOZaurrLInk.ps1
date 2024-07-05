@@ -1,4 +1,33 @@
 ﻿function Get-PrivGPOZaurrLink {
+    <#
+    .SYNOPSIS
+    Retrieves and processes Group Policy Object (GPO) links associated with a given Active Directory object.
+
+    .DESCRIPTION
+    This function retrieves and processes the GPO links associated with a specified Active Directory object. It parses the GPO links to extract relevant information such as distinguished name, canonical name, GUID, enforcement status, and enablement status.
+
+    .PARAMETER Object
+    The Active Directory object for which GPO links will be retrieved and processed.
+
+    .PARAMETER Limited
+    Indicates whether to provide limited information about the GPO links.
+
+    .PARAMETER GPOCache
+    A dictionary cache of Group Policy Objects for efficient processing.
+
+    .EXAMPLE
+    Get-PrivGPOZaurrLink -Object $ADObject
+
+    Description:
+    Retrieves and processes the GPO links associated with the specified Active Directory object.
+
+    .EXAMPLE
+    Get-PrivGPOZaurrLink -Object $ADObject -Limited
+
+    Description:
+    Retrieves limited information about the GPO links associated with the specified Active Directory object.
+
+    #>
     [cmdletBinding()]
     param(
         [Microsoft.ActiveDirectory.Management.ADObject] $Object,

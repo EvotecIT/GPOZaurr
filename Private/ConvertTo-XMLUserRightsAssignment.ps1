@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLUserRightsAssignment {
+    <#
+    .SYNOPSIS
+    Converts user rights assignments to XML format.
+
+    .DESCRIPTION
+    This function converts user rights assignments to XML format based on the provided GPO object.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) to extract user rights assignments from.
+
+    .PARAMETER SingleObject
+    Indicates whether to process a single object.
+
+    .EXAMPLE
+    ConvertTo-XMLUserRightsAssignment -GPO $GPOObject -SingleObject
+    Converts user rights assignments from a single GPO object to XML format.
+
+    .EXAMPLE
+    ConvertTo-XMLUserRightsAssignment -GPO $GPOObject
+    Converts user rights assignments from multiple GPO objects to XML format.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

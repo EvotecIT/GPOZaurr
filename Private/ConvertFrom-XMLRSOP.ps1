@@ -1,4 +1,32 @@
 ﻿function ConvertFrom-XMLRSOP {
+    <#
+    .SYNOPSIS
+    Converts XML data representing Resultant Set of Policy (RSOP) into a structured PowerShell object.
+
+    .DESCRIPTION
+    This function takes XML data representing RSOP and converts it into a structured PowerShell object for easier manipulation and analysis.
+
+    .PARAMETER Content
+    The XML content representing the RSOP data.
+
+    .PARAMETER ResultsType
+    The type of results being processed.
+
+    .PARAMETER Splitter
+    The delimiter used to split certain data elements.
+
+    .EXAMPLE
+    ConvertFrom-XMLRSOP -Content $xmlData -ResultsType "Computer" -Splitter "`n"
+
+    Description:
+    Converts the XML data in $xmlData representing computer RSOP results using a newline as the splitter.
+
+    .EXAMPLE
+    ConvertFrom-XMLRSOP -Content $xmlData -ResultsType "User" -Splitter ","
+
+    Description:
+    Converts the XML data in $xmlData representing user RSOP results using a comma as the splitter.
+    #>
     [cmdletBinding()]
     param(
         [System.Xml.XmlElement]$Content,

@@ -1,4 +1,35 @@
 ﻿function ConvertTo-XMLNested {
+    <#
+    .SYNOPSIS
+    Converts nested XML elements to a structured format for further processing.
+
+    .DESCRIPTION
+    This function recursively converts nested XML elements to a structured format for easier manipulation and analysis. It extracts properties from the XML elements and organizes them into a hierarchical structure.
+
+    .PARAMETER CreateGPO
+    Specifies the dictionary representing the XML structure being created.
+
+    .PARAMETER Setting
+    Specifies the XML element to be processed.
+
+    .PARAMETER SkipNames
+    Specifies an array of property names to skip during processing.
+
+    .PARAMETER Name
+    Specifies the name of the current XML element being processed.
+
+    .EXAMPLE
+    ConvertTo-XMLNested -CreateGPO $MyGPO -Setting $XmlSetting -SkipNames @('Name', 'Value') -Name 'Root'
+
+    Description:
+    Converts the nested XML element $XmlSetting into a structured format stored in $MyGPO, skipping properties 'Name' and 'Value', with the root element named 'Root'.
+
+    .EXAMPLE
+    $XmlElements | ForEach-Object { ConvertTo-XMLNested -CreateGPO $Output -Setting $_ -SkipNames @('ID') -Name 'Element' }
+
+    Description:
+    Processes multiple XML elements in $XmlElements, converting each into a structured format stored in $Output, skipping property 'ID', and naming each element 'Element'.
+    #>
     [cmdletBinding()]
     param(
         [System.Collections.IDictionary] $CreateGPO,

@@ -1,4 +1,51 @@
 function Get-GPOZaurrLinkLoop {
+    <#
+    .SYNOPSIS
+    Retrieves Group Policy Object (GPO) links for Active Directory objects based on specified criteria.
+
+    .DESCRIPTION
+    This function retrieves GPO links for Active Directory objects based on the provided parameters. It allows searching for GPO links within specific sites, domains, or organizational units. The function can handle duplicates and provides flexibility in defining search criteria.
+
+    .PARAMETER ADObject
+    Specifies the Active Directory objects for which GPO links will be retrieved.
+
+    .PARAMETER CacheReturnedGPOs
+    A dictionary cache of returned Group Policy Objects for efficient processing.
+
+    .PARAMETER ForestInformation
+    Information about the forest structure and domains for targeted searches.
+
+    .PARAMETER Linked
+    Specifies the type of objects to search for GPO links. Valid values are 'All', 'Root', 'DomainControllers', 'Site', or 'OrganizationalUnit'.
+
+    .PARAMETER SearchBase
+    Specifies the base location for the search within Active Directory.
+
+    .PARAMETER SearchScope
+    Specifies the scope of the search within Active Directory.
+
+    .PARAMETER Filter
+    Specifies additional filters to apply during the search.
+
+    .PARAMETER SkipDuplicates
+    Indicates whether to skip duplicate GPO links during processing.
+
+    .PARAMETER Site
+    Specifies the site(s) to search for GPO links.
+
+    .EXAMPLE
+    Get-GPOZaurrLinkLoop -Site 'SiteA', 'SiteB' -ForestInformation $ForestInfo
+
+    Description:
+    Retrieves GPO links for sites 'SiteA' and 'SiteB' within the forest using the provided forest information.
+
+    .EXAMPLE
+    Get-GPOZaurrLinkLoop -SearchBase 'OU=Users,DC=contoso,DC=com' -SearchScope Subtree -Filter '(objectClass -eq "user")'
+
+    Description:
+    Retrieves GPO links for all user objects within the specified organizational unit 'Users' in the 'contoso.com' domain.
+
+    #>
     [cmdletBinding()]
     param(
         [Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,

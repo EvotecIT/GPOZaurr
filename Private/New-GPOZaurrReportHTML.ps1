@@ -1,4 +1,35 @@
 ﻿function New-GPOZaurrReportHTML {
+    <#
+    .SYNOPSIS
+    Generates an HTML report based on Group Policy information.
+
+    .DESCRIPTION
+    The New-GPOZaurrReportHTML function generates an HTML report based on the Group Policy information provided. It includes detailed sections for general computer information, CPU and RAM details, operating system information, and disk information.
+
+    .PARAMETER Support
+    Specifies the Group Policy support information to be included in the report.
+
+    .PARAMETER Path
+    Specifies the path where the HTML report will be saved. If not provided, a temporary file will be created.
+
+    .PARAMETER Online
+    Indicates whether to generate an online report.
+
+    .PARAMETER Open
+    Indicates whether to open the generated report after creation.
+
+    .EXAMPLE
+    New-GPOZaurrReportHTML -Support $GPOInfo -Path "C:\Reports\GPOReport.html"
+    Generates an HTML report based on the Group Policy information in $GPOInfo and saves it to the specified path.
+
+    .EXAMPLE
+    New-GPOZaurrReportHTML -Support $GPOInfo -Online
+    Generates an online HTML report based on the Group Policy information in $GPOInfo.
+
+    .EXAMPLE
+    New-GPOZaurrReportHTML -Support $GPOInfo -Path "C:\Reports\GPOReport.html" -Open
+    Generates an HTML report based on the Group Policy information in $GPOInfo, saves it to the specified path, and opens the report after creation.
+    #>
     [cmdletBinding()]
     param(
         [System.Collections.IDictionary] $Support,

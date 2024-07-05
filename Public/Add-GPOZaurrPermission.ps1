@@ -1,4 +1,68 @@
 ﻿function Add-GPOZaurrPermission {
+    <#
+    .SYNOPSIS
+    Adds permissions to a Group Policy Object (GPO) in Active Directory.
+
+    .DESCRIPTION
+    This function allows you to add permissions to a specified GPO in Active Directory. You can specify the GPO by name, GUID, or apply permissions to all GPOs. Various parameters allow you to customize the permission settings.
+
+    .PARAMETER GPOName
+    Specifies the name of the GPO to which permissions will be added.
+
+    .PARAMETER GPOGuid
+    Specifies the GUID of the GPO to which permissions will be added.
+
+    .PARAMETER All
+    Indicates that permissions should be added to all GPOs.
+
+    .PARAMETER ADObject
+    Specifies the Active Directory object to which permissions will be applied.
+
+    .PARAMETER Type
+    Specifies the type of permissions to be added. Valid values are 'WellKnownAdministrative', 'Administrative', 'AuthenticatedUsers', and 'Default'.
+
+    .PARAMETER Principal
+    Specifies the trustee to which permissions will be granted.
+
+    .PARAMETER PrincipalType
+    Specifies the type of the trustee. Valid values are 'DistinguishedName', 'Name', and 'Sid'.
+
+    .PARAMETER PermissionType
+    Specifies the type of permission to be added.
+
+    .PARAMETER Inheritable
+    Indicates whether permissions should be inheritable.
+
+    .PARAMETER PermitType
+    Specifies the type of permission to be granted. Valid values are 'Allow', 'Deny', and 'All'.
+
+    .PARAMETER Forest
+    Specifies the forest in which the GPO resides.
+
+    .PARAMETER ExcludeDomains
+    Specifies the domains to exclude when applying permissions.
+
+    .PARAMETER IncludeDomains
+    Specifies the domains to include when applying permissions.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .PARAMETER ADAdministrativeGroups
+    Specifies the administrative groups in Active Directory.
+
+    .PARAMETER LimitProcessing
+    Specifies the maximum number of processing steps.
+
+    .EXAMPLE
+    Add-GPOZaurrPermission -GPOName "TestGPO" -Principal "User1" -PermissionType Read -PermitType Allow
+    Adds read permission to "User1" for the GPO named "TestGPO".
+
+    .EXAMPLE
+    Add-GPOZaurrPermission -GPOGuid "12345678-1234-1234-1234-1234567890AB" -Principal "Group1" -PermissionType Write -PermitType Deny
+    Denies write permission to "Group1" for the GPO with the specified GUID.
+
+    #>
     [cmdletBinding(SupportsShouldProcess, DefaultParameterSetName = 'GPOName')]
     param(
         [Parameter(ParameterSetName = 'GPOName', Mandatory)][string] $GPOName,

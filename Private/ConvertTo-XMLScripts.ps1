@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLScripts {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Objects (GPO) to XML scripts.
+
+    .DESCRIPTION
+    This function converts GPO objects to XML scripts for further processing.
+
+    .PARAMETER GPO
+    Specifies the GPO object to be converted.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object or multiple GPO objects.
+
+    .EXAMPLE
+    ConvertTo-XMLScripts -GPO $myGPO -SingleObject
+    Converts a single GPO object to an XML script.
+
+    .EXAMPLE
+    ConvertTo-XMLScripts -GPO $myGPO
+    Converts multiple GPO objects to XML scripts.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

@@ -1,4 +1,29 @@
 ﻿function ConvertTo-XMLGenericPublicKey {
+    <#
+    .SYNOPSIS
+    Converts a PSCustomObject representing a Group Policy Object (GPO) to an XML format.
+
+    .DESCRIPTION
+    This function takes a PSCustomObject representing a GPO and converts it to an XML format. It extracts specific properties from the GPO object and organizes them into a structured XML output.
+
+    .PARAMETER GPO
+    Specifies the PSCustomObject representing the GPO to be converted.
+
+    .PARAMETER Category
+    Specifies an array of strings representing categories to include in the XML output.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object or multiple GPO objects.
+
+    .EXAMPLE
+    ConvertTo-XMLGenericPublicKey -GPO $MyGPO -Category @("Category1", "Category2") -SingleObject
+    Converts the PSCustomObject $MyGPO to an XML format including categories "Category1" and "Category2" as a single object.
+
+    .EXAMPLE
+    $GPOs | ConvertTo-XMLGenericPublicKey -Category @("Category1") 
+    Converts multiple GPOs in the $GPOs array to an XML format including category "Category1".
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

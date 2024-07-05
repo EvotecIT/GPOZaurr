@@ -1,4 +1,69 @@
 ﻿function Get-PrivPermission {
+    <#
+    .SYNOPSIS
+    Retrieves permissions for a specified Group Policy Object (GPO) based on various criteria.
+
+    .DESCRIPTION
+    This function retrieves permissions for a specified Group Policy Object (GPO) based on the provided parameters. It allows filtering by principal, permission type, and other criteria.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) for which permissions will be retrieved.
+
+    .PARAMETER SecurityRights
+    Specifies the security rights to be evaluated for the GPO.
+
+    .PARAMETER Principal
+    Specifies the principal for which permissions will be retrieved.
+
+    .PARAMETER PrincipalType
+    Specifies the type of principal to filter by. Valid values are 'DistinguishedName', 'Name', 'NetbiosName', or 'Sid'.
+
+    .PARAMETER SkipWellKnown
+    Skips well-known principals when evaluating permissions.
+
+    .PARAMETER SkipAdministrative
+    Skips administrative principals when evaluating permissions.
+
+    .PARAMETER IncludeOwner
+    Includes the owner of the GPO in the permission results.
+
+    .PARAMETER IncludePermissionType
+    Specifies the permission types to include in the results.
+
+    .PARAMETER ExcludePermissionType
+    Specifies the permission types to exclude from the results.
+
+    .PARAMETER PermitType
+    Specifies the type of permissions to include. Valid values are 'Allow', 'Deny', or 'All'.
+
+    .PARAMETER ExcludePrincipal
+    Specifies principals to exclude from the results.
+
+    .PARAMETER ExcludePrincipalType
+    Specifies the type of principal to exclude. Valid values are 'DistinguishedName', 'Name', or 'Sid'.
+
+    .PARAMETER IncludeGPOObject
+    Includes the GPO object in the permission results.
+
+    .PARAMETER ADAdministrativeGroups
+    Specifies the Active Directory administrative groups to consider.
+
+    .PARAMETER Type
+    Specifies the type of principals to include. Valid values are 'AuthenticatedUsers', 'DomainComputers', 'Unknown', 'WellKnownAdministrative', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', or 'All'.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies extended forest information to be used in evaluation.
+
+    .EXAMPLE
+    Get-PrivPermission -GPO $GPO -SecurityRights $SecurityRights -Principal 'Domain Admins' -PrincipalType 'Name' -PermitType 'Allow'
+
+    Retrieves permissions for the specified GPO where 'Domain Admins' have 'Allow' permissions.
+
+    .EXAMPLE
+    Get-PrivPermission -GPO $GPO -SecurityRights $SecurityRights -Principal 'S-1-5-21-3623811015-3361044348-30300820-1013' -PrincipalType 'Sid' -PermitType 'Deny'
+
+    Retrieves permissions for the specified GPO where the principal with the SID 'S-1-5-21-3623811015-3361044348-30300820-1013' has 'Deny' permissions.
+    #>
     [cmdletBinding()]
     param(
         [Microsoft.GroupPolicy.Gpo] $GPO,

@@ -1,4 +1,33 @@
 ﻿function Get-GPOCategories {
+    <#
+    .SYNOPSIS
+    Retrieves GPO categories based on the provided GPO object and XML output.
+
+    .DESCRIPTION
+    This function retrieves GPO categories by analyzing the provided GPO object and XML output. It categorizes GPO settings based on different criteria.
+
+    .PARAMETER GPO
+    The GPO object containing information about the Group Policy Object.
+
+    .PARAMETER GPOOutput
+    An array of XML elements representing the GPO output.
+
+    .PARAMETER Splitter
+    The delimiter used to split GPO settings.
+
+    .PARAMETER FullObjects
+    A switch parameter to indicate whether to retrieve full GPO objects.
+
+    .PARAMETER CachedCategories
+    A dictionary containing cached GPO categories.
+
+    .EXAMPLE
+    Get-GPOCategories -GPO $gpoObject -GPOOutput $xmlOutput -Splitter ":" -FullObjects
+
+    Description:
+    Retrieves GPO categories for the specified GPO object and XML output, splitting settings using ":" as the delimiter and retrieving full GPO objects.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

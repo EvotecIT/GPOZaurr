@@ -1,4 +1,32 @@
 function Get-XMLNestedRegistry {
+    <#
+    .SYNOPSIS
+    Retrieves registry settings from XML data and formats them for output.
+
+    .DESCRIPTION
+    This function retrieves registry settings from XML data and formats them for output. It can either provide a limited set of information or the full details of each registry setting.
+
+    .PARAMETER GPO
+    The Group Policy Object (GPO) associated with the registry settings.
+
+    .PARAMETER DataSet
+    An array of XML elements containing the registry settings.
+
+    .PARAMETER Collection
+    The name of the collection of registry settings.
+
+    .PARAMETER Limited
+    Indicates whether to provide limited information about each registry setting.
+
+    .EXAMPLE
+    Get-XMLNestedRegistry -GPO $GPO -DataSet $DataSet -Collection "SoftwareSettings" -Limited
+    Retrieves limited information about the registry settings in the "SoftwareSettings" collection.
+
+    .EXAMPLE
+    Get-XMLNestedRegistry -GPO $GPO -DataSet $DataSet -Collection "WindowsSettings"
+    Retrieves full details of the registry settings in the "WindowsSettings" collection.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

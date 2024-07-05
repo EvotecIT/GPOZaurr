@@ -1,4 +1,38 @@
 ﻿function ConvertTo-XMLEventLog {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Object (GPO) data to an XML event log format.
+
+    .DESCRIPTION
+    This function takes a PSCustomObject representing GPO data and converts it to an XML event log format. It creates a structured XML output with specific GPO properties.
+
+    .PARAMETER GPO
+    Specifies the PSCustomObject containing GPO data to be converted.
+
+    .EXAMPLE
+    $GPOData = [PSCustomObject]@{
+        DisplayName = 'Example GPO'
+        DomainName = 'example.com'
+        GUID = '12345678-1234-1234-1234-1234567890AB'
+        GpoType = 'Security'
+        DataSet = @(
+            [PSCustomObject]@{
+                Log = 'Application'
+                Name = 'AuditLogRetentionPeriod'
+                SettingNumber = '1'
+            },
+            [PSCustomObject]@{
+                Log = 'System'
+                Name = 'MaximumLogSize'
+                SettingNumber = '1024'
+            }
+        )
+        Linked = $true
+        LinksCount = 2
+        Links = @('OU=Finance,DC=example,DC=com', 'OU=IT,DC=example,DC=com')
+    }
+    ConvertTo-XMLEventLog -GPO $GPOData
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO

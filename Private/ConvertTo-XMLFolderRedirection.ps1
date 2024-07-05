@@ -1,4 +1,29 @@
 ﻿function ConvertTo-XMLFolderRedirection {
+    <#
+    .SYNOPSIS
+    Converts a PowerShell custom object representing folder redirection settings into XML format.
+
+    .DESCRIPTION
+    This function takes a PowerShell custom object representing folder redirection settings and converts it into XML format for storage or transmission.
+
+    .PARAMETER GPO
+    The PowerShell custom object representing the folder redirection settings.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLFolderRedirection -GPO $folderRedirectionSettingsObject -SingleObject
+
+    Description:
+    Converts the $folderRedirectionSettingsObject into XML format for a single object.
+
+    .EXAMPLE
+    $folderRedirectionSettings | ConvertTo-XMLFolderRedirection -SingleObject
+
+    Description:
+    Converts multiple folder redirection settings in $folderRedirectionSettings into XML format for each object.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

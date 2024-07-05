@@ -1,4 +1,19 @@
 ﻿function Find-GPOPassword {
+    <#
+    .SYNOPSIS
+    Finds and decrypts the password stored in the cpassword attribute of a Group Policy Object (GPO) XML file.
+
+    .DESCRIPTION
+    This function takes the path to a GPO XML file as input, searches for the cpassword attribute, decrypts it, and returns the password.
+
+    .PARAMETER Path
+    Specifies the path to the GPO XML file.
+
+    .EXAMPLE
+    Find-GPOPassword -Path "C:\GPOs\GPO1.xml"
+    Searches for the cpassword attribute in the GPO XML file "GPO1.xml" and returns the decrypted password.
+
+    #>
     [cmdletBinding()]
     param(
         [string] $Path

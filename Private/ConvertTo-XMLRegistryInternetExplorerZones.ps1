@@ -1,4 +1,19 @@
 ﻿function ConvertTo-XMLRegistryInternetExplorerZones {
+    <#
+    .SYNOPSIS
+    Converts registry settings related to Internet Explorer security zones into XML format.
+
+    .DESCRIPTION
+    This function converts registry settings from a Group Policy Object (GPO) related to Internet Explorer security zones into XML format. It extracts relevant information such as display name, domain name, GUID, GPO type, configuration, policy type, and security zone based on the registry settings provided.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) containing the registry settings to be converted.
+
+    .EXAMPLE
+    ConvertTo-XMLRegistryInternetExplorerZones -GPO $GPO
+    Converts the registry settings from the specified Group Policy Object ($GPO) related to Internet Explorer security zones into XML format.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO

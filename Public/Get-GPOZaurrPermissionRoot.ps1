@@ -1,4 +1,41 @@
 ﻿function Get-GPOZaurrPermissionRoot {
+    <#
+    .SYNOPSIS
+    Retrieves the root permissions of Group Policy Objects (GPOs) based on specified criteria.
+
+    .DESCRIPTION
+    Retrieves the root permissions of GPOs based on the specified criteria, including filtering by permission types, forest, domains, and more.
+
+    .PARAMETER IncludePermissionType
+    Specifies the root permission types to include in the search.
+
+    .PARAMETER ExcludePermissionType
+    Specifies the root permission types to exclude from the search.
+
+    .PARAMETER Forest
+    Specifies the target forest. By default, the current forest is used.
+
+    .PARAMETER ExcludeDomains
+    Specifies domains to exclude from the search.
+
+    .PARAMETER IncludeDomains
+    Specifies domains to include in the search.
+
+    .PARAMETER ExtendedForestInformation
+    Provides additional forest information to speed up processing.
+
+    .PARAMETER SkipNames
+    Skips processing names during the operation.
+
+    .EXAMPLE
+    Get-GPOZaurrPermissionRoot -IncludePermissionType 'GpoRootCreate' -ExcludePermissionType 'GpoRootOwner' -Forest 'ExampleForest' -IncludeDomains 'Domain1', 'Domain2' -ExtendedForestInformation $ForestInfo -SkipNames
+
+    .EXAMPLE
+    Get-GPOZaurrPermissionRoot -IncludePermissionType 'GpoRootOwner' -ExcludePermissionType 'GpoRootCreate' -Forest 'AnotherForest' -ExcludeDomains 'Domain3' -SkipNames
+
+    .NOTES
+    General notes
+    #>
     [cmdletBinding()]
     param(
         [ValidateSet('GpoRootCreate', 'GpoRootOwner')][string[]] $IncludePermissionType,

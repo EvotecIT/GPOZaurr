@@ -1,4 +1,25 @@
 ﻿function ConvertTo-XMLTaskScheduler {
+    <#
+    .SYNOPSIS
+    Converts Task Scheduler settings to XML format.
+
+    .DESCRIPTION
+    This function converts Task Scheduler settings from a PSCustomObject to XML format. It provides detailed information about the task settings for each task.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) containing the Task Scheduler settings.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLTaskScheduler -GPO $GPOObject -SingleObject
+    Converts the Task Scheduler settings from the specified GPO object to XML format for a single object.
+
+    .EXAMPLE
+    ConvertTo-XMLTaskScheduler -GPO $GPOObject
+    Converts the Task Scheduler settings from the specified GPO object to XML format for multiple objects.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

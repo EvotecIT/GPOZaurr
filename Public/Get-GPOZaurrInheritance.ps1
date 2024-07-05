@@ -1,44 +1,44 @@
 ﻿function Get-GPOZaurrInheritance {
     <#
     .SYNOPSIS
-    Short description
+    Retrieves inheritance information for Group Policy Objects (GPOs) within specified Organizational Units (OUs).
 
     .DESCRIPTION
-    Long description
+    This function retrieves and displays inheritance information for GPOs within specified OUs. It provides details on blocked inheritance, excluded objects, and group policies associated with blocked objects.
 
     .PARAMETER IncludeBlockedObjects
-    Include OU's with blocked inheritance. Default disabled
+    Specifies whether to include OUs with blocked inheritance. By default, this is disabled.
 
     .PARAMETER OnlyBlockedInheritance
-    Show only OU's with blocked inheritance
+    Specifies whether to show only OUs with blocked inheritance.
 
     .PARAMETER IncludeExcludedObjects
-    Show excluded objets. Default disabled
+    Specifies whether to show excluded objects. By default, this is disabled.
 
     .PARAMETER IncludeGroupPoliciesForBlockedObjects
-    Include Group Policies for Blocked Objects. Default disabled
+    Specifies whether to include Group Policies for blocked objects. By default, this is disabled.
 
     .PARAMETER Exclusions
-    Provide exclusions for OU's approved by IT. You can provide OU by canonical name or distinguishedName
+    Specifies the OUs approved by IT to be excluded. You can provide OUs by canonical name or distinguishedName.
 
     .PARAMETER Forest
-    Target different Forest, by default current forest is used
+    Specifies the target forest. By default, the current forest is used.
 
     .PARAMETER ExcludeDomains
-    Exclude domain from search, by default whole forest is scanned
+    Specifies the domain to exclude from the search. By default, the entire forest is scanned.
 
     .PARAMETER IncludeDomains
-    Include only specific domains, by default whole forest is scanned
+    Specifies specific domains to include. By default, the entire forest is scanned.
 
     .PARAMETER ExtendedForestInformation
-    Ability to provide Forest Information from another command to speed up processing
+    Allows providing Forest Information from another command to speed up processing.
 
     .EXAMPLE
     $Objects = Get-GPOZaurrInheritance -IncludeBlockedObjects -IncludeExcludedObjects -OnlyBlockedInheritance -Exclusions $ExcludedOU
     $Objects | Format-Table
 
     .NOTES
-    General notes
+    These are general notes about the function.
     #>
     [cmdletBinding()]
     param(

@@ -1,4 +1,65 @@
 ﻿function Invoke-GPOZaurrContent {
+    <#
+    .SYNOPSIS
+    Invokes GPOZaurrContent function to retrieve Group Policy Objects information.
+
+    .DESCRIPTION
+    This function retrieves Group Policy Objects information based on the specified parameters. It can search for GPOs in a forest, exclude specific domains, include specific domains, and provide extended forest information.
+
+    .PARAMETER Forest
+    Specifies the forest name to search for Group Policy Objects.
+
+    .PARAMETER ExcludeDomains
+    Specifies an array of domains to exclude from the search.
+
+    .PARAMETER IncludeDomains
+    Specifies an array of domains to include in the search.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .PARAMETER GPOPath
+    Specifies the path to a specific Group Policy Object.
+
+    .PARAMETER Type
+    Specifies the type of information to retrieve.
+
+    .PARAMETER Splitter
+    Specifies the delimiter to use for splitting information.
+
+    .PARAMETER FullObjects
+    Indicates whether to retrieve full objects.
+
+    .PARAMETER OutputType
+    Specifies the type of output (HTML or Object).
+
+    .PARAMETER OutputPath
+    Specifies the path to save the output.
+
+    .PARAMETER Open
+    Indicates whether to open the output after retrieval.
+
+    .PARAMETER Online
+    Indicates whether to retrieve information online.
+
+    .PARAMETER CategoriesOnly
+    Indicates whether to retrieve only categories.
+
+    .PARAMETER SingleObject
+    Indicates whether to retrieve a single object.
+
+    .PARAMETER SkipNormalize
+    Indicates whether to skip normalization.
+
+    .EXAMPLE
+    Invoke-GPOZaurrContent -Forest "Contoso" -IncludeDomains "Domain1", "Domain2" -Type "Security" -OutputType "HTML" -OutputPath "C:\Reports\GPOReport.html"
+    Retrieves security-related Group Policy Objects information for the specified domains and saves the output as an HTML file.
+
+    .EXAMPLE
+    Invoke-GPOZaurrContent -GPOPath "CN={31B2F340-016D-11D2-945F-00C04FB984F9},CN=Policies,CN=System,DC=Contoso,DC=com" -Type "All" -OutputType "Object"
+    Retrieves all information for a specific Group Policy Object and outputs the result as an object.
+
+    #>
     [alias('Find-GPO')]
     [cmdletBinding(DefaultParameterSetName = 'Default')]
     param(

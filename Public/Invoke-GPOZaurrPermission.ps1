@@ -1,4 +1,60 @@
 ﻿function Invoke-GPOZaurrPermission {
+    <#
+    .SYNOPSIS
+    Sets permissions on Group Policy Objects (GPOs) based on specified criteria.
+
+    .DESCRIPTION
+    The Invoke-GPOZaurrPermission function sets permissions on GPOs based on various criteria such as GPO name, GPO GUID, AD objects, linked objects, permission levels, and more.
+
+    .PARAMETER PermissionRules
+    Specifies the permission rules to apply to the GPOs. This can be a script block containing the permission rules.
+
+    .PARAMETER GPOName
+    Specifies the name of the GPO to set permissions for.
+
+    .PARAMETER GPOGuid
+    Specifies the GUID of the GPO to set permissions for.
+
+    .PARAMETER Level
+    Specifies the permission level to set. This is a mandatory parameter.
+
+    .PARAMETER Limit
+    Specifies the limit for the permission level. This is a mandatory parameter.
+
+    .PARAMETER Linked
+    Specifies the type of linked object to set permissions for. Valid values are 'Root', 'DomainControllers', 'Site', 'OrganizationalUnit'.
+
+    .PARAMETER ADObject
+    Specifies the Active Directory objects to set permissions for. This parameter accepts input from the pipeline and by property name.
+
+    .PARAMETER Filter
+    Specifies the filter to apply when selecting objects. Default filter is "(objectClass -eq 'organizationalUnit' -or objectClass -eq 'domainDNS' -or objectClass -eq 'site')".
+
+    .PARAMETER SearchBase
+    Specifies the search base for filtering objects.
+
+    .PARAMETER SearchScope
+    Specifies the search scope for filtering objects.
+
+    .PARAMETER Type
+    Specifies the type of permissions to set. Valid values are 'Unknown', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'All'.
+
+    .PARAMETER ApprovedGroups
+    Specifies the approved groups for setting permissions.
+
+    .EXAMPLE
+    Invoke-GPOZaurrPermission -GPOName "TestGPO" -PermissionRules { New-GPOPermission -Group "Domain Admins" -AccessLevel FullControl }
+
+    Description:
+    Sets FullControl permission for the "Domain Admins" group on the GPO named "TestGPO".
+
+    .EXAMPLE
+    Get-GPO -All | Invoke-GPOZaurrPermission -PermissionRules { New-GPOPermission -Group "Help Desk" -AccessLevel Read } -Type "NotAdministrative"
+
+    Description:
+    Sets Read permission for the "Help Desk" group on all GPOs except administrative ones.
+
+    #>
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(ParameterSetName = 'GPOGUID')]
