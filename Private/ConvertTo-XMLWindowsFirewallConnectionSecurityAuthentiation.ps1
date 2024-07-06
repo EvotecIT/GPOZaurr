@@ -1,4 +1,25 @@
 ﻿function ConvertTo-XMLWindowsFirewallConnectionSecurityAuthentiation {
+    <#
+    .SYNOPSIS
+    Converts Windows Firewall Connection Security Authentication settings to XML format.
+
+    .DESCRIPTION
+    This function converts Windows Firewall Connection Security Authentication settings from a PSCustomObject to XML format. It provides detailed information about the authentication settings for each connection.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) containing the Windows Firewall Connection Security Authentication settings.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLWindowsFirewallConnectionSecurityAuthentiation -GPO $GPOObject -SingleObject
+    Converts the Windows Firewall Connection Security Authentication settings from the specified GPO object to XML format for a single object.
+
+    .EXAMPLE
+    ConvertTo-XMLWindowsFirewallConnectionSecurityAuthentiation -GPO $GPOObject
+    Converts the Windows Firewall Connection Security Authentication settings from the specified GPO object to XML format for multiple objects.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

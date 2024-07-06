@@ -1,4 +1,60 @@
 ﻿function Get-GPOZaurrAD {
+    <#
+    .SYNOPSIS
+    Retrieves Group Policy Objects (GPOs) information from Active Directory.
+
+    .DESCRIPTION
+    This function retrieves information about Group Policy Objects (GPOs) from Active Directory based on specified criteria such as GPO name, GPO GUID, date range, and forest details.
+
+    .PARAMETER GPOName
+    Specifies the name of the GPO to retrieve.
+
+    .PARAMETER GPOGuid
+    Specifies the GUID of the GPO to retrieve.
+
+    .PARAMETER Forest
+    Specifies the forest name to search for GPOs.
+
+    .PARAMETER ExcludeDomains
+    Specifies an array of domains to exclude from the search.
+
+    .PARAMETER IncludeDomains
+    Specifies an array of domains to include in the search.
+
+    .PARAMETER DateFrom
+    Specifies the start date for filtering GPOs based on creation or modification date.
+
+    .PARAMETER DateTo
+    Specifies the end date for filtering GPOs based on creation or modification date.
+
+    .PARAMETER DateRange
+    Specifies a predefined date range for filtering GPOs based on creation or modification date.
+
+    .PARAMETER DateProperty
+    Specifies the property (WhenCreated or WhenChanged) to use for filtering GPOs based on date.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional forest information to include in the output.
+
+    .EXAMPLE
+    Get-GPOZaurrAD -GPOName "ExampleGPO"
+
+    Description:
+    Retrieves information about a GPO with the name "ExampleGPO".
+
+    .EXAMPLE
+    Get-GPOZaurrAD -GPOGuid "{12345678-1234-1234-1234-123456789012}"
+
+    Description:
+    Retrieves information about a GPO with the specified GUID.
+
+    .EXAMPLE
+    Get-GPOZaurrAD -Forest "example.com" -IncludeDomains "domain1", "domain2" -DateRange "Last30Days"
+
+    Description:
+    Retrieves GPO information from the forest "example.com" for domains "domain1" and "domain2" created or modified in the last 30 days.
+
+    #>
     [cmdletbinding(DefaultParameterSetName = 'Default')]
     param(
         [Parameter(ParameterSetName = 'GPOName')]

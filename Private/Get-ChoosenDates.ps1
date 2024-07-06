@@ -1,4 +1,37 @@
 ﻿function Get-ChoosenDates {
+    <#
+    .SYNOPSIS
+    Retrieves dates based on the specified date range.
+
+    .DESCRIPTION
+    This function retrieves dates based on the specified date range. The available date ranges are:
+    - Everything
+    - PastHour
+    - CurrentHour
+    - PastDay
+    - CurrentDay
+    - PastMonth
+    - CurrentMonth
+    - PastQuarter
+    - CurrentQuarter
+    - Last14Days
+    - Last21Days
+    - Last30Days
+    - Last7Days
+    - Last3Days
+    - Last1Days
+
+    .PARAMETER DateRange
+    Specifies the date range to retrieve dates for.
+
+    .EXAMPLE
+    Get-ChoosenDates -DateRange PastHour
+    Retrieves dates for the past hour.
+
+    .EXAMPLE
+    Get-ChoosenDates -DateRange CurrentMonth
+    Retrieves dates for the current month.
+    #>
     [CmdletBinding()]
     param(
         [ValidateSet('Everything', 'PastHour', 'CurrentHour', 'PastDay', 'CurrentDay', 'PastMonth', 'CurrentMonth', 'PastQuarter', 'CurrentQuarter', 'Last14Days', 'Last21Days', 'Last30Days' , 'Last7Days', 'Last3Days', 'Last1Days')][string] $DateRange

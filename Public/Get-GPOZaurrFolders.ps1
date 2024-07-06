@@ -1,4 +1,40 @@
 ﻿function Get-GPOZaurrFolders {
+    <#
+    .SYNOPSIS
+    Retrieves information about GPO folders within specified domains.
+
+    .DESCRIPTION
+    This function retrieves information about various GPO folders within specified domains, such as PolicyDefinitions, Policies, Scripts, GPO Starters, NETLOGON Scripts, DfsrPrivate, and SYSVOL Root.
+
+    .PARAMETER Type
+    Specifies the type of folders to retrieve. Valid values are 'All', 'Netlogon', 'Sysvol'.
+
+    .PARAMETER FolderType
+    Specifies the type of folders to retrieve. Valid values are 'All', 'NTFRS', 'Empty'.
+
+    .PARAMETER Forest
+    Specifies the forest name to retrieve information for.
+
+    .PARAMETER ExcludeDomains
+    Specifies domains to exclude from the retrieval.
+
+    .PARAMETER IncludeDomains
+    Specifies domains to include in the retrieval.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .PARAMETER AsHashTable
+    Indicates whether to return the output as a hashtable.
+
+    .EXAMPLE
+    Get-GPOZaurrFolders -Type All -FolderType All -Forest 'example.com' -IncludeDomains 'domain1', 'domain2' -ExcludeDomains 'domain3' -ExtendedForestInformation $info -AsHashTable
+    Retrieves information about all types of GPO folders within the specified domains in the forest 'example.com', excluding 'domain3', and including 'domain1' and 'domain2', with extended forest information.
+
+    .EXAMPLE
+    Get-GPOZaurrFolders -Type Sysvol -FolderType NTFRS -Forest 'example.com' -IncludeDomains 'domain1' -AsHashTable
+    Retrieves information about Sysvol folders using NTFRS type within the specified domain 'domain1' in the forest 'example.com' and returns the output as a hashtable.
+    #>
     [cmdletBinding()]
     param(
         [ValidateSet('All', 'Netlogon', 'Sysvol')][string[]] $Type = 'All',

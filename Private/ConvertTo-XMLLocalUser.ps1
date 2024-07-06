@@ -1,4 +1,27 @@
 ﻿function ConvertTo-XMLLocalUser {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Objects (GPO) data to XML format for local users.
+
+    .DESCRIPTION
+    This function converts GPO data to XML format specifically for local users. It extracts relevant user settings from the GPO data and organizes them into a structured XML format.
+
+    .PARAMETER GPO
+    Specifies the GPO object containing user data to be converted.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single user object or multiple user objects.
+
+    .EXAMPLE
+    ConvertTo-XMLLocalUser -GPO $myGPO -SingleObject
+    Converts a single GPO object to XML format for local users.
+
+    .EXAMPLE
+    ConvertTo-XMLLocalUser -GPO $myGPO
+    Converts multiple GPO objects to XML format for local users.
+
+    #>
+    
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

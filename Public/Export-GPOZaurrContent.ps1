@@ -1,22 +1,23 @@
 ﻿function Export-GPOZaurrContent {
     <#
     .SYNOPSIS
-    Saves GPOs to XML or HTML files.
+    Exports Group Policy Objects (GPOs) to XML or HTML files.
 
     .DESCRIPTION
-    Saves GPOs to XML or HTML files.
+    This function exports GPOs to either XML or HTML files based on the specified parameters.
 
     .PARAMETER FolderOutput
-    The folder where the GPOs will be saved.
+    Specifies the folder path where the exported GPO files will be saved.
 
     .PARAMETER ReportType
-    The type of report to generate. Valid values are XML or HTML. Default is XML.
+    Specifies the type of report to generate. Valid values are XML or HTML. The default value is XML.
 
     .EXAMPLE
-    An example
+    Export-GPOZaurrContent -FolderOutput "C:\ExportedGPOs" -ReportType HTML
+    Exports all GPOs to HTML format and saves them in the "C:\ExportedGPOs" folder.
 
     .NOTES
-    General notes
+    This function exports GPOs to XML or HTML files for further analysis or backup purposes.
     #>
     [CmdletBinding()]
     param(

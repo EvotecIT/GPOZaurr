@@ -1,4 +1,26 @@
 ﻿function ConvertFrom-CSExtension {
+    <#
+    .SYNOPSIS
+    Converts Client-side Extension (CSE) GUIDs to their corresponding names.
+
+    .DESCRIPTION
+    This function takes an array of CSE GUIDs and returns their corresponding names. It can be used to easily identify the purpose of each CSE GUID.
+
+    .PARAMETER CSE
+    Specifies an array of Client-side Extension (CSE) GUIDs to be converted to names.
+
+    .PARAMETER Limited
+    Indicates whether the conversion should be limited to a predefined set of CSE GUIDs.
+
+    .EXAMPLE
+    ConvertFrom-CSExtension -CSE '{35378EAC-683F-11D2-A89A-00C04FBBCFA2}', '{0F6B957E-509E-11D1-A7CC-0000F87571E3}' -Limited
+    Converts the specified CSE GUIDs to their corresponding names, limited to a predefined set.
+
+    .EXAMPLE
+    ConvertFrom-CSExtension -CSE '{D02B1F73-3407-48AE-BA88-E8213C6761F1}', '{0ACDD40C-75AC-47ab-BAA0-BF6DE7E7FE63}'
+    Converts the specified CSE GUIDs to their corresponding names without any limitations.
+
+    #>
     [cmdletBinding()]
     param(
         [string[]] $CSE,

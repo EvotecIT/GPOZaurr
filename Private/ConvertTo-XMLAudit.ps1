@@ -1,4 +1,29 @@
 ﻿function ConvertTo-XMLAudit {
+    <#
+    .SYNOPSIS
+    Converts a PowerShell custom object representing an audit policy into XML format.
+
+    .DESCRIPTION
+    This function takes a PowerShell custom object representing an audit policy and converts it into XML format for storage or transmission.
+
+    .PARAMETER GPO
+    The PowerShell custom object representing the audit policy.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLAudit -GPO $auditPolicyObject -SingleObject
+
+    Description:
+    Converts the $auditPolicyObject into XML format for a single object.
+
+    .EXAMPLE
+    $auditPolicies | ConvertTo-XMLAudit -SingleObject
+
+    Description:
+    Converts multiple audit policies in $auditPolicies into XML format for each object.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

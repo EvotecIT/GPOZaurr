@@ -1,4 +1,32 @@
 ﻿function ConvertTo-XMLPrinterInternal {
+    <#
+    .SYNOPSIS
+    Converts printer settings to XML format for internal use.
+
+    .DESCRIPTION
+    This function converts printer settings to XML format for internal use. It takes a GPO object, entry details, type, and a switch for limited output. The output includes various printer settings in XML format.
+
+    .PARAMETER GPO
+    The GPO object containing printer settings.
+
+    .PARAMETER Entry
+    Details of the printer entry.
+
+    .PARAMETER Type
+    The type of printer setting.
+
+    .PARAMETER Limited
+    Switch to output limited printer settings.
+
+    .EXAMPLE
+    ConvertTo-XMLPrinterInternal -GPO $GPO -Entry $Entry -Type "Network" -Limited
+    Converts the specified printer settings to XML format with limited output.
+
+    .EXAMPLE
+    ConvertTo-XMLPrinterInternal -GPO $GPO -Entry $Entry -Type "Local"
+    Converts the specified printer settings to XML format without limited output.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

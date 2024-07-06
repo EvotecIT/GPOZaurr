@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLWindowsFirewallProfile {
+    <#
+    .SYNOPSIS
+    Converts a Windows Firewall profile to XML format.
+
+    .DESCRIPTION
+    This function takes a Windows Firewall profile object and converts it to XML format for further processing.
+
+    .PARAMETER GPO
+    Specifies the Windows Firewall profile object to convert.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLWindowsFirewallProfile -GPO $FirewallProfile -SingleObject
+    Converts a single Windows Firewall profile object to XML format.
+
+    .EXAMPLE
+    ConvertTo-XMLWindowsFirewallProfile -GPO $FirewallProfiles -SingleObject:$false
+    Converts multiple Windows Firewall profile objects to XML format.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

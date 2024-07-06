@@ -1,4 +1,45 @@
 function Get-GPOPrivInheritanceLoop {
+    <#
+    .SYNOPSIS
+    Retrieves the Group Policy Object (GPO) inheritance loop for a given Active Directory object.
+
+    .DESCRIPTION
+    This function retrieves the GPO inheritance loop for a specified Active Directory object. It analyzes the inheritance of GPOs based on the object's location in the Active Directory structure.
+
+    .PARAMETER ADObject
+    Specifies the Active Directory object for which the GPO inheritance loop needs to be determined.
+
+    .PARAMETER CacheReturnedGPOs
+    Specifies a dictionary containing cached GPO information to optimize retrieval.
+
+    .PARAMETER ForestInformation
+    Specifies a dictionary containing information about the Active Directory forest.
+
+    .PARAMETER Linked
+    Specifies the types of linked objects to consider during the inheritance analysis. Valid values are 'Root', 'DomainControllers', 'OrganizationalUnit'.
+
+    .PARAMETER SearchBase
+    Specifies the base location in Active Directory to start the search for GPO inheritance.
+
+    .PARAMETER SearchScope
+    Specifies the scope of the search in Active Directory.
+
+    .PARAMETER Filter
+    Specifies the filter to apply when searching for Active Directory objects.
+
+    .EXAMPLE
+    Get-GPOPrivInheritanceLoop -ADObject $ADObject -CacheReturnedGPOs $Cache -ForestInformation $ForestInfo -Linked 'Root' -SearchBase 'DC=contoso,DC=com' -SearchScope Subtree -Filter '(objectClass -eq "organizationalUnit")'
+
+    Description:
+    Retrieves the GPO inheritance loop for the specified Active Directory object located in the 'contoso.com' domain starting from the root.
+
+    .EXAMPLE
+    Get-GPOPrivInheritanceLoop -ADObject $ADObject -CacheReturnedGPOs $Cache -ForestInformation $ForestInfo -Linked 'DomainControllers' -SearchBase 'DC=contoso,DC=com' -SearchScope Base -Filter '(objectClass -eq "organizationalUnit")'
+
+    Description:
+    Retrieves the GPO inheritance loop for the specified Active Directory object located in the 'contoso.com' domain starting from the Domain Controllers container.
+
+    #>
     [cmdletBinding()]
     param(
         [Microsoft.ActiveDirectory.Management.ADObject[]] $ADObject,

@@ -1,4 +1,29 @@
 ﻿function ConvertTo-XMLGenericSecuritySettings {
+    <#
+    .SYNOPSIS
+    Converts Generic Security Settings to XML format.
+
+    .DESCRIPTION
+    This function converts Generic Security Settings to XML format for further processing.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) to convert.
+
+    .PARAMETER Category
+    Specifies the category of settings to convert.
+
+    .EXAMPLE
+    ConvertTo-XMLGenericSecuritySettings -GPO $GPOObject -Category 'Security'
+
+    Description:
+    Converts the security settings of the specified GPO object to XML format.
+
+    .EXAMPLE
+    ConvertTo-XMLGenericSecuritySettings -GPO $GPOObject -Category 'Network'
+
+    Description:
+    Converts the network settings of the specified GPO object to XML format.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

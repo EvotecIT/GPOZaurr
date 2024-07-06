@@ -1,4 +1,16 @@
 ﻿function Reset-GPOZaurrStatus {
+    <#
+    .SYNOPSIS
+    Resets the status of GPO configurations.
+
+    .DESCRIPTION
+    This function resets the status of GPO configurations by enabling the default types and disabling all other types.
+
+    .EXAMPLE
+    Reset-GPOZaurrStatus
+    Resets the status of GPO configurations to default.
+
+    #>
     param(
 
     )

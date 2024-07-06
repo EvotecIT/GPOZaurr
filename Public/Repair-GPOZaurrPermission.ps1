@@ -1,4 +1,34 @@
 function Repair-GPOZaurrPermission {
+    <#
+    .SYNOPSIS
+    Repairs permissions for Group Policy Objects (GPOs) based on specified criteria.
+
+    .DESCRIPTION
+    The Repair-GPOZaurrPermission function repairs permissions for GPOs based on the specified criteria. It analyzes the permissions of GPOs and adds necessary permissions if they are missing.
+
+    .PARAMETER Type
+    Specifies the type of permissions to repair. Valid values are 'AuthenticatedUsers', 'Unknown', 'System', 'Administrative', and 'All'.
+
+    .PARAMETER Forest
+    Specifies the forest name to analyze GPO permissions.
+
+    .PARAMETER ExcludeDomains
+    Specifies an array of domains to exclude from the analysis.
+
+    .PARAMETER IncludeDomains
+    Specifies an array of domains to include in the analysis.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .PARAMETER LimitProcessing
+    Specifies the maximum number of GPOs to process.
+
+    .EXAMPLE
+    Repair-GPOZaurrPermission -Type 'All' -Forest 'ContosoForest' -IncludeDomains @('Domain1', 'Domain2') -ExcludeDomains @('Domain3') -ExtendedForestInformation $info -LimitProcessing 100
+    Repairs permissions for all types of users in the 'ContosoForest' forest, including only 'Domain1' and 'Domain2' while excluding 'Domain3', with extended forest information and processing a maximum of 100 GPOs.
+
+    #>
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)][ValidateSet('AuthenticatedUsers', 'Unknown', 'System', 'Administrative', 'All')][string[]] $Type,

@@ -1,4 +1,38 @@
 ﻿function Get-GPOZaurrLinkSummary {
+    <#
+    .SYNOPSIS
+    Retrieves a summary of GPO links based on specified criteria.
+
+    .DESCRIPTION
+    This function retrieves a summary of GPO links based on the provided parameters. It categorizes the links into different types and provides detailed information about each link.
+
+    .PARAMETER Report
+    Specifies the type of report to generate. Valid values are 'All', 'MultipleLinks', 'OneLink', and 'LinksSummary'. Default is 'All'.
+
+    .PARAMETER UnlimitedProperties
+    Indicates whether to include unlimited properties in the report.
+
+    .PARAMETER Forest
+    Specifies the forest name to retrieve GPO links from.
+
+    .PARAMETER ExcludeDomains
+    Specifies an array of domains to exclude from the report.
+
+    .PARAMETER IncludeDomains
+    Specifies an array of domains to include in the report.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .EXAMPLE
+    Get-GPOZaurrLinkSummary -Forest "Contoso" -IncludeDomains "Domain1", "Domain2" -Report "MultipleLinks"
+    Retrieves a summary of GPO links for the specified forest and included domains, focusing on multiple links.
+
+    .EXAMPLE
+    Get-GPOZaurrLinkSummary -Forest "Fabrikam" -ExcludeDomains "Domain3" -Report "OneLink"
+    Retrieves a summary of GPO links for the specified forest excluding Domain3, focusing on a single link.
+
+    #>
     [cmdletBinding()]
     param(
         [ValidateSet('All', 'MultipleLinks', 'OneLink', 'LinksSummary')][string[]] $Report = 'All',

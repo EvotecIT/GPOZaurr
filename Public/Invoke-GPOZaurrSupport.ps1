@@ -1,4 +1,41 @@
 ﻿function Invoke-GPOZaurrSupport {
+    <#
+    .SYNOPSIS
+    Invokes GPOZaurrSupport function to retrieve Group Policy information.
+
+    .DESCRIPTION
+    This function retrieves Group Policy information using either HTML, XML, or Object format. It can be run locally or on a remote computer.
+
+    .PARAMETER Type
+    Specifies the type of output format. Valid values are 'NativeHTML', 'HTML', 'XML', or 'Object'. Default is 'HTML'.
+
+    .PARAMETER ComputerName
+    Specifies the name of the remote computer to retrieve Group Policy information from.
+
+    .PARAMETER UserName
+    Specifies the username to run the function as on the remote computer.
+
+    .PARAMETER Path
+    Specifies the path to save the output file. If not provided, a temporary file will be created.
+
+    .PARAMETER Splitter
+    Specifies the delimiter for splitting output data. Default is a new line.
+
+    .PARAMETER PreventShow
+    Prevents displaying the output in the console.
+
+    .PARAMETER Online
+    Runs the function online to retrieve the latest Group Policy information.
+
+    .EXAMPLE
+    Invoke-GPOZaurrSupport -Type HTML -ComputerName "RemoteComputer" -UserName "Admin" -Path "C:\Temp\GPOReport.html"
+    Retrieves Group Policy information in HTML format from a remote computer and saves it to a specified path.
+
+    .EXAMPLE
+    Invoke-GPOZaurrSupport -Type XML -Path "C:\Temp\GPOReport.xml" -Online
+    Retrieves the latest Group Policy information in XML format and saves it to a specified path.
+
+    #>
     [cmdletBinding()]
     param(
         [ValidateSet('NativeHTML', 'HTML', 'XML', 'Object')][string] $Type = 'HTML',

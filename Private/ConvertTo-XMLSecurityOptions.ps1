@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLSecurityOptions {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Object (GPO) data to XML security options.
+
+    .DESCRIPTION
+    This function converts GPO data to XML security options for further processing.
+
+    .PARAMETER GPO
+    Specifies the GPO object to convert.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object.
+
+    .EXAMPLE
+    ConvertTo-XMLSecurityOptions -GPO $myGPO -SingleObject
+    Converts a single GPO object to XML security options.
+
+    .EXAMPLE
+    ConvertTo-XMLSecurityOptions -GPO $myGPO
+    Converts multiple GPO objects to XML security options.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

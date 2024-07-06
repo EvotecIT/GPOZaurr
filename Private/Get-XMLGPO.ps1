@@ -1,4 +1,51 @@
 ﻿function Get-XMLGPO {
+    <#
+    .SYNOPSIS
+    Retrieves information from an XML representation of a Group Policy Object (GPO).
+
+    .DESCRIPTION
+    This function retrieves various details from an XML representation of a GPO, such as GPO name, domain name, links information, etc.
+
+    .PARAMETER XMLContent
+    The XML content representing the GPO.
+
+    .PARAMETER GPO
+    The Microsoft.GroupPolicy.Gpo object representing the GPO.
+
+    .PARAMETER PermissionsOnly
+    Indicates whether to retrieve only permissions information.
+
+    .PARAMETER OwnerOnly
+    Indicates whether to retrieve only owner information.
+
+    .PARAMETER ADAdministrativeGroups
+    A dictionary of Active Directory administrative groups.
+
+    .PARAMETER Splitter
+    The string used to split values in the output.
+
+    .PARAMETER ExcludeGroupPolicies
+    A dictionary of group policies to exclude.
+
+    .PARAMETER Type
+    An array of types to filter the output.
+
+    .PARAMETER LinksSummaryCache
+    A cache of links summary information.
+
+    .EXAMPLE
+    Get-XMLGPO -XMLContent $xml -GPO $gpo
+
+    Description:
+    Retrieves information from the XML content of a specific GPO.
+
+    .EXAMPLE
+    Get-XMLGPO -XMLContent $xml -GPO $gpo -PermissionsOnly
+
+    Description:
+    Retrieves only the permissions information from the XML content of a specific GPO.
+
+    #>
     [cmdletBinding()]
     param(
         [XML] $XMLContent,

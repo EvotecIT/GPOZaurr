@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLSystemServices {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Objects (GPO) data to an XML format for System Services.
+
+    .DESCRIPTION
+    This function takes a GPO object and converts its data into an XML format suitable for System Services. It organizes the GPO data including service names, startup modes, security auditing status, permissions, and security descriptors.
+
+    .PARAMETER GPO
+    Specifies the GPO object to be converted to XML format.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object or multiple GPO objects.
+
+    .EXAMPLE
+    ConvertTo-XMLSystemServices -GPO $myGPO -SingleObject
+    Converts a single GPO object $myGPO to XML format for System Services.
+
+    .EXAMPLE
+    ConvertTo-XMLSystemServices -GPO $myGPO
+    Converts multiple GPO objects to XML format for System Services.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

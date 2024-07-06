@@ -1,4 +1,32 @@
 ﻿function Test-SysVolFolders {
+    <#
+    .SYNOPSIS
+    Tests the SYSVOL folders for discrepancies between Group Policy Objects (GPOs) in Active Directory and SYSVOL.
+
+    .DESCRIPTION
+    The Test-SysVolFolders function compares the GPOs in Active Directory with the GPOs stored in the SYSVOL folder to identify any discrepancies. It checks for missing GPOs, GPOs not available in SYSVOL, and orphaned GPOs.
+
+    .PARAMETER GPOs
+    An array of Group Policy Objects to be compared.
+
+    .PARAMETER Server
+    The server name where the SYSVOL folder is located.
+
+    .PARAMETER Domain
+    The domain name where the SYSVOL folder is located.
+
+    .PARAMETER PoliciesAD
+    A dictionary containing the GPOs from Active Directory.
+
+    .PARAMETER PoliciesSearchBase
+    The search base for the GPOs in Active Directory.
+
+    .EXAMPLE
+    Test-SysVolFolders -GPOs $GPOs -Server "DC01" -Domain "contoso.com" -PoliciesAD $PoliciesAD -PoliciesSearchBase "OU=Group Policies,DC=contoso,DC=com"
+    Description:
+    This example tests the SYSVOL folders for discrepancies using the specified parameters.
+
+    #>
     [cmdletBinding()]
     param(
         [Array] $GPOs,

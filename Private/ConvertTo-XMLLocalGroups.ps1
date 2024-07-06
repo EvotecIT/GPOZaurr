@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLLocalGroups {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Objects (GPO) to XML format for local groups.
+
+    .DESCRIPTION
+    This function converts Group Policy Objects (GPO) to XML format for local groups. It takes a GPO object and an optional switch to process a single object.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) to be converted to XML format.
+
+    .PARAMETER SingleObject
+    Indicates whether to process a single GPO object.
+
+    .EXAMPLE
+    ConvertTo-XMLLocalGroups -GPO $myGPO
+    Converts the specified GPO object to XML format for local groups.
+
+    .EXAMPLE
+    ConvertTo-XMLLocalGroups -GPO $myGPO -SingleObject
+    Converts a single GPO object to XML format for local groups.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

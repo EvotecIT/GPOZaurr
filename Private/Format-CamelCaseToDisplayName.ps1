@@ -1,4 +1,25 @@
 ﻿function Format-CamelCaseToDisplayName {
+    <#
+    .SYNOPSIS
+    Converts a camelCase string to a display name with spaces.
+
+    .DESCRIPTION
+    This function takes a camelCase string and converts it to a display name by adding spaces between words.
+
+    .PARAMETER Text
+    The camelCase string(s) to be converted to display name.
+
+    .PARAMETER AddChar
+    The character to add between words in the display name.
+
+    .EXAMPLE
+    Format-CamelCaseToDisplayName -Text 'testString' -AddChar ' '
+    Converts 'testString' to 'Test String'
+
+    .EXAMPLE
+    Format-CamelCaseToDisplayName -Text 'anotherExample' -AddChar '-'
+    Converts 'anotherExample' to 'Another-Example'
+    #>
     [cmdletBinding()]
     param(
         [string[]] $Text,

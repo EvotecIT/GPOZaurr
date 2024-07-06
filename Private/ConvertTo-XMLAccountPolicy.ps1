@@ -1,4 +1,29 @@
 ﻿function ConvertTo-XMLAccountPolicy {
+    <#
+    .SYNOPSIS
+    Converts a PowerShell custom object representing an account policy into XML format.
+
+    .DESCRIPTION
+    This function takes a PowerShell custom object representing an account policy and converts it into XML format for storage or transmission.
+
+    .PARAMETER GPO
+    The PowerShell custom object representing the account policy.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLAccountPolicy -GPO $accountPolicyObject -SingleObject
+
+    Description:
+    Converts the $accountPolicyObject into XML format for a single object.
+
+    .EXAMPLE
+    $accountPolicies | ConvertTo-XMLAccountPolicy -SingleObject
+
+    Description:
+    Converts multiple account policies in $accountPolicies into XML format for each object.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

@@ -1,4 +1,29 @@
 ﻿function ConvertTo-XMLDriveMapSettings {
+    <#
+    .SYNOPSIS
+    Converts a PowerShell custom object representing drive mapping settings into XML format.
+
+    .DESCRIPTION
+    This function takes a PowerShell custom object representing drive mapping settings and converts it into XML format for storage or transmission.
+
+    .PARAMETER GPO
+    The PowerShell custom object representing the drive mapping settings.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLDriveMapSettings -GPO $driveMapSettingsObject -SingleObject
+
+    Description:
+    Converts the $driveMapSettingsObject into XML format for a single object.
+
+    .EXAMPLE
+    $driveMapSettings | ConvertTo-XMLDriveMapSettings -SingleObject
+
+    Description:
+    Converts multiple drive mapping settings in $driveMapSettings into XML format for each object.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

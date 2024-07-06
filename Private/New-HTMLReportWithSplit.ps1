@@ -1,4 +1,34 @@
 ﻿function New-HTMLReportWithSplit {
+    <#
+    .SYNOPSIS
+    Creates an HTML report with the option to split it into multiple files for easier viewing.
+
+    .DESCRIPTION
+    This function generates an HTML report based on the provided parameters. It also allows splitting the report into multiple files for better organization and readability.
+
+    .PARAMETER FilePath
+    Specifies the path where the HTML report will be saved.
+
+    .PARAMETER Online
+    Indicates whether the report should be generated for online viewing.
+
+    .PARAMETER HideHTML
+    Hides the HTML report file after generation.
+
+    .PARAMETER CurrentReport
+    Specifies the type of the current report to generate.
+
+    .EXAMPLE
+    New-HTMLReportWithSplit -FilePath "C:\Reports\GPO_Report.html" -Online -HideHTML -CurrentReport "Security"
+
+    Generates an HTML report for the "Security" report type and saves it to the specified file path. The report is optimized for online viewing and the HTML file is hidden after generation.
+
+    .EXAMPLE
+    New-HTMLReportWithSplit -FilePath "C:\Reports\All_Reports.html" -CurrentReport "All"
+
+    Generates an HTML report for all available report types and saves it to the specified file path.
+
+    #>
     [cmdletBinding()]
     param(
         [string] $FilePath,

@@ -1,4 +1,82 @@
 ﻿function Get-GPOZaurrPermission {
+    <#
+    .SYNOPSIS
+    Retrieves permissions for a Group Policy Object (GPO) based on specified criteria.
+
+    .DESCRIPTION
+    This function retrieves permissions for a specified GPO based on various criteria such as GPO name, GUID, principal, permission type, etc.
+
+    .PARAMETER GPOName
+    Specifies the name of the GPO to retrieve permissions for.
+
+    .PARAMETER GPOGuid
+    Specifies the GUID of the GPO to retrieve permissions for.
+
+    .PARAMETER Principal
+    Specifies the principal for which permissions are to be retrieved.
+
+    .PARAMETER PrincipalType
+    Specifies the type of principal to be used for permission retrieval. Valid values are 'DistinguishedName', 'Name', 'NetbiosName', 'Sid'.
+
+    .PARAMETER Type
+    Specifies the type of permissions to include. Valid values are 'AuthenticatedUsers', 'DomainComputers', 'Unknown', 'WellKnownAdministrative', 'NotWellKnown', 'NotWellKnownAdministrative', 'NotAdministrative', 'Administrative', 'All'.
+
+    .PARAMETER SkipWellKnown
+    Skips well-known permissions when retrieving permissions.
+
+    .PARAMETER SkipAdministrative
+    Skips administrative permissions when retrieving permissions.
+
+    .PARAMETER IncludeOwner
+    Includes the owner of the GPO in the permission retrieval.
+
+    .PARAMETER IncludePermissionType
+    Specifies the permission types to include in the retrieval.
+
+    .PARAMETER ExcludePermissionType
+    Specifies the permission types to exclude from the retrieval.
+
+    .PARAMETER PermitType
+    Specifies the type of permissions to permit. Valid values are 'Allow', 'Deny', 'All'.
+
+    .PARAMETER ExcludePrincipal
+    Specifies principals to exclude from the permission retrieval.
+
+    .PARAMETER ExcludePrincipalType
+    Specifies the type of principal to exclude. Valid values are 'DistinguishedName', 'Name', 'Sid'.
+
+    .PARAMETER IncludeGPOObject
+    Includes the GPO object in the permission retrieval.
+
+    .PARAMETER Forest
+    Specifies the forest to retrieve permissions from.
+
+    .PARAMETER ExcludeDomains
+    Specifies domains to exclude from permission retrieval.
+
+    .PARAMETER IncludeDomains
+    Specifies domains to include in permission retrieval.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional forest information to include in the retrieval.
+
+    .PARAMETER ADAdministrativeGroups
+    Specifies the administrative groups to include in the retrieval.
+
+    .PARAMETER ReturnSecurityWhenNoData
+    If no data is found, returns all data.
+
+    .PARAMETER ReturnSingleObject
+    Forces the return of a single object per GPO for processing.
+
+    .EXAMPLE
+    Get-GPOZaurrPermission -GPOName "TestGPO" -Principal "Domain Admins" -PermitType "Allow"
+    Retrieves permissions for the GPO named "TestGPO" for the principal "Domain Admins" with permission type "Allow".
+
+    .EXAMPLE
+    Get-GPOZaurrPermission -GPOGuid "12345678-1234-1234-1234-1234567890AB" -Type "Administrative" -PermitType "Deny"
+    Retrieves administrative permissions for the GPO with GUID "12345678-1234-1234-1234-1234567890AB" with permission type "Deny".
+    #>
     [cmdletBinding(DefaultParameterSetName = 'GPO' )]
     param(
         [Parameter(ParameterSetName = 'GPOName')]

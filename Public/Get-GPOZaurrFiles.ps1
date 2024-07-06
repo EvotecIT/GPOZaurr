@@ -1,4 +1,49 @@
 ﻿function Get-GPOZaurrFiles {
+    <#
+    .SYNOPSIS
+    Retrieves information about Group Policy Objects (GPOs) stored in SYSVOL and NETLOGON folders.
+
+    .DESCRIPTION
+    This function retrieves information about GPOs stored in SYSVOL and NETLOGON folders of specified domains. It can filter by type of files and hash algorithms used for verification.
+
+    .PARAMETER Type
+    Specifies the type of files to retrieve. Valid values are 'All', 'Netlogon', and 'Sysvol'.
+
+    .PARAMETER HashAlgorithm
+    Specifies the hash algorithm to use for file verification. Valid values are 'None', 'MACTripleDES', 'MD5', 'RIPEMD160', 'SHA1', 'SHA256', 'SHA384', 'SHA512'.
+
+    .PARAMETER Signature
+    Indicates whether to include file signatures for verification.
+
+    .PARAMETER AsHashTable
+    Indicates whether to return the results as a hashtable.
+
+    .PARAMETER Extended
+    Indicates whether to include extended information about the forest.
+
+    .PARAMETER ExtendedMetaData
+    Indicates whether to include extended metadata information.
+
+    .PARAMETER Forest
+    Specifies the forest name to retrieve GPO information from.
+
+    .PARAMETER ExcludeDomains
+    Specifies an array of domains to exclude from the search.
+
+    .PARAMETER IncludeDomains
+    Specifies an array of domains to include in the search.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional forest information to include.
+
+    .EXAMPLE
+    Get-GPOZaurrFiles -Type 'All' -HashAlgorithm 'SHA256' -Signature
+    Retrieves all files from SYSVOL and NETLOGON folders with SHA256 hash algorithm and includes file signatures.
+
+    .EXAMPLE
+    Get-GPOZaurrFiles -Type 'Sysvol' -HashAlgorithm 'MD5' -AsHashTable
+    Retrieves only SYSVOL files with MD5 hash algorithm and returns the results as a hashtable.
+    #>
     [cmdletbinding()]
     param(
         [ValidateSet('All', 'Netlogon', 'Sysvol')][string[]] $Type = 'All',

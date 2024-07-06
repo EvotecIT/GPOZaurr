@@ -1,4 +1,44 @@
 ﻿function Clear-GPOZaurrSysvolDFSR {
+    <#
+    .SYNOPSIS
+    Clears the ConflictAndDeleted folder in DFSR for specified GPOs.
+
+    .DESCRIPTION
+    This function clears the ConflictAndDeleted folder in DFSR for specified Group Policy Objects (GPOs) within a given forest. It allows excluding specific domains and domain controllers if needed.
+
+    .PARAMETER Forest
+    Specifies the forest name where the GPOs are located.
+
+    .PARAMETER ExcludeDomains
+    Specifies an array of domains to exclude from the cleanup process.
+
+    .PARAMETER ExcludeDomainControllers
+    Specifies an array of domain controllers to exclude from the cleanup process.
+
+    .PARAMETER IncludeDomains
+    Specifies an array of domains to include in the cleanup process.
+
+    .PARAMETER IncludeDomainControllers
+    Specifies an array of domain controllers to include in the cleanup process.
+
+    .PARAMETER SkipRODC
+    Indicates whether Read-Only Domain Controllers (RODCs) should be skipped during cleanup.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional forest information if needed.
+
+    .PARAMETER LimitProcessing
+    Specifies the maximum number of GPOs to process.
+
+    .EXAMPLE
+    Clear-GPOZaurrSysvolDFSR -Forest "contoso.com" -IncludeDomains "child.contoso.com" -ExcludeDomainControllers "dc1.contoso.com" -SkipRODC
+    Clears the ConflictAndDeleted folder in DFSR for GPOs in the "contoso.com" forest, including only the "child.contoso.com" domain and excluding the "dc1.contoso.com" domain controller.
+
+    .EXAMPLE
+    Clear-GPOZaurrSysvolDFSR -Forest "contoso.com" -IncludeDomains "child.contoso.com" -LimitProcessing 5
+    Clears the ConflictAndDeleted folder in DFSR for GPOs in the "contoso.com" forest, including only the "child.contoso.com" domain, and processes a maximum of 5 GPOs.
+
+    #>
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [alias('ForestName')][string] $Forest,

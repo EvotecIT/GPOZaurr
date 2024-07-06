@@ -1,4 +1,33 @@
 ﻿function Remove-PrivPermission {
+    <#
+    .SYNOPSIS
+    Removes a specified permission from a Group Policy Object (GPO).
+
+    .DESCRIPTION
+    This function removes a specified permission from a GPO based on the provided Principal and PrincipalType. It supports removing permissions by DistinguishedName or SID. It also provides the option to include specific permission types.
+
+    .PARAMETER Principal
+    Specifies the principal for which the permission needs to be removed.
+
+    .PARAMETER PrincipalType
+    Specifies the type of the principal. Valid values are 'DistinguishedName', 'Name', or 'Sid'.
+
+    .PARAMETER GPOPermission
+    Specifies the GPO permission object to remove.
+
+    .PARAMETER IncludePermissionType
+    Specifies the permission type to include in the removal process.
+
+    .EXAMPLE
+    Remove-PrivPermission -Principal "CN=User1,OU=Users,DC=Contoso,DC=com" -PrincipalType "DistinguishedName" -GPOPermission $PermissionObject -IncludePermissionType "Read"
+
+    This example removes the "Read" permission for the user with the specified DistinguishedName from the GPO.
+
+    .EXAMPLE
+    Remove-PrivPermission -Principal "S-1-5-21-3623811015-3361044348-30300820-1013" -PrincipalType "Sid" -GPOPermission $PermissionObject -IncludePermissionType "Write"
+
+    This example removes the "Write" permission for the user with the specified SID from the GPO.
+    #>
     [cmdletBinding(SupportsShouldProcess)]
     param(
         [string] $Principal,

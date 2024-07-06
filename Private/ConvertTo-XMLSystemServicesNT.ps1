@@ -1,4 +1,25 @@
 ﻿function ConvertTo-XMLSystemServicesNT {
+    <#
+    .SYNOPSIS
+    Converts a Group Policy Object (GPO) to an XML representation for System Services on Windows NT.
+
+    .DESCRIPTION
+    This function takes a GPO object and converts it into an XML format specifically tailored for System Services on Windows NT. It extracts relevant information about each service defined in the GPO and structures it in an XML format.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) to be converted to XML.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object or multiple GPO objects.
+
+    .EXAMPLE
+    ConvertTo-XMLSystemServicesNT -GPO $myGPO -SingleObject
+    Converts a single GPO object $myGPO to an XML representation for System Services on Windows NT.
+
+    .EXAMPLE
+    $GPOs | ConvertTo-XMLSystemServicesNT
+    Converts multiple GPO objects in the $GPOs array to XML representations for System Services on Windows NT.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

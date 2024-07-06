@@ -1,4 +1,32 @@
 ﻿function ConvertTo-XMLGenericPolicy {
+    <#
+    .SYNOPSIS
+    Converts a PowerShell custom object representing generic policy settings into XML format.
+
+    .DESCRIPTION
+    This function takes a PowerShell custom object representing generic policy settings and converts it into XML format for storage or transmission.
+
+    .PARAMETER GPO
+    The PowerShell custom object representing the generic policy settings.
+
+    .PARAMETER Category
+    An array of categories for the generic policy settings.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single object or multiple objects.
+
+    .EXAMPLE
+    ConvertTo-XMLGenericPolicy -GPO $genericPolicyObject -Category @('Category1', 'Category2') -SingleObject
+
+    Description:
+    Converts the $genericPolicyObject into XML format for multiple categories as a single object.
+
+    .EXAMPLE
+    $genericPolicyObjects | ConvertTo-XMLGenericPolicy -Category @('Category1') -SingleObject
+
+    Description:
+    Converts multiple generic policy settings in $genericPolicyObjects into XML format for a single category.
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

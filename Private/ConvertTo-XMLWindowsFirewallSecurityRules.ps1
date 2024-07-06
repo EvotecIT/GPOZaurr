@@ -1,4 +1,28 @@
 ﻿function ConvertTo-XMLWindowsFirewallSecurityRules {
+    <#
+    .SYNOPSIS
+    Converts Windows Firewall security rules data to XML format.
+
+    .DESCRIPTION
+    This function converts Windows Firewall security rules data to XML format. It takes a GPO object as input and generates XML data representing the security rules.
+
+    .PARAMETER GPO
+    Specifies the Group Policy Object (GPO) containing the security rules data.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object or multiple security rules.
+
+    .EXAMPLE
+    $GPO = Get-GPO -Name "FirewallRules"
+    ConvertTo-XMLWindowsFirewallSecurityRules -GPO $GPO -SingleObject
+    Converts the security rules data from the GPO "FirewallRules" to XML format for a single GPO object.
+
+    .EXAMPLE
+    $GPOs = Get-GPO -All
+    ConvertTo-XMLWindowsFirewallSecurityRules -GPO $GPOs -SingleObject:$false
+    Converts the security rules data from all GPOs to XML format for multiple security rules.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

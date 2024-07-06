@@ -1,4 +1,26 @@
 ﻿function ConvertTo-XMLPolicies {
+    <#
+    .SYNOPSIS
+    Converts Group Policy Object (GPO) data to XML format.
+
+    .DESCRIPTION
+    This function converts the provided GPO data into XML format for easier processing and analysis.
+
+    .PARAMETER GPO
+    Specifies the GPO object containing the data to be converted.
+
+    .PARAMETER SingleObject
+    Indicates whether to convert a single GPO object or multiple GPO objects.
+
+    .EXAMPLE
+    ConvertTo-XMLPolicies -GPO $myGPO -SingleObject
+    Converts a single GPO object $myGPO to XML format.
+
+    .EXAMPLE
+    ConvertTo-XMLPolicies -GPO $GPOList
+    Converts multiple GPO objects in $GPOList to XML format.
+
+    #>
     [cmdletBinding()]
     param(
         [PSCustomObject] $GPO,

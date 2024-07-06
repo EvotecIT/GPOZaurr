@@ -1,4 +1,34 @@
 ﻿function Get-GPOZaurrOrganizationalUnit {
+    <#
+    .SYNOPSIS
+    Retrieves information about Group Policy Objects (GPOs) linked to Organizational Units (OUs) within a specified forest.
+
+    .DESCRIPTION
+    This function retrieves detailed information about the GPOs linked to OUs within a specified forest. It provides information on linked GPOs, objects within OUs, and counts of objects at different levels.
+
+    .PARAMETER Forest
+    Specifies the name of the forest to retrieve information from.
+
+    .PARAMETER ExcludeDomains
+    Specifies an array of domains to exclude from processing.
+
+    .PARAMETER IncludeDomains
+    Specifies an array of domains to include for processing.
+
+    .PARAMETER ExtendedForestInformation
+    Specifies additional information about the forest.
+
+    .PARAMETER Option
+    Specifies the action to perform on the retrieved data. Valid values are 'OK', 'Unlink', or 'Delete'.
+
+    .PARAMETER ExcludeOrganizationalUnit
+    Specifies an array of OUs to exclude from processing.
+
+    .EXAMPLE
+    Get-GPOZaurrOrganizationalUnit -Forest "contoso.com" -IncludeDomains "child.contoso.com" -ExcludeDomains "test.contoso.com" -ExtendedForestInformation $ExtendedInfo -Option "OK" -ExcludeOrganizationalUnit "OU=Test,DC=contoso,DC=com"
+    Retrieves information about GPOs linked to OUs in the "contoso.com" forest, including the "child.contoso.com" domain, excluding the "test.contoso.com" domain, with additional forest information, performing the 'OK' action, and excluding the "OU=Test,DC=contoso,DC=com" OU.
+
+    #>
     [CmdletBinding()]
     param(
         [alias('ForestName')][string] $Forest,
