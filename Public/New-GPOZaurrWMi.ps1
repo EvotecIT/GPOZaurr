@@ -37,12 +37,12 @@
     Additional information about the forest for GPO customization.
 
     .EXAMPLE
-    New-GPOZaurrWMI -Name "TestGPO" -Query "SELECT * FROM Win32_OperatingSystem" -Force
-    Creates a new GPO named "TestGPO" with a WMI filter query targeting all Windows operating systems.
+    New-GPOZaurrWMI -Name "TestWMIFilter1" -Query "SELECT * FROM Win32_OperatingSystem" -Force
+    Creates a new WMI filter named "TestWMIFilter1" targeting all Windows operating systems.
 
     .EXAMPLE
-    New-GPOZaurrWMI -Name "FinanceGPO" -Query "SELECT * FROM Win32_Processor" -Forest "Contoso" -IncludeDomains "FinanceDomain"
-    Creates a new GPO named "FinanceGPO" with a WMI filter query targeting all processors in the "FinanceDomain" within the "Contoso" forest.
+    New-GPOZaurrWMI -Name "TestWMIFilter2" -Query "SELECT * FROM Win32_Processor" -Forest "Contoso" -IncludeDomains "FinanceDomain"
+    Creates a new WMI filter named "TestWMIFilter2" targeting all processors in the "FinanceDomain" within the "Contoso" forest.
 
     #>
     [cmdletBinding(SupportsShouldProcess)]
