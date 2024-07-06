@@ -1,40 +1,40 @@
 ﻿function New-GPOZaurrWMI {
     <#
     .SYNOPSIS
-    Creates a new Group Policy Object (GPO) based on a WMI filter query.
+    Creates a new WMI filter based on a WMI filter query.
 
     .DESCRIPTION
-    This function creates a new GPO in Active Directory based on a specified WMI filter query. It allows for customization of the GPO creation process by providing options to target specific forests, domains, and extended forest information.
+    This function creates a new WMI filter in Active Directory based on a specified WMI filter query.
 
     .PARAMETER Name
-    The name of the new GPO to be created.
+    The name of the new WMI filter to be created.
 
     .PARAMETER Description
-    The description for the new GPO. Default is an empty string.
+    The description for the new WMI filter. Default is an empty string.
 
     .PARAMETER Namespace
     The WMI namespace to target. Default is 'root\CIMv2'.
 
     .PARAMETER Query
-    The WMI filter query to be applied to the GPO.
+    The WMI filter query to be applied to the WMI entry.
 
     .PARAMETER SkipQueryCheck
-    Switch to skip the query check before creating the GPO.
+    Switch to skip the query check before creating the WMI entry.
 
     .PARAMETER Force
-    Switch to force the creation of the GPO without confirmation.
+    Switch to force the creation of the WMI entry without confirmation.
 
     .PARAMETER Forest
-    The forest to target for GPO creation.
+    The forest to target for WMI creation.
 
     .PARAMETER ExcludeDomains
-    An array of domains to exclude from GPO application.
+    An array of domains to exclude from WMI application.
 
     .PARAMETER IncludeDomains
-    An array of domains to include for GPO application.
+    An array of domains to include for WMI application.
 
     .PARAMETER ExtendedForestInformation
-    Additional information about the forest for GPO customization.
+    Additional information about the forest for WMI customization.
 
     .EXAMPLE
     New-GPOZaurrWMI -Name "TestWMIFilter1" -Query "SELECT * FROM Win32_OperatingSystem" -Force

@@ -1,28 +1,28 @@
 ﻿function Get-GPOZaurrLink {
     <#
     .SYNOPSIS
-    Retrieves Group Policy Object (GPO) Zaurr links based on specified criteria.
+    Retrieves Group Policy Object (GPO) links based on specified criteria.
 
     .DESCRIPTION
-    This function retrieves GPO Zaurr links based on various parameters such as ADObject, Filter, Linked, Site, etc. It provides flexibility in searching for GPO Zaurr links within Active Directory.
+    This function retrieves GPO links based on various parameters such as ADObject, Filter, Linked, Site, etc. It provides flexibility in searching for GPO links within Active Directory.
 
     .PARAMETER ADObject
-    Specifies the Active Directory object(s) to search for GPO Zaurr links.
+    Specifies the Active Directory object(s) to search for GPO links.
 
     .PARAMETER Filter
-    Specifies the filter criteria to search for GPO Zaurr links.
+    Specifies the filter criteria to search for GPO links.
 
     .PARAMETER SearchBase
-    Specifies the search base for filtering GPO Zaurr links.
+    Specifies the search base for filtering GPO links.
 
     .PARAMETER SearchScope
-    Specifies the search scope for filtering GPO Zaurr links.
+    Specifies the search scope for filtering GPO links.
 
     .PARAMETER Linked
     Specifies the type of linked GPOs to retrieve. Valid values are 'All', 'Root', 'DomainControllers', 'Site', and 'OrganizationalUnit'.
 
     .PARAMETER Site
-    Specifies the site(s) to search for GPO Zaurr links.
+    Specifies the site(s) to search for GPO links.
 
     .PARAMETER Limited
     Indicates whether to limit the search results.
@@ -34,7 +34,7 @@
     Specifies a cache for storing GPO information.
 
     .PARAMETER Forest
-    Specifies the forest name for filtering GPO Zaurr links.
+    Specifies the forest name for filtering GPO links.
 
     .PARAMETER ExcludeDomains
     Specifies the domains to exclude from the search.

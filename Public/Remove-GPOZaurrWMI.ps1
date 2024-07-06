@@ -1,19 +1,19 @@
 ﻿function Remove-GPOZaurrWMI {
     <#
     .SYNOPSIS
-    Removes Group Policy Objects (GPO) based on specified criteria.
+    Removes Group Policy WMI filters based on specified criteria.
 
     .DESCRIPTION
-    This function removes GPOs based on the provided GUIDs or names within the specified forest or domains. It retrieves WMI filters associated with the GPOs and removes them.
+    This function removes WMI filters based on the provided GUIDs or names within the specified forest or domains. It retrieves WMI filters associated with the GPOs and removes them.
 
     .PARAMETER Guid
-    Specifies an array of GUIDs of the GPOs to be removed.
+    Specifies an array of GUIDs of the WMI filters to be removed.
 
     .PARAMETER Name
-    Specifies an array of names of the GPOs to be removed.
+    Specifies an array of names of the WMI filters to be removed.
 
     .PARAMETER Forest
-    Specifies the forest name where the GPOs are located.
+    Specifies the forest name where the WMI filters are located.
 
     .PARAMETER ExcludeDomains
     Specifies an array of domains to exclude from the removal process.
@@ -29,14 +29,14 @@
 
     Description
     -----------
-    Removes the GPO with the specified GUID.
+    Removes the WMI filter with the specified GUID.
 
     .EXAMPLE
-    Remove-GPOZaurrWMI -Name "TestGPO"
+    Remove-GPOZaurrWMI -Name "TestWMIFilter"
 
     Description
     -----------
-    Removes the GPO with the specified name.
+    Removes the WMI filter with the specified name.
 
     #>
     [CmdletBinding(SupportsShouldProcess)]

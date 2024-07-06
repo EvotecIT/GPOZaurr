@@ -1,10 +1,10 @@
 ﻿function Find-CSExtension {
     <#
     .SYNOPSIS
-    This function retrieves Group Policy Client Side Extensions (CSEs) from a specified Windows 10 computer.
+    This function retrieves Group Policy Client Side Extensions (CSEs) from a specified Windows computer.
 
     .DESCRIPTION
-    The Find-CSExtension function lists Group Policy Client Side Extensions (CSEs) configured on a Windows 10 computer. It queries the Windows Registry to retrieve information about the CSEs.
+    The Find-CSExtension function lists Group Policy Client Side Extensions (CSEs) configured on a Windows computer. It queries the Windows Registry to retrieve information about the CSEs.
 
     .PARAMETER CSE
     Specifies an array of CSE names to filter the results. If not provided, all CSEs will be listed.
