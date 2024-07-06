@@ -1,5 +1,11 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.5 - 2024.07.06
+* Added or improved help on all functions. by @neztach in https://github.com/EvotecIT/GPOZaurr/pull/56
+
+### New Contributors
+* @neztach made their first contribution in https://github.com/EvotecIT/GPOZaurr/pull/56
+
 ## 1.1.4 - 2024.06.11
 - Small improvements & fixes
 
