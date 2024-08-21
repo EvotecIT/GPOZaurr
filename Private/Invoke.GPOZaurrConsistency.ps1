@@ -40,7 +40,7 @@
                 New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Script:Reporting['GPOConsistency']['Variables']['Inconsistent'] -FontWeight normal, bold
                 New-HTMLListItem -Text "Inconsistent inherited permissions: ", $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'] -FontWeight normal, bold
             } -FontSize 10pt
-            New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them.'
+            New-HTMLText -FontSize 10pt -Text 'Having inconsistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them.'
             New-HTMLChart {
                 New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
                 New-ChartBarOptions -Type barStacked
@@ -66,7 +66,7 @@
             New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Script:Reporting['GPOConsistency']['Variables']['Inconsistent'] -FontWeight normal, bold
             New-HTMLListItem -Text "Inconsistent inherited permissions: ", $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'] -FontWeight normal, bold
         } -FontSize 10pt
-        New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them. Please notice that if ', `
+        New-HTMLText -FontSize 10pt -Text 'Having inconsistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them. Please notice that if ', `
             ' Not available ', 'is visible in the table you should first fix related, more pressing issue, before fixing permissions inconsistency.' -FontWeight normal, bold, normal
     }
     Solution       = {
