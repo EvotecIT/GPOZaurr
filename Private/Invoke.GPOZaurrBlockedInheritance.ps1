@@ -80,7 +80,7 @@
             "As GPOs can be inherited by default, they can also be blocked, if required using the Block Inheritance. "
             "If the Block Inheritance setting is enabled, the inheritance of group policy setting is blocked. "
             "This setting is mostly used when the OU contains users or computers that require different settings than what is applied to the domain level. "
-            "Unfortunetly blocking inheritance can have serious security consequences. "
+            "Unfortunately blocking inheritance can have serious security consequences. "
         )
         New-HTMLText -Text @(
             'As it stands currently there are ',
