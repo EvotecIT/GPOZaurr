@@ -3,5 +3,5 @@
 #$GPOS = Get-GPOZaurr -GPOName 'TEST | Office Configuration'
 #$GPOS | Format-Table -AutoSize *
 
-$GPOS = Get-GPOZaurr -GPOName 'New Group Policy Object3'
+$GPOS = Get-GPOZaurr -GPOName 'TEST | EmptyWITHGPF'
 $GPOS | Format-Table -AutoSize *
