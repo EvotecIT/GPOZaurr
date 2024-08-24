@@ -40,7 +40,7 @@
                 New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Script:Reporting['GPOConsistency']['Variables']['Inconsistent'] -FontWeight normal, bold
                 New-HTMLListItem -Text "Inconsistent inherited permissions: ", $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'] -FontWeight normal, bold
             } -FontSize 10pt
-            New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them.'
+            New-HTMLText -FontSize 10pt -Text 'Having inconsistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them.'
             New-HTMLChart {
                 New-ChartLegend -Names 'Bad', 'Good' -Color PaleGreen, Salmon
                 New-ChartBarOptions -Type barStacked
@@ -66,7 +66,7 @@
             New-HTMLListItem -Text 'Inconsistent top level permissions: ', $Script:Reporting['GPOConsistency']['Variables']['Inconsistent'] -FontWeight normal, bold
             New-HTMLListItem -Text "Inconsistent inherited permissions: ", $Script:Reporting['GPOConsistency']['Variables']['InconsistentInside'] -FontWeight normal, bold
         } -FontSize 10pt
-        New-HTMLText -FontSize 10pt -Text 'Having incosistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them. Please notice that if ', `
+        New-HTMLText -FontSize 10pt -Text 'Having inconsistent permissions on AD in comparison to those on SYSVOL can lead to uncontrolled ability to modify them. Please notice that if ', `
             ' Not available ', 'is visible in the table you should first fix related, more pressing issue, before fixing permissions inconsistency.' -FontWeight normal, bold, normal
     }
     Solution       = {
@@ -145,7 +145,7 @@
                             }
                             New-HTMLWizardStep -Name 'Fix inconsistent downlevel permissions' {
                                 New-HTMLText -Text @(
-                                    "Unfortunetly this step is manual until automation is developed. "
+                                    "Unfortunately this step is manual until automation is developed. "
                                     "If there are inconsistent permissions found inside GPO one has to fix them manually by going into SYSVOL and making sure inheritance is enabled, and that permissions are consistent across all files."
                                     "Please keep in mind that it's possible inconsistent downlevel permissions fix will not be required once the top level fix is applied. "
                                     "Rerun report to find out if you've just fixed top-level permissions. "

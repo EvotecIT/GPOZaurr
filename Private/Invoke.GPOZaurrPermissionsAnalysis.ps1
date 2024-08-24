@@ -185,7 +185,7 @@
         } -FontSize 10pt
 
         New-HTMLText -FontSize 10pt -Text @(
-            "Unfortunetly it's not as simple as it sounds. While checking for permissions mostly works fine, it's possible a Group Policy has totally removed account permissions from being able to asses any of it. ",
+            "Unfortunately it's not as simple as it sounds. While checking for permissions mostly works fine, it's possible a Group Policy has totally removed account permissions from being able to asses any of it. ",
             "The account we're using "
             "$($Env:USERDOMAIN)\$($Env:USERNAME.ToUpper())",
             " may simply not have enough permisions to properly asses permissions for a GPO. "
@@ -265,7 +265,7 @@
 
         New-HTMLText -Text "Fourth problem relates to UNKNOWN SID" -FontSize 10pt -FontWeight bold -TextDecoration underline -Alignment center
         New-HTMLText -FontSize 10pt -TextBlock {
-            "Sometimes groups or users are deleted in Active Directory and unfortunetly their permissions are not cleaned automatically. "
+            "Sometimes groups or users are deleted in Active Directory and Unfortunately their permissions are not cleaned automatically. "
             "Those are left in-place and stay there forever until removed. "
         } -LineBreak
 
