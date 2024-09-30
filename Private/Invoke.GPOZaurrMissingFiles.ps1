@@ -30,11 +30,11 @@
     Summary    = {
         New-HTMLText -FontSize 10pt -TextBlock {
             "Group Policies can become broken for various reasons. One of the common reasons is when GPOs are created and then deleted without being properly removed from Active Directory. "
-            "In other cases it can be due to replication issues, or simply due to corruption. "
+            "In other cases, it can be due to replication issues, or simply due to corruption. "
             "This can lead to GPOs not being applied as expected, or not being applied at all. "
-            "If random files are missing from GPOs it's important to fix them to ensure that GPOs are applied as expected. "
+            "If random files are missing from GPOs, it's important to fix them to ensure that GPOs are applied as expected. "
             "This report provides you with list of GPOs that have missing files. "
-            "Usually once files are missing it's best to restore them from backup (if available) or remove given section completly. "
+            "Once files are missing, it's usually best to restore them from backup (if available) or remove the given section completely. "
             "It's not possible to restore missing files from Active Directory directly or manually. "
         } -LineBreak
         New-HTMLText -Text 'As it stands currently there are ', $Script:Reporting['GPOBrokenPartially']['Variables']['RequireFixing'], ' error requring fixing. ' -FontSize 10pt -FontWeight normal, bold, normal
