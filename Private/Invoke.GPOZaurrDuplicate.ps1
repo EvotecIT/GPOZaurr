@@ -29,7 +29,7 @@
             "CNF objects, Conflict objects or Duplicate Objects are created in Active Directory when there is simultaneous creation of an AD object under the same container "
             "on two separate Domain Controllers near about the same time or before the replication occurs. "
             "This results in a conflict and the same is exhibited by a CNF (Duplicate) object. "
-            "While it doesn't nessecary has a huge impact on Active Directory it's important to keep Active Directory in proper, healthy state. "
+            "While it doesn't nessecarily have a huge impact on Active Directory, it's important to keep Active Directory in proper, healthy state. "
         }
         New-HTMLText -Text 'As it stands currently there are ', $Script:Reporting['GPODuplicates']['Data'].Count, ' CNF (Duplicate) Group Policy objects to be deleted.' -FontSize 10pt -FontWeight normal, bold, normal
     }
