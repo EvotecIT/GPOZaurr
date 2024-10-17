@@ -1,5 +1,10 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.6
+- Improve HTML reports with `ScrollX`
+- Improve HTML reports by hiding some unnesecary columns
+- Added `SizeMB` and `Size` to reports around files/GPOs which could help analyze performance issues
+
 ## 1.1.5 - 2024.07.06
 * Added or improved help on all functions. by @neztach in https://github.com/EvotecIT/GPOZaurr/pull/56
 
