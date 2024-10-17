@@ -133,6 +133,7 @@
             }
         }
         New-HTMLSection -Name 'Group Policy Organizational Units' {
+            # Not adding ScrollX to hide Objects, as it can get quite big
             New-HTMLTable -DataTable $Script:Reporting['GPOOrganizationalUnit']['Data'] -Filtering {
                 New-TableHeader -ResponsiveOperations none -Names 'GPONames', 'Objects'
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Unlink GPO, Delete OU' -BackgroundColor Salmon -Row
@@ -141,7 +142,7 @@
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'OK' -BackgroundColor LightGreen -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Excluded' -BackgroundColor DeepSkyBlue -Row
                 New-HTMLTableCondition -Name 'Status' -ComparisonType string -Value 'Excluded, Default OU' -BackgroundColor DeepSkyBlue -Row
-            } -PagingOptions 10, 20, 30, 40, 50 -ExcludeProperty GPO
+            } -PagingOptions 7, 15, 30, 45, 60 -ExcludeProperty GPO
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix Group Organizational Units' {
@@ -257,7 +258,7 @@
                 New-HTMLTable -DataTable $Script:Reporting['GPOOrganizationalUnit']['WarningsAndErrors'] -Filtering {
                     New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
                     New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
-                } -PagingOptions 10, 20, 30, 40, 50
+                } -PagingOptions 7, 15, 30, 45, 60
             }
         }
     }
