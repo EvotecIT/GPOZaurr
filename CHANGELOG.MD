@@ -1,9 +1,21 @@
 ﻿# GPOZaurr Release History
 
-## 1.1.6
-- Improve HTML reports with `ScrollX`
-- Improve HTML reports by hiding some unnesecary columns
-- Added `SizeMB` and `Size` to reports around files/GPOs which could help analyze performance issues
+## 1.1.6 - 2024.10.17
+### What's Changed
+* Improve HTML reports with `ScrollX`
+* Improve HTML reports by hiding some unnesecary columns
+* Added `SizeMB` and `Size` to reports around files/GPOs which could help analyze performance issues
+* Other minor HTML fixes
+* Fixed typo "Unfortunetly" -> "Unfortunately" by @davidmwilliams in https://github.com/EvotecIT/GPOZaurr/pull/61
+* Minor typo correction "incosistent" -> "inconsistent" by @davidmwilliams in https://github.com/EvotecIT/GPOZaurr/pull/60
+* Update Invoke.GPOZaurrDuplicate.ps1 by @SamErde in https://github.com/EvotecIT/GPOZaurr/pull/63
+* Fix typo and grammar by @SamErde in https://github.com/EvotecIT/GPOZaurr/pull/64
+
+### New Contributors
+* @davidmwilliams made their first contribution in https://github.com/EvotecIT/GPOZaurr/pull/61
+* @SamErde made their first contribution in https://github.com/EvotecIT/GPOZaurr/pull/63
+
+**Full Changelog**: https://github.com/EvotecIT/GPOZaurr/compare/v1.1.5...v1.1.6
 
 ## 1.1.5 - 2024.07.06
 * Added or improved help on all functions. by @neztach in https://github.com/EvotecIT/GPOZaurr/pull/56
