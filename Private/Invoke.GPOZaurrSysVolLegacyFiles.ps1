@@ -15,8 +15,22 @@
     Overview   = {
 
     }
+    Summary    = {
+        New-HTMLText -TextBlock {
+            "This report shows legacy ADM files in SYSVOL. These files are no longer used and can be safely removed. "
+            "Before 'adm' files were replaced by 'admx' files, they were stored in the SYSVOL share, directly per each GPO. "
+            "This report will help you identify and remove these files. "
+        }
+    }
     Solution   = {
-        New-HTMLTable -DataTable $Script:Reporting['SysVolLegacyFiles']['Data'] -Filtering
+        New-HTMLSection -Invisible {
+            New-HTMLPanel {
+                & $Script:GPOConfiguration['SysVolLegacyFiles']['Summary']
+            }
+        }
+        New-HTMLSection -Name "Legacy ADM Files in SYSVOL" {
+            New-HTMLTable -DataTable $Script:Reporting['SysVolLegacyFiles']['Data'] -Filtering -PagingOptions 7, 15, 30, 45, 60 -ScrollX
+        }
         if ($Script:Reporting['SysVolLegacyFiles']['WarningsAndErrors']) {
             New-HTMLSection -Name 'Warnings & Errors to Review' {
                 New-HTMLTable -DataTable $Script:Reporting['SysVolLegacyFiles']['WarningsAndErrors'] -Filtering {
