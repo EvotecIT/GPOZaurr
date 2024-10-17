@@ -16,7 +16,9 @@ $GPOZaurrLinks = [ordered] @{
 
     }
     Solution       = {
-        New-HTMLTable -DataTable $Script:Reporting['GPOLinks']['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:Reporting['GPOLinks']['Data'] -Filtering -ScrollX -PagingOptions 7, 15, 30, 45, 60 -ExcludeProperty 'LinksObjects' {
+            New-HTMLTableCondition -Name 'Linked' -Value 'True' -BackgroundColor PaleGreen -ComparisonType string -FailBackgroundColor Salmon
+        }
         if ($Script:Reporting['GPOLinks']['WarningsAndErrors']) {
             New-HTMLSection -Name 'Warnings & Errors to Review' {
                 New-HTMLTable -DataTable $Script:Reporting['GPOLinks']['WarningsAndErrors'] -Filtering {
