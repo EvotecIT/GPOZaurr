@@ -27,4 +27,4 @@
 #Invoke-GPOZaurr -Online -FilePath $PSScriptRoot\Reports\GPOZaurr.html -Type GPOAnalysis #-SplitReports -Forest test.evotec.pl
 
 
-Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurr.html -Type GPOBlockedInheritance -Forest 'ad.evotec.xyz'
+Invoke-GPOZaurr -FilePath $PSScriptRoot\Reports\GPOZaurr.html # -Verbose #-Type GPOBlockedInheritance -Forest 'ad.evotec.xyz'
