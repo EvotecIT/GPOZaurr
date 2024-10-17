@@ -87,6 +87,7 @@
                         LastAccessTime       = $File.LastAccessTime
                         LastWriteTime        = $File.LastWriteTime
                         Attributes           = $File.Attributes
+                        SizeMB               = [math]::Round(($File.Length / 1MB), 2)
                         AccessControlType    = 'Allow' # : Allow
                         Principal            = $IdentityOwner.Name         # : BUILTIN\Administrators
                         PrincipalSid         = $IdentityOwner.SID
@@ -95,6 +96,7 @@
                         FileSystemRights     = 'Owner'  # : FullControl
                         IsInherited          = $false
                         FullNameOnSysVol     = $File.FullName.Replace($Path, $PathOnSysvol)
+                        Size                 = $File.Length
                     }
                 }
                 $FilePermission = Get-FilePermissions -Path $File.FullName -ACLS $ACL -Verbose:$false
@@ -137,6 +139,7 @@
                         LastAccessTime       = $File.LastAccessTime
                         LastWriteTime        = $File.LastWriteTime
                         Attributes           = $File.Attributes
+                        SizeMB               = [math]::Round(($File.Length / 1MB), 2)
                         AccessControlType    = $Perm.AccessControlType # : Allow
                         Principal            = $Identity.Name         # : BUILTIN\Administrators
                         PrincipalSid         = $Identity.SID
@@ -145,6 +148,7 @@
                         FileSystemRights     = $Perm.FileSystemRights  # : FullControl
                         IsInherited          = $Perm.IsInherited       # : True
                         FullNameOnSysVol     = $File.FullName.Replace($Path, $PathOnSysvol)
+                        Size                 = $File.Length
                     }
 
                 }
