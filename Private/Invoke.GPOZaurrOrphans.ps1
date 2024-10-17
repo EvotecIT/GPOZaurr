@@ -128,7 +128,8 @@
                 New-HTMLTableCondition -Name 'Status' -Value "Not available on SYSVOL" -BackgroundColor LightCoral -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "ObjectClass issue" -BackgroundColor MediumOrchid -ComparisonType string
                 New-HTMLTableCondition -Name 'Status' -Value "Permissions issue" -BackgroundColor MediumVioletRed -ComparisonType string -Color White
-            } -PagingOptions 10, 20, 30, 40, 50
+                New-HTMLTableCondition -Name 'Status' -Value "Exists" -BackgroundColor LightGreen -ComparisonType string
+            } -PagingOptions 7, 15, 30, 45, 60 -ScrollX
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix - Not available on SYSVOL / Active Directory / ObjectClass issue' {
