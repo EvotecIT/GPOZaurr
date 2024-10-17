@@ -328,7 +328,7 @@
                     foreach ($Key in  $Output.Reports.Keys) {
                         New-HTMLTab -Name $Key {
                             Write-Verbose "Invoke-GPOZaurrContent - Generating HTML Table for $Key"
-                            New-HTMLTable -DataTable $Output.Reports[$Key] -Filtering -Title $Key
+                            New-HTMLTable -DataTable $Output.Reports[$Key] -Filtering -Title $Key -PagingOptions 7, 15, 30, 45, 60 -ScrollX
                         }
                     }
                 } -FilePath $OutputPath -ShowHTML:$Open -Online:$Online
