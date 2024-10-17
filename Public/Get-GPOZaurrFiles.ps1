@@ -329,6 +329,8 @@
                     SuggestedActionComment = $SuggestedActionComment
                     BelongsToGPO           = $BelongsToGPO
                     GPODisplayName         = $GPODisplayName
+                    SizeMB                 = [math]::Round(($_.Length / 1MB), 2)
+                    Size                   = $_.Length
                     Attributes             = $_.Attributes
                     CreationTime           = $_.CreationTime
                     LastAccessTime         = $_.LastAccessTime
@@ -340,6 +342,8 @@
                 $MetaData['SuggestedActionComment'] = $SuggestedActionComment
                 $MetaData['BelongsToGPO'] = $BelongsToGPO
                 $MetaData['GPODisplayName'] = $GPODisplayName
+                $MetaData['SizeMB'] = [math]::Round(($_.Length / 1MB), 2)
+                $MetaData['Size'] = $_.Length
             }
             if ($Signature) {
                 try {
