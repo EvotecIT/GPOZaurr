@@ -220,12 +220,14 @@
     # if there are any, then we can't say that GPO is empty, and they are not visible in the XML
     $GPFFile = $false
     $FilesCount = 0
+    $TotalSize = 0
     Get-ChildItem -LiteralPath $SysvolGpoPath -Recurse -ErrorAction SilentlyContinue -File | ForEach-Object {
         if ($_.Extension -eq '.gpf') {
             #Write-Warning -Message "Get-XMLGPO - GPO [$DisplayName/$DomainName] has no data in XML, but it contains GPF files. Excluding from empty GPO list."
             $GPFFile = $true
         }
         $FilesCount++
+        $TotalSize += $_.Length
     }
 
     if ($ComputerSettingsAvailable -eq $false -and $UserSettingsAvailable -eq $false -and $GPFFile -eq $false) {
@@ -363,6 +365,8 @@
             'Problem'                           = $Problem
             'ApplyPermission'                   = $null
             'Exclude'                           = $Exclude
+            'SizeMB'                            = [Math]::Round($TotalSize / 1MB, 2)
+            'Size'                              = $TotalSize
             'Description'                       = $GPO.Description
             'ComputerPolicies'                  = $XMLContent.GPO.Computer.ExtensionData.Name -join ", "
             'UserPolicies'                      = $XMLContent.GPO.User.ExtensionData.Name -join ", "
