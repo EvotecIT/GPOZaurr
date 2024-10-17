@@ -68,7 +68,7 @@
                     New-HTMLTableCondition -Name 'LinksCount' -Value 0 -ComparisonType number
                     New-HTMLTableCondition -Name 'LinksEnabledCount' -Value 0 -ComparisonType number
                 } -BackgroundColor Salmon -FailBackgroundColor Goldenrod -Logic OR -HighlightHeaders 'LinksCount', 'LinksEnabledCount', 'DisplayName', 'DomainName'
-            }
+            } -ScrollX -PagingOptions 7, 15, 30, 45, 60
         }
         if ($Script:Reporting['GPOUpdates']['WarningsAndErrors']) {
             New-HTMLSection -Name 'Warnings & Errors to Review' {

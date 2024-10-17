@@ -71,7 +71,7 @@
         New-HTMLSection -Name 'Group Policy Unknown Permissions Analysis' {
             New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsUnknown']['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'Permission' -Value '' -BackgroundColor Salmon -ComparisonType string -Row
-            } -PagingOptions 7, 15, 30, 45, 60
+            } -PagingOptions 7, 15, 30, 45, 60 -ScrollX
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix Group Policy Unknown Permissions' {
@@ -174,7 +174,7 @@
                 New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsUnknown']['WarningsAndErrors'] -Filtering {
                     New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
                     New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
-                } -PagingOptions 10, 20, 30, 40, 50
+                } -PagingOptions 7, 15, 30, 45, 60
             }
         }
     }

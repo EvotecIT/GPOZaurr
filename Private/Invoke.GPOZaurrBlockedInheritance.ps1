@@ -154,14 +154,14 @@
                     New-TableCondition -Name 'ComputersCount' -Value 0
                 } -BackgroundColor Salmon -FailBackgroundColor Amber -HighlightHeaders 'UsersCount', 'ComputersCount'
                 New-TableColumnOption -Hidden $true -ColumnIndex 8
-            } -PagingOptions 5, 10, 20, 30, 40, 50 -ExcludeProperty GroupPolicies
+            } -PagingOptions 5, 10, 20, 30, 40, 50 -ExcludeProperty GroupPolicies -ScrollX
         }
         New-HTMLSection -Name 'Group Policies affecting objects in Organizational Units with Blocked Inheritance' {
             New-HTMLTable -DataTable $Script:Reporting['GPOBlockedInheritance']['Data'].GroupPolicies -Filtering {
                 New-TableCondition -Name 'Enabled' -Value $true -BackgroundColor SpringGreen -FailBackgroundColor Salmon
                 New-TableCondition -Name 'Enforced' -Value $true -BackgroundColor Amber -FailBackgroundColor AirForceBlue
                 New-TableCondition -Name 'LinkedDirectly' -Value $true -BackgroundColor Amber -FailBackgroundColor AirForceBlue
-            } -PagingOptions 5, 10, 20, 30, 40, 50 -DataTableID 'TableWithGroupPoliciesBlockedInheritance'
+            } -PagingOptions 5, 10, 20, 30, 40, 50 -DataTableID 'TableWithGroupPoliciesBlockedInheritance' -ScrollX
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix - Organizational Units with Group Policy Blocked Inheritance' {

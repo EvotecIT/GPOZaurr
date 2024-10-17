@@ -16,7 +16,7 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsRoot']['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsRoot']['Data'] -Filtering -PagingOptions 7, 15, 30, 45, 60 -ScrollX
         if ($Script:Reporting['GPOPermissionsRoot']['WarningsAndErrors']) {
             New-HTMLSection -Name 'Warnings & Errors to Review' {
                 New-HTMLTable -DataTable $Script:Reporting['GPOPermissionsRoot']['WarningsAndErrors'] -Filtering {

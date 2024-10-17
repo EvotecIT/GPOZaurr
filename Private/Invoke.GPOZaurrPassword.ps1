@@ -16,7 +16,7 @@
 
     }
     Solution   = {
-        New-HTMLTable -DataTable $Script:Reporting['GPOPassword']['Data'] -Filtering
+        New-HTMLTable -DataTable $Script:Reporting['GPOPassword']['Data'] -Filtering -ScrollX -PagingOptions 7, 15, 30, 45, 60
 
         if ($Script:Reporting['GPOPassword']['WarningsAndErrors']) {
             New-HTMLSection -Name 'Warnings & Errors to Review' {

@@ -1,12 +1,12 @@
 ﻿$GPOZaurrGPORedirects = [ordered] @{
-    Name       = 'Group Policies With Redirected SYSVOL'
-    Enabled    = $false
-    ActionRequired     = $null
-    Data       = $null
-    Execute    = {
+    Name           = 'Group Policies With Redirected SYSVOL'
+    Enabled        = $false
+    ActionRequired = $null
+    Data           = $null
+    Execute        = {
         Get-GPOZaurrRedirect -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains
     }
-    Processing = {
+    Processing     = {
         foreach ($GPO in $Script:Reporting['GPORedirect']['Data']) {
             $Script:Reporting['GPORedirect']['Variables']['GPOTotal']++
             if ($GPO.IsCorrect -eq $true) {
@@ -21,15 +21,15 @@
             $Script:Reporting['GPORedirect']['ActionRequired'] = $false
         }
     }
-    Variables  = @{
+    Variables      = @{
         GPOTotal        = 0
         GPOIsCorrect    = 0
         GPOIsNotCorrect = 0
     }
-    Overview   = {
+    Overview       = {
 
     }
-    Summary    = {
+    Summary        = {
         New-HTMLText -TextBlock {
             "Group Policies are stored in Active Directory and SYSVOL. SYSVOL is a folder shared by the domain controllers to hold its logon scripts, "
             "group policy data, and other domain-wide data which needs to be available anywhere there is a domain controller. "
@@ -49,7 +49,7 @@
             "If you notice any GPO with redirect, you should investigate it. "
         } -FontSize 10pt -LineBreak
     }
-    Solution   = {
+    Solution       = {
         New-HTMLSection -Invisible {
             New-HTMLPanel {
                 & $Script:GPOConfiguration['GPORedirect']['Summary']
@@ -65,7 +65,7 @@
         New-HTMLSection -Name 'Group Policies showing redirects (if any)' {
             New-HTMLTable -DataTable $Script:Reporting['GPORedirect']['Data'] -Filtering {
                 New-HTMLTableCondition -Name 'IsCorrect' -Value $false -BackgroundColor Salmon -ComparisonType bool -FailBackgroundColor MintGreen -HighlightHeaders 'IsCorrect', 'Path', 'ExpectedPath'
-            }
+            } -ScrollX -PagingOptions 7, 15, 30, 45, 60
         }
         if ($Script:Reporting['GPORedirect']['WarningsAndErrors']) {
             New-HTMLSection -Name 'Warnings & Errors to Review' {

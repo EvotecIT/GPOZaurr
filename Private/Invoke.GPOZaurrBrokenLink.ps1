@@ -76,7 +76,7 @@ $GPOZaurrBrokenLink = [ordered] @{
         New-HTMLSection -Name 'Group Policy Broken Links' {
             New-HTMLTable -DataTable $Script:Reporting['GPOBrokenLink']['Data'] -Filtering {
 
-            } -PagingOptions 10, 20, 30, 40, 50
+            } -PagingOptions 7, 15, 30, 45, 60 -ScrollX
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to remove Broken Links' {

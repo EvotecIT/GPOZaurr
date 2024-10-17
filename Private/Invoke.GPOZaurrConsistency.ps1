@@ -91,7 +91,7 @@
                 New-HTMLTableCondition -Name 'ACLConsistentInside' -Value $true -BackgroundColor PaleGreen -TextTransform capitalize -ComparisonType string
                 New-HTMLTableCondition -Name 'ACLConsistent' -Value 'Not available' -BackgroundColor Crimson -ComparisonType string
                 New-HTMLTableCondition -Name 'ACLConsistentInside' -Value 'Not available' -BackgroundColor Crimson -ComparisonType string
-            } -PagingOptions 10, 20, 30, 40, 50
+            } -PagingOptions 7, 15, 30, 45, 60 -ScrollX -ExcludeProperty 'UserVersion', 'ComputerVersion', 'WmiFilter', 'ACLConsistentInsideDetails'
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix - Permissions Consistency' {

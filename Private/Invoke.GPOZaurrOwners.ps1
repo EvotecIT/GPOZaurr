@@ -184,7 +184,7 @@
                 #New-HTMLTableCondition -Name 'Status' -Value 'Administrative, Inconsistent, Approved' -BackgroundColor Salmon -ComparisonType string -Row
                 # New-HTMLTableCondition -Name 'Status' -Value 'NotAdministrative, Inconsistent, Approved' -BackgroundColor Salmon -ComparisonType string -Row
 
-            } -PagingOptions 10, 20, 30, 40, 50
+            } -PagingOptions 7, 15, 30, 45, 60 -ScrollX
         }
         if ($Script:Reporting['Settings']['HideSteps'] -eq $false) {
             New-HTMLSection -Name 'Steps to fix Group Policy Owners' {
@@ -307,7 +307,7 @@
                 New-HTMLTable -DataTable $Script:Reporting['GPOOwners']['WarningsAndErrors'] -Filtering {
                     New-HTMLTableCondition -Name 'Type' -Value 'Warning' -BackgroundColor SandyBrown -ComparisonType string -Row
                     New-HTMLTableCondition -Name 'Type' -Value 'Error' -BackgroundColor Salmon -ComparisonType string -Row
-                } -PagingOptions 10, 20, 30, 40, 50
+                } -PagingOptions 7, 15, 30, 45, 60
             }
         }
     }

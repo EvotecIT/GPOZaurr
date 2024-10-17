@@ -18,7 +18,7 @@
     Solution       = {
         foreach ($Key in $Script:Reporting['GPOAnalysis']['Data'].Keys) {
             New-HTMLTab -Name $Key {
-                New-HTMLTable -DataTable $Script:Reporting['GPOAnalysis']['Data'][$Key] -Filtering -Title $Key
+                New-HTMLTable -DataTable $Script:Reporting['GPOAnalysis']['Data'][$Key] -Filtering -Title $Key -ScrollX
             }
         }
         if ($Script:Reporting['GPOAnalysis']['WarningsAndErrors']) {
