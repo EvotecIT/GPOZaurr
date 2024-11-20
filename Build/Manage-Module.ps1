@@ -1,7 +1,5 @@
 Clear-Host
 
-Import-Module "PSPublishModule" -Force
-
 Invoke-ModuleBuild -ModuleName 'GPOZaurr' {
     # Usual defaults as per standard module
     $Manifest = @{
