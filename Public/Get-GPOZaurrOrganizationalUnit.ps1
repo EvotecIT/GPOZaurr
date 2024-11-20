@@ -51,7 +51,7 @@
     foreach ($Domain in $ForestInformation.Domains) {
         Write-Verbose "Get-GPOZaurrOrganizationalUnit - Processing $($Domain)"
         $CountTop = 0
-        $TopOrganizationalUnits = Get-ADOrganizationalUnit -Filter * -Properties LinkedGroupPolicyObjects, DistinguishedName, ntSecurityDescriptor -Server $ForestInformation['QueryServers'][$Domain]['hostname'][0] -SearchScope OneLevel
+        [Array] $TopOrganizationalUnits = Get-ADOrganizationalUnit -Filter * -Properties LinkedGroupPolicyObjects, DistinguishedName, ntSecurityDescriptor -Server $ForestInformation['QueryServers'][$Domain]['hostname'][0] -SearchScope OneLevel
         foreach ($TopOU in $TopOrganizationalUnits) {
             $CountTop++
             Write-Verbose "Get-GPOZaurrOrganizationalUnit - Processing $($Domain) / $($TOPOU.DistinguishedName) [$CountTop/$($TopOrganizationalUnits.Count)]"
@@ -75,7 +75,7 @@
             }
 
             # cache children OUs
-            $OUs = Get-ADOrganizationalUnit -SearchScope Subtree -SearchBase $TopOU.DistinguishedName -Server $ForestInformation['QueryServers'][$Domain]['hostname'][0] -Properties LinkedGroupPolicyObjects, DistinguishedName -Filter *
+            [Array] $OUs = Get-ADOrganizationalUnit -SearchScope Subtree -SearchBase $TopOU.DistinguishedName -Server $ForestInformation['QueryServers'][$Domain]['hostname'][0] -Properties LinkedGroupPolicyObjects, DistinguishedName -Filter *
             Write-Verbose "Get-GPOZaurrOrganizationalUnit - Processing $($Domain) / $($TOPOU.DistinguishedName) [$CountTop/$($TopOrganizationalUnits.Count)], found $($OUs.Count) OU's to process."
             foreach ($OU in $OUs) {
                 if (-not $CachedOu[$OU.DistinguishedName]) {
@@ -103,8 +103,13 @@
             Write-Verbose "Get-GPOZaurrOrganizationalUnit - Processing $($Domain) / $($TOPOU.DistinguishedName) [$CountTop/$($TopOrganizationalUnits.Count)], found $($ObjectsInOu.Count) objects to process."
             foreach ($Object in $ObjectsInOu) {
                 $Place = ConvertFrom-DistinguishedName -ToOrganizationalUnit -DistinguishedName $Object.DistinguishedName
-                $AllOUs = ConvertFrom-DistinguishedName -ToMultipleOrganizationalUnit -IncludeParent -DistinguishedName $Place
+                [Array] $AllOUs = ConvertFrom-DistinguishedName -ToMultipleOrganizationalUnit -IncludeParent -DistinguishedName $Place
                 foreach ($OU in $AllOUs) {
+                    if (-not $CachedOu[$OU]) {
+                        Write-Warning "Get-GPOZaurrOrganizationalUnit - Object $($Object.DistinguishedName) is in OU $($OU) but it's not in cache. This should not happen. Please report this issue."
+                        Write-Warning "Get-GPOZaurrOrganizationalUnit - Debug information: Place: $($Place), AllOUs: $($AllOUs.Count)"
+                        continue
+                    }
                     if ($OU -eq $Place) {
                         $CachedOu[$OU]['Objects'][$Object.DistinguishedName] = $Object
                         $CachedOu[$OU]['ObjectsClasses'][$Object.ObjectClass] = ''
