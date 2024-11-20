@@ -1,5 +1,9 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.7 - 2024.11.20
+### What's Changed
+- Added some additional logging to track down issue
+
 ## 1.1.6 - 2024.10.17
 ### What's Changed
 * Improve HTML reports with `ScrollX`
