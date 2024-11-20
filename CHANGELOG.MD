@@ -1,5 +1,11 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.8 - 2024.11.20
+### What's new
+- Added `RestrictedGroups` to GroupAnalysis
+
+**Full Changelog**: https://github.com/EvotecIT/GPOZaurr/compare/v1.1.7...v1.1.8
+
 ## 1.1.7 - 2024.11.20
 ### What's Changed
 - Added some additional logging to track down issue
