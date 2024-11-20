@@ -156,12 +156,16 @@
                 Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOName $Name
             }
             foreach ($GUID in $GPOGUID) {
-                Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOGUID $GUID
+                Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation -GPOGuid $GUID
             }
         )
     } else {
         Write-Verbose "Invoke-GPOZaurrContent - Query AD for GPOs"
         [Array] $GPOs = Get-GPOZaurrAD -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+    }
+    if ($GPOs.Count -eq 0) {
+        Write-Warning "Invoke-GPOZaurrContent - No GPOs found. Exiting."
+        return
     }
     # This caches single reports.
     $TemporaryCachedSingleReports = [ordered] @{}
@@ -171,7 +175,7 @@
     $Output['Reports'] = [ordered] @{}
     $Output['CategoriesFull'] = [ordered] @{}
 
-    $ForestInformation = Get-WinADForestDetails -PreferWritable  -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+    $ForestInformation = Get-WinADForestDetails -PreferWritable -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
 
     Write-Verbose "Invoke-GPOZaurrContent - Loading GPO Report to Categories"
     $CountGPO = 0

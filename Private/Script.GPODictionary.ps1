@@ -380,7 +380,7 @@
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'FSLogix' -SingleObject
         }
     }
-    Firefox                                    = @{
+    Firefox                                         = @{
         Types      = @(
             @{
                 Category = 'RegistrySettings'
@@ -972,6 +972,21 @@
         }
         CodeSingle = {
             ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Remote Desktop Services*' -SingleObject
+        }
+    }
+    RestrictedGroups                                = @{
+        Types      = @(
+            @{
+                Category = 'SecuritySettings'
+                Settings = 'RestrictedGroups'
+            }
+        )
+        GPOPath    = 'Policies -> Windows Settings -> Security Settings -> Restricted Groups'
+        Code       = {
+            ConvertTo-XMLRestrictedGroups -GPO $GPO
+        }
+        CodeSingle = {
+            ConvertTo-XMLRestrictedGroups -GPO $GPO -SingleObject
         }
     }
     RSSFeeds                                        = @{
