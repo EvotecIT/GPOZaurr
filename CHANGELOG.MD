@@ -1,5 +1,8 @@
 ﻿# GPOZaurr Release History
 
+## 1.1.9 - 2024.12.02
+- Fixes `Invoke-GPOZaurr` when using SplitReports without path [#58](https://github.com/EvotecIT/GPOZaurr/issues/58)
+
 ## 1.1.8 - 2024.11.20
 ### What's new
 - Added `RestrictedGroups` to GroupAnalysis
