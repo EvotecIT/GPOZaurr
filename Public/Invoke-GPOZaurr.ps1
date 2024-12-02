@@ -126,6 +126,10 @@
         }
     }
 
+    if (-not $FilePath) {
+        $FilePath = Get-FileName -Extension 'html' -Temporary -Name "GpoZaurr"
+    }
+
     # Build data
     foreach ($T in $Script:GPOConfiguration.Keys) {
         if ($Script:GPOConfiguration[$T].Enabled -eq $true) {
@@ -201,10 +205,6 @@
     if (-not $SplitReports) {
         # Generate pretty HTML
         $TimeLogHTML = Start-TimeLog
-        if (-not $FilePath) {
-            $FilePath = Get-FileName -Extension 'html' -Temporary
-        }
-
         New-HTMLReportAll -FilePath $FilePath -Online:$Online -HideHTML:$HideHTML -Type $Type
 
         $TimeLogEndHTML = Stop-TimeLog -Time $TimeLogHTML -Option OneLiner
