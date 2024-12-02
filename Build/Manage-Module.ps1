@@ -27,7 +27,8 @@ Invoke-ModuleBuild -ModuleName 'GPOZaurr' {
     }
     New-ConfigurationManifest @Manifest
 
-    New-ConfigurationModule -Type RequiredModule -Name 'PSWriteColor', 'PSSharedGoods', 'ADEssentials', 'PSWriteHTML' -Guid Auto -Version Latest
+    New-ConfigurationModule -Type RequiredModule -Name 'PSWriteColor', 'PSSharedGoods', 'ADEssentials' -Guid Auto -Version Latest
+    New-ConfigurationModule -Type RequiredModule -Name "PSWriteHTML" -Guid Auto -Version "1.27.0"
     #New-ConfigurationModule -Type ExternalModule -Name 'Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Management','Microsoft.PowerShell.Security'
     New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword', 'ADEssentials'
 
