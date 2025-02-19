@@ -59,6 +59,10 @@
     Invoke-GPOZaurrContent -GPOPath "CN={31B2F340-016D-11D2-945F-00C04FB984F9},CN=Policies,CN=System,DC=Contoso,DC=com" -Type "All" -OutputType "Object"
     Retrieves all information for a specific Group Policy Object and outputs the result as an object.
 
+    .EXAMPLE
+    Invoke-GPOZaurrContent -GPOName "Group Policy Test" -SingleObject | ConvertTo-Json -Depth 3
+    Quickly view GPO settings by name in JSON format for easy inspection.
+
     #>
     [alias('Find-GPO')]
     [cmdletBinding(DefaultParameterSetName = 'Default')]
