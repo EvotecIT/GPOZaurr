@@ -1,5 +1,13 @@
 ﻿Import-Module "$PSScriptRoot\..\GPoZaurr.psd1" -Force
 
+
+#$O = Invoke-GPOZaurrContent -GPOName "Test-RestrictedGroups" -Verbose
+#$O
+
+Invoke-GPOZaurr -Online -Type GPOBroken, GPOBrokenLink -Verbose -SplitReports
+
+return
+
 #$Output = Invoke-GPOZaurrContent -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPODefender'
 $Output = Invoke-GPOZaurrContent -GPOPath 'C:\Support\GitHub\GpoZaurr\Ignore\GPOExport' -Type WindowsHelloForBusiness
 $Output | Format-Table
