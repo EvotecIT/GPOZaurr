@@ -3,6 +3,8 @@
 $OUs = Get-GPOZaurrOrganizationalUnit
 $Ous | Format-Table
 
+return
+
 Get-GPOZaurrOrganizationalUnit -Verbose -Option Unlink -Exclusions @(
    'OU=Groups,OU=Production,DC=ad,DC=evotec,DC=pl'
 ) | Format-Table
