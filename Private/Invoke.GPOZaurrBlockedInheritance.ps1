@@ -1,5 +1,5 @@
 ﻿$GPOZaurrBlockedInheritance = [ordered] @{
-    Name           = 'Group Policy Blocked Inhertiance'
+    Name           = 'Group Policy Blocked Inheritance'
     Enabled        = $true
     ActionRequired = $null
     Data           = $null

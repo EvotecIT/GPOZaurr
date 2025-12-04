@@ -4,7 +4,7 @@
 #$Objects = Get-GPOZaurrInheritance
 #$Objects | Format-Table
 
-# Get same output DN, CanonicalName, BlockInheritance (True/False) + Users/Computers + UsersCount/ComputerCount for those with Blocked Inhertiance
+# Get same output DN, CanonicalName, BlockInheritance (True/False) + Users/Computers + UsersCount/ComputerCount for those with Blocked Inheritance
 # This is so you can have a list what machines are affected
 $ExcludedOU = @(
     # Works on OU/
