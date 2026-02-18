@@ -15,7 +15,23 @@ function ConvertTo-XMLRegistryDefenderOnReport {
         [PSCustomObject] $GPO
     )
 
-    foreach ($Registry in $GPO.Settings) {
+    [Array] $RegistrySettings = @()
+    if ($GPO.Settings) {
+        $RegistrySettings = $GPO.Settings
+    } elseif ($GPO.DataSet) {
+        # This path supports direct use from dictionary code where RegistrySettings is not requested explicitly.
+        [Array] $DataSet = $GPO.DataSet
+        if ($DataSet.Count -gt 0 -and (
+                $DataSet[0].PSObject.Properties.Name -contains 'Properties' -or
+                $DataSet[0].PSObject.Properties.Name -contains 'Registry' -or
+                $DataSet[0].PSObject.Properties.Name -contains 'Collection'
+            )
+        ) {
+            $RegistrySettings = Get-XMLNestedRegistry -GPO $GPO -DataSet $GPO.DataSet
+        }
+    }
+
+    foreach ($Registry in $RegistrySettings) {
         if ($Registry.Key -like 'SOFTWARE\Microsoft\Windows Defender*') {
             [PSCustomObject] [ordered] @{
                 DisplayName    = $GPO.DisplayName

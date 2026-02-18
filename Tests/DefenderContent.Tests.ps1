@@ -8,8 +8,8 @@ Describe 'Defender content detection' {
             $Entry = $Script:GPODitionary['WindowsDefender']
             $Entry.GPOPath | Should -Contain 'Policies -> Administrative Templates -> Windows Components/Windows Defender'
             $Entry.GPOPath | Should -Contain 'Policies -> Administrative Templates -> Windows Components/Microsoft Defender Antivirus'
-            $Entry.ByReports.Report | Should -Contain 'RegistrySettings'
-            $Entry.CodeReport.ToString() | Should -Match 'ConvertTo-XMLRegistryDefenderOnReport'
+            ($Entry.Types | Where-Object { $_.Category -eq 'RegistrySettings' -and $_.Settings -eq 'RegistrySettings' }).Count | Should -BeGreaterOrEqual 1
+            $Entry.Code.ToString() | Should -Match 'ConvertTo-XMLRegistryDefenderOnReport'
         }
     }
 
@@ -57,6 +57,32 @@ Describe 'Defender content detection' {
             [Array] $Result = ConvertTo-XMLRegistryDefenderOnReport -GPO $GPO
             $Result.Count | Should -Be 1
             $Result[0].FallbackSource | Should -Be 'RegistrySettings'
+            $Result[0].Key | Should -Be 'SOFTWARE\Microsoft\Windows Defender\MpEngine'
+            $Result[0].Name | Should -Be 'MpFolderScanThreadCount'
+        }
+    }
+
+    It 'ConvertTo-XMLRegistryDefenderOnReport supports raw DataSet input' {
+        InModuleScope GPOZaurr {
+            $GPO = [PSCustomObject] @{
+                DisplayName = 'Test Defender GPO'
+                DomainName  = 'contoso.com'
+                GUID        = '11111111-1111-1111-1111-111111111111'
+                GpoType     = 'Computer'
+                Linked      = $true
+                LinksCount  = 1
+                Links       = @('OU=Workstations,DC=contoso,DC=com')
+                DataSet     = ([xml] @"
+<Root>
+    <Registry changed='2026-02-18T11:15:00' disabled='0'>
+        <Properties action='U' hive='HKEY_LOCAL_MACHINE' key='SOFTWARE\Microsoft\Windows Defender\MpEngine' name='MpFolderScanThreadCount' type='REG_DWORD' value='4' />
+    </Registry>
+</Root>
+"@).Root.Registry
+            }
+
+            [Array] $Result = ConvertTo-XMLRegistryDefenderOnReport -GPO $GPO
+            $Result.Count | Should -Be 1
             $Result[0].Key | Should -Be 'SOFTWARE\Microsoft\Windows Defender\MpEngine'
             $Result[0].Name | Should -Be 'MpFolderScanThreadCount'
         }

@@ -1169,10 +1169,9 @@
                 Category = 'RegistrySettings'
                 Settings = 'Policy'
             }
-        )
-        ByReports  = @(
             @{
-                Report = 'RegistrySettings'
+                Category = 'RegistrySettings'
+                Settings = 'RegistrySettings'
             }
         )
         GPOPath    = @(
@@ -1180,13 +1179,16 @@
             'Policies -> Administrative Templates -> Windows Components/Microsoft Defender Antivirus'
         )
         Code       = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*', 'Windows Components/Microsoft Defender Antivirus*'
+            @(
+                ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*', 'Windows Components/Microsoft Defender Antivirus*'
+                ConvertTo-XMLRegistryDefenderOnReport -GPO $GPO
+            ) | Where-Object { $_ }
         }
         CodeSingle = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*', 'Windows Components/Microsoft Defender Antivirus*' -SingleObject
-        }
-        CodeReport = {
-            ConvertTo-XMLRegistryDefenderOnReport -GPO $GPO
+            @(
+                ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*', 'Windows Components/Microsoft Defender Antivirus*' -SingleObject
+                ConvertTo-XMLRegistryDefenderOnReport -GPO $GPO
+            ) | Where-Object { $_ }
         }
     }
     WindowsDefenderExploitGuard                     = @{
