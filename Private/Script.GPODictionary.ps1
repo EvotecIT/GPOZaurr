@@ -1170,12 +1170,23 @@
                 Settings = 'Policy'
             }
         )
-        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Windows Defender'
+        ByReports  = @(
+            @{
+                Report = 'RegistrySettings'
+            }
+        )
+        GPOPath    = @(
+            'Policies -> Administrative Templates -> Windows Components/Windows Defender'
+            'Policies -> Administrative Templates -> Windows Components/Microsoft Defender Antivirus'
+        )
         Code       = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*'
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*', 'Windows Components/Microsoft Defender Antivirus*'
         }
         CodeSingle = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*' -SingleObject
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*', 'Windows Components/Microsoft Defender Antivirus*' -SingleObject
+        }
+        CodeReport = {
+            ConvertTo-XMLRegistryDefenderOnReport -GPO $GPO
         }
     }
     WindowsDefenderExploitGuard                     = @{
@@ -1186,12 +1197,15 @@
                 Settings = 'Policy'
             }
         )
-        GPOPath    = 'Policies -> Administrative Templates -> Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard'
+        GPOPath    = @(
+            'Policies -> Administrative Templates -> Windows Components/Windows Defender/Windows Defender Exploit Guard'
+            'Policies -> Administrative Templates -> Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard'
+        )
         Code       = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard*'
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*/Windows Defender Exploit Guard*', 'Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard*', 'Windows Components/Microsoft Defender Antivirus/Windows Defender Exploit Guard*'
         }
         CodeSingle = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard*' -SingleObject
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Windows Defender*/Windows Defender Exploit Guard*', 'Windows Components/Microsoft Defender Antivirus/Microsoft Defender Exploit Guard*', 'Windows Components/Microsoft Defender Antivirus/Windows Defender Exploit Guard*' -SingleObject
         }
     }
     # WindowsFirewall                                = @{

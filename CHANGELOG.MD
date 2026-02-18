@@ -1,5 +1,12 @@
 ﻿# GPOZaurr Release History
 
+## Unreleased
+- Fix `WindowsDefender` content detection for newer ADMX categories by supporting both:
+  - `Windows Components/Windows Defender*`
+  - `Windows Components/Microsoft Defender Antivirus*`
+- Fix `WindowsDefenderExploitGuard` detection for legacy/new category naming variants.
+- Add Defender registry fallback parsing (`SOFTWARE\Microsoft\Windows Defender*`) so Defender settings that land in `RegistrySettings` are still surfaced in `WindowsDefender` report output. [#81](https://github.com/EvotecIT/GPOZaurr/issues/81)
+
 ## 1.1.9 - 2024.12.02
 - Fixes `Invoke-GPOZaurr` when using SplitReports without path [#58](https://github.com/EvotecIT/GPOZaurr/issues/58)
 
