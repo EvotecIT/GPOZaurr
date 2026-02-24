@@ -31,25 +31,49 @@ function ConvertTo-XMLRegistryDefenderOnReport {
         }
     }
 
+    $UsedNames = [System.Collections.Generic.List[string]]::new()
+    $CreateGPO = [ordered] @{
+        DisplayName = $GPO.DisplayName
+        DomainName  = $GPO.DomainName
+        GUID        = $GPO.GUID
+        GpoType     = $GPO.GpoType
+    }
+    $DefenderSettings = 0
+
     foreach ($Registry in $RegistrySettings) {
         if ($Registry.Key -like 'SOFTWARE\Microsoft\Windows Defender*') {
-            [PSCustomObject] [ordered] @{
-                DisplayName    = $GPO.DisplayName
-                DomainName     = $GPO.DomainName
-                GUID           = $GPO.GUID
-                GpoType        = $GPO.GpoType
-                FallbackSource = 'RegistrySettings'
-                Hive           = $Registry.Hive
-                Key            = $Registry.Key
-                Name           = $Registry.Name
-                Type           = $Registry.Type
-                Value          = $Registry.Value
-                Changed        = $Registry.Changed
-                Filters        = $Registry.Filters
-                Linked         = $GPO.Linked
-                LinksCount     = $GPO.LinksCount
-                Links          = $GPO.Links
+            $DefenderSettings++
+            $SettingName = if ($Registry.Name) { $Registry.Name } else { $Registry.Key }
+            $PropertyName = Format-ToTitleCase -Text $SettingName -RemoveWhiteSpace -RemoveChar ',', '-', "'", '\(', '\)', ':'
+
+            if ($PropertyName -in $UsedNames) {
+                $UsedNames.Add($PropertyName)
+                $TimesUsed = ($UsedNames | Group-Object | Where-Object { $_.Name -eq $PropertyName }).Count
+                $PropertyName = -join ($PropertyName, "$TimesUsed")
+            } else {
+                $UsedNames.Add($PropertyName)
+            }
+
+            $SettingValue = $Registry.Value
+            if ($null -eq $SettingValue -or "$SettingValue" -eq '') {
+                $SettingValue = $Registry.Name
+            }
+            $CreateGPO[$PropertyName] = $SettingValue
+
+            # Some Defender data can be encoded in either value or value-name depending on setting type.
+            if ($Registry.Name -and "$SettingValue" -ne "$($Registry.Name)") {
+                $CreateGPO["$($PropertyName)ValueName"] = $Registry.Name
+            }
+            if ($Registry.Key) {
+                $CreateGPO["$($PropertyName)RegistryKey"] = $Registry.Key
             }
         }
+    }
+
+    if ($DefenderSettings -gt 0) {
+        $CreateGPO['Linked'] = $GPO.Linked
+        $CreateGPO['LinksCount'] = $GPO.LinksCount
+        $CreateGPO['Links'] = $GPO.Links
+        [PSCustomObject] $CreateGPO
     }
 }

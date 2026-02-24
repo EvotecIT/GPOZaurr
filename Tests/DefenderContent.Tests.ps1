@@ -56,9 +56,8 @@ Describe 'Defender content detection' {
 
             [Array] $Result = ConvertTo-XMLRegistryDefenderOnReport -GPO $GPO
             $Result.Count | Should -Be 1
-            $Result[0].FallbackSource | Should -Be 'RegistrySettings'
-            $Result[0].Key | Should -Be 'SOFTWARE\Microsoft\Windows Defender\MpEngine'
-            $Result[0].Name | Should -Be 'MpFolderScanThreadCount'
+            $Result[0].MpFolderScanThreadCount | Should -Be '4'
+            $Result[0].MpFolderScanThreadCountRegistryKey | Should -Be 'SOFTWARE\Microsoft\Windows Defender\MpEngine'
         }
     }
 
@@ -83,8 +82,53 @@ Describe 'Defender content detection' {
 
             [Array] $Result = ConvertTo-XMLRegistryDefenderOnReport -GPO $GPO
             $Result.Count | Should -Be 1
-            $Result[0].Key | Should -Be 'SOFTWARE\Microsoft\Windows Defender\MpEngine'
-            $Result[0].Name | Should -Be 'MpFolderScanThreadCount'
+            $Result[0].MpFolderScanThreadCount | Should -Be '4'
+            $Result[0].MpFolderScanThreadCountRegistryKey | Should -Be 'SOFTWARE\Microsoft\Windows Defender\MpEngine'
+        }
+    }
+
+    It 'ConvertTo-XMLGenericPolicy prefers list item names over zero-only data' {
+        InModuleScope GPOZaurr {
+            [xml] $ListValue = @"
+<Value>
+    <Element>
+        <Name>C:\PathOne</Name>
+        <Data>0</Data>
+    </Element>
+    <Element>
+        <Name>D:\PathTwo</Name>
+        <Data>0</Data>
+    </Element>
+</Value>
+"@
+
+            $GPO = [PSCustomObject] @{
+                DisplayName = 'Test Defender GPO'
+                DomainName  = 'contoso.com'
+                GUID        = '11111111-1111-1111-1111-111111111111'
+                GpoType     = 'Computer'
+                Linked      = $true
+                LinksCount  = 1
+                Links       = @('OU=Workstations,DC=contoso,DC=com')
+                DataSet     = @(
+                    [PSCustomObject] @{
+                        Category = 'Windows Components/Microsoft Defender Antivirus/Exclusions'
+                        Name     = 'Path Exclusions'
+                        State    = 'Enabled'
+                        ListBox  = @(
+                            [PSCustomObject] @{
+                                Name  = 'Path Exclusions'
+                                Value = $ListValue.Value
+                            }
+                        )
+                    }
+                )
+            }
+
+            $Result = ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'Windows Components/Microsoft Defender Antivirus*'
+            $Result.PathExclusionsPathExclusions | Should -Match 'C:\\PathOne'
+            $Result.PathExclusionsPathExclusions | Should -Match 'D:\\PathTwo'
+            $Result.PathExclusionsPathExclusions | Should -Not -Be '0; 0'
         }
     }
 }
