@@ -287,6 +287,39 @@
             }
         }
     }
+    if ($Output['Reports']['WindowsDefender']) {
+        # Defender can be represented by policy categories and raw registry settings.
+        # Merge entries per GPO so fallback fields do not create duplicated-looking rows.
+        $MergedWindowsDefender = [System.Collections.Generic.List[PSCustomObject]]::new()
+        $GroupedWindowsDefender = $Output['Reports']['WindowsDefender'] | Group-Object -Property DisplayName, DomainName, GUID, GpoType
+        foreach ($Group in $GroupedWindowsDefender) {
+            $MergedObject = [ordered] @{}
+            foreach ($Entry in $Group.Group) {
+                foreach ($Property in $Entry.PSObject.Properties) {
+                    if (-not $MergedObject.Contains($Property.Name)) {
+                        $MergedObject[$Property.Name] = $Property.Value
+                    } else {
+                        $CurrentValue = $MergedObject[$Property.Name]
+                        $CurrentEmpty = $null -eq $CurrentValue -or ($CurrentValue -is [string] -and $CurrentValue -eq '')
+                        $NewEmpty = $null -eq $Property.Value -or ($Property.Value -is [string] -and $Property.Value -eq '')
+                        if ($CurrentEmpty -and -not $NewEmpty) {
+                            $MergedObject[$Property.Name] = $Property.Value
+                        } elseif (-not $CurrentEmpty -and -not $NewEmpty -and "$CurrentValue" -ne "$($Property.Value)") {
+                            $PropertyCounter = 2
+                            $AlternativeName = -join ($Property.Name, "$PropertyCounter")
+                            while ($MergedObject.Contains($AlternativeName)) {
+                                $PropertyCounter++
+                                $AlternativeName = -join ($Property.Name, "$PropertyCounter")
+                            }
+                            $MergedObject[$AlternativeName] = $Property.Value
+                        }
+                    }
+                }
+            }
+            $MergedWindowsDefender.Add([PSCustomObject] $MergedObject)
+        }
+        $Output['Reports']['WindowsDefender'] = $MergedWindowsDefender
+    }
     # Normalize - meaning that before we return each GPO report we make sure that each entry has the same column names regardless which one is first.
     # Normally if you would have a GPO with just 2 entries for given subject (say LAPS), and then another GPO having 5 settings for the same type
     # and you would display them one after another - all entries would be shown using first object which has less properties then 2nd or 3rd object

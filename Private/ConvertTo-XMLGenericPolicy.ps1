@@ -92,7 +92,26 @@
 
                             #>
                                         if ($Value.Value.Element) {
-                                            $Settings["$SubName"] = $Value.Value.Element.Data -join '; '
+                                            [Array] $ElementValues = foreach ($Element in @($Value.Value.Element)) {
+                                                if (-not $Element) {
+                                                    continue
+                                                }
+                                                $ElementName = [string] $Element.Name
+                                                $ElementData = [string] $Element.Data
+
+                                                if (-not [string]::IsNullOrWhiteSpace($ElementName) -and ($ElementData -eq '' -or $ElementData -eq '0')) {
+                                                    $ElementName
+                                                } elseif (-not [string]::IsNullOrWhiteSpace($ElementName) -and -not [string]::IsNullOrWhiteSpace($ElementData) -and $ElementName -ne $ElementData) {
+                                                    "$ElementName ($ElementData)"
+                                                } elseif (-not [string]::IsNullOrWhiteSpace($ElementData)) {
+                                                    $ElementData
+                                                } elseif (-not [string]::IsNullOrWhiteSpace($ElementName)) {
+                                                    $ElementName
+                                                }
+                                            }
+                                            if ($ElementValues.Count -gt 0) {
+                                                $Settings["$SubName"] = $ElementValues -join '; '
+                                            }
                                         } elseif ($null -eq $Value.Value.Name) {
                                             # Shouldn't happen but lets see
                                             Write-Verbose "Tracking $Value"
@@ -174,7 +193,26 @@
 
                                 #>
                                     if ($Value.Value.Element) {
-                                        $CreateGPO["$SubName"] = $Value.Value.Element.Data -join '; '
+                                        [Array] $ElementValues = foreach ($Element in @($Value.Value.Element)) {
+                                            if (-not $Element) {
+                                                continue
+                                            }
+                                            $ElementName = [string] $Element.Name
+                                            $ElementData = [string] $Element.Data
+
+                                            if (-not [string]::IsNullOrWhiteSpace($ElementName) -and ($ElementData -eq '' -or $ElementData -eq '0')) {
+                                                $ElementName
+                                            } elseif (-not [string]::IsNullOrWhiteSpace($ElementName) -and -not [string]::IsNullOrWhiteSpace($ElementData) -and $ElementName -ne $ElementData) {
+                                                "$ElementName ($ElementData)"
+                                            } elseif (-not [string]::IsNullOrWhiteSpace($ElementData)) {
+                                                $ElementData
+                                            } elseif (-not [string]::IsNullOrWhiteSpace($ElementName)) {
+                                                $ElementName
+                                            }
+                                        }
+                                        if ($ElementValues.Count -gt 0) {
+                                            $CreateGPO["$SubName"] = $ElementValues -join '; '
+                                        }
                                     } elseif ($null -eq $Value.Value.Name) {
                                         # Shouldn't happen but lets see
                                         Write-Verbose "Tracking $Value"
