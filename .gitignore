@@ -6,3 +6,5 @@ ReleasesUnpacked/*
 *.log
 *.html
 Artefacts/*
+WebsiteArtifacts/
+en-US/
