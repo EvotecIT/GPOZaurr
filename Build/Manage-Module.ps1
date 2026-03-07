@@ -1,4 +1,39 @@
-Clear-Host
+[CmdletBinding()]
+param(
+    [switch]$SkipPublish
+)
+
+try {
+    Clear-Host
+} catch {
+    Write-Verbose "Skipping Clear-Host because the current host is non-interactive."
+}
+
+function Import-LocalPSPublishModule {
+    $candidateRoots = @()
+
+    if ($env:POWERFORGE_ROOT) {
+        $candidateRoots += $env:POWERFORGE_ROOT
+    }
+
+    $candidateRoots += [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\PSPublishModule'))
+
+    foreach ($root in $candidateRoots | Select-Object -Unique) {
+        if ([string]::IsNullOrWhiteSpace($root)) {
+            continue
+        }
+
+        $manifestPath = Join-Path $root 'Module\PSPublishModule.psd1'
+        if (Test-Path -LiteralPath $manifestPath -PathType Leaf) {
+            Import-Module $manifestPath -Force -ErrorAction Stop
+            return
+        }
+    }
+
+    Import-Module PSPublishModule -Force -ErrorAction Stop
+}
+
+Import-LocalPSPublishModule
 
 Invoke-ModuleBuild -ModuleName 'GPOZaurr' {
     # Usual defaults as per standard module
@@ -208,7 +243,7 @@ Invoke-ModuleBuild -ModuleName 'GPOZaurr' {
     # when creating PSD1 use special style without comments and with only required parameters
     New-ConfigurationFormat -ApplyTo 'DefaultPSD1', 'OnMergePSD1' -PSD1Style 'Minimal'
     # configuration for documentation, at the same time it enables documentation processing
-    New-ConfigurationDocumentation -Enable:$false -StartClean -UpdateWhenNew -PathReadme 'Docs\Readme.md' -Path 'Docs'
+    New-ConfigurationDocumentation -Enable:$true -StartClean -UpdateWhenNew -SyncExternalHelpToProjectRoot -PathReadme 'Docs\Readme.md' -Path 'Docs'
 
     #New-ConfigurationImportModule -ImportSelf
 
@@ -220,6 +255,8 @@ Invoke-ModuleBuild -ModuleName 'GPOZaurr' {
     New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot\..\Artefacts\Packed" -ArtefactName '<ModuleName>.v<ModuleVersion>.zip' -AddRequiredModules
 
     # options for publishing to github/psgallery
-    #New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true
-    #New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true
+    if (-not $SkipPublish) {
+        New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true
+        New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true
+    }
 } -ExitCode
