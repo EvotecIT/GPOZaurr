@@ -100,6 +100,60 @@ function Get-PlaceholderMatches {
     }
 }
 
+function Write-CommandMetadata {
+    param(
+        [Parameter(Mandatory)]
+        [string]$ModuleManifestPath,
+        [Parameter(Mandatory)]
+        [string]$OutputPath
+    )
+
+    if (-not (Test-Path -LiteralPath $ModuleManifestPath -PathType Leaf)) {
+        return
+    }
+
+    $resolvedManifestPath = [System.IO.Path]::GetFullPath($ModuleManifestPath)
+    Remove-Module -Name $moduleName -Force -ErrorAction SilentlyContinue
+    try {
+        Import-Module $resolvedManifestPath -Force -ErrorAction Stop | Out-Null
+        $allCommands = @(Get-Command -Module $moduleName -ErrorAction Stop)
+        $aliasesByTarget = @{}
+
+        foreach ($aliasCommand in $allCommands | Where-Object CommandType -EQ 'Alias') {
+            $targetName = $aliasCommand.ResolvedCommandName
+            if ([string]::IsNullOrWhiteSpace($targetName)) {
+                continue
+            }
+
+            if (-not $aliasesByTarget.ContainsKey($targetName)) {
+                $aliasesByTarget[$targetName] = [System.Collections.Generic.List[string]]::new()
+            }
+
+            if (-not $aliasesByTarget[$targetName].Contains($aliasCommand.Name)) {
+                $null = $aliasesByTarget[$targetName].Add($aliasCommand.Name)
+            }
+        }
+
+        $commandMetadata = foreach ($command in $allCommands | Where-Object CommandType -In @('Function', 'Cmdlet', 'Filter', 'ExternalScript') | Sort-Object Name) {
+            [ordered]@{
+                name    = $command.Name
+                kind    = if ($command.CommandType -EQ 'Cmdlet') { 'Cmdlet' } else { 'Function' }
+                aliases = @($aliasesByTarget[$command.Name] | Sort-Object -Unique)
+            }
+        }
+
+        $payload = [ordered]@{
+            moduleName  = $moduleName
+            generatedAt = (Get-Date).ToString('o')
+            commands    = @($commandMetadata)
+        }
+
+        $payload | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $OutputPath -Encoding UTF8
+    } finally {
+        Remove-Module -Name $moduleName -Force -ErrorAction SilentlyContinue
+    }
+}
+
 if (-not (Get-Command Invoke-ModuleBuild -ErrorAction SilentlyContinue)) {
     Import-LocalPSPublishModule
 }
@@ -143,11 +197,16 @@ if (Test-Path -LiteralPath $apiRoot) {
 New-Item -ItemType Directory -Path $apiRoot -Force | Out-Null
 Copy-Item -LiteralPath $helpPath -Destination (Join-Path $apiRoot "$moduleName-help.xml") -Force
 
+$psd1Path = Join-Path $repoRoot "$moduleName.psd1"
+if (Test-Path -LiteralPath $psd1Path -PathType Leaf) {
+    Copy-Item -LiteralPath $psd1Path -Destination (Join-Path $apiRoot "$moduleName.psd1") -Force
+    Write-CommandMetadata -ModuleManifestPath $psd1Path -OutputPath (Join-Path $apiRoot 'command-metadata.json')
+}
+
 if (Test-Path -LiteralPath $examplesSource -PathType Container) {
     Copy-Item -LiteralPath $examplesSource -Destination $examplesTarget -Recurse -Force
 }
 
-$psd1Path = Join-Path $repoRoot "$moduleName.psd1"
 $version = $null
 if (Test-Path -LiteralPath $psd1Path -PathType Leaf) {
     $version = (Import-PowerShellDataFile -Path $psd1Path).ModuleVersion.ToString()
