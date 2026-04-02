@@ -56,7 +56,7 @@
         [System.Collections.IDictionary] $ADAdministrativeGroups
     )
     if (-not $ADAdministrativeGroups) {
-        $ADAdministrativeGroups = Get-ADADministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
+        $ADAdministrativeGroups = Get-ADAdministrativeGroups -Type DomainAdmins, EnterpriseAdmins -Forest $Forest -IncludeDomains $IncludeDomains -ExcludeDomains $ExcludeDomains -ExtendedForestInformation $ExtendedForestInformation
     }
     $AdministrativeExists = [ordered] @{
         DisplayName      = $GPOPermissions[0].DisplayName
