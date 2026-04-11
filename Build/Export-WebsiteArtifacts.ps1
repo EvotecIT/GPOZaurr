@@ -238,7 +238,7 @@ $manifest = [ordered]@{
     artifacts = [ordered]@{
         api = 'WebsiteArtifacts/apidocs'
         docs = 'Website/content/project-docs'
-        examples = 'content/examples'
+        examples = 'Website/content/examples'
     }
 }
 
