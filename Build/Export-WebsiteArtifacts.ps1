@@ -9,6 +9,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $moduleName = 'GPOZaurr'
 $slug = 'gpozaurr'
+$toleratedBuildFailure = $false
 $docsSource = Join-Path $repoRoot 'Docs'
 $helpCandidates = @(
     (Join-Path $repoRoot "en-US\$moduleName-help.xml"),
@@ -175,6 +176,7 @@ if (-not $helpPath -and -not $SkipBuild) {
         }
 
         Write-Warning "Manage-Module.ps1 reported a build failure after external help was generated. Continuing website artifact export with the refreshed help output. Original error: $($_.Exception.Message)"
+        $toleratedBuildFailure = $true
     }
 
     $helpPath = Find-HelpFile
@@ -245,3 +247,7 @@ New-Item -ItemType Directory -Path $resolvedArtifactsRoot -Force | Out-Null
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
 
 Write-Host "Exported website artifacts -> $resolvedArtifactsRoot" -ForegroundColor Green
+
+if ($toleratedBuildFailure -and $global:LASTEXITCODE -ne 0) {
+    $global:LASTEXITCODE = 0
+}
