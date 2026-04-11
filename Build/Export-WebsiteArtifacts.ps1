@@ -216,7 +216,7 @@ $commit = (& git -C $repoRoot rev-parse HEAD).Trim()
 $manifest = [ordered]@{
     slug = $slug
     name = $moduleName
-    description = 'GPOZaurr website artifacts for the Evotec multi-project hub.'
+    description = 'GPOZaurr helps inspect, report on, and remediate Group Policy environments with PowerShell.'
     mode = 'hub-full'
     contentMode = 'hybrid'
     status = 'active'
@@ -231,12 +231,12 @@ $manifest = [ordered]@{
         docs = $true
         apiPowerShell = $true
         apiDotNet = $false
-        examples = $false
+        examples = $true
     }
     artifacts = [ordered]@{
         api = 'WebsiteArtifacts/apidocs'
         docs = 'Website/content/project-docs'
-        examples = 'Examples'
+        examples = 'content/examples'
     }
 }
 
