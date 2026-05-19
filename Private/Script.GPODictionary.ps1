@@ -494,12 +494,15 @@
                 Settings = 'Policy'
             }
         )
-        GPOPath    = 'Policies -> Administrative Templates -> LAPS'
+        GPOPath    = @(
+            'Policies -> Administrative Templates -> LAPS'
+            'Policies -> Administrative Templates -> System -> LAPS'
+        )
         Code       = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'LAPS'
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'LAPS', 'System/LAPS*'
         }
         CodeSingle = {
-            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'LAPS' -SingleObject
+            ConvertTo-XMLGenericPolicy -GPO $GPO -Category 'LAPS', 'System/LAPS*' -SingleObject
         }
     }
     Lithnet                                         = @{
