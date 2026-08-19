@@ -5,6 +5,17 @@ Describe 'Get-ADAdministrativeGroups domain filtering' {
 
     It 'skips excluded and unreachable domains without indexing missing query servers' {
         InModuleScope GPOZaurr {
+            function Get-ADDomain {
+                param([string] $Server)
+            }
+            function Get-ADGroup {
+                param(
+                    [string] $Filter,
+                    [string] $Server,
+                    [System.Management.Automation.ActionPreference] $ErrorAction
+                )
+            }
+
             Mock Get-WinADForestDetails {
                 [ordered] @{
                     Forest       = [PSCustomObject] @{ Domains = @('root.contoso.com', 'excluded.contoso.com', 'offline.contoso.com') }
