@@ -1,3 +1,9 @@
+param(
+    [Alias('ConfigurationGateMode')]
+    [ValidateSet('Manifest', 'Build', 'Publish')]
+    [string] $RunMode = 'Build'
+)
+
 Build-Module -ModuleName 'GPOZaurr' {
     # Usual defaults as per standard module
     $Manifest = @{
@@ -25,7 +31,8 @@ Build-Module -ModuleName 'GPOZaurr' {
     }
     New-ConfigurationManifest @Manifest
 
-    New-ConfigurationModule -Type RequiredModule -Name 'PSWriteColor', 'PSSharedGoods', 'ADEssentials' -Guid Auto -Version Latest -VersionSource PSGallery
+    New-ConfigurationModule -Type RequiredModule -Name 'PSWriteColor', 'PSSharedGoods' -Guid Auto -Version Latest -VersionSource PSGallery
+    New-ConfigurationModule -Type RequiredModule -Name 'ADEssentials' -Guid Auto -Version 1.0.5 -VersionSource PSGallery
     New-ConfigurationModule -Type RequiredModule -Name "PSWriteHTML" -Guid Auto -Version Latest -VersionSource PSGallery
     #New-ConfigurationModule -Type ExternalModule -Name 'Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Management','Microsoft.PowerShell.Security'
     New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword', 'ADEssentials'
@@ -203,7 +210,7 @@ Build-Module -ModuleName 'GPOZaurr' {
 
     #New-ConfigurationImportModule -ImportSelf
 
-    New-ConfigurationBuild -Enable:$true -SignModule -MergeModuleOnBuild -MergeFunctionsFromApprovedModules -CertificateThumbprint '483292C9E317AA13B07BB7A96AE9D1A5ED9E7703'
+    New-ConfigurationBuild -Enable:$true -SignModule -MergeModuleOnBuild -MergeFunctionsFromApprovedModules -CertificateThumbprint '92E95FB58EFFA6A4A75E77A33CDD6BFE6DD30F1A'
 
     # New-ConfigurationTest -TestsPath "$PSScriptRoot\..\Tests" -Enable
 
@@ -212,7 +219,9 @@ Build-Module -ModuleName 'GPOZaurr' {
 
     # options for publishing to github/psgallery
 
-    #New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true -UseAsDependencyVersionSource
-    #New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true -GenerateReleaseNotes
+    New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true -UseAsDependencyVersionSource
+    New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true -GenerateReleaseNotes
+
+    New-ConfigurationGate -Mode $RunMode
 
 } -ExitCode
