@@ -43,14 +43,14 @@ Provide a date from which to start the search, by default the last X days are us
 ```yaml
 Type: DateTime
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -DateProperty
@@ -59,14 +59,14 @@ Choose a date property. It can be WhenCreated or WhenChanged or both. By default
 ```yaml
 Type: String[]
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values: WhenCreated, WhenChanged
 
 Required: False
 Position: named
 Default value: WhenCreated
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -DateRange
@@ -75,14 +75,14 @@ Provide a date range to search for, by default the last X days are used
 ```yaml
 Type: String
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values: PastHour, CurrentHour, PastDay, CurrentDay, PastMonth, CurrentMonth, PastQuarter, CurrentQuarter, Last14Days, Last21Days, Last30Days, Last7Days, Last3Days, Last1Days
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -DateTo
@@ -91,14 +91,14 @@ Provide a date to which to end the search, by default the last X days are used
 ```yaml
 Type: DateTime
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
@@ -107,14 +107,14 @@ Exclude domain from search, by default whole forest is scanned
 ```yaml
 Type: String[]
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -123,14 +123,14 @@ Ability to provide Forest Information from another command to speed up processin
 ```yaml
 Type: IDictionary
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -146,7 +146,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOGuid
@@ -162,7 +162,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOName
@@ -171,14 +171,14 @@ Provide GPO name to search for. By default command returns all GPOs
 ```yaml
 Type: String
 Parameter Sets: GPOName
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -194,7 +194,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

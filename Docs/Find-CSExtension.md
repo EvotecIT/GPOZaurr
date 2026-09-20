@@ -41,14 +41,14 @@ Specifies the name of the computer from which to retrieve the CSE information.
 ```yaml
 Type: String
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 1
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -CSE
@@ -57,14 +57,14 @@ Specifies an array of CSE names to filter the results. If not provided, all CSEs
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 0
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

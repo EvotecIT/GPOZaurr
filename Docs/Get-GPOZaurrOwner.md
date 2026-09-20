@@ -49,14 +49,14 @@ Ability to provide AD Administrative Groups from another command to speed up pro
 ```yaml
 Type: IDictionary
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ApprovedOwner
@@ -72,7 +72,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
@@ -81,14 +81,14 @@ Exclude domain from search, by default whole forest is scanned
 ```yaml
 Type: String[]
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -97,14 +97,14 @@ Ability to provide Forest Information from another command to speed up processin
 ```yaml
 Type: IDictionary
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -120,7 +120,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOGuid
@@ -136,7 +136,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOName
@@ -145,14 +145,14 @@ Name of GPO. By default all GPOs are returned
 ```yaml
 Type: String
 Parameter Sets: GPOName
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -168,7 +168,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeSysvol
@@ -177,14 +177,14 @@ Includes Owner from SYSVOL as well
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -SkipBroken
@@ -193,14 +193,14 @@ Doesn't display GPOs that have no SYSVOL content (orphaned GPOs)
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

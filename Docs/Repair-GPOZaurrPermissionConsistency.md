@@ -51,14 +51,14 @@ Specifies an array of domains to exclude from the repair process.
 ```yaml
 Type: String[]
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -67,14 +67,14 @@ Specifies additional information about the forest.
 ```yaml
 Type: IDictionary
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -90,7 +90,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOGuid
@@ -106,7 +106,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOName
@@ -115,14 +115,14 @@ Specifies the name of the GPO to repair.
 ```yaml
 Type: String
 Parameter Sets: GPOName
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -138,7 +138,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -LimitProcessing
@@ -147,14 +147,14 @@ Specifies the maximum number of GPOs to process.
 ```yaml
 Type: Int32
 Parameter Sets: Default, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: 2147483647
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

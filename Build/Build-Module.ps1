@@ -33,6 +33,7 @@ Build-Module -ModuleName 'GPOZaurr' {
 
     New-ConfigurationModule -Type RequiredModule -Name 'PSWriteColor', 'PSSharedGoods' -Guid Auto -Version Latest -VersionSource PSGallery
     New-ConfigurationModule -Type RequiredModule -Name 'ADEssentials' -Guid Auto -Version 1.0.5 -VersionSource PSGallery
+    New-ConfigurationModule -Type RequiredModule -Name 'PSEventViewer' -Guid Auto -Version 4.0.0 -VersionSource PSGallery
     New-ConfigurationModule -Type RequiredModule -Name "PSWriteHTML" -Guid Auto -Version Latest -VersionSource PSGallery
     #New-ConfigurationModule -Type ExternalModule -Name 'Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Management','Microsoft.PowerShell.Security'
     New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword', 'ADEssentials'
@@ -214,8 +215,8 @@ Build-Module -ModuleName 'GPOZaurr' {
 
     # New-ConfigurationTest -TestsPath "$PSScriptRoot\..\Tests" -Enable
 
-    New-ConfigurationArtefact -Type Unpacked -Enable -Path "$PSScriptRoot\..\Artefacts\Unpacked" -AddRequiredModules
-    New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot\..\Artefacts\Packed" -ArtefactName '<ModuleName>.v<ModuleVersion>.zip' -AddRequiredModules
+    New-ConfigurationArtefact -Type Unpacked -Enable -Path "$PSScriptRoot\..\Artefacts\Unpacked" -AddRequiredModules -RequiredModulesSource Download -RequiredModulesTool PowerShellGet -RequiredModulesRepository PSGallery
+    New-ConfigurationArtefact -Type Packed -Enable -Path "$PSScriptRoot\..\Artefacts\Packed" -ArtefactName '<ModuleName>.v<ModuleVersion>.zip' -AddRequiredModules -RequiredModulesSource Download -RequiredModulesTool PowerShellGet -RequiredModulesRepository PSGallery
 
     # options for publishing to github/psgallery
 

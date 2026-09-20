@@ -34,14 +34,14 @@ Specifies an array of domains to exclude from processing.
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 1
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludeOrganizationalUnit
@@ -57,7 +57,7 @@ Required: False
 Position: 5
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -66,14 +66,14 @@ Specifies additional information about the forest.
 ```yaml
 Type: IDictionary
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 3
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -89,7 +89,7 @@ Required: False
 Position: 0
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -105,7 +105,7 @@ Required: False
 Position: 2
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Option
@@ -114,14 +114,14 @@ Specifies the action to perform on the retrieved data. Valid values are 'OK', 'U
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values: OK, Unlink, Delete
 
 Required: False
 Position: 4
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

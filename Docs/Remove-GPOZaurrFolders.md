@@ -34,14 +34,14 @@ Indicates whether the backup path should include a timestamp.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -BackupPath
@@ -50,14 +50,14 @@ The path where the GPOZaurr folders will be backed up.
 ```yaml
 Type: String
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 0
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
@@ -66,14 +66,14 @@ Specifies domains to exclude from processing.
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 6
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -82,14 +82,14 @@ Specifies additional forest information.
 ```yaml
 Type: IDictionary
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 8
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -FolderName
@@ -98,14 +98,14 @@ Specifies the name of the folder to remove.
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 3
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -FolderType
@@ -114,14 +114,14 @@ Specifies the type of folders to remove. Options are 'NTFRS' or 'Empty'.
 ```yaml
 Type: String
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values: NTFRS, Empty
 
 Required: True
 Position: 2
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -137,7 +137,7 @@ Required: False
 Position: 5
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -153,7 +153,7 @@ Required: False
 Position: 7
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -LimitProcessing
@@ -162,14 +162,14 @@ Limits the number of folders to process.
 ```yaml
 Type: Int32
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 4
 Default value: 2147483647
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Type
@@ -178,14 +178,14 @@ Specifies the type of folders to remove. Options are 'All', 'Netlogon', or 'Sysv
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values: All, Netlogon, Sysvol
 
 Required: False
 Position: 1
 Default value: All
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

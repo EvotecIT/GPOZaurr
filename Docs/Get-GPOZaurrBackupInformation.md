@@ -43,14 +43,14 @@ Specifies the path(s) to the folder containing GPOZaurr manifest files.
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 0
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

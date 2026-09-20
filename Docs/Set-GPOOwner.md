@@ -38,14 +38,14 @@ Choose Owner Name to set for Group Policy
 ```yaml
 Type: String
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 1
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Type
@@ -54,14 +54,14 @@ Choose Owner Type. When chosing Administrative Type, owner will be set to Domain
 ```yaml
 Type: String
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values: Administrative, Default
 
 Required: False
 Position: 0
 Default value: Default
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

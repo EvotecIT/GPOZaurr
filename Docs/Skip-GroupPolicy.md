@@ -50,18 +50,18 @@ Define DomainName where Group Policy is located. Otherwise each domain will be c
 ```yaml
 Type: String
 Parameter Sets: Name, Guid
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GUID
-{{ Fill GUID Description }}
+Specifies a value for guid.
 
 ```yaml
 Type: String
@@ -73,7 +73,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Name
@@ -89,7 +89,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

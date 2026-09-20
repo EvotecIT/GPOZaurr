@@ -51,14 +51,14 @@ Specifies an array of domains to exclude from the search.
 ```yaml
 Type: String[]
 Parameter Sets: Type, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -67,14 +67,14 @@ Specifies additional information about the forest.
 ```yaml
 Type: IDictionary
 Parameter Sets: Type, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -90,7 +90,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOGuid
@@ -106,7 +106,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOName
@@ -115,14 +115,14 @@ Specifies the name of the GPO to retrieve.
 ```yaml
 Type: String
 Parameter Sets: GPOName
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -138,7 +138,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeGPOObject
@@ -147,14 +147,14 @@ Indicates whether to include the GPO object in the output.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Type, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Type
@@ -163,14 +163,14 @@ Specifies the type of consistency to check. Valid values are 'Consistent', 'Inco
 ```yaml
 Type: String[]
 Parameter Sets: Type
-Aliases:
+Aliases: None
 Possible values: Consistent, Inconsistent, All
 
 Required: False
 Position: named
 Default value: All
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -VerifyInheritance
@@ -179,14 +179,14 @@ Indicates whether to verify inheritance of permissions.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Type, GPOName, GPOGUID
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

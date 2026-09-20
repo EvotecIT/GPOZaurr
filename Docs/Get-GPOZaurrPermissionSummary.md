@@ -39,14 +39,14 @@ Specifies domains to exclude from the search.
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 5
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludePermissionType
@@ -55,14 +55,14 @@ Specifies the permission types to exclude from the summary.
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values: GpoApply, GpoEdit, GpoCustom, GpoEditDeleteModifySecurity, GpoRead, GpoOwner, GpoRootCreate, GpoRootOwner
 
 Required: False
 Position: 3
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -71,14 +71,14 @@ Provides additional forest information to speed up processing.
 ```yaml
 Type: IDictionary
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 7
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -94,7 +94,7 @@ Required: False
 Position: 4
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -110,7 +110,7 @@ Required: False
 Position: 6
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludePermissionType
@@ -119,14 +119,14 @@ Specifies the permission types to include in the summary.
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values: GpoApply, GpoEdit, GpoCustom, GpoEditDeleteModifySecurity, GpoRead, GpoOwner, GpoRootCreate, GpoRootOwner
 
 Required: False
 Position: 2
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -PermitType
@@ -135,14 +135,14 @@ Specifies the type of permission to permit. Options include 'Allow', 'Deny', and
 ```yaml
 Type: String
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values: Allow, Deny, All
 
 Required: False
 Position: 1
 Default value: All
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Separator
@@ -151,14 +151,14 @@ Specifies the separator to use in the output.
 ```yaml
 Type: String
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 8
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Type
@@ -167,14 +167,14 @@ Specifies the type of permissions to include. Options include 'AuthenticatedUser
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values: AuthenticatedUsers, DomainComputers, Unknown, WellKnownAdministrative, NotWellKnown, NotWellKnownAdministrative, NotAdministrative, Administrative, All
 
 Required: False
 Position: 0
 Default value: All
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

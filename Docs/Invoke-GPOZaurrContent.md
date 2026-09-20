@@ -53,14 +53,14 @@ Indicates whether to retrieve only categories.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
@@ -69,30 +69,30 @@ Specifies an array of domains to exclude from the search.
 ```yaml
 Type: String[]
 Parameter Sets: Default
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Extended
-{{ Fill Extended Description }}
+Specifies the extended switch.
 
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -101,14 +101,14 @@ Specifies additional information about the forest.
 ```yaml
 Type: IDictionary
 Parameter Sets: Default
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -124,7 +124,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -FullObjects
@@ -133,34 +133,34 @@ Indicates whether to retrieve full objects.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOGUID
-{{ Fill GPOGUID Description }}
+Specifies one or more values for gpoguid.
 
 ```yaml
 Type: String[]
 Parameter Sets: Default
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOName
-{{ Fill GPOName Description }}
+Specifies one or more values for gpo name.
 
 ```yaml
 Type: String[]
@@ -172,7 +172,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOPath
@@ -181,14 +181,14 @@ Specifies the path to a specific Group Policy Object.
 ```yaml
 Type: String
 Parameter Sets: Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -204,7 +204,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Online
@@ -213,14 +213,14 @@ Indicates whether to retrieve information online.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Open
@@ -229,14 +229,14 @@ Indicates whether to open the output after retrieval.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -OutputPath
@@ -245,14 +245,14 @@ Specifies the path to save the output.
 ```yaml
 Type: String
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -OutputType
@@ -261,14 +261,14 @@ Specifies the type of output (HTML or Object).
 ```yaml
 Type: String[]
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values: HTML, Object
 
 Required: False
 Position: named
 Default value: Object
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -SingleObject
@@ -277,30 +277,30 @@ Indicates whether to retrieve a single object.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -SkipCleanup
-{{ Fill SkipCleanup Description }}
+Specifies the skip cleanup switch.
 
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -SkipNormalize
@@ -309,14 +309,14 @@ Indicates whether to skip normalization.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Splitter
@@ -325,14 +325,14 @@ Specifies the delimiter to use for splitting information.
 ```yaml
 Type: String
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: [System.Environment]::NewLine
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Type
@@ -341,14 +341,14 @@ Specifies the type of information to retrieve.
 ```yaml
 Type: String[]
 Parameter Sets: Default, Local
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

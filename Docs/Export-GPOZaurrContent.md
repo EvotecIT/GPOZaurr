@@ -41,7 +41,7 @@ Required: True
 Position: 0
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ReportType
@@ -50,14 +50,14 @@ Specifies the type of report to generate. Valid values are XML or HTML. The defa
 ```yaml
 Type: String
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values: XML, HTML
 
 Required: False
 Position: 1
 Default value: XML
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

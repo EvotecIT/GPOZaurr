@@ -41,14 +41,14 @@ Specifies an array of Client-side Extension (CSE) GUIDs to be converted to names
 ```yaml
 Type: String[]
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 0
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Limited
@@ -57,14 +57,14 @@ Indicates whether the conversion should be limited to a predefined set of CSE GU
 ```yaml
 Type: SwitchParameter
 Parameter Sets: __AllParameterSets
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

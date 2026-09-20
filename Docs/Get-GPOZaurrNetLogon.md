@@ -58,14 +58,14 @@ Specifies an array of domains to exclude from GPO retrieval.
 ```yaml
 Type: String[]
 Parameter Sets: Default, OwnerOnly, SkipOwner
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -74,14 +74,14 @@ Specifies additional forest information to include in the output.
 ```yaml
 Type: IDictionary
 Parameter Sets: Default, OwnerOnly, SkipOwner
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -97,7 +97,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -113,7 +113,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -OwnerOnly
@@ -122,14 +122,14 @@ Specifies whether to include only GPOs with identified owners.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: OwnerOnly
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -SkipOwner
@@ -138,14 +138,14 @@ Specifies whether to skip checking the owner of GPOs.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: SkipOwner
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

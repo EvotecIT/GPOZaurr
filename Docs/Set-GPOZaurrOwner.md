@@ -33,23 +33,23 @@ PS > Set-GPOZaurrOwner -Type All -Verbose -WhatIf -LimitProcessing 2
 ## PARAMETERS
 
 ### -Action
-{{ Fill Action Description }}
+Specifies a value for action.
 
 ```yaml
 Type: String
 Parameter Sets: Type, Named
-Aliases:
+Aliases: None
 Possible values: OnlyAD, OnlyFileSystem
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ApprovedOwner
-{{ Fill ApprovedOwner Description }}
+Specifies one or more values for approved owner.
 
 ```yaml
 Type: String[]
@@ -61,7 +61,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
@@ -70,14 +70,14 @@ Exclude domain from search, by default whole forest is scanned
 ```yaml
 Type: String[]
 Parameter Sets: Type, Named
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -86,14 +86,14 @@ Ability to provide Forest Information from another command to speed up processin
 ```yaml
 Type: IDictionary
 Parameter Sets: Type, Named
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Force
@@ -102,14 +102,14 @@ Pushes new owner regardless if it's already set or not
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Type, Named
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -125,7 +125,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOGuid
@@ -141,7 +141,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOName
@@ -150,14 +150,14 @@ Name of GPO. By default all GPOs are targetted
 ```yaml
 Type: String
 Parameter Sets: Named
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -173,7 +173,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -LimitProcessing
@@ -182,14 +182,14 @@ Allows to specify maximum number of items that will be fixed in a single run. It
 ```yaml
 Type: Int32
 Parameter Sets: Type, Named
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: 2147483647
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Principal
@@ -198,14 +198,14 @@ Parameter description
 ```yaml
 Type: String
 Parameter Sets: Type, Named
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -SkipSysvol
@@ -214,14 +214,14 @@ Set GPO Owner only in Active Directory. By default GPO Owner is being set in bot
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Type, Named
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Type
@@ -234,14 +234,14 @@ All - if Owner is known it checks if it's Administrative, if it sn't it fixes th
 ```yaml
 Type: String
 Parameter Sets: Type
-Aliases:
+Aliases: None
 Possible values: Unknown, NotAdministrative, NotMatching, Inconsistent, All
 
 Required: True
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

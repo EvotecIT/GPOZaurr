@@ -60,30 +60,30 @@ Specifies the Active Directory object(s) to search for GPO links.
 ```yaml
 Type: ADObject[]
 Parameter Sets: ADObject
-Aliases:
+Aliases: None
 Possible values:
 
 Required: True
 Position: named
 Default value: None
 Accept pipeline input: True (ByValue, ByPropertyName)
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -AsHashTable
-{{ Fill AsHashTable Description }}
+Specifies the as hash table switch.
 
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Linked, ADObject, Filter, Site
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
@@ -92,30 +92,30 @@ Specifies the domains to exclude from the search.
 ```yaml
 Type: String[]
 Parameter Sets: Linked, ADObject, Filter, Site
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
-{{ Fill ExtendedForestInformation Description }}
+Specifies one or more values for extended forest information.
 
 ```yaml
 Type: IDictionary
 Parameter Sets: Linked, ADObject, Filter, Site
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Filter
@@ -124,14 +124,14 @@ Specifies the filter criteria to search for GPO links.
 ```yaml
 Type: String
 Parameter Sets: Filter
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -147,7 +147,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOCache
@@ -156,14 +156,14 @@ Specifies a cache for storing GPO information.
 ```yaml
 Type: IDictionary
 Parameter Sets: Linked, ADObject, Filter, Site
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -179,7 +179,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Limited
@@ -188,14 +188,14 @@ Indicates whether to limit the search results.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Linked, ADObject, Filter
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Linked
@@ -204,14 +204,14 @@ Specifies the type of linked GPOs to retrieve. Valid values are 'All', 'Root', '
 ```yaml
 Type: String[]
 Parameter Sets: Linked
-Aliases:
+Aliases: None
 Possible values: All, Root, DomainControllers, Site, OrganizationalUnit
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -SearchBase
@@ -220,14 +220,14 @@ Specifies the search base for filtering GPO links.
 ```yaml
 Type: String
 Parameter Sets: Filter
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -SearchScope
@@ -236,14 +236,14 @@ Specifies the search scope for filtering GPO links.
 ```yaml
 Type: ADSearchScope
 Parameter Sets: Filter
-Aliases:
+Aliases: None
 Possible values: Base, OneLevel, Subtree
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Site
@@ -252,14 +252,14 @@ Specifies the site(s) to search for GPO links.
 ```yaml
 Type: String[]
 Parameter Sets: Site
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -SkipDuplicates
@@ -268,30 +268,30 @@ Indicates whether to skip duplicate search results.
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Linked, ADObject, Filter
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Summary
-{{ Fill Summary Description }}
+Specifies the summary switch.
 
 ```yaml
 Type: SwitchParameter
 Parameter Sets: Linked, ADObject, Filter, Site
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters

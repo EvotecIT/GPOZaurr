@@ -47,19 +47,19 @@ PS > Optimize-GPOZaurr -All -WhatIf -Verbose -LimitProcessing 2 {
 ## PARAMETERS
 
 ### -All
-{{ Fill All Description }}
+Specifies the all switch.
 
 ```yaml
 Type: SwitchParameter
 Parameter Sets: All
-Aliases:
+Aliases: None
 Possible values:
 
 Required: True
 Position: named
 Default value: False
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludeDomains
@@ -68,14 +68,14 @@ Exclude domain from search, by default whole forest is scanned
 ```yaml
 Type: String[]
 Parameter Sets: GPOName, GPOGUID, All
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExcludeGroupPolicies
@@ -84,14 +84,14 @@ Provide a list of group policies to skip using Skip-GroupPolicy cmdlet
 ```yaml
 Type: ScriptBlock
 Parameter Sets: GPOName, GPOGUID, All
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: 1
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -ExtendedForestInformation
@@ -100,14 +100,14 @@ Ability to provide Forest Information from another command to speed up processin
 ```yaml
 Type: IDictionary
 Parameter Sets: GPOName, GPOGUID, All
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -Forest
@@ -123,11 +123,11 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOGuid
-{{ Fill GPOGuid Description }}
+Specifies a value for gpo guid.
 
 ```yaml
 Type: String
@@ -139,11 +139,11 @@ Required: True
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -GPOName
-{{ Fill GPOName Description }}
+Specifies a value for gpo name.
 
 ```yaml
 Type: String
@@ -155,7 +155,7 @@ Required: True
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -IncludeDomains
@@ -171,7 +171,7 @@ Required: False
 Position: named
 Default value: None
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### -LimitProcessing
@@ -180,14 +180,14 @@ Allows to specify maximum number of items that will be fixed in a single run. It
 ```yaml
 Type: Int32
 Parameter Sets: GPOName, GPOGUID, All
-Aliases:
+Aliases: None
 Possible values:
 
 Required: False
 Position: named
 Default value: 0
 Accept pipeline input: False
-Accept wildcard characters: True
+Accept wildcard characters: False
 ```
 
 ### CommonParameters
