@@ -2,7 +2,7 @@
 Module Name: GPOZaurr
 Module Guid: f7d4c9e4-0298-4f51-ad77-e8e3febebbde
 Download Help Link: https://github.com/EvotecIT/GPOZaurr
-Help Version: 1.1.12
+Help Version: 1.1.13
 Locale: en-US
 ---
 # GPOZaurr Module
