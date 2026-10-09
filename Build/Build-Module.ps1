@@ -4,7 +4,7 @@ param(
     [string] $RunMode = 'Build'
 )
 
-Import-Module PSPublishModule -MinimumVersion '3.0.161' -Force -ErrorAction Stop
+Import-Module PSPublishModule -MinimumVersion '3.0.162' -Force -ErrorAction Stop
 
 Build-Module -ModuleName 'GPOZaurr' {
     # Usual defaults as per standard module
@@ -33,8 +33,8 @@ Build-Module -ModuleName 'GPOZaurr' {
     }
     New-ConfigurationManifest @Manifest
 
-    New-ConfigurationModule -Type ApprovedModule -Name 'PSWriteColor' -Guid Auto -RequiredVersion '1.0.7' -VersionSource PSGallery
-    New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods' -Guid Auto -RequiredVersion '0.0.313' -VersionSource PSGallery
+    New-ConfigurationModule -Type ApprovedModule -Name 'PSWriteColor' -Guid Auto -Version 'Latest' -VersionSource PSGallery
+    New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods' -Guid Auto -Version 'Latest' -VersionSource PSGallery
     New-ConfigurationModule -Type RequiredModule -Name 'ADEssentials' -Guid Auto -Version 1.0.6 -VersionSource PSGallery
     New-ConfigurationModule -Type RequiredModule -Name 'PSEventViewer' -Guid Auto -Version 4.0.0 -VersionSource PSGallery
     New-ConfigurationModule -Type RequiredModule -Name "PSWriteHTML" -Guid Auto -Version Latest -VersionSource PSGallery
