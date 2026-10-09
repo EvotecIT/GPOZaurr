@@ -1,8 +1,14 @@
 param(
     [Alias('ConfigurationGateMode')]
     [ValidateSet('Manifest', 'Build', 'Publish')]
-    [string] $RunMode = 'Build'
+    [string] $RunMode = 'Build',
+
+    [bool] $SignModule = ($RunMode -eq 'Publish'),
+
+    [bool] $PublishGitHub = $true
 )
+
+Import-Module PSPublishModule -MinimumVersion '3.0.164' -Force -ErrorAction Stop
 
 Build-Module -ModuleName 'GPOZaurr' {
     # Usual defaults as per standard module
@@ -31,12 +37,13 @@ Build-Module -ModuleName 'GPOZaurr' {
     }
     New-ConfigurationManifest @Manifest
 
-    New-ConfigurationModule -Type RequiredModule -Name 'PSWriteColor', 'PSSharedGoods' -Guid Auto -Version Latest -VersionSource PSGallery
-    New-ConfigurationModule -Type RequiredModule -Name 'ADEssentials' -Guid Auto -Version 1.0.5 -VersionSource PSGallery
+    New-ConfigurationModule -Type ApprovedModule -Name 'PSWriteColor' -Guid Auto -Version 'Latest' -VersionSource PSGallery
+    New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods' -Guid Auto -Version 'Latest' -VersionSource PSGallery
+    New-ConfigurationModule -Type RequiredModule -Name 'ADEssentials' -Guid Auto -Version 1.0.7 -VersionSource PSGallery
     New-ConfigurationModule -Type RequiredModule -Name 'PSEventViewer' -Guid Auto -Version 4.0.0 -VersionSource PSGallery
     New-ConfigurationModule -Type RequiredModule -Name "PSWriteHTML" -Guid Auto -Version Latest -VersionSource PSGallery
     #New-ConfigurationModule -Type ExternalModule -Name 'Microsoft.PowerShell.Utility', 'Microsoft.PowerShell.Management','Microsoft.PowerShell.Security'
-    New-ConfigurationModule -Type ApprovedModule -Name 'PSSharedGoods', 'PSWriteColor', 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword', 'ADEssentials'
+    New-ConfigurationModule -Type ApprovedModule -Name 'Connectimo', 'PSUnifi', 'PSWebToolbox', 'PSMyPassword', 'ADEssentials'
     New-ConfigurationModuleSkip -IgnoreModuleName @(
         # this are builtin into PowerShell, so not critical
         'powershellget'
@@ -211,7 +218,7 @@ Build-Module -ModuleName 'GPOZaurr' {
 
     #New-ConfigurationImportModule -ImportSelf
 
-    New-ConfigurationBuild -Enable:$true -SignModule -MergeModuleOnBuild -MergeFunctionsFromApprovedModules -CertificateThumbprint '92E95FB58EFFA6A4A75E77A33CDD6BFE6DD30F1A'
+    New-ConfigurationBuild -Enable:$true -SignModule:$SignModule -MergeModuleOnBuild -MergeFunctionsFromApprovedModules -CertificateThumbprint '92E95FB58EFFA6A4A75E77A33CDD6BFE6DD30F1A'
 
     # New-ConfigurationTest -TestsPath "$PSScriptRoot\..\Tests" -Enable
 
@@ -221,7 +228,9 @@ Build-Module -ModuleName 'GPOZaurr' {
     # options for publishing to github/psgallery
 
     New-ConfigurationPublish -Type PowerShellGallery -FilePath 'C:\Support\Important\PowerShellGalleryAPI.txt' -Enabled:$true -UseAsDependencyVersionSource
-    New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true -GenerateReleaseNotes
+    if ($PublishGitHub) {
+        New-ConfigurationPublish -Type GitHub -FilePath 'C:\Support\Important\GitHubAPI.txt' -UserName 'EvotecIT' -Enabled:$true -GenerateReleaseNotes
+    }
 
     New-ConfigurationGate -Mode $RunMode
 
