@@ -4,7 +4,7 @@ param(
     [string] $RunMode = 'Build'
 )
 
-Import-Module PSPublishModule -MinimumVersion '3.0.162' -Force -ErrorAction Stop
+Import-Module PSPublishModule -MinimumVersion '3.0.163' -Force -ErrorAction Stop
 
 Build-Module -ModuleName 'GPOZaurr' {
     # Usual defaults as per standard module
